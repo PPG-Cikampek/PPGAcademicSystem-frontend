@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "npm run build && node App.js"
+    "start": "node server.js"
   },
   "dependencies": {
     "@iconify-icon/react": "^2.1.0",
@@ -21,6 +21,7 @@
     "chart.js": "^4.4.6",
     "chartjs-to-image": "^1.2.2",
     "date-fns": "^4.1.0",
+    "express": "^4.21.2",
     "file-saver": "^2.0.5",
     "framer-motion": "^11.11.11",
     "html2canvas": "^1.4.1",
