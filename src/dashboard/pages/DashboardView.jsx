@@ -45,19 +45,19 @@ const DashboardView = () => {
                 {error && <ErrorCard error={error} onClear={() => setError(null)} />}
 
                 {!isLoading && dashboardData && (
-                    <div className="flex flex-col md:flex-row flex-wrap justify-between gap-8">
+                    <div className="flex md:flex-row flex-wrap justify-start gap-8">
                         {Object.entries(dashboardData).map(([key, value]) => (
-                            <div key={key} className='card-interactive rounded-md border-0 border-b-4 border-secondary p-8 hover:cursor-default m-0 flex flex-col gap-2 min-h-40 md:min-w-80 max-w-96 flex-grow'>
+                            <div key={key} className='card-interactive rounded-md border-0 border-b-4 border-secondary md:p-8 hover:cursor-default m-0 flex flex-col md:gap-2 min-h-16 min-w-40 md:min-h-40 md:min-w-80 max-w-96 flex-grow'>
 
                                 {key !== 'Kehadiran'
                                     ?
                                     <>
-                                        <h1 className="text-3xl font-bold">{value}</h1>
+                                        <h1 className="text-lg md:text-3xl font-bold">{value}</h1>
                                         <p className="">{key}</p>
                                     </>
                                     : value > 0 ?
                                         <>
-                                            <h1 className="text-3xl font-bold">{value.toFixed(2)}%</h1>
+                                            <h1 className="text-lg md:text-3xl font-bold">{value.toFixed(2)}%</h1>
                                             <p className="">{key}</p>
                                         </>
                                         :

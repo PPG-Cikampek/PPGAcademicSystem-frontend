@@ -4,7 +4,7 @@ import { AuthContext } from '../../Context/auth-context';
 
 import Sidebar from '../Sidebar/Sidebar';
 import Navbar from '../NavBar/Navbar';
-import { GraduationCap, Presentation, Users, House, Gauge, Settings, UserCog, Layers2, FolderCog, CalendarCog, ArrowRightLeft } from 'lucide-react';
+import { GraduationCap, Presentation, Users, House, Gauge, UserRoundPlus, UserCog, Layers2, FolderCog, CalendarCog, ArrowRightLeft } from 'lucide-react';
 
 const DashboardNav = ({ children }) => {
     const auth = useContext(AuthContext)
@@ -89,21 +89,11 @@ const DashboardNav = ({ children }) => {
                 end: true,
                 subOptions: [
                     { link: '/settings/academic', label: 'Tahun Ajaran Kelompok', icon: <CalendarCog /> },
-                    { link: '/settings/transfer-students', label: 'Mutasi dan Pindah Sambung', icon: <ArrowRightLeft /> },
+                    { link: '/settings/transfer-students', label: 'Mutasi & Pindah Sambung', icon: <ArrowRightLeft size={24}/> },
+                    { link: '/settings/requestMember', label: 'Permintaan Akun', icon: <UserRoundPlus /> },
                     // { link: '/settings/more', label: 'Lainnya', icon: <Settings /> },
                 ],
             },
-            // {
-            //     link: '/settings/academic',
-            //     icon: <CalendarCog />,
-            //     label: 'Tahun Ajaran Kelompok',
-            // },
-            // {
-            //     link: '/settings/transfer-students',
-            //     icon: <ArrowRightLeft />,
-            //     label: 'Mutasi dan Pindah Sambung',
-            // },
-
         ];
     }
 

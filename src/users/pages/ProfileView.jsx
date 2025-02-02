@@ -178,7 +178,7 @@ const ProfileView = () => {
 
     return (
         <div className="container mx-auto p-6 max-w-4xl">
-            <div className='card-basic flex flex-col items-stretch mb-12'>
+            <div className='card-basic rounded-md flex flex-col items-stretch mb-12'>
                 <Modal
                     isOpen={modalIsOpen}
                     onClose={() => setModalIsOpen(false)}
@@ -204,6 +204,7 @@ const ProfileView = () => {
 
                     <div className="flex flex-col md:flex-row gap-4 justify-around py-2">
                         <DynamicForm
+                            className={'border-0 ring-0'}
                             customDescription={
                                 <div className='relative'>
                                     <div className=''>

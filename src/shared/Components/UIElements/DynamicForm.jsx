@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 
 import { Icon } from '@iconify-icon/react/dist/iconify.js';
 
-const DynamicForm = ({ logo, title, subtitle, fields = [], onSubmit, button, customDescription, labels = true, footer = true, helpButton }) => {
+const DynamicForm = ({ logo, title, subtitle, fields = [], onSubmit, button, customDescription, labels = true, footer = true, helpButton, className }) => {
     const { register, handleSubmit, formState: { errors }, setValue, trigger } = useForm();
     const [showPassword, setShowPassword] = useState(false);
 
@@ -26,7 +26,7 @@ const DynamicForm = ({ logo, title, subtitle, fields = [], onSubmit, button, cus
     const currentYear = new Date().getFullYear();
 
     return (
-        <div className='card-basic rounded-md items-stretch flex-col m-2'>
+        <div className={`card-basic rounded-md items-stretch flex-col m-2 ${className}`}>
             {/* Header */}
             <div className={`flex flex-col p-2 justify-center items-center ${logo && 'mt-6' || ''}`}>
                 {logo && (<img src={logo} alt="logo" className="size-24 self-center" />)}
