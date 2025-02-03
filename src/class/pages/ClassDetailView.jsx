@@ -319,7 +319,7 @@ const ClassDetailView = () => {
                                     <Users className="mr-2 h-5 w-5 text-gray-600" />
                                     <h2 className="text-xl font-medium text-gray-800">Siswa</h2>
                                 </div>
-                                {classData.class.isLocked === false && (
+                                {auth.userRole === 'admin kelompok' && classData.class.isLocked === false && (
                                     <Link to={`/dashboard/classes/${classId}/add-students/`}>
                                         <button className="button-primary pl-[11px] mt-0">
                                             <PlusIcon className="w-4 h-4 mr-2" />
@@ -358,7 +358,7 @@ const ClassDetailView = () => {
                                                 </td>
                                                 <td className="px-6 py-4 text-sm text-gray-900">{student.nis}</td>
                                                 <td className="px-6 py-4 text-sm text-gray-900">{student.name}</td>
-                                                {classData.class.isLocked === false && classData.class.teachingGroupYearId.academicYearId.isActive === true && (
+                                                {auth.userRole === 'admin kelompok' &&  classData.class.isLocked === false && classData.class.teachingGroupYearId.academicYearId.isActive === true && (
                                                     <td className="flex gap-4 py-4">
                                                         <button
                                                             onClick={(e) => { e.stopPropagation(); removeHandler('student', student.name, student._id); }}

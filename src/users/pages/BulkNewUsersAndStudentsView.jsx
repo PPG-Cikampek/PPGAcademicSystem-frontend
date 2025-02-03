@@ -109,7 +109,7 @@ const BulkNewUsersAndStudentsView = () => {
 
             <DynamicForm
                 title='Tambah Akun Peserta Didik'
-                subtitle={'Sistem Absensi Digital'}
+                subtitle={'Sistem Akademik Digital'}
                 fields={bulkCreateFields || [
                     { name: 'count', label: 'Jumlah Akun', placeholder: '0', type: 'text', required: true },
                     { name: 'teachingGroupName', label: 'Kelompok', placeholder: 'Kelompok', type: 'text', required: true },

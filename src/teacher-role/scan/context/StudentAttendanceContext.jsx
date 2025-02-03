@@ -48,6 +48,15 @@ const reducer = (state, action) => {
                         : student
                 ),
             };
+        case 'SET_NOTES':
+            return {
+                ...state,
+                studentList: state.studentList.map(student =>
+                    student.studentId.nis === action.payload.id
+                        ? { ...student, teachersNotes: action.payload.notes }
+                        : student
+                ),
+            };
         case 'SET_VIOLATIONS':
             return {
                 ...state,

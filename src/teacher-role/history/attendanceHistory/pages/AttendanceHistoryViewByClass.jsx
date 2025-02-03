@@ -41,7 +41,7 @@ const AttendanceHistoryViewByClass = () => {
 
     const editAttendanceHandler = (attendanceId) => {
         console.log('edit attendance', attendanceId);
-        navigate(`/attendance/history/class/edit-confirmation/${attendanceId}`)
+        navigate(`/attendance/history/class/${classId}/${attendanceId}/edit`)
     }
 
     const deleteAttendanceHandler = (studentName, attendanceId) => {
@@ -138,7 +138,6 @@ const AttendanceHistoryViewByClass = () => {
 
             {error && <ErrorCard error={error} onClear={() => setError(null)} />}
 
-
             {expandedDates.length > 1 && dateCount > 1 && (
                 <motion.button
                     initial={{ opacity: 0, y: -20 }}
@@ -209,13 +208,19 @@ const AttendanceHistoryViewByClass = () => {
                                                         {new Date().toLocaleDateString('en-CA') !== new Date(attendance.forDate).toLocaleDateString('en-CA') && (
                                                             <td className="border-t border-gray-300 text-xs flex">
                                                                 <button
-                                                                    onClick={() => editAttendanceHandler(attendance._id)}
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        editAttendanceHandler(attendance._id);
+                                                                    }}
                                                                     className="p-1 rounded-full active:bg-gray-200 text-blue-500 active:text-blue-700 transition duration-300"
                                                                 >
                                                                     <Edit2 size={16} />
                                                                 </button>
                                                                 {/* <button
-                                                                    onClick={() => deleteAttendanceHandler(attendance.studentId.name, attendance._id)}
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        deleteAttendanceHandler(attendance.studentId.name, attendance._id);
+                                                                    }}
                                                                     className="p-1 rounded-full active:bg-gray-200 text-red-500 active:text-red-700 transition duration-300"
                                                                 >
                                                                     <Trash size={16} />
@@ -232,19 +237,6 @@ const AttendanceHistoryViewByClass = () => {
                         </motion.div>
                     ))}
             </AnimatePresence>
-
-            {/* {error && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="px-6 py-6 border border-gray-200 rounded-full bg-white"
-                >
-                    <p className="text-gray-600 italic text-center">
-                        {error}
-                    </p>
-                </motion.div>
-            )} */}
         </div>
     );
 };

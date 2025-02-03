@@ -1,10 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, Controller } from 'react-hook-form';
+import { registerLocale, setDefaultLocale } from 'react-datepicker';
+import id from 'date-fns/locale/id';
 
 import { Icon } from '@iconify-icon/react/dist/iconify.js';
 
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+
+registerLocale('id', id);
+setDefaultLocale('id');
+
 const DynamicForm = ({ logo, title, subtitle, fields = [], onSubmit, button, customDescription, labels = true, footer = true, helpButton, className }) => {
-    const { register, handleSubmit, formState: { errors }, setValue, trigger } = useForm();
+    const { register, handleSubmit, control, formState: { errors }, setValue, trigger } = useForm();
     const [showPassword, setShowPassword] = useState(false);
 
     useEffect(() => {
@@ -40,7 +48,7 @@ const DynamicForm = ({ logo, title, subtitle, fields = [], onSubmit, button, cus
                 className=""
             >
                 {Array.isArray(fields) && fields.map((field) => (
-                    <div key={field.name} className="mt-6">
+                    <div key={field.name} className="mt-6 w-full">
                         {labels && field.label && (<label className="block text-gray-700 pb-1">{field.label}</label>)}
                         {field.type === 'textarea' ? (
                             <textarea
@@ -91,19 +99,37 @@ const DynamicForm = ({ logo, title, subtitle, fields = [], onSubmit, button, cus
                                 className={`w-full p-2 mb-1 border rounded-[4px] shadow-sm hover:ring-1 hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 ${field.disabled ? 'bg-gray-200 cursor-not-allowed' : ''}`}
                             />
                         ) : field.type === 'phone' ? (
-                            <input
-                                type="tel"
-                                defaultValue={field.value || ''}
-                                placeholder={field.placeholder || '123-456-7890'}
-                                {...register(field.name, {
-                                    required: field.required,
-                                    // pattern: {
-                                    //     value: /^[0-9]{3}-[0-9]{3}-[0-9]{4}$/,
-                                    //     message: "Enter a valid phone number (123-456-7890)"
-                                    // }
-                                })}
-                                disabled={field.disabled}
-                                className={`w-full p-2 mb-1 border rounded-[4px] shadow-sm hover:ring-1 hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 ${field.disabled ? 'bg-gray-200 cursor-not-allowed' : ''}`}
+                            <div className="relative flex items-center">
+                                <span className="absolute left-0 px-2 text-gray-500 border-r border-gray-300">+62</span>
+                                <input
+                                    type="tel"
+                                    defaultValue={field.value || ''}
+                                    placeholder={field.placeholder || '8123456789'}
+                                    {...register(field.name, {
+                                        required: field.required,
+                                        pattern: {
+                                            value: /^8[1-9][0-9]{6,9}$/,
+                                            message: "Nomor tidak valid! (contoh valid: 8123456789)"
+                                        }
+                                    })}
+                                    disabled={field.disabled}
+                                    className={`w-full pl-12 p-2 mb-1 border rounded-[4px] shadow-sm hover:ring-1 hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 ${field.disabled ? 'bg-gray-200 cursor-not-allowed' : ''}`}
+                                />
+                            </div>
+                        ) : field.type === 'date' ? (
+                            <Controller
+                                name={field.name}
+                                control={control}
+                                defaultValue={field.value || null}
+                                render={({ field: { onChange, value } }) => (
+                                    <DatePicker
+                                        selected={value}
+                                        onChange={onChange}
+                                        className="w-full p-2 border rounded-md shadow-sm hover:ring-1 hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
+                                        dateFormat="dd/MM/yyyy"
+                                        wrapperClassName='w-full'
+                                    />
+                                )}
                             />
                         ) : (
                             <div className="relative">
@@ -132,7 +158,7 @@ const DynamicForm = ({ logo, title, subtitle, fields = [], onSubmit, button, cus
                         )}
                         {errors[field.name] && (
                             <span className="text-danger text-sm">
-                                {field.label} is required
+                                {errors[field.name].message || `${field.label} tidak boleh kosong!`}
                             </span>
                         )}
                     </div>

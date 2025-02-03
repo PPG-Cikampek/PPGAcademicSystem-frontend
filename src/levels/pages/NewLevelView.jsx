@@ -9,7 +9,7 @@ import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 import Modal from '../../shared/Components/UIElements/ModalBottomClose'
 
-import logo from '../../assets/logos/ppgcikampek.png';
+import logo from '../../assets/logos/ppgcikampek.webp';
 import { div } from 'framer-motion/client';
 
 
@@ -125,7 +125,7 @@ const NewLevelView = () => {
                 )}
                 <DynamicForm
                     title={isBranch ? 'Tambah Desa' : 'Tambah Kelompok'}
-                    subtitle={'Sistem Absensi Digital'}
+                    subtitle={'Sistem Akademik Digital'}
                     fields={isBranch ? branchFields : teachingGroupFields}
                     onSubmit={handleFormSubmit}
                     disabled={isLoading}

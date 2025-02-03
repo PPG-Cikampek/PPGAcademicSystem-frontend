@@ -129,7 +129,7 @@ const TeachersView = () => {
                                                 </div>
                                             )}
                                         </td>
-                                        <td className='p-2 md:p-4 '> <div className={`py-2 px-4 text-sm text-center w-min border rounded-md ${teacher.positionEndDate ? 'text-red-500 bg-red-100' : 'text-green-500 bg-green-100'}`}>{teacher.positionEndDate ? 'Tidak Aktif' : 'Aktif'}</div></td>
+                                        <td className='p-2 md:p-4 '> <div className={`py-1 px-2 text-sm text-center w-min border rounded-md ${teacher.positionEndDate ? 'text-red-500 bg-red-100' : 'text-green-500 bg-green-100'}`}>{teacher.positionEndDate ? 'Tidak Aktif' : 'Aktif'}</div></td>
                                         <td className="p-2 md:p-4 text-sm text-gray-900">{teacher.nid}</td>
                                         <td className="p-2 md:p-4 text-sm text-gray-900">{teacher.name}</td>
                                         {auth.userRole === 'admin' && <td className="p-2 md:p-4 text-sm text-gray-500">{teacher?.userId?.teachingGroupId?.branchId?.name}</td>}

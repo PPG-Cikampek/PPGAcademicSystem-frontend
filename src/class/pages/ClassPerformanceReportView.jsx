@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Document, Page, Text, View, pdf, PDFViewer, Image } from '@react-pdf/renderer';
 import { saveAs } from 'file-saver';
 
-import logo from '../../assets/logos/ppgcikampek.png';
+import logo from '../../assets/logos/ppgcikampek.webp';
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 
 import { ArrowDownToLine } from 'lucide-react';

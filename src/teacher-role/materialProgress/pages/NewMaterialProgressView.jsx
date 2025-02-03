@@ -157,7 +157,7 @@ const NewMaterialProgresslView = () => {
             <div className={`pb-24 transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
                 <DynamicForm
                     // title='Pencapaian Materi'
-                    // subtitle={'Sistem Absensi Digital'}
+                    // subtitle={'Sistem Akademik Digital'}
                     subtitle={'Pencapaian Materi'}
                     fields={inputFields || []}
                     onSubmit={handleFormSubmit}

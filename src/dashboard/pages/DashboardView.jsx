@@ -45,9 +45,9 @@ const DashboardView = () => {
                 {error && <ErrorCard error={error} onClear={() => setError(null)} />}
 
                 {!isLoading && dashboardData && (
-                    <div className="flex md:flex-row flex-wrap justify-start gap-8">
+                    <div className="flex md:flex-row flex-wrap justify-between md:justify-start gap-4 md:gap-8">
                         {Object.entries(dashboardData).map(([key, value]) => (
-                            <div key={key} className='card-interactive rounded-md border-0 border-b-4 border-secondary md:p-8 hover:cursor-default m-0 flex flex-col md:gap-2 min-h-16 min-w-40 md:min-h-40 md:min-w-80 max-w-96 flex-grow'>
+                            <div key={key} className='card-interactive rounded-md border-0 border-b-4 border-secondary md:p-8 hover:cursor-default m-0 flex flex-col gap-4 min-h-16 min-w-40 max-w-[10.5rem] md:min-h-40 md:min-w-80 md:max-w-96 flex-grow'>
 
                                 {key !== 'Kehadiran'
                                     ?

@@ -99,7 +99,7 @@ const UpdateAcademicYearView = () => {
 
                 <DynamicForm
                     title={`Aktifkan Tahun Ajaran`}
-                    subtitle={`Sistem Absensi Digital`}
+                    subtitle={`Sistem Akademik Digital`}
                     fields={[
                         { name: 'name', label: 'Nama Tahun Ajaran', type: 'text', required: false, value: loadedAcademicYear?.name || '' },
                     ]}

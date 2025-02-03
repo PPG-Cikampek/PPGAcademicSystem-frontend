@@ -129,7 +129,7 @@ const NewStudentView = () => {
             <div className={`pb-24 transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
                 <DynamicForm
                     title='Tambah Peserta Didik'
-                    subtitle={'Sistem Absensi Digital'}
+                    subtitle={'Sistem Akademik Digital'}
                     fields={signUpFields || [
                         { name: 'name', label: 'Name', placeholder: 'Nama Lengkap', type: 'text', required: true },
                         { name: 'email', label: 'Email', placeholder: 'Email', type: 'email', required: true },

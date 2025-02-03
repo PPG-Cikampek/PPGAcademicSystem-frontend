@@ -35,7 +35,7 @@ const getOverallStats = (data) => {
     return Object.keys(statusCounts).map((status) => ({
         status,
         count: statusCounts[status],
-        percentage: Math.round((statusCounts[status] / total) * 100),
+        percentage: Math.round((statusCounts[status] / total) * 100 * 100) / 100,
     }));
 }
 
@@ -205,7 +205,7 @@ const StatCard = ({ level, title, subtitle, stats, onViewMore, expanded }) => {
     )
 }
 
-const TeachingGroupAdminPerformanceCards = ({ data, initialView, month }) => {
+const TeachingGroupAdminPerformanceCards = ({ data, violationData, initialView, month }) => {
     const [view, setView] = useState(initialView);
     const [selectedClass, setSelectedClass] = useState(null);
     const [showRelativeToTarget, setShowRelativeToTarget] = useState(false);
@@ -214,7 +214,6 @@ const TeachingGroupAdminPerformanceCards = ({ data, initialView, month }) => {
     const auth = useContext(AuthContext)
 
     const navigate = useNavigate()
-
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: {
@@ -420,7 +419,7 @@ const TeachingGroupAdminPerformanceCards = ({ data, initialView, month }) => {
                                     onClick={(e) => e.stopPropagation()} // Prevents triggering parent onClick
                                 >
                                     <motion.div>
-                                        <StudentReportView studentData={student} attendanceData={calculateStats(student.attendances)} noCard={true} />
+                                        <StudentReportView studentData={student} attendanceData={calculateStats(student.attendances)} violationData={violationData} noCard={true} />
                                     </motion.div>
                                 </div>
                             )}
@@ -446,12 +445,12 @@ const TeachingGroupAdminPerformanceCards = ({ data, initialView, month }) => {
 
                 <div className="flex flex-col gap-2">
                     <p>Kalkulasi Berdasarkan: {!showRelativeToTarget ? <strong>Hari berjalan</strong> : <strong>Hari efektif</strong>}</p>
-                    <button
+                    {/* <button
                         onClick={() => setShowRelativeToTarget(!showRelativeToTarget)}
                         className="text-primary px-4 py-2 rounded border border-primary hover:bg-primary hover:text-white transition"
                     >
                         Ubah
-                    </button>
+                    </button> */}
                 </div>
             </div>
 

@@ -3,8 +3,9 @@ import { NavLink } from 'react-router-dom';
 import { SidebarContext } from '../../Context/sidebar-context';
 import { AuthContext } from '../../Context/auth-context';
 import { LogOut } from 'lucide-react';
-import logo from '../../../../assets/logos/ppgcikampek.png';
+import logo from '../../../../assets/logos/ppgcikampek.webp';
 
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const Sidebar = ({ linksList, children }) => {
     const [expandedMenu, setExpandedMenu] = useState(null);
@@ -85,6 +86,11 @@ const Sidebar = ({ linksList, children }) => {
                                                     to={subOption.link}
                                                     // onClick={sidebarHandler}
                                                     className={({ isActive }) => ` flex items-center px-4 py-2 text-sm hover:bg-gray-100 focus:outline-none focus:ring-primary-subtle ${isActive ? 'bg-gray-100 text-primary font-medium' : 'text-gray-800'} `}
+                                                    onClick={() => {
+                                                        if (sidebar.isSidebarOpen && !window.matchMedia('(min-width: 768px)').matches) {
+                                                            sidebarHandler();
+                                                        }
+                                                    }}
                                                 >
                                                     {subOption.icon}
                                                     <span className={`shrink-0 ml-3 text-clip ${sidebar.isSidebarOpen ? 'block' : 'hidden'}`}>{subOption.label}</span>

@@ -8,7 +8,7 @@ import { AuthContext } from '../../shared/Components/Context/auth-context';
 import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 
-import logo from '../../assets/logos/ppgcikampek.png';
+import logo from '../../assets/logos/ppgcikampek.webp';
 import QRScanner from '../components/QRScanner';
 
 const AuthView = () => {
@@ -107,7 +107,7 @@ const AuthView = () => {
                     <DynamicForm
                         logo={logo}
                         title='PPG Cikampek'
-                        subtitle={'Sistem Absensi Digital'}
+                        subtitle={'Sistem Akademik Digital'}
                         fields={loginFields}
                         onSubmit={handleFormSubmit}
                         disabled={isLoading}
@@ -138,7 +138,7 @@ const AuthView = () => {
                     <DynamicForm
                         logo={logo}
                         title='PPG Cikampek'
-                        subtitle={'Sistem Absensi Digital'}
+                        subtitle={'Sistem Akademik Digital'}
                         onSubmit={handleFormSubmit}
                         disabled={isLoading}
                         fields={studentLoginFields}

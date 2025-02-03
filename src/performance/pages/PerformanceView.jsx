@@ -12,6 +12,7 @@ import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 
 import ExperimentalCards from '../components/ExperementalCards';
 import PieChart from '../components/PieChart';
+import { academicYearFormatter } from '../../shared/Utilities/academicYearFormatter';
 
 const PerformanceView = () => {
 
@@ -71,7 +72,7 @@ const PerformanceView = () => {
       return Object.keys(statusCounts).map((status) => ({
         status,
         count: statusCounts[status],
-        percentage: Math.round((statusCounts[status] / total) * 100),
+        percentage: Math.round((statusCounts[status] / total) * 100 * 100) / 100,
       })).sort((a, b) => a.status.localeCompare(b.status));
     };
 
@@ -186,8 +187,10 @@ const PerformanceView = () => {
   };
 
   const selectDateRangeHandler = (dates) => {
-    const [start, end] = dates;
-    if (start && end) {
+    const start = dates;
+    const end = new Date(start);
+    end.setDate(end.getDate() + 6);
+    if (start) {
       setPeriode(start.toLocaleDateString('id-ID', {
         day: '2-digit',
         timeZone: 'Asia/Jakarta'
@@ -245,7 +248,7 @@ const PerformanceView = () => {
                       {!selectedAcademicYear && <option value={''}>Pilih</option>}
                       {academicYearsList && academicYearsList.map((academicYear, index) => (
                         <option key={index} value={academicYear._id}>
-                          {academicYear.name}
+                          {academicYearFormatter(academicYear.name)}
                         </option>
                       ))}
                     </select>
@@ -254,10 +257,9 @@ const PerformanceView = () => {
                       selected={startDate}
                       onChange={selectDateRangeHandler}
                       startDate={startDate}
-                      endDate={endDate}
                       locale={'id-ID'}
-                      selectsRange
                       isClearable
+                      showWeekPicker
                       withPortal={window.innerWidth <= 768}
                       className={`${selectedAcademicYear && 'pr-8'} border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300`}
                       disabled={!selectedAcademicYear}

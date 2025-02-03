@@ -15,7 +15,8 @@ const AttendedStudents = () => {
     const { state, dispatch } = useContext(StudentAttendanceContext);
     const prevStudentList = useRef(state.studentList);
     const { isLoading, error, sendRequest } = useHttp();
-    const [showViolationsMenu, setShowViolationsMenu] = useState({}); // Change to an object to track each student's menu
+    const [showViolationsMenu, setShowViolationsMenu] = useState({});
+    const [showNotesField, setShowNotesField] = useState({});
 
 
     const patchMultipleStudentStatuses = async (updates) => {
@@ -44,7 +45,7 @@ const AttendedStudents = () => {
                     prevStudent.status !== student.status ||
                     prevStudent.attributes !== student.attributes ||
                     prevStudent.violations !== student.violations ||
-                    prevStudent.notes !== student.notes
+                    prevStudent.teachersNotes !== student.teachersNotes
                 )
             ) {
                 changedStatuses.push({
@@ -52,7 +53,7 @@ const AttendedStudents = () => {
                     status: student.status,
                     attributes: student.attributes,
                     violations: student.violations,
-                    notes: student.notes,
+                    teachersNotes: student.teachersNotes,
                     timestamp: student.timestamp,
                 });
             }
@@ -76,6 +77,10 @@ const AttendedStudents = () => {
 
     const handleViolationsChange = (id, violationType) => {
         dispatch({ type: 'SET_VIOLATIONS', payload: { id, violationType } });
+    };
+
+    const handleNotesChange = (id, notes) => {
+        dispatch({ type: 'SET_NOTES', payload: { id, notes } });
     };
 
     const handleCheckboxChange = (id) => {
@@ -105,8 +110,12 @@ const AttendedStudents = () => {
         }
     };
 
-    const toggleMenu = (nis) => {
+    const toggleViolationsMenu = (nis) => {
         setShowViolationsMenu((prev) => ({ ...prev, [nis]: !prev[nis] }));
+    };
+
+    const toggleNotesField = (nis) => {
+        setShowNotesField((prev) => ({ ...prev, [nis]: !prev[nis] }));
     };
 
     return (
@@ -201,7 +210,42 @@ const AttendedStudents = () => {
                                     <button
                                         type="button"
                                         className={`border p-1 px-2 rounded-full active:ring-2 active:ring-blue-300 bg-white flex justify-between items-center ${(student.status === "Sakit" || student.status === "Izin" || student.status === "Tanpa Keterangan") && 'hidden'}`}
-                                        onClick={() => toggleMenu(student.studentId.nis)}
+                                        onClick={() => toggleNotesField(student.studentId.nis)}
+                                    >
+                                        Catatan
+                                        {showNotesField[student.studentId.nis] ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                                    </button>
+                                    <AnimatePresence>
+                                        {showNotesField[student.studentId.nis] && (
+                                            <motion.div
+                                                initial={{ height: 0, opacity: 0 }}
+                                                animate={{ height: "auto", opacity: 1 }}
+                                                exit={{ height: 0, opacity: 0 }}
+                                                transition={{ duration: 0.3, ease: "backInOut" }}
+                                            // className="overflow-hidden bg-white"
+                                            >
+                                                <div className={`mt-2 mr-4 rounded-md bg-white ring-1 ring-black ring-opacity-5`}>
+                                                    <div className="flex flex-col py-2">
+                                                        <div className="px-2 inline-flex items-center">
+                                                            <input
+                                                                type="text"
+                                                                onChange={(e) => handleNotesChange(student.studentId.nis, e.target.value)}
+                                                                value={student.teachersNotes}
+                                                                className={`w-full p-2 mb-1 border rounded-sm shadow-sm hover:ring-1 hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 ${student.status === "Sakit" || student.status === "Izin" || student.status === "Tanpa Keterangan" ? 'bg-gray-200 cursor-not-allowed' : ''}`}
+                                                                disabled={student.status === "Sakit" || student.status === "Izin" || student.status === "Tanpa Keterangan"}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
+                                <div className={`relative w-full`}>
+                                    <button
+                                        type="button"
+                                        className={`border p-1 px-2 rounded-full active:ring-2 active:ring-blue-300 bg-white flex justify-between items-center ${(student.status === "Sakit" || student.status === "Izin" || student.status === "Tanpa Keterangan") && 'hidden'}`}
+                                        onClick={() => toggleViolationsMenu(student.studentId.nis)}
                                     >
                                         Temuan
                                         {showViolationsMenu[student.studentId.nis] ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -213,7 +257,7 @@ const AttendedStudents = () => {
                                                 animate={{ height: "auto", opacity: 1 }}
                                                 exit={{ height: 0, opacity: 0 }}
                                                 transition={{ duration: 0.3, ease: "backInOut" }}
-                                                // className="overflow-hidden bg-white"
+                                            // className="overflow-hidden bg-white"
                                             >
                                                 <div className={`mt-2 mr-4 rounded-md bg-white ring-1 ring-black ring-opacity-5`}>
                                                     <div className="flex flex-col py-2">
@@ -277,6 +321,7 @@ const AttendedStudents = () => {
                                         )}
                                     </AnimatePresence>
                                 </div>
+
                             </div>
                         </div>
                     </div>

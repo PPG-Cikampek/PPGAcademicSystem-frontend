@@ -176,7 +176,7 @@ const NewUserView = () => {
                 </div>
                 <DynamicForm
                     title={isAccountForAdmin ? 'Tambah Akun Admin' : 'Tambah Akun Guru'}
-                    subtitle={'Sistem Absensi Digital'}
+                    subtitle={'Sistem Akademik Digital'}
                     fields={adminFields || [
                         { name: 'name', label: 'Name', placeholder: 'Nama Lengkap', type: 'text', required: true },
                         { name: 'email', label: 'Email', placeholder: 'Email', type: 'email', required: true },

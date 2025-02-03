@@ -13,6 +13,7 @@ import PieChart from '../components/PieChart';
 import TeachingGroupAdminPerformanceCards from '../components/TeachingGroupAdminPerformanceCards';
 
 import { useReactToPrint } from 'react-to-print';
+import { academicYearFormatter } from '../../shared/Utilities/academicYearFormatter';
 
 const TeachingGroupPerformanceView = () => {
 
@@ -94,7 +95,7 @@ const TeachingGroupPerformanceView = () => {
       return Object.keys(statusCounts).map((status) => ({
         status,
         count: statusCounts[status],
-        percentage: Math.round((statusCounts[status] / total) * 100),
+        percentage: Math.round((statusCounts[status] / total) * 100 * 100) / 100,
       })).sort((a, b) => a.status.localeCompare(b.status));
     };
 
@@ -225,7 +226,7 @@ const TeachingGroupPerformanceView = () => {
                 )}
                 {overallAttendances && !isLoading && selectedAcademicYear && (<button className='button-primary m-0 self-center' onClick={() => handlePrint()}>Print ke PDF</button>)}
               </div>
-              
+
               <div className="flex flex-col md:flex-row justify-between gap-4">
 
                 <div className="flex flex-col gap-5">
@@ -246,7 +247,7 @@ const TeachingGroupPerformanceView = () => {
                         {!selectedAcademicYear && <option value={''}>Pilih</option>}
                         {academicYearsList && academicYearsList.map((academicYear, index) => (
                           <option key={index} value={academicYear._id}>
-                            {academicYear.name}
+                            {academicYearFormatter(academicYear.name)}
                           </option>
                         ))}
                       </select>
@@ -311,8 +312,8 @@ const TeachingGroupPerformanceView = () => {
               </div>
             </div>
           )}
-          {attendanceData && !isLoading && selectedAcademicYear && (
-            <TeachingGroupAdminPerformanceCards data={attendanceData} initialView={'classes'} month={periode} />
+          {violationData && attendanceData && !isLoading && selectedAcademicYear && (
+            <TeachingGroupAdminPerformanceCards data={attendanceData} violationData={violationData} initialView={'classes'} month={periode} />
           )}
         </main>
       </div>

@@ -11,6 +11,7 @@ import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 
 import PieChart from '../components/PieChart';
 import TeachingGroupAdminPerformanceCards from '../components/TeachingGroupAdminPerformanceCards';
+import { academicYearFormatter } from '../../shared/Utilities/academicYearFormatter';
 
 const TeacherPerformanceView = () => {
 
@@ -64,7 +65,7 @@ const TeacherPerformanceView = () => {
             return Object.keys(statusCounts).map((status) => ({
                 status,
                 count: statusCounts[status],
-                percentage: Math.round((statusCounts[status] / total) * 100),
+                percentage: Math.round((statusCounts[status] / total) * 100 * 100) / 100,
             })).sort((a, b) => a.status.localeCompare(b.status));
         };
 
@@ -118,7 +119,6 @@ const TeacherPerformanceView = () => {
         registerLocale("id-ID", idID);
         fetchAcademicYears();
         fetchAttendanceData();
-        setPeriode("Semua")
     }, [fetchAcademicYears, fetchAttendanceData]);
 
     const selectAcademicYearHandler = (academicYearId) => {
@@ -212,7 +212,7 @@ const TeacherPerformanceView = () => {
                                             {!selectedAcademicYear && <option value={''}>Pilih</option>}
                                             {academicYearsList && academicYearsList.map((academicYear, index) => (
                                                 <option key={index} value={academicYear._id}>
-                                                    {academicYear.name}
+                                                    {academicYearFormatter(academicYear.name)}
                                                 </option>
                                             ))}
                                         </select>
@@ -276,8 +276,8 @@ const TeacherPerformanceView = () => {
                     </div>
 
                 )}
-                {attendanceData && !isLoading && selectedAcademicYear && (
-                    <TeachingGroupAdminPerformanceCards data={attendanceData} initialView={'classes'} month={periode} />
+                {violationData && attendanceData && !isLoading && selectedAcademicYear && (
+                    <TeachingGroupAdminPerformanceCards data={attendanceData} violationData={violationData} initialView={'classes'} month={periode} />
                 )}
             </main>
         </div>

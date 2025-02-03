@@ -365,12 +365,12 @@ const PerformanceCards = ({ data }) => {
 
                 <div className="flex flex-col gap-2">
                     <p>Kalkulasi Berdasarkan: {!showRelativeToTarget ? <strong>Hari berjalan</strong> : <strong>Hari efektif</strong>}</p>
-                    <button
+                    {/* <button
                         onClick={() => setShowRelativeToTarget(!showRelativeToTarget)}
                         className="text-primary px-4 py-2 rounded border border-primary hover:bg-primary hover:text-white transition"
                     >
                         Ubah
-                    </button>
+                    </button> */}
                 </div>
             </div>
 

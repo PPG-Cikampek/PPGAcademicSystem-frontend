@@ -3,13 +3,19 @@ import React, { useState, useEffect } from 'react';
 import { Document, Page, Text, View, pdf, PDFViewer, Image } from '@react-pdf/renderer';
 import { saveAs } from 'file-saver';
 
-import logo from '../../assets/logos/ppgcikampek.png';
+import logo from '../../assets/logos/ppgcikampek.webp';
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 
 import { ArrowDownToLine } from 'lucide-react';
 import PieChart from '../../performance/components/PieChart';
 import ReactPDFChart from 'react-pdf-charts';
 import PerformanceReportChart from '../../performance/components/PerformanceReportChart';
+
+const violationTranslations = {
+    attribute: "Perlengkapan Belajar",
+    attitude: "Sikap",
+    tidiness: "Kerapihan",
+};
 
 const styles = {
     page: {
@@ -127,7 +133,7 @@ const styles = {
     }
 };
 
-const StudentReportView = ({ studentData, attendanceData, noCard = false }) => {
+const StudentReportView = ({ studentData, attendanceData, violationData, noCard = false }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [reportData, setReportData] = useState();
     const [reportChart, setReportChart] = useState();
@@ -135,6 +141,7 @@ const StudentReportView = ({ studentData, attendanceData, noCard = false }) => {
 
     console.log(studentData)
     console.log(attendanceData)
+    console.log(violationData)
 
     useEffect(() => {
         setIsLoading(true)
@@ -207,7 +214,7 @@ const StudentReportView = ({ studentData, attendanceData, noCard = false }) => {
                 </View>
 
 
-                <View style={[styles.flex, styles.flexCol, { justifyContent: 'center' }]}>
+                <View style={[styles.flex, styles.flexCol, { justifyContent: 'space-between' }]}>
                     <View>
                         <View style={styles.subHeader}>
                             {/* Title */}
@@ -240,11 +247,11 @@ const StudentReportView = ({ studentData, attendanceData, noCard = false }) => {
 
                         <View style={styles.body}>
                             {/* Performance Table */}
-                            <View style={styles.table}>
+                            <View style={[styles.table, { width: '60%' }]}>
                                 {/* Table Header */}
                                 <View style={[styles.tableRow, styles.tableHeader, { paddingLeft: 5 }]}>
-                                    <Text style={styles.tableCell}>KETERANGAN</Text>
-                                    <Text style={[styles.tableCell, styles.tableCellNumber]}>JUMLAH</Text>
+                                    <Text style={styles.tableCell}>ITEM</Text>
+                                    <Text style={[styles.tableCell, styles.tableCellNumber]}>REPETISI</Text>
                                     <Text style={[styles.tableCell, styles.tableCellNumber]}>PERSENTASE</Text>
                                 </View>
 
@@ -252,10 +259,39 @@ const StudentReportView = ({ studentData, attendanceData, noCard = false }) => {
                                 {reportData.data.map((row, index) => (
                                     <View key={index} style={[styles.tableRow, { paddingLeft: 5 }]}>
                                         <Text style={styles.tableCell}>{row.status}</Text>
-                                        <Text style={[styles.tableCell, styles.tableCellNumber]}>{row.count}</Text>
+                                        <Text style={[styles.tableCell, styles.tableCellNumber]}>{row.count} Hari</Text>
                                         <Text style={[styles.tableCell, styles.tableCellNumber]}>{row.percentage}%</Text>
                                     </View>
                                 ))}
+                            </View>
+
+                            <View style={[styles.table, { width: '40%' }]}>
+
+                                {/* Table Header */}
+                                <View style={[styles.tableRow, styles.tableHeader, { paddingLeft: 5 }]}>
+                                    <Text style={styles.tableCell}>ITEM</Text>
+                                    <Text style={[styles.tableCell, styles.tableCellNumber]}>REPETISI</Text>
+                                </View>
+
+                                {/* Table Rows */}
+                                {violationData.map((row, index) => (
+                                    <View key={index} style={[styles.tableRow, { paddingLeft: 5 }]}>
+                                        <Text style={styles.tableCell}>{violationTranslations[row.violation] || row.violation}</Text>
+                                        <Text style={[styles.tableCell, styles.tableCellNumber]}>{row.count} Kali</Text>
+                                    </View>
+                                ))}
+                            </View>
+                        </View>
+
+                        <View style={{ marginTop: 10, marginBottom: 30, display: 'flex', flexDirection: 'col', justifyContent: 'start', alignItems: 'start' }}>
+                            {/* full-width box with 2px border solid black */}
+                            <Text style={{ fontFamily: 'Times-Bold', textDecoration: 'underline', fontStyle: 'italic', marginBottom: 5 }}>
+                                CATATAN GURU:
+                            </Text>
+                            <View style={{ width: '100%', border: '1px solid black', padding: 10 }}>
+                                <Text style={{ minHeight: 50 }}>
+                                    {'\n\n\n\n\n\n\n\n'}
+                                </Text>
                             </View>
                         </View>
 
@@ -266,13 +302,14 @@ const StudentReportView = ({ studentData, attendanceData, noCard = false }) => {
                         <PieChart attendanceData={attendanceData} chartType={'mobile'} toImage={false} />
                     </ReactPDFChart> */}
 
-                    <View>
+                    {/* <View>
                         <ReactPDFChart>
                             {reportChart && reportChart}
                         </ReactPDFChart>
-                    </View>
+                    </View> */}
 
-                    <View style={{ marginTop: 20, flexDirection: 'col', justifyContent: 'space-between', alignItems: 'center', alignSelf: 'flex-end' }}>
+                    <View style={{ marginTop: 50, flexDirection: 'col', justifyContent: 'space-between', alignItems: 'center', alignSelf: 'flex-end' }}>
+                        <Text style={{ marginVertical: 3 }}>Cikampek, {new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })}</Text>
                         <Text>Hormat Kami,</Text>
                         <View style={styles.signature} key={studentData.teachers[0]._id}>
                             <Text style={styles.signatureName}>{studentData.teachers[0].name}</Text>

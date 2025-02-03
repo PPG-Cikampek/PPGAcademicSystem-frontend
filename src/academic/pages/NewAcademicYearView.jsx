@@ -79,7 +79,7 @@ const NewAcademicYearView = () => {
                 }
                 <DynamicForm
                     title='Tambah Tahun Ajaran'
-                    subtitle={'Sistem Absensi Digital'}
+                    subtitle={'Sistem Akademik Digital'}
                     fields={academicYearFields}
                     onSubmit={handleFormSubmit}
                     disabled={isLoading}

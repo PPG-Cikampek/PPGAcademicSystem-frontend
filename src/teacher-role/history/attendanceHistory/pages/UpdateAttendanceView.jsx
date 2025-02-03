@@ -41,6 +41,7 @@ const UpdateAttendanceView = () => {
                 attendanceId: loadedAttendance.id,
                 status: data.status,
                 attributes: data.attributes,
+                updateReason: data.updateReason,
                 timestamp: Date.now(),
             }]
         });
@@ -96,10 +97,8 @@ const UpdateAttendanceView = () => {
                     subtitle={'Edit Data Absen'}
                     fields={[
                         { name: 'name', label: 'Nama Lengkap', type: 'text', required: false, disabled: true, value: loadedAttendance?.studentId?.name || '' },
-                        { name: 'statusOld', label: 'Status Kehadiran (sebelumnya)', type: 'text', required: false, disabled: true, value: loadedAttendance?.status || '' },
-                        { name: 'attributesOld', label: 'Atribut (sebelumnya)', type: 'text', required: false, disabled: true, value: loadedAttendance?.attributes ? 'Ya' : 'Tidak' || '' },
                         {
-                            name: 'status', label: 'Status Kehadiran (baru)', type: 'select', required: true,
+                            name: 'status', label: 'Status Kehadiran', type: 'select', required: true,
                             value: loadedAttendance?.status || '',
                             options: [
                                 { label: 'Hadir', value: 'Hadir' },
@@ -109,14 +108,8 @@ const UpdateAttendanceView = () => {
                                 { label: 'Tanpa Keterangan', value: 'Tanpa Keterangan' },
                             ]
                         },
-                        {
-                            name: 'attributes', label: 'Atribut Lengkap? (baru)', type: 'select', required: true,
-                            value: loadedAttendance?.attributes || '',
-                            options: [
-                                { label: 'Ya', value: "true" },
-                                { label: 'Tidak', value: "false" },
-                            ]
-                        },
+                        { name: 'updateReason', label: 'Alasan Mengubah Data', type: 'textarea', required: true, textAreaRows: 3 },
+
 
                     ]}
                     onSubmit={handleFormSubmit}

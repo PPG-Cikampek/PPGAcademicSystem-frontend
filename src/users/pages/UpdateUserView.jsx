@@ -89,7 +89,7 @@ const UpdateUserView = () => {
                             : loadedUser.role === 'teacher'
                                 ? 'Ubah Data Guru'
                                 : 'Ubah Data Peserta Didik'}
-                    subtitle={'Sistem Absensi Digital'}
+                    subtitle={'Sistem Akademik Digital'}
                     fields={[
                         { name: 'name', label: 'Nama', placeholder: 'Nama Lengkap', type: 'text', required: true, value: loadedUser.name },
                         ...(loadedUser.role === 'admin' ? [{ name: 'role', label: 'Jenis Akun', placeholder: 'admin', type: 'select', required: true, value: loadedUser.role, options: [{ label: 'Admin', value: 'admin' }, { label: 'Admin Kelompok', value: 'teachingGroupAdmin' }] }] : []),

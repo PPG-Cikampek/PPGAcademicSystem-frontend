@@ -10,6 +10,7 @@ import { StudentAttendanceProvider } from "./teacher-role/scan/context/StudentAt
 import LoadingCircle from "./shared/Components/UIElements/LoadingCircle";
 import MaterialProgressView from "./teacher-role/materialProgress/pages/materialProgressView";
 import NewMaterialProgresslView from "./teacher-role/materialProgress/pages/NewMaterialProgressView";
+import RequestMemberView from "./users/pages/RequestMemberView";
 
 const DashboardNav = lazy(() => import("./shared/Components/Navigation/DashboardNav/DashboardNav"));
 const DashboardView = lazy(() => import("./dashboard/pages/DashboardView"));
@@ -123,8 +124,13 @@ function App() {
                     <AttendanceHistoryViewByClass />
                   </PageHeader>
                 } />
-              <Route path='/attendance/history/class/edit/:attendanceId' element={<UpdateAttendanceView />} />
-              <Route path='/attendance/history/class/edit-confirmation/:attendanceId' element={<EditAttendanceConfirmation />} />
+              <Route path='/attendance/history/class/:classId/:attendanceId/edit' element=
+                {
+                  <PageHeader>
+                    <UpdateAttendanceView />
+                  </PageHeader>
+                } />
+              {/* <Route path='/attendance/history/class/edit-confirmation/:attendanceId' element={<EditAttendanceConfirmation />} /> */}
               <Route path='/materialProgress' element=
                 {
                   <PageHeader>
@@ -253,16 +259,10 @@ function App() {
               <Route path='/settings/academic/new' element={<NewTeachingGroupYearView />} />
               <Route path='/settings/academic/:teachingGroupYearId' element={<UpdateTeachingGroupYearsView />} />
               <Route path='/settings/academic/classes/new' element={<NewClassView />} />
+              <Route path='/settings/requestMember' element={<RequestMemberView />} />
               <Route path='/dashboard/classes/:classId/add-students' element={<AddStudentToClassView />} />
               <Route path='/dashboard/classes/:classId/add-teachers' element={<AddTeacherToClassView />} />
-              <Route path='/performance' element={<Suspense
-                fallback={
-                  <div className="flex justify-center mt-16">
-                    <LoadingCircle size={32} />
-                  </div>
-                }>
-                <TeachingGroupPerformanceView />
-              </Suspense>} />
+              <Route path='/performance' element={<TeachingGroupPerformanceView />} />
             </>
           )}
           {userRole === 'admin' && (

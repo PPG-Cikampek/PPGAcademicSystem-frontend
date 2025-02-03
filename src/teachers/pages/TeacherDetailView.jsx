@@ -28,6 +28,21 @@ const TeacherDetailView = () => {
         });
     };
 
+    const mapPosition = (position) => {
+        switch (position) {
+            case 'branchTeacher':
+                return 'MT Desa';
+            case 'teachingGroupTeacher':
+                return 'MT Kelompok';
+            case 'localTeacher':
+                return 'MS';
+            case 'assistant':
+                return 'Asisten';
+            default:
+                return '';
+        }
+    };
+
     useEffect(() => {
         
         const fetchTeacherData = async () => {
@@ -47,7 +62,7 @@ const TeacherDetailView = () => {
                     { label: 'Tanggal Lahir', value: formatDate(responseData.teacher.dateOfBirth), icon: <Icon icon="material-symbols:date-range-outline" width="24" height="24" /> },
                     { label: 'Jenis Kelamin', value: responseData.teacher.gender? (responseData.teacher.gender === 'male' ? 'Laki-laki' : 'Perempuan') : '', icon: <Icon icon="tabler:gender-bigender" width="24" height="24" /> },
                     { label: 'Domisili', value: responseData.teacher.address, icon: <Icon icon="ph:map-pin-bold" width="24" height="24" /> },
-                    { label: 'Posisi', value: responseData.teacher.position ? (responseData.teacher.position === 'teacher' ? 'Guru' : 'Asisten') : '', icon: <Icon icon="material-symbols:category-outline-rounded" width="24" height="24" /> },
+                    { label: 'Posisi', value: mapPosition(responseData.teacher.position), icon: <Icon icon="material-symbols:category-outline-rounded" width="24" height="24" /> },
                     { label: 'Mulai Masa Tugas', value: formatDate(responseData.teacher.positionStartDate), icon: <Icon icon="lucide:briefcase" width="24" height="24" /> },
                 ]);
 
@@ -81,7 +96,7 @@ const TeacherDetailView = () => {
                     )}
                     <h1 className="text-2xl font-medium mb-6 text-gray-700">Biodata Tenaga Pendidik</h1>
                     <div className="flex flex-col md:flex-row gap-4 md:gap-8">
-                        <div className="card-basic border mx-0 py-12 flex flex-col items-center flex-1 basis-96 min-w-80 md:max-w-96">
+                        <div className="card-basic rounded-md border mx-0 py-12 flex flex-col items-center flex-1 basis-96 min-w-80 md:max-w-96">
                             <img
                                 src={teacherInfo?.image ? `${import.meta.env.VITE_BACKEND_URL}/${teacherInfo.image}`: "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"}
                                 alt="Profile"
@@ -96,7 +111,7 @@ const TeacherDetailView = () => {
                             </div>
                         </div>
 
-                        <div className="card-basic p-8 flex flex-col border mx-0 flex-1 justify-start">
+                        <div className="card-basic rounded-md p-8 flex flex-col border mx-0 flex-1 justify-start">
                             <h2 className="text-lg mb-8">Profile Tenaga Pendidik</h2>
                             <ul className="space-y-6">
                                 {teacherDetails.map((item, index) => (

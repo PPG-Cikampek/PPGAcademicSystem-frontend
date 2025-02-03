@@ -101,7 +101,7 @@ const UpdateTeachingGroupView = () => {
                 {error && <ErrorCard error={error} onClear={() => setError(null)} />}
                 <DynamicForm
                     title='Update Data Kelompok'
-                    subtitle={'Sistem Absensi Digital'}
+                    subtitle={'Sistem Akademik Digital'}
                     fields={[
                         { name: 'name', label: 'Nama Kelompok', placeholder: 'Nama Kelompok', type: 'text', required: true, value: loadedLevel?.name || '' },
                         { name: 'address', label: 'Alamat', type: 'textarea', required: true, value: loadedLevel?.address || '' },

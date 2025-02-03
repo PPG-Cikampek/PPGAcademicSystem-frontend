@@ -112,7 +112,7 @@ const NewJournalView = () => {
       <div className={`pb-24 transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
         <DynamicForm
           // title='Tambah Jurnal'
-          // subtitle={'Sistem Absensi Digital'}
+          // subtitle={'Sistem Akademik Digital'}
           subtitle={'Tambah Jurnal'}
           fields={classFields}
           onSubmit={handleFormSubmit}
