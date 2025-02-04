@@ -5,6 +5,9 @@ import useHttp from '../../shared/hooks/http-hook'
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle'
 import ErrorCard from '../../shared/Components/UIElements/ErrorCard'
 
+import { GraduationCap, Presentation, Users, Gauge, Layers2, Layers } from 'lucide-react';
+
+
 const DashboardView = () => {
     const { isLoading, error, sendRequest, setError } = useHttp()
     const [dashboardData, setDashboardData] = useState()
@@ -46,29 +49,52 @@ const DashboardView = () => {
 
                 {!isLoading && dashboardData && (
                     <div className="flex md:flex-row flex-wrap justify-between md:justify-start gap-4 md:gap-8">
-                        {Object.entries(dashboardData).map(([key, value]) => (
-                            <div key={key} className='card-interactive rounded-md border-0 border-b-4 border-secondary md:p-8 hover:cursor-default m-0 flex flex-col gap-4 min-h-16 min-w-40 max-w-[10.5rem] md:min-h-40 md:min-w-80 md:max-w-96 flex-grow'>
-
-                                {key !== 'Kehadiran'
-                                    ?
-                                    <>
-                                        <h1 className="text-lg md:text-3xl font-bold">{value}</h1>
-                                        <p className="">{key}</p>
-                                    </>
-                                    : value > 0 ?
-                                        <>
-                                            <h1 className="text-lg md:text-3xl font-bold">{value.toFixed(2)}%</h1>
-                                            <p className="">{key}</p>
-                                        </>
-                                        :
-                                        <>
-                                            <h1 className="text-2xl font-bold">Tidak ada data</h1>
-                                            <p className="">{key}</p>
-                                        </>
-                                }
-
+                        {dashboardData.Desa &&
+                            <div className='card-interactive rounded-md gap-4 md:gap-8 flex-grow items-center justify-start border-0 border-b-4 border-secondary md:p-8 hover:cursor-default m-0 min-h-16 min-w-40 max-w-[10.5rem] md:min-h-40 md:min-w-80 md:max-w-96'>
+                                <Layers className="size-8 md:size-10" />
+                                <div className="flex flex-col">
+                                    <h1 className="text-lg md:text-3xl font-bold">{dashboardData.Desa && dashboardData.Desa}</h1>
+                                    <p className="">{"Desa"}</p>
+                                </div>
                             </div>
-                        ))}
+                        }
+                        {dashboardData.Kelompok &&
+                            <div className='card-interactive rounded-md gap-4 md:gap-8 flex-grow items-center justify-start border-0 border-b-4 border-secondary md:p-8 hover:cursor-default m-0 min-h-16 min-w-40 max-w-[10.5rem] md:min-h-40 md:min-w-80 md:max-w-96'>
+                                <Layers2 className="size-8 md:size-10" />
+                                <div className="flex flex-col">
+                                    <h1 className="text-lg md:text-3xl font-bold">{dashboardData.Kelompok && dashboardData.Kelompok}</h1>
+                                    <p className="">{"Kelompok"}</p>
+                                </div>
+                            </div>
+                        }
+                        <div className='card-interactive rounded-md gap-4 md:gap-8 flex-grow items-center justify-start border-0 border-b-4 border-secondary md:p-8 hover:cursor-default m-0 min-h-16 min-w-40 max-w-[10.5rem] md:min-h-40 md:min-w-80 md:max-w-96'>
+                            <Presentation className="size-8 md:size-10" />
+                            <div className="flex flex-col">
+                                <h1 className="text-lg md:text-3xl font-bold">{dashboardData.Kelas && dashboardData.Kelas}</h1>
+                                <p className="">{"Kelas"}</p>
+                            </div>
+                        </div>
+                        <div className='card-interactive rounded-md gap-4 md:gap-8 flex-grow items-center justify-start border-0 border-b-4 border-secondary md:p-8 hover:cursor-default m-0 min-h-16 min-w-40 max-w-[10.5rem] md:min-h-40 md:min-w-80 md:max-w-96'>
+                            <Users className="size-8 md:size-10" />
+                            <div className="flex flex-col">
+                                <h1 className="text-lg md:text-3xl font-bold">{dashboardData["Peserta Didik"] && dashboardData["Peserta Didik"]}</h1>
+                                <p className="">{"Peserta Didik"}</p>
+                            </div>
+                        </div>
+                        <div className='card-interactive rounded-md gap-4 md:gap-8 flex-grow items-center justify-start border-0 border-b-4 border-secondary md:p-8 hover:cursor-default m-0 min-h-16 min-w-40 max-w-[10.5rem] md:min-h-40 md:min-w-80 md:max-w-96'>
+                            <GraduationCap className="size-8 md:size-10" />
+                            <div className="flex flex-col">
+                                <h1 className="text-lg md:text-3xl font-bold">{dashboardData["Tenaga Pendidik"] && dashboardData["Tenaga Pendidik"]}</h1>
+                                <p className="">{"Tenaga Pendidik"}</p>
+                            </div>
+                        </div>
+                        <div className='card-interactive rounded-md gap-4 md:gap-8 flex-grow items-center justify-start border-0 border-b-4 border-secondary md:p-8 hover:cursor-default m-0 min-h-16 min-w-40 max-w-[10.5rem] md:min-h-40 md:min-w-80 md:max-w-96'>
+                            <Gauge className="size-8 md:size-10" />
+                            <div className="flex flex-col">
+                                <h1 className="text-lg md:text-3xl font-bold">{dashboardData.Kehadiran && dashboardData.Kehadiran}%</h1>
+                                <p className="">{"Kehadiran"}</p>
+                            </div>
+                        </div>
                     </div>
                 )}
             </main>

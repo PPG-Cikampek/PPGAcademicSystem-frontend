@@ -85,6 +85,7 @@ const StudentsView = () => {
             try {
                 const responseData = await sendRequest(url);
                 setStudents(responseData.students);
+                console.log(responseData.students);
             } catch (err) {
                 // Error is handled by useHttp
             }
@@ -120,7 +121,7 @@ const StudentsView = () => {
                             <thead className=" border-b">
                                 <tr>
                                     <th className="p-2 md:p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
-                                    <th className="p-2 md:p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    {auth.userRole !== 'admin' && <th className="p-2 md:p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>}
                                     <th className="p-2 md:p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NIS</th>
                                     <th className="p-2 md:p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
                                     {auth.userRole === 'admin' && <th className="p-2 md:p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Desa</th>}
@@ -142,7 +143,7 @@ const StudentsView = () => {
                                                 <StudentInitial studentName={student.name} clsName={`size-10 rounded-full bg-blue-200 text-blue-500 flex items-center justify-center font-medium m-auto`} />
                                             )}
                                         </td>
-                                        <td className='p-2 md:p-4 '> <div className={`py-1 px-2 text-sm text-center w-min border rounded-md ${!student.isActive ? 'text-red-500 bg-red-100' : 'text-green-500 bg-green-100'}`}>{!student.isActive ? 'Tidak Aktif' : 'Aktif'}</div></td>
+                                        {auth.userRole !== 'admin' &&<td className='p-2 md:p-4 '> <div className={`py-1 px-2 text-sm text-center w-min border rounded-md ${!student.isActive ? 'text-red-500 bg-red-100' : 'text-green-500 bg-green-100'}`}>{!student.isActive ? 'Tidak Aktif' : 'Aktif'}</div></td>}
                                         <td className="p-2 md:p-4 text-sm text-gray-900">{student.nis}</td>
                                         <td className="p-2 md:p-4 text-sm text-gray-900">{student.name}</td>
                                         {auth.userRole === 'admin' && <td className="p-2 md:p-4 text-sm text-gray-500">{student.userId.teachingGroupId.branchId.name}</td>}

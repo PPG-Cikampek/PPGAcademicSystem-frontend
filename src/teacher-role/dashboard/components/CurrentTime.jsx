@@ -34,7 +34,7 @@ const CurrentTime = () => {
     };
 
     return (
-        <div className="space-y-1 mb-2 text-gray-600">
+        <div className="space-y-1 text-gray-600">
             <div className="font-normal">
                 {formatDate(date)}
             </div>

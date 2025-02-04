@@ -10,7 +10,7 @@ import { StudentAttendanceProvider } from "./teacher-role/scan/context/StudentAt
 import LoadingCircle from "./shared/Components/UIElements/LoadingCircle";
 import MaterialProgressView from "./teacher-role/materialProgress/pages/materialProgressView";
 import NewMaterialProgresslView from "./teacher-role/materialProgress/pages/NewMaterialProgressView";
-import RequestMemberView from "./users/pages/RequestMemberView";
+import RequestAccountView from "./users/pages/RequestAccountView";
 
 const DashboardNav = lazy(() => import("./shared/Components/Navigation/DashboardNav/DashboardNav"));
 const DashboardView = lazy(() => import("./dashboard/pages/DashboardView"));
@@ -259,7 +259,7 @@ function App() {
               <Route path='/settings/academic/new' element={<NewTeachingGroupYearView />} />
               <Route path='/settings/academic/:teachingGroupYearId' element={<UpdateTeachingGroupYearsView />} />
               <Route path='/settings/academic/classes/new' element={<NewClassView />} />
-              <Route path='/settings/requestMember' element={<RequestMemberView />} />
+              <Route path='/settings/requestMember' element={<RequestAccountView />} />
               <Route path='/dashboard/classes/:classId/add-students' element={<AddStudentToClassView />} />
               <Route path='/dashboard/classes/:classId/add-teachers' element={<AddTeacherToClassView />} />
               <Route path='/performance' element={<TeachingGroupPerformanceView />} />

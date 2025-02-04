@@ -42,15 +42,14 @@ const Profile = ({ user, isLoading }) => {
                             <div className="flex-1 space-y-3 py-1 grow">
                                 <div className="h-5 w-36 bg-slate-700 rounded"></div>
                                 <div className="h-3 w-56 bg-slate-400 rounded"></div>
-                               
                             </div>
                         </div>
                     )}
                     {!isLoading && (
                         <>
                             <h2 className="text-xl font-medium">{user.name || 'Unknown'}</h2>
-                            <h3>
-                                {user.userId?.teachingGroupId?.name || 'No TeachingGroup'} - {user.userId?.teachingGroupId?.branchId?.name || 'No Branch'}
+                            <h3 className='font-normal text-gray-600'>
+                                {user.userId?.teachingGroupId?.branchId?.name || 'No Branch'} - {user.userId?.teachingGroupId?.name || 'No TeachingGroup'}
                             </h3>
                         </>
                     )}

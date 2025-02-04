@@ -17,6 +17,13 @@ const HomeScreenView = () => {
     const auth = useContext(AuthContext);
     const { state, dispatch } = useContext(StudentAttendanceContext);
 
+    const getPositionName = {
+        branchTeacher: 'MT Desa',
+        teachingGroupTeacher : 'MT Kelompok',
+        localTeacher : 'MS',
+        assistant : 'Asisten',
+    }
+
     // console.log(auth.isLoggedIn)
     // console.log(auth.userId)
     // console.log(auth.userRole)
@@ -72,8 +79,8 @@ const HomeScreenView = () => {
             {data && !isLoading && (
                 <SequentialAnimation>
                     <div className="mt-20 flex-1 p-4">
-                        <div className="mb-4 space-y-1">
-                            <h1 className="text-xl font-medium">Tenaga Pendidik</h1>
+                        <div className="card-basic rounded-md flex-col ">
+                            <h1 className="text-xl font-medium mb-2">{getPositionName[data.position] || data.position}</h1>
                             <CurrentTime />
                         </div>
                         <div className="mb-4">

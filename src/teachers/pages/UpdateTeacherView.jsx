@@ -146,7 +146,7 @@ const UpdateTeacherView = () => {
                             options: [
                                 { label: 'MT Desa', value: 'branchTeacher' },
                                 { label: 'MT Kelompok', value: 'teachingGroupTeacher' },
-                                { label: 'MT Setempat', value: 'localTeacher' },
+                                { label: 'MS', value: 'localTeacher' },
                                 { label: 'Asisten', value: 'assistant' }
                             ]
                         },

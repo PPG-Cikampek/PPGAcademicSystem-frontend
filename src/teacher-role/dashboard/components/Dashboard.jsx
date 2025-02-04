@@ -5,14 +5,14 @@ const Dashboard = ({ data }) => {
     // console.log(JSON.stringify(data))
 
     return (
-        <div className='my-8'>
+        <div className='card-basic rounded-md flex-col pb-0 my-8'>
             <h2 className='text-xl font-medium mb-2 '>{data.name}</h2>
             <div className="grid grid-cols-2 gap-4 mb-4">
-                <div className="card-basic rounded-md flex-col my-0 active:ring-1 w-full">
+                <div className="card-basic rounded-md flex-col my-0 active:ring-1 ">
                     <h3 className="text-gray-500 text-sm">Peserta Didik</h3>
                     <p className="text-2xl font-bold">{data.students?.length || 'No Data'}</p>
                 </div>
-                <div className="card-basic rounded-md flex-col my-0 active:ring-1 w-full">
+                <div className="card-basic rounded-md flex-col my-0 active:ring-1 ">
                     <h3 className="text-gray-500 text-sm">Total Pertemuan</h3>
                     <p className="text-2xl font-bold">
                         {data.attendances && data.teachingGroupYearId?.semesterTarget ?
