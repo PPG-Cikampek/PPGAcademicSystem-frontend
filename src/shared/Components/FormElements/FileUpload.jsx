@@ -88,7 +88,7 @@ const FileUpload = forwardRef((props, ref) => {
                 onCropComplete={onCropComplete}
               />
               <button onClick={cropImageHandler} className="button-primary absolute z-99 left-1/2 -translate-x-1/2 -bottom-12">
-                Crop
+                Pilih
               </button>
             </div>
           </CropperModal>

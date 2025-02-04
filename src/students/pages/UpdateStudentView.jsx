@@ -18,6 +18,8 @@ const UpdateStudentView = () => {
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [loadedStudent, setLoadedStudent] = useState();
     const [loadedDate, setLoadedDate] = useState();
+    const [croppedImage, setCroppedImage] = useState(null);
+
     const fileInputRef = useRef();
 
     const studentId = useParams().studentId;
@@ -46,15 +48,18 @@ const UpdateStudentView = () => {
         formData.append('parentName', data.parentName);
         formData.append('address', data.address);
 
-        if (fileInputRef.current.files[0]) {
-            formData.append('image', fileInputRef.current.files[0]);
+        if (croppedImage) {
+            formData.append('image', croppedImage);
+        } else {
+            setError("Tidak ada foto yang dipilih!");
+            throw new Error('Tidak ada foto yang dipilih!');
         }
 
         let responseData;
         try {
             responseData = await sendRequest(url, 'PATCH', formData);
         } catch (err) { }
-        setModal({ title: 'Berhasil!', message: responseData.message, onConfirm: null});
+        setModal({ title: 'Berhasil!', message: responseData.message, onConfirm: null });
         setModalIsOpen(true);
     };
 
@@ -96,7 +101,10 @@ const UpdateStudentView = () => {
                 )}
             </Modal>
 
-            {error && <ErrorCard error={error} onClear={() => setError(null)} />}
+            {error &&
+                <div className="mx-2">
+                    <ErrorCard className="mx-2" error={error} onClear={() => setError(null)} />
+                </div>}
 
             <div className={`pb-24 transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
                 <DynamicForm
@@ -110,6 +118,7 @@ const UpdateStudentView = () => {
                                     buttonClassName={`${isLoading && 'hidden'} border border-gray-600 bg-gray-50 size-9 rounded-full absolute offset bottom-2 right-2 translate-x-1/2 translate-y-1/2`}
                                     imgClassName={`${isLoading && 'animate-pulse'} mt-2 rounded-md size-32 md:size-48 shrink-0`}
                                     defaultImageSrc={loadedStudent?.image ? `${import.meta.env.VITE_BACKEND_URL}/${loadedStudent.image}` : "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"}
+                                    onImageCropped={setCroppedImage}
                                 />
                             </div>
                         </div>

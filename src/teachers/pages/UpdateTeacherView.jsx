@@ -64,8 +64,6 @@ const UpdateTeacherView = () => {
 
         if (croppedImage) {
             formData.append('image', croppedImage);
-        } else if (fileInputRef.current.files[0]) {
-            formData.append('image', fileInputRef.current.files[0]);
         } else {
             setError("Tidak ada foto yang dipilih!");
             throw new Error('Tidak ada foto yang dipilih!');

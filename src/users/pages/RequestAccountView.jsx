@@ -53,14 +53,12 @@ const RequestAccountView = () => {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-200">
-                                {teachers.map((teacher) => (
-                                    <tr onClick={() => navigate(`/dashboard/teachers/${teacher._id}`)} key={teacher._id} className="hover:bg-gray-50 hover:cursor-pointer transition">
-                                        <td className='p-2 md:p-4 '> <div className={`py-1 px-2 text-sm text-center w-min border rounded-md ${teacher.positionEndDate ? 'text-red-500 bg-red-100' : 'text-green-500 bg-green-100'}`}>{teacher.positionEndDate ? 'Tidak Aktif' : 'Aktif'}</div></td>
-                                        <td className="p-2 md:p-4 text-sm text-gray-900">{teacher.nid}</td>
-                                        <td className="p-2 md:p-4 text-sm text-gray-900">{teacher.name}</td>
-                                        <td className={`p-2 md:p-4 text-sm text-gray-900 ${teacher.isProfileComplete ? 'text-green-500' : 'text-red-500 hover:underline cursor-pointer'}`}>{teacher.isProfileComplete ? 'Lengkap' : 'Lengkapi'}</td>
+                                    <tr className="hover:bg-gray-50 hover:cursor-pointer transition">
+                                        <td className="p-2 md:p-4 text-sm text-gray-900">1234</td>
+                                        <td className="p-2 md:p-4 text-sm text-gray-900">1 Februari 2024</td>
+                                        <td className="p-2 md:p-4 text-sm text-gray-900">3</td>
+                                        <td className="p-2 md:p-4 text-sm text-gray-900">Pending</td>
                                     </tr>
-                                ))}
                                 {teachers.length === 0 && (
                                     <tr>
                                         <td colSpan={8} className='p-4 text-center italic text-gray-500'>
@@ -72,17 +70,18 @@ const RequestAccountView = () => {
                         </table>
                     </div>
                 )}
-                <div className="flex flex-col justify-center md:flex-row my-12 gap-4 md:mr-24">
+                <h2 className='text-2xl font-bold my-12 mb-4'>Buat Permintaan Akun</h2>
+                <div className="flex flex-col justify-center md:flex-row gap-4">
                     <div className='card-interactive md:min-h-64 md:min-w-96 min-h-36 rounded-md items-center md:mb-12 gap-4'>
                         <div className="mx-auto flex flex-col items-center gap-2 ">
                             <GraduationCap size={48} />
-                            <div className='font-semibold'>Akun Guru</div>
+                            <div className='font-semibold'>Permintaan Akun Guru</div>
                         </div>
                     </div>
                     <div className='card-interactive md:min-h-64 md:min-w-96 min-h-36 rounded-md items-center mb-12 gap-4'>
                         <div className="mx-auto flex flex-col items-center gap-2 ">
                             <Users size={48} />
-                            <div className='font-semibold'>Akun Siswa</div>
+                            <div className='font-semibold'>Permintaan Akun Siswa</div>
                         </div>
                     </div>
                 </div>

@@ -128,6 +128,8 @@ const DynamicForm = ({ logo, title, subtitle, fields = [], onSubmit, button, cus
                                         className="w-full p-2 border rounded-md shadow-sm hover:ring-1 hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
                                         dateFormat="dd/MM/yyyy"
                                         wrapperClassName='w-full'
+                                        showYearDropdown
+                                        showMonthDropdown
                                     />
                                 )}
                             />
