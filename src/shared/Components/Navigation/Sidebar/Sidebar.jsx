@@ -62,14 +62,26 @@ const Sidebar = ({ linksList, children }) => {
                                     }}
                                     className={({ isActive }) => `
                                         flex items-center px-4 py-3 
-                                        hover:bg-gray-100 
+                                        hover:bg-gray-100
                                         focus:outline-none focus:ring-primary-subtle
                                         ${isActive && link.link ? 'bg-gray-100 text-primary font-medium' : 'text-gray-800'} 
-                                        ${sidebar.isSidebarOpen ? 'justify-start' : 'justify-center'}
+                                        ${sidebar.isSidebarOpen && !link.subOptions ? 'justify-start' : sidebar.isSidebarOpen && link.subOptions ? 'justify-between' : 'justify-center'}
                                     `}
                                 >
-                                    {link.icon}
-                                    <span className={`shrink-0 ml-3 text-clip ${sidebar.isSidebarOpen ? 'block' : 'hidden'}`}>{link.label}</span>
+                                    <div className="flex justify-between items-center w-full">
+                                        <div className='flex items-center'>
+                                            {link.icon}
+                                            <span className={`shrink-0 ml-3 text-clip ${sidebar.isSidebarOpen ? 'block' : 'hidden'}`}>{link.label}</span>
+                                        </div>
+                                        <div>
+                                            {link.subOptions && expandedMenu !== link.label && window.matchMedia('(min-width: 768px)') && sidebar.isSidebarOpen && (
+                                                <ChevronDown />
+                                            )}
+                                            {link.subOptions && expandedMenu === link.label && window.matchMedia('(min-width: 768px)') && sidebar.isSidebarOpen && (
+                                                <ChevronUp />
+                                            )}
+                                        </div>
+                                    </div>
                                 </NavLink>
 
                                 {/* Sub-menu */}

@@ -58,13 +58,12 @@ const AttendedStudents = () => {
                 });
             }
         });
-
         // Batch updates if changes exist
         if (changedStatuses.length > 0) {
             patchMultipleStudentStatuses(changedStatuses);
+            prevStudentList.current = state.studentList;
         }
 
-        prevStudentList.current = state.studentList;
     }, [state.studentList]);
 
     const handleStatusChange = (id, newStatus, timestamp = Date.now()) => {
@@ -209,7 +208,7 @@ const AttendedStudents = () => {
                                 <div className={`relative w-full`}>
                                     <button
                                         type="button"
-                                        className={`border p-1 px-2 rounded-full active:ring-2 active:ring-blue-300 bg-white flex justify-between items-center ${(student.status === "Sakit" || student.status === "Izin" || student.status === "Tanpa Keterangan") && 'hidden'}`}
+                                        className={`border p-1 px-2 rounded-full active:ring-2 active:ring-blue-300 bg-white flex justify-between items-center`}
                                         onClick={() => toggleNotesField(student.studentId.nis)}
                                     >
                                         Catatan
@@ -231,8 +230,7 @@ const AttendedStudents = () => {
                                                                 type="text"
                                                                 onChange={(e) => handleNotesChange(student.studentId.nis, e.target.value)}
                                                                 value={student.teachersNotes}
-                                                                className={`w-full p-2 mb-1 border rounded-sm shadow-sm hover:ring-1 hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 ${student.status === "Sakit" || student.status === "Izin" || student.status === "Tanpa Keterangan" ? 'bg-gray-200 cursor-not-allowed' : ''}`}
-                                                                disabled={student.status === "Sakit" || student.status === "Izin" || student.status === "Tanpa Keterangan"}
+                                                                className={`w-full p-2 mb-1 border rounded-sm shadow-sm hover:ring-1 hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300`}
                                                             />
                                                         </div>
                                                     </div>

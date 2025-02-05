@@ -11,6 +11,8 @@ import LoadingCircle from "./shared/Components/UIElements/LoadingCircle";
 import MaterialProgressView from "./teacher-role/materialProgress/pages/materialProgressView";
 import NewMaterialProgresslView from "./teacher-role/materialProgress/pages/NewMaterialProgressView";
 import RequestAccountView from "./users/pages/RequestAccountView";
+import RequestAccountForm from "./users/pages/RequestAccountForm";
+import RequestAccountTicketDetail from "./users/pages/RequestAccountTicketDetail";
 
 const DashboardNav = lazy(() => import("./shared/Components/Navigation/DashboardNav/DashboardNav"));
 const DashboardView = lazy(() => import("./dashboard/pages/DashboardView"));
@@ -259,7 +261,9 @@ function App() {
               <Route path='/settings/academic/new' element={<NewTeachingGroupYearView />} />
               <Route path='/settings/academic/:teachingGroupYearId' element={<UpdateTeachingGroupYearsView />} />
               <Route path='/settings/academic/classes/new' element={<NewClassView />} />
-              <Route path='/settings/requestMember' element={<RequestAccountView />} />
+              <Route path='/settings/requestAccount' element={<RequestAccountView />} />
+              <Route path='/settings/requestAccount/:accountType' element={<RequestAccountForm />} />
+              <Route path='/settings/requestAccount/ticket/:ticketId' element={<RequestAccountTicketDetail />} />
               <Route path='/dashboard/classes/:classId/add-students' element={<AddStudentToClassView />} />
               <Route path='/dashboard/classes/:classId/add-teachers' element={<AddTeacherToClassView />} />
               <Route path='/performance' element={<TeachingGroupPerformanceView />} />

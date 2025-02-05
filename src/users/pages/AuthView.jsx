@@ -121,14 +121,14 @@ const AuthView = () => {
                                 >
                                     {isLoading ? (<LoadingCircle>Processing...</LoadingCircle>) : ('Login')}
                                 </button>
-                                {/* <button
+                                <button
                                     type="button"
                                     onClick={handleToggle}
                                     className="button-secondary"
                                     disabled={isLoading}
                                 >
                                     {isStudent ? 'Gunakan Email' : 'Gunakan Kode QR'}
-                                </button> */}
+                                </button>
                             </div>
                         }
                         helpButton={<div onClick={() => navigate(`/reset-password/reset`)} className='text-center mt-2'><p className='underline text-xs text-gray-600 active:text-primary hover:text-primary hover:cursor-pointer'>Reset Password</p></div>}

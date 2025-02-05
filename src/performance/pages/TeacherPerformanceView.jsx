@@ -12,6 +12,7 @@ import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 import PieChart from '../components/PieChart';
 import TeachingGroupAdminPerformanceCards from '../components/TeachingGroupAdminPerformanceCards';
 import { academicYearFormatter } from '../../shared/Utilities/academicYearFormatter';
+import { getMonday } from '../../shared/Utilities/getMonday';
 
 const TeacherPerformanceView = () => {
 
@@ -108,10 +109,15 @@ const TeacherPerformanceView = () => {
                 year.classes = year.classes.filter(cls => auth.userClassIds.includes(cls._id));
                 return year;
             });
+
+            console.log(getOverallStats(updatedData))
+            console.log(getViolationStats(updatedData))
+
             setOverallAttendances(null)
+            setViolationData(null)
             setAttendanceData(updatedData);
             setOverallAttendances(getOverallStats(updatedData));
-            setViolationData(getViolationStats(attendanceData));
+            setViolationData(getViolationStats(updatedData));
         } catch (err) { }
     }, [sendRequest, selectedAcademicYear, selectedClass, startDate, endDate]);
 
@@ -152,22 +158,30 @@ const TeacherPerformanceView = () => {
     };
 
     const selectDateRangeHandler = (dates) => {
-        const [start, end] = dates;
-        if (start && end) {
-            setPeriode(start.toLocaleDateString('id-ID', {
+        let startingWeek = null;
+        let endOfWeek = null;
+
+        if (dates) {
+            startingWeek = getMonday(dates);
+            endOfWeek = new Date(startingWeek);
+            endOfWeek.setDate(startingWeek.getDate() + 6);
+
+            console.log(startingWeek)
+            console.log(endOfWeek)
+
+            setPeriode(startingWeek.toLocaleDateString('id-ID', {
                 day: '2-digit',
                 timeZone: 'Asia/Jakarta'
             }) + " - " +
-                end.toLocaleDateString('id-ID', {
+                endOfWeek.toLocaleDateString('id-ID', {
                     day: '2-digit',
                     month: 'long',
                     year: 'numeric',
                     timeZone: 'Asia/Jakarta'
                 }))
         }
-
-        setStartDate(start);
-        setEndDate(end);
+        setStartDate(startingWeek)
+        setEndDate(endOfWeek);
     };
 
     return (
@@ -218,17 +232,18 @@ const TeacherPerformanceView = () => {
                                         </select>
                                         <DatePicker
                                             dateFormat="dd/MM/yyyy"
+                                            maxDate={new Date(getMonday(new Date()).setDate(getMonday(new Date()).getDate() + 6))}
                                             selected={startDate}
                                             onChange={selectDateRangeHandler}
                                             startDate={startDate}
                                             endDate={endDate}
                                             locale={'id-ID'}
-                                            selectsRange
+                                            showWeekPicker
                                             isClearable
                                             withPortal={window.innerWidth <= 768}
                                             className={`${selectedAcademicYear && 'pr-8'} border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300`}
                                             disabled={!selectedAcademicYear}
-                                            placeholderText={`${selectedAcademicYear ? 'Masukkan Periode' : 'Pilih Tahun Ajaran'}`}
+                                            placeholderText={`${selectedAcademicYear ? 'Semua' : 'Pilih Tahun Ajaran'}`}
                                             onFocus={(e) => e.target.readOnly = true}
                                         />
                                         <select

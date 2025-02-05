@@ -13,6 +13,7 @@ import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 import ExperimentalCards from '../components/ExperementalCards';
 import PieChart from '../components/PieChart';
 import { academicYearFormatter } from '../../shared/Utilities/academicYearFormatter';
+import { getMonday } from '../../shared/Utilities/getMonday';
 
 const PerformanceView = () => {
 
@@ -72,7 +73,7 @@ const PerformanceView = () => {
       return Object.keys(statusCounts).map((status) => ({
         status,
         count: statusCounts[status],
-        percentage: Math.round((statusCounts[status] / total) * 100 * 100) / 100,
+        percentage: Math.round((statusCounts[status] / total) * 1000) * 10 / 100,
       })).sort((a, b) => a.status.localeCompare(b.status));
     };
 
@@ -111,6 +112,7 @@ const PerformanceView = () => {
         'Content-Type': 'application/json',
       });
       setOverallAttendances(null)
+      setViolationData(null)
       setAttendanceData(attendanceData);
       setOverallAttendances(getOverallStats(attendanceData));
       setViolationData(getViolationStats(attendanceData));
@@ -187,10 +189,8 @@ const PerformanceView = () => {
   };
 
   const selectDateRangeHandler = (dates) => {
-    const start = dates;
-    const end = new Date(start);
-    end.setDate(end.getDate() + 6);
-    if (start) {
+    const [start, end] = dates;
+    if (start && end) {
       setPeriode(start.toLocaleDateString('id-ID', {
         day: '2-digit',
         timeZone: 'Asia/Jakarta'
@@ -256,10 +256,12 @@ const PerformanceView = () => {
                       dateFormat="dd/MM/yyyy"
                       selected={startDate}
                       onChange={selectDateRangeHandler}
+                      maxDate={new Date(getMonday(new Date()).setDate(getMonday(new Date()).getDate() + 6))}
                       startDate={startDate}
+                      endDate={endDate}
                       locale={'id-ID'}
                       isClearable
-                      showWeekPicker
+                      selectsRange
                       withPortal={window.innerWidth <= 768}
                       className={`${selectedAcademicYear && 'pr-8'} border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300`}
                       disabled={!selectedAcademicYear}

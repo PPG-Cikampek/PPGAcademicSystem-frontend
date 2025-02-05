@@ -35,7 +35,7 @@ const getOverallStats = (data) => {
     return Object.keys(statusCounts).map((status) => ({
         status,
         count: statusCounts[status],
-        percentage: Math.round((statusCounts[status] / total) * 100 * 100) / 100,
+        percentage: Math.round((statusCounts[status] / total) * 1000) * 10 / 100,
     }));
 }
 
@@ -375,7 +375,7 @@ const TeachingGroupAdminPerformanceCards = ({ data, violationData, initialView, 
                         variants={itemVariants}
 
                     >
-                        {console.log(student)}
+                        {/* {console.log(student)} */}
 
                         <div className="card-basic rounded-md hover:cursor-pointer hover:bg-gray-50 hover:ring-1 hover:ring-primary flex-col transition-all duration-200">
                             <div className="flex md:justify-between md:flex-row flex-col justify-start items-start gap-4 ">
@@ -419,7 +419,7 @@ const TeachingGroupAdminPerformanceCards = ({ data, violationData, initialView, 
                                     onClick={(e) => e.stopPropagation()} // Prevents triggering parent onClick
                                 >
                                     <motion.div>
-                                        <StudentReportView studentData={student} attendanceData={calculateStats(student.attendances)} violationData={violationData} noCard={true} />
+                                        <StudentReportView studentData={student} attendanceData={calculateStats(student.attendances)} noCard={true} />
                                     </motion.div>
                                 </div>
                             )}

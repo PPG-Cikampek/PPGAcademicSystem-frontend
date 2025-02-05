@@ -91,7 +91,7 @@ const DashboardView = () => {
                         <div className='card-interactive rounded-md gap-4 md:gap-8 flex-grow items-center justify-start border-0 border-b-4 border-secondary md:p-8 hover:cursor-default m-0 min-h-16 min-w-40 max-w-[10.5rem] md:min-h-40 md:min-w-80 md:max-w-96'>
                             <Gauge className="size-8 md:size-10" />
                             <div className="flex flex-col">
-                                <h1 className="text-lg md:text-3xl font-bold">{dashboardData.Kehadiran && dashboardData.Kehadiran}%</h1>
+                                <h1 className="text-lg md:text-3xl font-bold">{dashboardData.Kehadiran && dashboardData.Kehadiran.toFixed(1)}%</h1>
                                 <p className="">{"Kehadiran"}</p>
                             </div>
                         </div>

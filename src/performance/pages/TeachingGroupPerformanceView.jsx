@@ -14,6 +14,7 @@ import TeachingGroupAdminPerformanceCards from '../components/TeachingGroupAdmin
 
 import { useReactToPrint } from 'react-to-print';
 import { academicYearFormatter } from '../../shared/Utilities/academicYearFormatter';
+import { getMonday } from '../../shared/Utilities/getMonday';
 
 const TeachingGroupPerformanceView = () => {
 
@@ -95,7 +96,7 @@ const TeachingGroupPerformanceView = () => {
       return Object.keys(statusCounts).map((status) => ({
         status,
         count: statusCounts[status],
-        percentage: Math.round((statusCounts[status] / total) * 100 * 100) / 100,
+        percentage: Math.round((statusCounts[status] / total) * 1000) * 10 / 100,
       })).sort((a, b) => a.status.localeCompare(b.status));
     };
 
@@ -146,6 +147,7 @@ const TeachingGroupPerformanceView = () => {
       });
       setTeachingGroupData(getTeachingGroupData(attendanceData))
       setOverallAttendances(null)
+      setViolationData(null)
       setAttendanceData(attendanceData);
       setOverallAttendances(getOverallStats(attendanceData));
       setViolationData(getViolationStats(attendanceData));
@@ -255,6 +257,7 @@ const TeachingGroupPerformanceView = () => {
                         dateFormat="dd/MM/yyyy"
                         selected={startDate}
                         onChange={selectDateRangeHandler}
+                        maxDate={new Date(getMonday(new Date()).setDate(getMonday(new Date()).getDate() + 6))}
                         startDate={startDate}
                         endDate={endDate}
                         locale={'id-ID'}

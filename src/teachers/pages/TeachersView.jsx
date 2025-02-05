@@ -13,11 +13,9 @@ const TeachersView = () => {
     const [teachers, setTeachers] = useState()
     const [searchTerm, setSearchTerm] = useState('');
     const [modal, setModal] = useState({ title: '', message: '', onConfirm: null });
-    const [modalIsOpen, setModalIsOpen] = useState(false);
     const { isLoading, sendRequest } = useHttp();
 
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [currentStudent, setCurrentStudent] = useState(null);
 
     const navigate = useNavigate();
     const auth = useContext(AuthContext);

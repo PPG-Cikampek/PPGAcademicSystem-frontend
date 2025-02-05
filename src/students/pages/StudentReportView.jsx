@@ -3,19 +3,61 @@ import React, { useState, useEffect } from 'react';
 import { Document, Page, Text, View, pdf, PDFViewer, Image } from '@react-pdf/renderer';
 import { saveAs } from 'file-saver';
 
-import logo from '../../assets/logos/ppgcikampek.webp';
+import logo from '../../assets/logos/ppgcikampek.png';
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 
 import { ArrowDownToLine } from 'lucide-react';
 import PieChart from '../../performance/components/PieChart';
 import ReactPDFChart from 'react-pdf-charts';
 import PerformanceReportChart from '../../performance/components/PerformanceReportChart';
+import { set } from 'react-hook-form';
 
 const violationTranslations = {
     attribute: "Perlengkapan Belajar",
     attitude: "Sikap",
     tidiness: "Kerapihan",
 };
+
+const formatDate = (date) => {
+    if (!(date instanceof Date)) {
+        date = new Date(date);
+    }
+    return date.toLocaleDateString('id-ID', {
+        weekday: 'long',
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+        timeZone: 'Asia/Jakarta'
+    });
+};
+
+const getViolationStats = (data) => {
+    const violationCounts = data.attendances.reduce((acc, attendance) => {
+        Object.entries(attendance.violations).forEach(([key, value]) => {
+            if (value) {
+                const existing = acc.find(item => item.violation === key);
+                if (existing) {
+                    existing.count += 1;
+                } else {
+                    acc.push({ violation: key, count: 1 });
+                }
+            }
+        });
+        return acc;
+    }, []);
+
+    return violationCounts;
+};
+
+const getTeachersNotes = (data) => {
+    const teachersNotes = data.attendances
+        .filter(attendance => attendance.teachersNotes) // Remove empty notes
+        .map(attendance => ({
+            noteContent: attendance.teachersNotes,
+            noteDate: attendance.forDate
+        }));
+    return teachersNotes;
+}
 
 const styles = {
     page: {
@@ -133,15 +175,13 @@ const styles = {
     }
 };
 
-const StudentReportView = ({ studentData, attendanceData, violationData, noCard = false }) => {
+const StudentReportView = ({ studentData, attendanceData, noCard = false }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [reportData, setReportData] = useState();
     const [reportChart, setReportChart] = useState();
     const [showPreview, setShowPreview] = useState(false);
-
-    console.log(studentData)
-    console.log(attendanceData)
-    console.log(violationData)
+    const [teachersNotes, setTeachersNotes] = useState(false);
+    const [violationData, setViolationData] = useState(false);
 
     useEffect(() => {
         setIsLoading(true)
@@ -177,8 +217,14 @@ const StudentReportView = ({ studentData, attendanceData, violationData, noCard 
             data: transformedAttendance,
         };
 
+        console.log(getViolationStats(studentData))
+        console.log(getTeachersNotes(studentData))
+
+
         setReportData(documentData);
         setIsLoading(false)
+        setTeachersNotes(getTeachersNotes(studentData))
+        setViolationData(getViolationStats(studentData))
         setReportChart(<PerformanceReportChart attendanceData={attendanceData} />)
 
     }, [studentData, setReportChart]);
@@ -286,13 +332,13 @@ const StudentReportView = ({ studentData, attendanceData, violationData, noCard 
                         <View style={{ marginTop: 10, marginBottom: 30, display: 'flex', flexDirection: 'col', justifyContent: 'start', alignItems: 'start' }}>
                             {/* full-width box with 2px border solid black */}
                             <Text style={{ fontFamily: 'Times-Bold', textDecoration: 'underline', fontStyle: 'italic', marginBottom: 5 }}>
-                                CATATAN GURU:
+                                CATATAN KOMUNIKASI KEPADA ORANG TUA:
                             </Text>
-                            <View style={{ width: '100%', border: '1px solid black', padding: 10 }}>
-                                <Text style={{ minHeight: 50 }}>
-                                    {'\n\n\n\n\n\n\n\n'}
-                                </Text>
-                            </View>
+                            {teachersNotes.map((row, index) => (
+                                <View key={index} style={[styles.tableRow, { paddingLeft: 5 }]}>
+                                    <Text style={styles.tableCell}>{index + 1}. {row.noteContent} {`(${formatDate(row.noteDate)})`}</Text>
+                                </View>
+                            ))}
                         </View>
 
                     </View>

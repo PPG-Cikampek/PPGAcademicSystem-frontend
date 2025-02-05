@@ -61,10 +61,7 @@ const HomeScreenView = () => {
     });
 
     let activeClassCount = 0;
-
-    console.log(activeClassCount)
     // console.log(JSON.stringify(data))
-
 
     return (
         <div className="flex flex-col">
@@ -79,7 +76,7 @@ const HomeScreenView = () => {
             {data && !isLoading && (
                 <SequentialAnimation>
                     <div className="mt-20 flex-1 p-4">
-                        <div className="card-basic rounded-md flex-col ">
+                        <div className="card-basic rounded-md flex-col mb-4">
                             <h1 className="text-xl font-medium mb-2">{getPositionName[data.position] || data.position}</h1>
                             <CurrentTime />
                         </div>

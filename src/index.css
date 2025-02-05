@@ -17,8 +17,12 @@ html {
     border-radius: 5px;
   }
 
+  table {
+    @apply border border-gray-200
+  }
+
   .card-interactive {
-    @apply mt-4 p-4 flex justify-center rounded-3xl md:mx-8 bg-white shadow-sm transition ease-out hover:-translate-y-1 hover:scale-[1.025]  hover:cursor-pointer hover:shadow-lg duration-200
+    @apply mt-4 p-4 flex justify-center rounded-3xl md:mx-8 bg-white shadow-sm ring-1 ring-gray-200 transition ease-out hover:-translate-y-1 hover:scale-[1.025]  hover:cursor-pointer hover:shadow-lg duration-200
   }
 
   .card-basic {
@@ -84,6 +88,6 @@ html {
 
 
 body {
-  @apply bg-gray-100 text-sm font-normal h-full;
+  @apply bg-gray-50 text-sm font-normal h-full;
 }
 
