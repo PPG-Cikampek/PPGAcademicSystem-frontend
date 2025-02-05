@@ -154,14 +154,14 @@ const AuthView = () => {
                                         {isLoading ? (<LoadingCircle>Processing...</LoadingCircle>) : ('Login')}
                                     </button>
                                 )}
-                                {/* <button
+                                <button
                                     type="button"
                                     onClick={handleToggle}
                                     className="button-secondary"
                                     disabled={isLoading}
                                 >
                                     {isStudent ? 'Gunakan Email' : 'Gunakan Kode QR'}
-                                </button> */}
+                                </button>
                             </div>
                         }
                         helpButton={studentLoginFields.length === 0 && <QRScanner setStudentLoginField={setStudentLoginFields} setNis={setNis} />}
