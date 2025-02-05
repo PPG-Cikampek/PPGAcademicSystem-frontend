@@ -30,9 +30,11 @@ const StudentDetailView = () => {
 
     useEffect(() => {
         const fetchStudentData = async () => {
-            const url = studentId
-                ? `${import.meta.env.VITE_BACKEND_URL}/students/${studentId}`
-                : `${import.meta.env.VITE_BACKEND_URL}/students/user/${auth.userId}`;
+            const url = auth.userRole === 'student'
+                ? `${import.meta.env.VITE_BACKEND_URL}/students/user/${auth.userId}`
+                : studentId
+                    ? `${import.meta.env.VITE_BACKEND_URL}/students/${studentId}`
+                    : ''
 
             try {
                 const responseData = await sendRequest(url);

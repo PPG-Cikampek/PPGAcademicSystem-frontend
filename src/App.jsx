@@ -13,6 +13,7 @@ import NewMaterialProgresslView from "./teacher-role/materialProgress/pages/NewM
 import RequestAccountView from "./users/pages/RequestAccountView";
 import RequestAccountForm from "./users/pages/RequestAccountForm";
 import RequestAccountTicketDetail from "./users/pages/RequestAccountTicketDetail";
+import StudentDashboardView from "./students/pages/StudentDashboardView";
 
 const DashboardNav = lazy(() => import("./shared/Components/Navigation/DashboardNav/DashboardNav"));
 const DashboardView = lazy(() => import("./dashboard/pages/DashboardView"));
@@ -132,7 +133,6 @@ function App() {
                     <UpdateAttendanceView />
                   </PageHeader>
                 } />
-              {/* <Route path='/attendance/history/class/edit-confirmation/:attendanceId' element={<EditAttendanceConfirmation />} /> */}
               <Route path='/materialProgress' element=
                 {
                   <PageHeader>
@@ -230,13 +230,45 @@ function App() {
                     <StudentReportView />
                   </PageHeader>
                 } />
+              <Route path='/verify-email/:token' element={<EmailVerifyView />} />
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
           </HomeNavigation>
         </StudentAttendanceProvider>
       </QueryClientProvider>
     )
-  } else if (token && userRole !== 'teacher') {
+  } else if (token && userRole === 'student') {
+    routes = (
+      <HomeNavigation >
+        <Routes>
+          <Route path='/' element={
+            <PageHeader>
+              <StudentDashboardView />
+            </PageHeader>
+          } />
+          <Route path='/dashboard/students/:studentId' element=
+            {
+              <PageHeader>
+                <StudentDetailView />
+              </PageHeader>
+            } />
+          <Route path='/dashboard/students/:studentId/update' element=
+            {
+              <PageHeader>
+                <UpdateStudentView />
+              </PageHeader>
+            } />
+          <Route path='/settings/profile/:userId' element={
+            <PageHeader>
+              <ProfileView />
+            </PageHeader>
+          } />
+          <Route path='/verify-email/:token' element={<EmailVerifyView />} />
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </HomeNavigation>
+    )
+  } else if (token && userRole === 'admin' || userRole === 'admin kelompok') {
     routes = (
       <DashboardNav>
         {/* <div className="max-w-7xl mx-auto"> */}
@@ -271,7 +303,6 @@ function App() {
           )}
           {userRole === 'admin' && (
             <>
-              <Route path='/verify-email/:token' element={<EmailVerifyView />} />
               <Route path='/profile/:userId' element={<ProfileView />} />
               <Route path='/settings/academic' element={<AcademicYearsView />} />
               <Route path='/settings/academic/new' element={<NewAcademicYearView />} />
@@ -287,7 +318,6 @@ function App() {
               <Route path='/performance' element={<PerformanceView />} />
             </>
           )}
-
           <Route path="*" element={<Navigate to="/dashboard" />} />
         </Routes>
         {/* </div> */}

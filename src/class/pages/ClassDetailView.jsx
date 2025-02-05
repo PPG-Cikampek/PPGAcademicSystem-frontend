@@ -257,7 +257,7 @@ const ClassDetailView = () => {
                                     </Link>
                                 )}
                             </div>
-                            <div className="rounded-md border border-gray-200 bg-white shadow-sm overflow-auto text-nowrap">
+                            <div className="rounded-md bg-white shadow-sm overflow-auto text-nowrap">
                                 <table className="w-full">
                                     <thead className="bg-white">
                                         <tr>
@@ -328,7 +328,7 @@ const ClassDetailView = () => {
                                     </Link>
                                 )}
                             </div>
-                            <div className="rounded-md border border-gray-200 bg-white shadow-sm  overflow-auto text-nowrap">
+                            <div className="rounded-md bg-white shadow-sm overflow-auto text-nowrap">
                                 <table className="w-full">
                                     <thead className="bg-white">
                                         <tr>

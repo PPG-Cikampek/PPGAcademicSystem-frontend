@@ -18,50 +18,53 @@ const HomeNavigation = ({ children }) => {
     // console.log(auth.currentTeachingGroupYear || 'no active year')
     // console.log(auth.userClassIds || 'no classes')
 
-    const links = [
-        {
-            link: `/dashboard/teachers/${auth.userId}`,
-            icon: <GraduationCap />,
-            label: auth.userName,
-        },
-        {
-            link: '/attendance/history/',
-            icon: <Presentation />,
-            label: 'Kelas',
-        },
-        {
-            link: '/journal',
-            icon: <Notebook />,
-            label: 'Jurnal',
-        },
-        {
-            link: '/dashboard/students',
-            icon: <Users />,
-            label: 'Peserta Didik',
-        },
-        {
-            link: '/performances',
-            icon: <Gauge />,
-            label: 'Performa Kehadiran',
-        },
-        // {
-        //     link: `/profile/${auth.userId}`,
-        //     icon: <Settings />,
-        //     label: 'Pengaturan',
-        // },
-        {
-            link: '/dashboard/academic',
-            icon: <CalendarCog />,
-            label: 'Tahun Ajaran',
-        },
-    ];
+    const links = auth.userRole === 'teacher' ?
+        [
+            {
+                link: `/dashboard/teachers/${auth.userId}`,
+                icon: <GraduationCap />,
+                label: auth.userName,
+            },
+            {
+                link: '/attendance/history/',
+                icon: <Presentation />,
+                label: 'Kelas',
+            },
+            {
+                link: '/journal',
+                icon: <Notebook />,
+                label: 'Jurnal',
+            },
+            {
+                link: '/dashboard/students',
+                icon: <Users />,
+                label: 'Peserta Didik',
+            },
+            {
+                link: '/performances',
+                icon: <Gauge />,
+                label: 'Performa Kehadiran',
+            },
+            {
+                link: '/dashboard/academic',
+                icon: <CalendarCog />,
+                label: 'Tahun Ajaran',
+            },
+        ] :
+        [
+            {
+                link: `/dashboard/students/${auth.userId}`,
+                icon: <GraduationCap />,
+                label: auth.userName,
+            },
+        ]
 
     return (
         <Sidebar
             linksList={links}
         >
             {children}
-            <BottomNav />
+            {auth.userRole === 'teacher' && <BottomNav />}
         </Sidebar>
 
     )

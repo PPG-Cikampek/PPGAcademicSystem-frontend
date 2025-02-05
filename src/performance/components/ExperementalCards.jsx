@@ -362,11 +362,11 @@ const ExperimentalCards = ({ data, initialView, month }) => {
                     >
                         <div className="flex flex-col gap-1">
                             <h3 className="text-lg font-medium">Kelompok {teachingGroup.name}</h3>
-                            <p className="text-sm text-gray-600">
+                            {teachingGroupYear.semesterTarget && (<p className="text-sm text-gray-600">
                                 Target Semester: {teachingGroupYear.semesterTarget} hari
-                            </p>
+                            </p>)}
                             <p className="text-sm text-gray-600">
-                                Jumlah Siswa: {teachingGroup.uniqueStudents} siswa
+                                Jumlah Siswa: {teachingGroup.uniqueStudents || 0} siswa
                             </p>
                         </div>
                         <div className="md:hidden flex flex-col md:flex-row gap-2 items-end md:items-end">
@@ -426,9 +426,9 @@ const ExperimentalCards = ({ data, initialView, month }) => {
             >
                 <div className="mx-4 md:mx-8  flex flex-col">
                     <h2 className="text-xl font-bold">Kelompok {teachingGroupName}</h2>
-                    <p className="text-sm text-gray-600">
+                    {teachingGroupYear.semesterTarget && (<p className="text-sm text-gray-600">
                         Target Semester: {teachingGroupYear.semesterTarget} hari
-                    </p>
+                    </p>)}
                 </div>
 
                 {classes.map(cls => (
@@ -522,11 +522,11 @@ const ExperimentalCards = ({ data, initialView, month }) => {
             >
                 <div className="mx-4 md:mx-8  flex flex-col">
                     <h2 className="text-xl font-bold">Kelompok {selectedClassData.name}</h2>
-                    <p className="text-sm text-gray-600">
+                    {teachingGroupYear.semesterTarget && (<p className="text-sm text-gray-600">
                         Target Semester: {teachingGroupYear.semesterTarget} hari
-                    </p>
+                    </p>)}
                     <p className="text-sm text-gray-600">
-                        Jumlah Siswa: {students.uniqueStudents} siswa
+                        Jumlah Siswa: {students.uniqueStudents || 0} siswa
                     </p>
                     <p className="text-sm text-gray-600">
                         Total Pertemuan: {attendanceCount(selectedClassData)} hari
