@@ -64,7 +64,7 @@ const HomeScreenView = () => {
     // console.log(JSON.stringify(data))
 
     return (
-        <div className="flex flex-col">
+        <div className="flex flex-col pb-12">
             <div>
                 <Profile user={data} isLoading={isLoading} />
             </div>
@@ -75,12 +75,12 @@ const HomeScreenView = () => {
             )}
             {data && !isLoading && (
                 <SequentialAnimation>
-                    <div className="mt-20 flex-1 p-4">
-                        <div className="card-basic rounded-md flex-col mb-4">
+                    <div className="mt-16 flex-1 p-4">
+                        <div className="card-basic rounded-md flex-col mb-2">
                             <h1 className="text-xl font-medium mb-2">{getPositionName[data.position] || data.position}</h1>
                             <CurrentTime />
                         </div>
-                        <div className="mb-4">
+                        <div className="mb-2">
                             {data.classIds.map((item, index) => {
                                 const isClassInTeachingGroupYear = item?.teachingGroupYearId?.academicYearId?.isActive
                                 if (isClassInTeachingGroupYear) {

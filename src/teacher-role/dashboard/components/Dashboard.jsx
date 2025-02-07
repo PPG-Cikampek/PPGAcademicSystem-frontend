@@ -5,7 +5,7 @@ const Dashboard = ({ data }) => {
     // console.log(JSON.stringify(data))
 
     return (
-        <div className='card-basic rounded-md flex-col pb-0 my-8'>
+        <div className='card-basic rounded-md flex-col pb-0 my-4'>
             <h2 className='text-xl font-medium mb-2 '>{data.name}</h2>
             <div className="grid grid-cols-2 gap-4 mb-4">
                 <div className="card-basic rounded-md flex-col my-0 active:ring-1 ">

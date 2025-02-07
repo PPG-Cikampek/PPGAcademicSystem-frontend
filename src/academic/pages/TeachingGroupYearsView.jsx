@@ -312,7 +312,7 @@ const TeachingGroupYearsView = () => {
 
                     {/* Expandable Section */}
                     <div
-                      className={`overflow-hidden transition-all duration-300 ${expandedId === year._id ? 'max-h-96' : 'max-h-0'
+                      className={`overflow-hidden transition-all duration-300 ${expandedId === year._id ? 'max-h-[512px]' : 'max-h-0'
                         }`}
                     >
                       <div className="border-t">

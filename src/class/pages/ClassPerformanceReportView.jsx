@@ -241,12 +241,12 @@ const ClassPerformanceReportView = ({ studentData, noCard = false }) => {
                     {/* {studentData.teachers.map(teacher => (
                         <View style={styles.signature} key={teacher._id}>
                             <Text style={styles.signatureName}>{teacher.name}</Text>
-                            <Text>NID: {teacher.nid}</Text>
+                            <Text>NIG: {teacher.nig}</Text>
                         </View>
                     ))} */}
                     <View style={styles.signature} key={studentData.teachers[0]._id}>
                         <Text style={styles.signatureName}>{studentData.teachers[0].name}</Text>
-                        <Text>NID: {studentData.teachers[0].nid}</Text>
+                        <Text>NIG: {studentData.teachers[0].nig}</Text>
                     </View>
                 </View>
             </Page>

@@ -51,7 +51,8 @@ const UpdateUserView = () => {
 
         try {
             const responseData = await sendRequest(url, 'PATCH', body, {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + auth.token
             });
         } catch (err) {
             // Error is already handled by useHttp

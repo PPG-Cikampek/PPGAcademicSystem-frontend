@@ -263,7 +263,7 @@ const ClassDetailView = () => {
                                         <tr>
                                             <th className="pl-6 py-3 text-left text-sm font-medium text-gray-500"></th>
                                             <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Nama</th>
-                                            <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">NID</th>
+                                            <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">NIG</th>
                                             <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Posisi</th>
                                             <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Nomor WA</th>
                                             {auth.userRole !== 'teacher' && classData.class.isLocked === false && classData.class.teachingGroupYearId.academicYearId.isActive === true && (<th className="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Atur</th>)}
@@ -289,7 +289,7 @@ const ClassDetailView = () => {
                                                     )}
                                                 </td>
                                                 <td className="px-6 py-4 text-sm text-gray-900">{teacher.name}</td>
-                                                <td className="px-6 py-4 text-sm text-gray-600">{teacher.nid}</td>
+                                                <td className="px-6 py-4 text-sm text-gray-600">{teacher.nig}</td>
                                                 <td className="px-6 py-4 text-sm text-gray-600">{teacher.position}</td>
                                                 <td className="px-6 py-4 text-sm text-gray-600">{teacher.phone}</td>
                                                 {auth.userRole !== 'teacher' && classData.class.isLocked === false && classData.class.teachingGroupYearId.academicYearId.isActive === true && (

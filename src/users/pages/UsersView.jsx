@@ -189,7 +189,7 @@ const UsersView = () => {
                                                 ? 'Siswa'
                                                 : 'Admin Daerah'}</span>
                         </div>
-                        <p className="text-sm text-gray-500 hidden md:block">{user.email}</p>
+                        {user.role !== 'student' && <p className="text-sm text-gray-500 hidden md:block">{user.email}</p>}
                     </div>
                 </div>
                 <div className="flex items-center space-x-4">

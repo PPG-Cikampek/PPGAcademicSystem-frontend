@@ -80,7 +80,7 @@ const NewUserView = () => {
                 role: 'teacher',
                 teachingGroupName: data.teachingGroupName,
                 teacherDetails: {
-                    nid: data.nid
+                    nig: data.nig
                 }
             });
 
@@ -100,9 +100,9 @@ const NewUserView = () => {
     };
 
     const teacherObject = () => {
-        const updatedList = adminFields.filter((item) => item.name !== 'nid' && item.name !== 'role'); // Removing the object
+        const updatedList = adminFields.filter((item) => item.name !== 'nig' && item.name !== 'role'); // Removing the object
 
-        const newObject = { name: 'nid', label: 'NID Guru', placeholder: '00001234', type: 'text', required: true };
+        const newObject = { name: 'nig', label: 'NIG Guru', placeholder: '00001234', type: 'text', required: true };
         // const newObject2 = { name: 'position', label: 'Posisi', placeholder: 'Guru', type: 'select', required: true, options:
         //     [
         //         { label: 'Guru', value: 'teacher' },
@@ -114,7 +114,7 @@ const NewUserView = () => {
 
     // Function to remove an object by its `id`
     const adminObject = () => {
-        const updatedList = adminFields.filter((item) => item.name !== 'nid' && item.name !== 'role'); // Removing the object
+        const updatedList = adminFields.filter((item) => item.name !== 'nig' && item.name !== 'role'); // Removing the object
         const newObject2 = {
             name: 'role',
             label: 'Akun',
@@ -137,9 +137,9 @@ const NewUserView = () => {
         setTimeout(() => {
             setIsAccountForAdmin((prev) => !prev);
             if (!isAccountForAdmin) {
-                adminObject(); // Remove 'nid' field if switching to admin
+                adminObject(); // Remove 'nig' field if switching to admin
             } else {
-                teacherObject(); // Add 'nid' field if switching to teacher
+                teacherObject(); // Add 'nig' field if switching to teacher
             }
             setIsTransitioning(false);
         }, 200);

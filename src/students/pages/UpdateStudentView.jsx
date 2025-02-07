@@ -10,6 +10,7 @@ import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 import Modal from "../../shared/Components/UIElements/ModalBottomClose";
 import FileUpload from '../../shared/Components/FormElements/FileUpload';
 import { Icon } from '@iconify-icon/react';
+import { AuthContext } from '../../shared/Components/Context/auth-context';
 
 const UpdateStudentView = () => {
     const [modal, setModal] = useState({ title: '', message: '', onConfirm: null });
@@ -21,6 +22,7 @@ const UpdateStudentView = () => {
     const [croppedImage, setCroppedImage] = useState(null);
 
     const fileInputRef = useRef();
+    const auth = useContext(AuthContext)
 
     const studentId = useParams().studentId;
     const navigate = useNavigate();
@@ -42,19 +44,24 @@ const UpdateStudentView = () => {
         const url = `${import.meta.env.VITE_BACKEND_URL}/students/${studentId}`;
         const formData = new FormData();
 
+        auth.userRole === 'admin' && formData.append('nis', data.nis);
         formData.append('name', data.name);
         formData.append('dateOfBirth', data.dateOfBirth);
         formData.append('gender', data.gender);
         formData.append('parentName', data.parentName);
         formData.append('address', data.address);
 
+
         if (croppedImage) {
             formData.append('image', croppedImage);
         } else {
-            setError("Tidak ada foto yang dipilih!");
-            throw new Error('Tidak ada foto yang dipilih!');
+            if (auth.userRole !== 'admin') {
+                setError("Tidak ada foto yang dipilih!");
+                throw new Error('Tidak ada foto yang dipilih!');
+            }
         }
 
+        console.log(formData)
         let responseData;
         try {
             responseData = await sendRequest(url, 'PATCH', formData);
@@ -125,11 +132,12 @@ const UpdateStudentView = () => {
                     }
                     subtitle={'Update Profile Peserta Didik'}
                     fields={[
-                        { name: 'name', label: 'Nama Lengkap', placeholder: 'Nama Lengkap', type: 'text', required: true, disabled: isLoading, value: loadedStudent?.name || '' },
-                        { name: 'dateOfBirth', label: 'Tanggal Lahir', placeholder: 'Desa', type: 'date', required: true, disabled: isLoading, value: loadedDate || '' },
-                        { name: 'gender', label: 'Jenis Kelamin', type: 'select', required: true, disabled: isLoading, value: loadedStudent?.gender || '', options: [{ label: 'Laki-Laki', value: 'male' }, { label: 'Perempuan', value: 'female' }] },
-                        { name: 'parentName', label: 'Nama Orang Tua', type: 'text', required: true, disabled: isLoading, value: loadedStudent?.parentName || '' },
-                        { name: 'address', label: 'Alamat', type: 'textarea', required: true, disabled: isLoading, value: loadedStudent?.address || '' },
+                        auth.userRole === 'admin' && { name: 'nis', label: 'NIS', placeholder: '20100010', type: 'text', required: false, disabled: isLoading, value: loadedStudent?.nis || '' },
+                        { name: 'name', label: 'Nama Lengkap', placeholder: 'Nama Lengkap', type: 'text', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.name || '' },
+                        { name: 'dateOfBirth', label: 'Tanggal Lahir', placeholder: 'Desa', type: 'date', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedDate || '' },
+                        { name: 'gender', label: 'Jenis Kelamin', type: 'select', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.gender || '', options: [{ label: 'Laki-Laki', value: 'male' }, { label: 'Perempuan', value: 'female' }] },
+                        { name: 'parentName', label: 'Nama Orang Tua', type: 'text', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.parentName || '' },
+                        { name: 'address', label: 'Alamat', type: 'textarea', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.address || '' },
                     ]}
                     onSubmit={handleFormSubmit}
                     disabled={isLoading}

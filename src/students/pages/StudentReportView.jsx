@@ -359,7 +359,7 @@ const StudentReportView = ({ studentData, attendanceData, noCard = false }) => {
                         <Text>Hormat Kami,</Text>
                         <View style={styles.signature} key={studentData.teachers[0]._id}>
                             <Text style={styles.signatureName}>{studentData.teachers[0].name}</Text>
-                            <Text>NID: {studentData.teachers[0].nid}</Text>
+                            <Text>NIG: {studentData.teachers[0].nig}</Text>
                         </View>
                     </View>
                 </View>

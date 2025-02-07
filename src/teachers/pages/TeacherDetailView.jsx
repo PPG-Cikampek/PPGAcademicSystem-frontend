@@ -57,7 +57,7 @@ const TeacherDetailView = () => {
                 setIsProfileComplete(responseData.teacher.isProfileComplete)
 
                 setTeacherDetails([
-                    { label: 'NID', value: responseData.teacher.nid, icon: <Icon icon="icon-park-outline:id-card-h" width="24" height="24" /> },
+                    { label: 'NIG', value: responseData.teacher.nig, icon: <Icon icon="icon-park-outline:id-card-h" width="24" height="24" /> },
                     { label: 'Nomor HP', value: responseData.teacher.phone, icon: <Icon icon="tabler:phone" width="24" height="24" /> },
                     { label: 'Tanggal Lahir', value: formatDate(responseData.teacher.dateOfBirth), icon: <Icon icon="material-symbols:date-range-outline" width="24" height="24" /> },
                     { label: 'Jenis Kelamin', value: responseData.teacher.gender? (responseData.teacher.gender === 'male' ? 'Laki-laki' : 'Perempuan') : '', icon: <Icon icon="tabler:gender-bigender" width="24" height="24" /> },
@@ -69,7 +69,7 @@ const TeacherDetailView = () => {
                 // Update teacher info
                 setTeacherInfo({
                     name: responseData.teacher.name,
-                    nid: responseData.teacher.nid,
+                    nig: responseData.teacher.nig,
                     image: responseData.teacher.image,
                     branch: responseData.teacher.userId.teachingGroupId.branchId.name,
                     teachingGroup: responseData.teacher.userId.teachingGroupId.name,
@@ -103,7 +103,7 @@ const TeacherDetailView = () => {
                                 className="mt-2 rounded-md size-48 md:size-64 shrink-0"
                             />
                             <h2 className="mt-4 text-lg font-normal">{teacherInfo.name}</h2>
-                            <p className="mt-2 text-gray-600">{teacherInfo.nid}</p>
+                            <p className="mt-2 text-gray-600">{teacherInfo.nig}</p>
                             <div className="mt-4 flex flex-col md:flex-row gap-2 text-center">
                                 <NavLink to="" className="badge-primary">{teacherInfo.branch}</NavLink>
                                 <NavLink to="" className="badge-primary">{teacherInfo.teachingGroup}</NavLink>

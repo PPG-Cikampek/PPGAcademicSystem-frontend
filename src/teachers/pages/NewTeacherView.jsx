@@ -25,7 +25,7 @@ const NewTeacherView = () => {
   const loginFields = [
     { name: 'name', label: 'Name', placeholder: 'Nama Lengkap', type: 'text', required: true },
     { name: 'email', label: 'Email', placeholder: 'Email', type: 'email', required: true },
-    { name: 'nid', label: 'NID', placeholder: 'NID', type: 'text', required: true },
+    { name: 'nig', label: 'NIG', placeholder: 'NIG', type: 'text', required: true },
     { name: 'phone', label: 'Nomor HP Aktif', placeholder: 'Nomor HP Aktif', type: 'text', required: true },
     {
       name: 'position',
@@ -61,7 +61,7 @@ const NewTeacherView = () => {
     const body = JSON.stringify({
       name: data.name,
       email: data.email,
-      nid: data.nid,
+      nig: data.nig,
       phone: data.phone,
       position: data.position,
       dateOfBirth: data.dateOfBirth,

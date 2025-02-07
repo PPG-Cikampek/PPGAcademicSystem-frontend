@@ -58,7 +58,7 @@ const IndividualDoughnut = ({ status, percentage }) => {
 const CombinedDoughnutChart = ({ attendanceData, toImage }) => {
   const chartRef = useRef(null);
   const [chartImage, setChartImage] = useState(null);
-  
+
   useEffect(() => {
     if (chartRef.current && toImage === true) {
       html2canvas(chartRef.current).then((canvas) => {
@@ -113,6 +113,7 @@ const MultiDoughnutChart = ({ attendanceData }) => (
 
 const PieChart = ({ attendanceData, chartType, toImage = false }) => {
   const [transformedData, setTransformedData] = useState([]);
+  console.log(attendanceData)
 
   const transformData = () => {
     const hadir = attendanceData
@@ -141,13 +142,19 @@ const PieChart = ({ attendanceData, chartType, toImage = false }) => {
       (item) => item.status === "Tanpa Keterangan"
     );
 
-    setTransformedData(
-      [hadir, tidakHadir, tanpaKeterangan && tanpaKeterangan.count > 0 ? {
-        status: "Tanpa Keterangan",
-        count: tanpaKeterangan.count,
-        percentage: tanpaKeterangan.percentage,
-      } : null].filter(Boolean)
-    );
+    const finalData = [hadir, tidakHadir, tanpaKeterangan && tanpaKeterangan.count > 0 ? {
+      status: "Tanpa Keterangan",
+      count: tanpaKeterangan.count,
+      percentage: tanpaKeterangan.percentage,
+    } : null].filter(Boolean)
+
+    const finalDataFormatted = finalData.map((item) => ({
+      ...item,
+      percentage: item.percentage.toFixed(1),
+    }));
+
+    setTransformedData(finalDataFormatted);
+    console.log(JSON.stringify(finalData, null, 2));
 
   };
 

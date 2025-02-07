@@ -111,6 +111,7 @@ const PerformanceView = () => {
       const attendanceData = await sendRequest(url, 'POST', body, {
         'Content-Type': 'application/json',
       });
+
       setOverallAttendances(null)
       setViolationData(null)
       setAttendanceData(attendanceData);

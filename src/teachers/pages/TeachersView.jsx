@@ -101,7 +101,7 @@ const TeachersView = () => {
                                 <tr>
                                     <th className="p-2 md:p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
                                     <th className="p-2 md:p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th className="p-2 md:p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NID</th>
+                                    <th className="p-2 md:p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NIG</th>
                                     <th className="p-2 md:p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
                                     {auth.userRole === 'admin' && <th className="p-2 md:p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Desa</th>}
                                     {auth.userRole === 'admin' && <th className="p-2 md:p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kelompok</th>}
@@ -128,7 +128,7 @@ const TeachersView = () => {
                                             )}
                                         </td>
                                         <td className='p-2 md:p-4 '> <div className={`py-1 px-2 text-sm text-center w-min border rounded-md ${teacher.positionEndDate ? 'text-red-500 bg-red-100' : 'text-green-500 bg-green-100'}`}>{teacher.positionEndDate ? 'Tidak Aktif' : 'Aktif'}</div></td>
-                                        <td className="p-2 md:p-4 text-sm text-gray-900">{teacher.nid}</td>
+                                        <td className="p-2 md:p-4 text-sm text-gray-900">{teacher.nig}</td>
                                         <td className="p-2 md:p-4 text-sm text-gray-900">{teacher.name}</td>
                                         {auth.userRole === 'admin' && <td className="p-2 md:p-4 text-sm text-gray-500">{teacher?.userId?.teachingGroupId?.branchId?.name}</td>}
                                         {auth.userRole === 'admin' && <td className="p-2 md:p-4 text-sm text-gray-500">{teacher?.userId?.teachingGroupId?.name}</td>}

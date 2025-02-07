@@ -90,7 +90,7 @@ const DynamicForm = ({ logo, title, subtitle, fields = [], onSubmit, button, cus
                                 {...register(field.name, {
                                     required: field.required,
                                     validate: (value) =>
-                                        value >= 2020 && value <= (currentYear + 1) || "Enter a valid year",
+                                        value >= 2018 && value <= (currentYear + 1) || "Tahun tidak valid!",
                                 })}
                                 disabled={field.disabled}
                                 min="1900"

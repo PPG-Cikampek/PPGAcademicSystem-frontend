@@ -15,6 +15,8 @@ const ClassCards = ({ data }) => {
         });
     };
 
+    console.log(JSON.stringify(data))
+
     let activeClassCount = 0;
 
     return (
