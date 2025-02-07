@@ -20,6 +20,7 @@ const UpdateStudentView = () => {
     const [loadedStudent, setLoadedStudent] = useState();
     const [loadedDate, setLoadedDate] = useState();
     const [croppedImage, setCroppedImage] = useState(null);
+    const [fields, setFields] = useState([])
 
     const fileInputRef = useRef();
     const auth = useContext(AuthContext)
@@ -38,7 +39,30 @@ const UpdateStudentView = () => {
             } catch (err) { }
         };
         fetchStudent();
+
     }, [sendRequest, studentId]);
+
+    useEffect(() => {
+
+        if (auth.userRole === 'admin') {
+            setFields([
+                { name: 'nis', label: 'NIS', placeholder: '20100010', type: 'text', required: false, disabled: isLoading, value: loadedStudent?.nis || '' },
+                { name: 'name', label: 'Nama Lengkap', placeholder: 'Nama Lengkap', type: 'text', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.name || '' },
+                { name: 'dateOfBirth', label: 'Tanggal Lahir', placeholder: 'Desa', type: 'date', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedDate || '' },
+                { name: 'gender', label: 'Jenis Kelamin', type: 'select', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.gender || '', options: [{ label: 'Laki-Laki', value: 'male' }, { label: 'Perempuan', value: 'female' }] },
+                { name: 'parentName', label: 'Nama Orang Tua', type: 'text', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.parentName || '' },
+                { name: 'address', label: 'Alamat', type: 'textarea', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.address || '' },
+            ])
+        } else {
+            setFields([
+                { name: 'name', label: 'Nama Lengkap', placeholder: 'Nama Lengkap', type: 'text', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.name || '' },
+                { name: 'dateOfBirth', label: 'Tanggal Lahir', placeholder: 'Desa', type: 'date', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedDate || '' },
+                { name: 'gender', label: 'Jenis Kelamin', type: 'select', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.gender || '', options: [{ label: 'Laki-Laki', value: 'male' }, { label: 'Perempuan', value: 'female' }] },
+                { name: 'parentName', label: 'Nama Orang Tua', type: 'text', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.parentName || '' },
+                { name: 'address', label: 'Alamat', type: 'textarea', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.address || '' },
+            ])
+        }
+    }, [loadedStudent])
 
     const handleFormSubmit = async (data) => {
         const url = `${import.meta.env.VITE_BACKEND_URL}/students/${studentId}`;
@@ -113,49 +137,50 @@ const UpdateStudentView = () => {
                     <ErrorCard className="mx-2" error={error} onClear={() => setError(null)} />
                 </div>}
 
-            <div className={`pb-24 transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
-                <DynamicForm
-                    customDescription={
-                        <div className='relative'>
-                            <div className=''>
-                                <FileUpload
-                                    ref={fileInputRef}
-                                    accept=".jpg,.jpeg,.png"
-                                    buttonLabel={<Icon icon="jam:upload" width="24" height="24" />}
-                                    buttonClassName={`${isLoading && 'hidden'} border border-gray-600 bg-gray-50 size-9 rounded-full absolute offset bottom-2 right-2 translate-x-1/2 translate-y-1/2`}
-                                    imgClassName={`${isLoading && 'animate-pulse'} mt-2 rounded-md size-32 md:size-48 shrink-0`}
-                                    defaultImageSrc={loadedStudent?.image ? `${import.meta.env.VITE_BACKEND_URL}/${loadedStudent.image}` : "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"}
-                                    onImageCropped={setCroppedImage}
-                                />
+            {!isLoading && fields && (
+                <div className={`pb-24 transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
+                    <DynamicForm
+                        customDescription={
+                            <div className='relative'>
+                                <div className=''>
+                                    <FileUpload
+                                        ref={fileInputRef}
+                                        accept=".jpg,.jpeg,.png"
+                                        buttonLabel={<Icon icon="jam:upload" width="24" height="24" />}
+                                        buttonClassName={`${isLoading && 'hidden'} border border-gray-600 bg-gray-50 size-9 rounded-full absolute offset bottom-2 right-2 translate-x-1/2 translate-y-1/2`}
+                                        imgClassName={`${isLoading && 'animate-pulse'} mt-2 rounded-md size-32 md:size-48 shrink-0`}
+                                        defaultImageSrc={loadedStudent?.image ? `${import.meta.env.VITE_BACKEND_URL}/${loadedStudent.image}` : "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"}
+                                        onImageCropped={setCroppedImage}
+                                    />
+                                </div>
                             </div>
-                        </div>
-                    }
-                    subtitle={'Update Profile Peserta Didik'}
-                    fields={[
-                        auth.userRole === 'admin' && { name: 'nis', label: 'NIS', placeholder: '20100010', type: 'text', required: false, disabled: isLoading, value: loadedStudent?.nis || '' },
-                        { name: 'name', label: 'Nama Lengkap', placeholder: 'Nama Lengkap', type: 'text', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.name || '' },
-                        { name: 'dateOfBirth', label: 'Tanggal Lahir', placeholder: 'Desa', type: 'date', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedDate || '' },
-                        { name: 'gender', label: 'Jenis Kelamin', type: 'select', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.gender || '', options: [{ label: 'Laki-Laki', value: 'male' }, { label: 'Perempuan', value: 'female' }] },
-                        { name: 'parentName', label: 'Nama Orang Tua', type: 'text', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.parentName || '' },
-                        { name: 'address', label: 'Alamat', type: 'textarea', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.address || '' },
-                    ]}
-                    onSubmit={handleFormSubmit}
-                    disabled={isLoading}
-                    reset={false}
-                    footer={false}
-                    button={
-                        <div className="flex flex-col justify-stretch mt-4">
-                            <button
-                                type="submit"
-                                className={`button-primary ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                disabled={isLoading}
-                            >
-                                {isLoading ? (<LoadingCircle>Processing...</LoadingCircle>) : ('Update')}
-                            </button>
-                        </div>
-                    }
-                />
-            </div>
+                        }
+                        subtitle={'Update Profile Peserta Didik'}
+                        fields={fields || [
+                            { name: 'name', label: 'Nama Lengkap', placeholder: 'Nama Lengkap', type: 'text', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.name || '' },
+                            { name: 'dateOfBirth', label: 'Tanggal Lahir', placeholder: 'Desa', type: 'date', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedDate || '' },
+                            { name: 'gender', label: 'Jenis Kelamin', type: 'select', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.gender || '', options: [{ label: 'Laki-Laki', value: 'male' }, { label: 'Perempuan', value: 'female' }] },
+                            { name: 'parentName', label: 'Nama Orang Tua', type: 'text', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.parentName || '' },
+                            { name: 'address', label: 'Alamat', type: 'textarea', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.address || '' },
+                        ]}
+                        onSubmit={handleFormSubmit}
+                        disabled={isLoading}
+                        reset={false}
+                        footer={false}
+                        button={
+                            <div className="flex flex-col justify-stretch mt-4">
+                                <button
+                                    type="submit"
+                                    className={`button-primary ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                    disabled={isLoading}
+                                >
+                                    {isLoading ? (<LoadingCircle>Processing...</LoadingCircle>) : ('Update')}
+                                </button>
+                            </div>
+                        }
+                    />
+                </div>
+            )}
         </div>
     );
 };
