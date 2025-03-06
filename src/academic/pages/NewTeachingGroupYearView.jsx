@@ -73,13 +73,13 @@ const NewTeachingGroupYearView = () => {
                 onClick={() => {
                     setModalIsOpen(false)
                 }}
-                className={`${modal.onConfirm ? 'btn-danger-outline' : 'button-primary mt-0 '} ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                className={`${modal.onConfirm ? 'btn-danger-outline' : 'button-primary mt-0 '} ${isLoading ? 'opacity-50 hover:cursor-not-allowed' : ''}`}
                 disabled={isLoading}
             >
                 {isLoading ? <LoadingCircle /> : modal.onConfirm ? 'Batal' : 'Tutup'}
             </button>
             {modal.onConfirm && (
-                <button onClick={modal.onConfirm} className={`button-primary mt-0 ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                <button onClick={modal.onConfirm} className={`button-primary mt-0 ${isLoading ? 'opacity-50 hover:cursor-not-allowed' : ''}`}>
                     {isLoading ? <LoadingCircle /> : 'Ya'}
                 </button>
             )}
@@ -134,7 +134,7 @@ const NewTeachingGroupYearView = () => {
                                         <div
                                             key={year._id}
                                             className={`p-4 border rounded-lg transition-all duration-300 ${hasTargetTeachingGroup
-                                                ? "bg-gray-100 border-gray-300 text-gray-500 cursor-not-allowed"
+                                                ? "bg-gray-100 border-gray-300 text-gray-500 hover:cursor-not-allowed"
                                                 : "bg-white border-gray-200 hover:ring-4 hover:ring-blue-200 hover:border-blue-500 hover:shadow-xl cursor-pointer"
                                                 }`}
                                             onClick={!hasTargetTeachingGroup ? () => registerYearHandler(year.name, year.id) : undefined}

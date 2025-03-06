@@ -104,7 +104,7 @@ const UpdateUserView = () => {
                         <div className="flex flex-col justify-stretch mt-4">
                             <button
                                 type="submit"
-                                className={`button-primary ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                className={`button-primary ${isLoading ? 'opacity-50 hover:cursor-not-allowed' : ''}`}
                                 disabled={isLoading}
                             >
                                 {isLoading ? (<LoadingCircle>Processing...</LoadingCircle>) : ('Update')}

@@ -197,7 +197,7 @@ const RequestAccountForm = () => {
                         ))}
                         <button
                             type="button"
-                            className={`button-primary ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`button-primary ${isLoading ? 'opacity-50 hover:cursor-not-allowed' : ''}`}
                             onClick={handleAddData}
                             disabled={isLoading}
                         >
@@ -239,7 +239,7 @@ const RequestAccountForm = () => {
                             </div>
                             <button
                                 type="button"
-                                className={`button-primary ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                className={`button-primary ${isLoading ? 'opacity-50 hover:cursor-not-allowed' : ''}`}
                                 onClick={handleSubmit}
                                 disabled={isLoading}
                             >

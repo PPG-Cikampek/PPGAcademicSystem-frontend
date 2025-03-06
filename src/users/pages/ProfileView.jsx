@@ -215,7 +215,7 @@ const ProfileView = () => {
                                             buttonClassName={`${isLoading && 'hidden'} border border-gray-600 bg-gray-50 size-9 rounded-full absolute offset bottom-7 right-7 md:bottom-9 md:right-9 translate-x-1/2 translate-y-1/2`}
                                             imgClassName={`${isLoading && 'animate-pulse'} mt-2 rounded-full size-48 md:size-64 shrink-0`}
                                             defaultImageSrc={userData?.image ? `${import.meta.env.VITE_BACKEND_URL}/${userData.image}` : "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"}
-                                            onPick={setPickedFile}
+                                            onImageCropped={setPickedFile}
                                         />
                                     </div>
                                 </div>
@@ -229,7 +229,7 @@ const ProfileView = () => {
                                     <div className="flex flex-col justify-stretch mt-4">
                                         <button
                                             type="submit"
-                                            className={`button-primary ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                            className={`button-primary ${isLoading ? 'opacity-50 hover:cursor-not-allowed' : ''}`}
                                             disabled={isLoading}
                                         >
                                             {isLoading ? (<LoadingCircle>Processing...</LoadingCircle>) : ('Simpan Gambar')}
