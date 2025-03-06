@@ -241,7 +241,7 @@ const ProfileView = () => {
                         <div className="flex flex-col self-center">
                             {isLoading && (
                                 <div className="animate-pulse flex space-x-4 mb-6">
-                                    <div className="flex-1 space-y-6 py-1">
+                                    <div className="flex-1 h-fit space-y-6 py-1">
                                         <div className="h-5 bg-slate-500 rounded"></div>
                                         <div className="space-y-3">
                                             <div className="grid grid-cols-3 gap-4">

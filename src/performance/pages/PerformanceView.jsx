@@ -56,45 +56,6 @@ const PerformanceView = () => {
   }, [sendRequest]);
 
   const fetchAttendanceData = useCallback(async () => {
-    const getOverallStats = (data) => {
-      const attendances = [];
-      data.teachingGroupYears.forEach((year) => {
-        year.classes.forEach((cls) => {
-          cls.attendances.forEach((att) => {
-            attendances.push(att.status);
-          });
-        });
-      });
-      const statusCounts = attendances.reduce((acc, status) => {
-        acc[status] = (acc[status] || 0) + 1;
-        return acc;
-      }, {});
-      const total = attendances.length;
-      return Object.keys(statusCounts).map((status) => ({
-        status,
-        count: statusCounts[status],
-        percentage: Math.round((statusCounts[status] / total) * 1000) * 10 / 100,
-      })).sort((a, b) => a.status.localeCompare(b.status));
-    };
-
-    const getViolationStats = (data) => {
-      const violationCounts = {};
-
-      data.teachingGroupYears.forEach((groupYear) => {
-        groupYear.classes.forEach((cls) => {
-          cls.attendances.forEach((attendance) => {
-            Object.entries(attendance.violations).forEach(([violation, occurred]) => {
-              if (occurred) {
-                violationCounts[violation] = (violationCounts[violation] || 0) + 1;
-              }
-            });
-          });
-        });
-      });
-
-      return Object.entries(violationCounts).map(([violation, count]) => ({ violation, count }));
-    };
-
     const url = `${import.meta.env.VITE_BACKEND_URL}/attendances/reports/`;
     const body = JSON.stringify({
       academicYearId: selectedAcademicYear,
@@ -105,18 +66,18 @@ const PerformanceView = () => {
       endDate: endDate ? endDate.toISOString() : null,
     });
 
-    console.log(body)
-
     try {
       const attendanceData = await sendRequest(url, 'POST', body, {
         'Content-Type': 'application/json',
       });
 
+      const { overallStats, violationStats, ...cardsData } = attendanceData
+
       setOverallAttendances(null)
       setViolationData(null)
-      setAttendanceData(attendanceData);
-      setOverallAttendances(getOverallStats(attendanceData));
-      setViolationData(getViolationStats(attendanceData));
+      setAttendanceData(cardsData);
+      setOverallAttendances(attendanceData.overallStats);
+      setViolationData(attendanceData.violationStats);
     } catch (err) { }
   }, [sendRequest, selectedAcademicYear, selectedBranch, selectedTeachingGroup, selectedClass, startDate, endDate]);
 
@@ -127,6 +88,9 @@ const PerformanceView = () => {
   }, [fetchAcademicYears, fetchAttendanceData]);
 
   const selectAcademicYearHandler = (academicYearId) => {
+    setOverallAttendances(null)
+    setViolationData(null)
+    setAttendanceData(null)
     setSelectedAcademicYear(academicYearId);
     setBranchesList([]);
     setSelectedBranch(null);
@@ -149,6 +113,9 @@ const PerformanceView = () => {
   };
 
   const selectBranchHandler = (branchId) => {
+    setOverallAttendances(null)
+    setViolationData(null)
+    setAttendanceData(null)
     setSelectedBranch(branchId);
     setTeachingGroupsList([]);
     setSelectedTeachingGroup(null);
@@ -168,6 +135,9 @@ const PerformanceView = () => {
   };
 
   const selectTeachingGroupHandler = (teachingGroupId) => {
+    setOverallAttendances(null)
+    setViolationData(null)
+    setAttendanceData(null)
     setSelectedTeachingGroup(teachingGroupId);
     setClassesList([]);
     setSelectedClass(null);
@@ -186,10 +156,16 @@ const PerformanceView = () => {
   };
 
   const selectClassHandler = (classId) => {
+    setOverallAttendances(null)
+    setViolationData(null)
+    setAttendanceData(null)
     setSelectedClass(classId);
   };
 
   const selectDateRangeHandler = (dates) => {
+    setOverallAttendances(null)
+    setViolationData(null)
+    setAttendanceData(null)
     const [start, end] = dates;
     if (start && end) {
       setPeriode(start.toLocaleDateString('id-ID', {

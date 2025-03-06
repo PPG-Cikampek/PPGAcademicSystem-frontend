@@ -272,7 +272,7 @@ const UsersView = () => {
                 {users && (
                     <>
                         <div className="bg-white p-4 rounded-md shadow-sm mb-6 flex items-center space-x-4">
-                            <div className="flex-1 relative">
+                            <div className="flex-1 h-fit relative">
                                 <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
                                 <input
                                     type="text"

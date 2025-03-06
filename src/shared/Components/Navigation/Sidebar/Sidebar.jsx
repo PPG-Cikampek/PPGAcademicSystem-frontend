@@ -22,7 +22,7 @@ const Sidebar = ({ linksList, children }) => {
     };
 
     return (
-        <div className="relative h-screen md:h-dvh md:flex">
+        <div className="relative h-full md:flex">
             {/* Overlay for mobile when sidebar is open */}
             {sidebar.isSidebarOpen && (
                 <div
@@ -35,7 +35,7 @@ const Sidebar = ({ linksList, children }) => {
             <div
                 className={`
                     fixed md:relative
-                    h-full
+                    h-full md:h-[unset]
                     bg-white text-gray-800 border-gray-200 
                     transition-all duration-300 ease-in-out
                     z-30 opacity-0 md:opacity-100
@@ -130,7 +130,7 @@ const Sidebar = ({ linksList, children }) => {
             </div>
 
             {/* Main Content */}
-            <div className="flex-1">
+            <div className="flex-1 h-fit">
                 {children}
             </div>
         </div>

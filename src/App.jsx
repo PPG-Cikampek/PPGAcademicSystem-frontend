@@ -341,7 +341,7 @@ function App() {
           v7_startTransition: true,
           v7_relativeSplatPath: true
         }}>
-          <main>
+          <main className="h-auto">
             <Suspense
               fallback={
                 <div className="flex justify-center mt-16">

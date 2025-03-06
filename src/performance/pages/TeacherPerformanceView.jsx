@@ -110,14 +110,13 @@ const TeacherPerformanceView = () => {
                 return year;
             });
 
-            console.log(getOverallStats(updatedData))
-            console.log(getViolationStats(updatedData))
+            const { overallStats, violationStats, ...cardsData } = responseData
 
             setOverallAttendances(null)
             setViolationData(null)
-            setAttendanceData(updatedData);
-            setOverallAttendances(getOverallStats(updatedData));
-            setViolationData(getViolationStats(updatedData));
+            setAttendanceData(cardsData);
+            setOverallAttendances(responseData.overallStats);
+            setViolationData(responseData.violationStats);
         } catch (err) { }
     }, [sendRequest, selectedAcademicYear, selectedClass, startDate, endDate]);
 
@@ -128,6 +127,9 @@ const TeacherPerformanceView = () => {
     }, [fetchAcademicYears, fetchAttendanceData]);
 
     const selectAcademicYearHandler = (academicYearId) => {
+        setOverallAttendances(null)
+        setViolationData(null)
+        setAttendanceData(null)
         setSelectedAcademicYear(academicYearId);
         setClassesList([]);
         setSelectedClass(null);
@@ -154,10 +156,16 @@ const TeacherPerformanceView = () => {
     };
 
     const selectClassHandler = (classId) => {
+        setOverallAttendances(null)
+        setViolationData(null)
+        setAttendanceData(null)
         setSelectedClass(classId);
     };
 
     const selectDateRangeHandler = (dates) => {
+        setOverallAttendances(null)
+        setViolationData(null)
+        setAttendanceData(null)
         let startingWeek = null;
         let endOfWeek = null;
 

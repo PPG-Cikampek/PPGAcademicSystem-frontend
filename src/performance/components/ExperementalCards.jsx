@@ -145,7 +145,7 @@ const StatCard = ({ level, title, subtitle, stats, onViewMore, expanded }) => {
     return (
         <div className="bg-white rounded-lg shadow-sm mx-4 md:mx-8  p-6 mb-4 transition-all">
             <div className="flex justify-between items-start mb-4">
-                <div className="flex-1">
+                <div className="flex-1 h-fit">
                     <h3 className="text-lg font-medium">{level} {title}</h3>
                     <p className="text-sm text-gray-600">{subtitle}</p>
                 </div>
@@ -217,7 +217,7 @@ const ExperimentalCards = ({ data, initialView, month }) => {
 
     const navigate = useNavigate()
 
-
+    console.log(data)
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: {

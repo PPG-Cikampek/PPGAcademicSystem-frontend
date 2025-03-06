@@ -13,7 +13,7 @@ const PageHeader = ({ page = 'PPG Cikampek', children }) => {
     }
 
     return (
-        <div className='w-full h-full'>
+        <div className='w-full h-auto'>
             <div className='px-3 py-2 flex bg-white items-center gap-2 shadow-sm'>
                 <button
                     className="p-2 rounded-full focus:bg-gray-200 hover:outline-none hover:ring-1 hover:ring-offset-1 hover:ring-gray-400"

@@ -98,7 +98,7 @@ const StudentDetailView = () => {
                     <h1 className="text-2xl font-medium mb-6 text-gray-700">Data Peserta Didik</h1>
                     <div className='flex flex-col md:flex-row gap-8'>
                         {/* First card displaying main student information */}
-                        <div className='card-basic rounded-md border mx-0 py-12 flex flex-col items-center flex-1 basis-96 min-w-80 md:max-w-96'>
+                        <div className='card-basic rounded-md border mx-0 py-12 flex flex-col items-center flex-1 h-full basis-96 min-w-80 md:max-w-96'>
                             <div className='relative'>
                                 {showQRCode ? (
                                     <QRCodeCanvas
@@ -141,7 +141,7 @@ const StudentDetailView = () => {
                         </div>
 
                         {/* Second card displaying additional details */}
-                        <div className='card-basic rounded-md p-8 flex flex-col border mx-0 flex-1 justify-between'>
+                        <div className='card-basic rounded-md p-8 flex flex-col border mx-0 flex-1 h-full justify-between'>
                             <ul className='space-y-6'>
                                 <h2 className='text-lg mb-8'>Profile Peserta Didik</h2>
                                 {studentDetails.map((item, index) => (

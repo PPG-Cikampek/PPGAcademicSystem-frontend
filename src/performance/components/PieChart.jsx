@@ -150,7 +150,7 @@ const PieChart = ({ attendanceData, chartType, toImage = false }) => {
 
     const finalDataFormatted = finalData.map((item) => ({
       ...item,
-      percentage: item.percentage.toFixed(1),
+      percentage: item.percentage.toFixed(2),
     }));
 
     setTransformedData(finalDataFormatted);
@@ -159,7 +159,8 @@ const PieChart = ({ attendanceData, chartType, toImage = false }) => {
   };
 
   useEffect(() => {
-    transformData();
+    // transformData();
+    setTransformedData(attendanceData);
   }, [attendanceData]);
 
   return (

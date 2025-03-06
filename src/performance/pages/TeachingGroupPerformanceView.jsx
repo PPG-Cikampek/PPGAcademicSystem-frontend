@@ -79,53 +79,15 @@ const TeachingGroupPerformanceView = () => {
   }, [sendRequest]);
 
   const fetchAttendanceData = useCallback(async () => {
-    const getOverallStats = (data) => {
-      const attendances = [];
-      data.teachingGroupYears.forEach((year) => {
-        year.classes.forEach((cls) => {
-          cls.attendances.forEach((att) => {
-            attendances.push(att.status);
-          });
-        });
-      });
-      const statusCounts = attendances.reduce((acc, status) => {
-        acc[status] = (acc[status] || 0) + 1;
-        return acc;
-      }, {});
-      const total = attendances.length;
-      return Object.keys(statusCounts).map((status) => ({
-        status,
-        count: statusCounts[status],
-        percentage: Math.round((statusCounts[status] / total) * 1000) * 10 / 100,
-      })).sort((a, b) => a.status.localeCompare(b.status));
-    };
-
-    const getViolationStats = (data) => {
-      const violationCounts = {};
-      data.teachingGroupYears.forEach((groupYear) => {
-        groupYear.classes.forEach((cls) => {
-          cls.attendances.forEach((attendance) => {
-            Object.entries(attendance.violations).forEach(([violation, occurred]) => {
-              if (occurred) {
-                violationCounts[violation] = (violationCounts[violation] || 0) + 1;
-              }
-            });
-          });
-        });
-      });
-
-      return Object.entries(violationCounts).map(([violation, count]) => ({ violation, count }));
-    };
-
     const getTeachingGroupData = (data) => {
-      if (!data || !data.teachingGroupYears[0] || !data.teachingGroupYears[0].teachingGroupId || !data.teachingGroupYears[0].teachingGroupId.branchId) {
+      if (!data || !data[0] || !data[0].teachingGroupId || !data[0].teachingGroupId.branchId) {
         return null;
       }
 
       const teachingGroupData = {
-        branchName: data.teachingGroupYears[0].teachingGroupId.branchId.name,
-        teachingGroupName: data.teachingGroupYears[0].teachingGroupId.name,
-        semesterTarget: data.teachingGroupYears[0].semesterTarget,
+        branchName: data[0].teachingGroupId.branchId.name,
+        teachingGroupName: data[0].teachingGroupId.name,
+        semesterTarget: data[0].semesterTarget,
       };
 
       return teachingGroupData;
@@ -145,12 +107,16 @@ const TeachingGroupPerformanceView = () => {
       const attendanceData = await sendRequest(url, 'POST', body, {
         'Content-Type': 'application/json',
       });
-      setTeachingGroupData(getTeachingGroupData(attendanceData))
+
+      const { overallStats, violationStats, ...cardsData } = attendanceData
+
+      setTeachingGroupData(getTeachingGroupData(attendanceData.teachingGroupYears))
       setOverallAttendances(null)
       setViolationData(null)
-      setAttendanceData(attendanceData);
-      setOverallAttendances(getOverallStats(attendanceData));
-      setViolationData(getViolationStats(attendanceData));
+      setAttendanceData(null)
+      setAttendanceData(cardsData);
+      setOverallAttendances(attendanceData.overallStats);
+      setViolationData(attendanceData.violationStats);
     } catch (err) { }
   }, [sendRequest, selectedAcademicYear, selectedClass, startDate, endDate]);
 
@@ -161,6 +127,9 @@ const TeachingGroupPerformanceView = () => {
   }, [fetchAcademicYears, fetchAttendanceData]);
 
   const selectAcademicYearHandler = (academicYearId) => {
+    setOverallAttendances(null)
+    setViolationData(null)
+    setAttendanceData(null)
     setSelectedAcademicYear(academicYearId);
     setClassesList([]);
     setSelectedClass(null);
@@ -181,10 +150,16 @@ const TeachingGroupPerformanceView = () => {
   };
 
   const selectClassHandler = (classId) => {
+    setOverallAttendances(null)
+    setViolationData(null)
+    setAttendanceData(null)
     setSelectedClass(classId);
   };
 
   const selectDateRangeHandler = (dates) => {
+    setOverallAttendances(null)
+    setViolationData(null)
+    setAttendanceData(null)
     const [start, end] = dates;
     if (start && end) {
       setPeriode(start.toLocaleDateString('id-ID', {

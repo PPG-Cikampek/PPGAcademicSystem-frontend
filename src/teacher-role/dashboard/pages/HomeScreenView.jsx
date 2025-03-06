@@ -75,7 +75,7 @@ const HomeScreenView = () => {
             )}
             {data && !isLoading && (
                 <SequentialAnimation>
-                    <div className="mt-16 flex-1 p-4">
+                    <div className="mt-16 flex-1 h-fit p-4">
                         <div className="card-basic rounded-md flex-col mb-2">
                             <h1 className="text-xl font-medium mb-2">{getPositionName[data.position] || data.position}</h1>
                             <CurrentTime />

@@ -39,7 +39,7 @@ const Profile = ({ user, isLoading }) => {
                 <div>
                     {isLoading && (
                         <div className="animate-pulse flex space-x-4">
-                            <div className="flex-1 space-y-3 py-1 grow">
+                            <div className="flex-1 h-fit space-y-3 py-1 grow">
                                 <div className="h-5 w-36 bg-slate-700 rounded"></div>
                                 <div className="h-3 w-56 bg-slate-400 rounded"></div>
                             </div>

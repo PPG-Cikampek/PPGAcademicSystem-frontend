@@ -188,7 +188,7 @@ const LevelsView = () => {
                                     {/* <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
                                         <Building className="w-4 h-4 text-indigo-600" />
                                     </div> */}
-                                    <div className="flex-1"  >
+                                    <div className="flex-1 h-fit"  >
                                         <div className='flex items-center gap-2'>
                                             <h2 className="text-sm font-semibold text-gray-900">Desa {branch.name}</h2>
                                             <div className="text-xs text-gray-500 border border-gray-500 rounded p-1">

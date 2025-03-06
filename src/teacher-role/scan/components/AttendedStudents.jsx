@@ -176,7 +176,7 @@ const AttendedStudents = () => {
                                 <SquareCheck />
                             </span>
                         </label>
-                        <div className="flex-1">
+                        <div className="flex-1 h-fit">
                             <div className="flex gap-2 items-center mb-2">
                                 {student.studentId.image ? (
                                     <img
