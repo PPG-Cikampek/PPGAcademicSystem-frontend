@@ -50,6 +50,11 @@ const HomeNavigation = ({ children }) => {
                 icon: <CalendarCog />,
                 label: 'Tahun Ajaran',
             },
+            {
+                link: `/settings/profile/` + auth.userId,
+                icon: <Settings />,
+                label: 'Pengaturan Akun',
+            },
         ] :
         [
             {

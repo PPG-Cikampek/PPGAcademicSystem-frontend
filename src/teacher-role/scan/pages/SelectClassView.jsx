@@ -9,7 +9,6 @@ import LoadingCircle from '../../../shared/Components/UIElements/LoadingCircle'
 import { StudentAttendanceContext } from '../context/StudentAttendanceContext'
 import ClassCards from '../../history/attendanceHistory/components/ClassCards'
 import InfoCard from '../../shared/Components/UIElements/InfoCard'
-import { set } from 'react-hook-form'
 
 const SelectClassView = () => {
     const [loadedData, setLoadedData] = useState();
@@ -18,7 +17,6 @@ const SelectClassView = () => {
     const auth = useContext(AuthContext)
     const classIds = auth.userClassIds
     const navigate = useNavigate()
-
 
     useEffect(() => {
         const loadClasses = async () => {

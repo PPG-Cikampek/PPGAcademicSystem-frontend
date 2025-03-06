@@ -19,9 +19,9 @@ const HomeScreenView = () => {
 
     const getPositionName = {
         branchTeacher: 'MT Desa',
-        teachingGroupTeacher : 'MT Kelompok',
-        localTeacher : 'MS',
-        assistant : 'Asisten',
+        teachingGroupTeacher: 'MT Kelompok',
+        localTeacher: 'MS',
+        assistant: 'Asisten',
     }
 
     // console.log(auth.isLoggedIn)
@@ -62,6 +62,7 @@ const HomeScreenView = () => {
 
     let activeClassCount = 0;
     // console.log(JSON.stringify(data))
+    console.log(data)
 
     return (
         <div className="flex flex-col pb-12">
@@ -83,7 +84,9 @@ const HomeScreenView = () => {
                         <div className="mb-2">
                             {data.classIds.map((item, index) => {
                                 const isClassInTeachingGroupYear = item?.teachingGroupYearId?.academicYearId?.isActive
+                                console.log(item)
                                 if (isClassInTeachingGroupYear) {
+                                    console.log(item)
                                     activeClassCount++;
                                     return <Dashboard key={index} data={item} />
                                 }

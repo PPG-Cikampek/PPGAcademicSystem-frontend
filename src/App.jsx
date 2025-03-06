@@ -230,6 +230,12 @@ function App() {
                     <StudentReportView />
                   </PageHeader>
                 } />
+              <Route path='/settings/profile/:userId' element=
+                {
+                  <PageHeader>
+                    <ProfileView />
+                  </PageHeader>
+                } />
               <Route path='/verify-email/:token' element={<EmailVerifyView />} />
               <Route path="*" element={<Navigate to="/" />} />
             </Routes>
@@ -258,11 +264,12 @@ function App() {
                 <UpdateStudentView />
               </PageHeader>
             } />
-          <Route path='/settings/profile/:userId' element={
-            <PageHeader>
-              <ProfileView />
-            </PageHeader>
-          } />
+          <Route path='/settings/profile/:userId' element=
+            {
+              <PageHeader>
+                <ProfileView />
+              </PageHeader>
+            } />
           <Route path='/verify-email/:token' element={<EmailVerifyView />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
