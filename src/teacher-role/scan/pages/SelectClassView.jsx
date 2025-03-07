@@ -6,8 +6,6 @@ import { AuthContext } from '../../../shared/Components/Context/auth-context'
 
 import LoadingCircle from '../../../shared/Components/UIElements/LoadingCircle'
 
-import { StudentAttendanceContext } from '../context/StudentAttendanceContext'
-import ClassCards from '../../history/attendanceHistory/components/ClassCards'
 import InfoCard from '../../shared/Components/UIElements/InfoCard'
 
 const SelectClassView = () => {

@@ -1,4 +1,5 @@
-import React, { useContext, useRef, useEffect, useState } from 'react';
+import React, { useContext, useRef, useState, useEffect } from 'react';
+import { useBlocker } from 'react-router-dom';
 
 import useHttp from '../../../shared/hooks/http-hook';
 
@@ -9,6 +10,7 @@ import { Icon } from '@iconify-icon/react';
 import StudentInitial from '../../../shared/Components/UIElements/StudentInitial';
 
 import { motion, AnimatePresence } from 'framer-motion';
+import LoadingCircle from '../../../shared/Components/UIElements/LoadingCircle';
 
 
 const AttendedStudents = () => {
@@ -17,25 +19,43 @@ const AttendedStudents = () => {
     const { isLoading, error, sendRequest } = useHttp();
     const [showViolationsMenu, setShowViolationsMenu] = useState({});
     const [showNotesField, setShowNotesField] = useState({});
+    const [unsavedChanges, setUnsavedChanges] = useState(0);
 
-
-    const patchMultipleStudentStatuses = async (updates) => {
-        try {
-            const url = `${import.meta.env.VITE_BACKEND_URL}/attendances/`
-            const body = JSON.stringify({ updates })
-            console.log(body)
-
-            const response = await sendRequest(url, 'PATCH', body, {
-                'Content-Type': 'application/json'
-            });
-
-            console.log('Successfully updated statuses:', response);
-        } catch (error) {
-            console.error('Error updating statuses:', error);
-        }
-    };
-
+    // Handle window/tab close
     useEffect(() => {
+        const handleBeforeUnload = (e) => {
+            if (unsavedChanges > 0) {
+                e.preventDefault();
+                e.returnValue = "You have unsaved changes. Are you sure you want to leave?";
+                return e.returnValue;
+            }
+        };
+
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+    }, [unsavedChanges]);
+
+    // Calculate changes on student list updates
+    useEffect(() => {
+        let changes = 0;
+        state.studentList.forEach((student, index) => {
+            const prevStudent = prevStudentList.current[index];
+            if (
+                prevStudent &&
+                (
+                    prevStudent.status !== student.status ||
+                    prevStudent.attributes !== student.attributes ||
+                    prevStudent.violations !== student.violations ||
+                    prevStudent.teachersNotes !== student.teachersNotes
+                )
+            ) {
+                changes++;
+            }
+        });
+        setUnsavedChanges(changes);
+    }, [state.studentList]);
+
+    const handleSave = async () => {
         const changedStatuses = [];
         state.studentList.forEach((student, index) => {
             const prevStudent = prevStudentList.current[index];
@@ -58,13 +78,24 @@ const AttendedStudents = () => {
                 });
             }
         });
-        // Batch updates if changes exist
-        if (changedStatuses.length > 0) {
-            patchMultipleStudentStatuses(changedStatuses);
-            prevStudentList.current = state.studentList;
-        }
 
-    }, [state.studentList]);
+        if (changedStatuses.length > 0) {
+            try {
+                const url = `${import.meta.env.VITE_BACKEND_URL}/attendances/`
+                const body = JSON.stringify({ updates: changedStatuses })
+
+                const response = await sendRequest(url, 'PATCH', body, {
+                    'Content-Type': 'application/json'
+                });
+
+                console.log('Successfully updated statuses:', response);
+                prevStudentList.current = state.studentList;
+                setUnsavedChanges(0);
+            } catch (error) {
+                console.error('Error updating statuses:', error);
+            }
+        }
+    };
 
     const handleStatusChange = (id, newStatus, timestamp = Date.now()) => {
         dispatch({ type: 'SET_STATUS', payload: { id, newStatus, timestamp } });
@@ -125,19 +156,23 @@ const AttendedStudents = () => {
                     isLoading ? (
                         <div className='flex items-center gap-2 animate-pulse'>
                             <LoaderCircle size={24} className='animate-spin' />
-                            <span className='text-xs text-gray-600'>Menyimpan otomatis...</span>
+                            <span className='text-xs text-gray-600'>Menyimpan...</span>
                         </div>
                     ) : (
-                        error
-                            ? <Icon icon="mdi:cloud-alert-outline" width="24" height="24" />
-                            : (
-                                <div className='flex items-center gap-2 animate-pulse'>
-                                    <Icon icon="ci:cloud-check" width="24" height="24" />
-                                    <span className='text-xs text-gray-600'>Perubahan tersimpan</span>
-                                </div>
-                            )
-
-                    ))}
+                        error ? (
+                            <Icon icon="mdi:cloud-alert-outline" width="24" height="24" />
+                        ) : (
+                            <div className='flex items-center gap-2'>
+                                <Icon icon={unsavedChanges > 0 ? "lucide:circle-alert" : "ci:cloud-check"} width="24" height="24" />
+                                <span className='text-xs text-gray-600'>
+                                    {unsavedChanges > 0 
+                                        ? `Perubahan belum disimpan` 
+                                        : 'Perubahan tersimpan'}
+                                </span>
+                            </div>
+                        )
+                    )
+                )}
             </div>
             {state.studentList.length !== 0 && state.isTeachingGroupYearActivated === true ? (
                 <div className="inline-flex items-center">
@@ -343,6 +378,13 @@ const AttendedStudents = () => {
                             Izin
                         </button>
                     </div>
+                    <button
+                        onClick={handleSave}
+                        className="btn-mobile-primary"
+                        disabled={isLoading}
+                    >
+                        {isLoading ? (<LoadingCircle>Menyimpan...</LoadingCircle>) : 'Simpan'}
+                    </button>
                 </div>
             )}
         </div>
