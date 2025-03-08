@@ -74,7 +74,7 @@ const DynamicForm = ({ logo, title, subtitle, fields = [], onSubmit, button, cus
                                 defaultValue={field.value || ''}
                                 {...register(field.name, { required: field.required })}
                                 disabled={field.disabled}
-                                className={`w-full p-2 border rounded-md shadow-sm hover:ring-secondary-subtle focus:outline-none focus:ring-2 focus:ring-secondary transition-all duration-300 ${field.disabled ? 'bg-gray-200' : ''}`}
+                                className={`w-full p-2 border rounded-md shadow-sm hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 ${field.disabled ? 'bg-gray-200' : ''}`}
                             >
                                 {field.options.map((option, index) => (
                                     <option key={index} value={option.value} disabled={option.disabled}>
@@ -116,6 +116,41 @@ const DynamicForm = ({ logo, title, subtitle, fields = [], onSubmit, button, cus
                                     className={`w-full pl-12 p-2 mb-1 border rounded-[4px] shadow-sm hover:ring-1 hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 ${field.disabled ? 'bg-gray-200 cursor-not-allowed' : ''}`}
                                 />
                             </div>
+                        ) : field.type === 'radio' ? (
+                            <div className="flex gap-4">
+                                {field.options.map((option, index) => (
+                                    <div key={index} className="flex items-center space-x-2">
+                                        <input
+                                            type="radio"
+                                            value={option.value}
+                                            defaultChecked={field.value === option.value}
+                                            {...register(field.name, { required: field.required })}
+                                            disabled={field.disabled || option.disabled}
+                                            className={`border-gray-300 shadow-sm focus:ring-2 focus:ring-primary 
+                                            ${field.disabled ? 'bg-gray-200 cursor-not-allowed' : ''}`}
+                                        />
+                                        <label>{option.label}</label>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : field.type === 'number' ? (
+                            <input
+                                type="number"
+                                defaultValue={field.value || ''}
+                                placeholder={field.placeholder || ''}
+                                min={field.min}
+                                max={field.max}
+                                step={field.step || 1}
+                                {...register(field.name, {
+                                    required: field.required,
+                                    ...(field.min && { min: { value: field.min, message: `Minimum value is ${field.min}` } }),
+                                    ...(field.max && { max: { value: field.max, message: `Maximum value is ${field.max}` } })
+                                })}
+                                disabled={field.disabled}
+                                className={`w-full p-2 mb-1 border rounded-[4px] shadow-sm hover:ring-1 hover:ring-primary 
+                                focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 
+                                ${field.disabled ? 'bg-gray-200 cursor-not-allowed' : ''}`}
+                            />
                         ) : field.type === 'date' ? (
                             <Controller
                                 name={field.name}
@@ -131,6 +166,55 @@ const DynamicForm = ({ logo, title, subtitle, fields = [], onSubmit, button, cus
                                         showYearDropdown
                                         showMonthDropdown
                                     />
+                                )}
+                            />
+                        ) : field.type === 'multi-input' ? (
+                            <Controller
+                                name={field.name}
+                                control={control}
+                                defaultValue={field.value || ['']}
+                                render={({ field: { onChange, value = [''] } }) => (
+                                    <div className="space-y-2">
+                                        {value.map((item, index) => (
+                                            <div key={index} className="flex gap-2">
+                                                <input
+                                                    type={field.inputType || 'text'}
+                                                    value={item}
+                                                    onChange={(e) => {
+                                                        const newValues = [...value];
+                                                        newValues[index] = field.inputType === 'number'
+                                                            ? e.target.value === '' ? '' : Number(e.target.value)
+                                                            : e.target.value;
+                                                        onChange(newValues);
+                                                    }}
+                                                    min={field.inputType === 'number' ? (field.min || 0) : undefined}
+                                                    max={field.inputType === 'number' ? field.max : undefined}
+                                                    step={field.inputType === 'number' ? (field.step || 1) : undefined}
+                                                    placeholder={field.placeholder || ''}
+                                                    className="w-full p-2 border rounded-[4px] shadow-sm hover:ring-1 hover:ring-primary 
+                                                        focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
+                                                />
+                                                <button
+                                                    type="button"
+                                                    onClick={() => {
+                                                        const newValues = value.filter((_, i) => i !== index);
+                                                        onChange(newValues.length ? newValues : ['']);
+                                                    }}
+                                                    className="px-2 pt-1 text-danger hover:bg-danger/10 rounded-full transition-colors"
+                                                >
+                                                    <Icon icon="mdi:delete" width="20" height="20" />
+                                                </button>
+                                            </div>
+                                        ))}
+                                        <button
+                                            type="button"
+                                            onClick={() => onChange([...value, ''])}
+                                            className="text-sm text-primary hover:text-primary-dark flex items-center gap-1"
+                                        >
+                                            <Icon icon="mdi:plus" width="20" height="20" />
+                                            Tambah
+                                        </button>
+                                    </div>
                                 )}
                             />
                         ) : (

@@ -147,7 +147,7 @@ const RequestAccountForm = () => {
                 )}
             </Modal>
             {error && <div className="mx-2 mt-12"><ErrorCard error={error} onClear={() => setError(null)} /></div>}
-            <div className="card-basic rounded-md items-stretch flex-col my-12 mx-48">
+            <div className="card-basic rounded-md items-stretch flex-col m-2">
                 <div className="pb-24 transition-opacity duration-300">
                     <div className="flex flex-col p-2 justify-center items-center my-6">
                         <h2 className="text-2xl mt-4 font-medium text-center">{isStudent ? 'Akun Peserta Didik' : 'Akun Tenaga Pendidik'}</h2>
@@ -197,7 +197,7 @@ const RequestAccountForm = () => {
                         ))}
                         <button
                             type="button"
-                            className={`button-primary ${isLoading ? 'opacity-50 hover:cursor-not-allowed' : ''}`}
+                            className={`button-primary ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                             onClick={handleAddData}
                             disabled={isLoading}
                         >
@@ -239,7 +239,7 @@ const RequestAccountForm = () => {
                             </div>
                             <button
                                 type="button"
-                                className={`button-primary ${isLoading ? 'opacity-50 hover:cursor-not-allowed' : ''}`}
+                                className={`button-primary ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 onClick={handleSubmit}
                                 disabled={isLoading}
                             >

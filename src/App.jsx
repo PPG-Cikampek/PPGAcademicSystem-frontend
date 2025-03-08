@@ -14,6 +14,11 @@ import RequestAccountView from "./users/pages/RequestAccountView";
 import RequestAccountForm from "./users/pages/RequestAccountForm";
 import RequestAccountTicketDetail from "./users/pages/RequestAccountTicketDetail";
 import StudentDashboardView from "./students/pages/StudentDashboardView";
+import MunaqasyahView from "./munaqasyah/pages/MunaqasyahView";
+import QuestionBankView from "./munaqasyah/pages/QuestionBankView";
+import SelectMunaqasyahClassView from "./munaqasyah/pages/SelectMunaqasyahClassView";
+import NewQuestionView from "./munaqasyah/pages/NewQuestionView";
+import QuestionDetailView from "./munaqasyah/pages/QuestionDetailView";
 
 const DashboardNav = lazy(() => import("./shared/Components/Navigation/DashboardNav/DashboardNav"));
 const DashboardView = lazy(() => import("./dashboard/pages/DashboardView"));
@@ -323,6 +328,11 @@ function App() {
               <Route path='/settings/users/:userId' element={<UpdateUserView />} />
               <Route path='/settings/users/bulk-create' element={<BulkNewUsersAndStudentsView />} />
               <Route path='/performance' element={<PerformanceView />} />
+              <Route path='/munaqasyah' element={<MunaqasyahView />} />
+              <Route path='/munaqasyah/question-bank' element={<SelectMunaqasyahClassView />} />
+              <Route path='/munaqasyah/question-bank/:classGrade' element={<QuestionBankView />} />
+              <Route path='/munaqasyah/question-bank/:classGrade/new' element={<NewQuestionView />} />
+              <Route path='/munaqasyah/question-bank/:classGrade/:questionId' element={<QuestionDetailView />} />
             </>
           )}
           <Route path="*" element={<Navigate to="/dashboard" />} />

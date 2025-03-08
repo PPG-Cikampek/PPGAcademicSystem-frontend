@@ -8,6 +8,7 @@ import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 import { Search, Users, Pencil, Trash, ChevronDown, Filter, PlusIcon } from 'lucide-react';
 import FloatingMenu from '../../shared/Components/UIElements/FloatingMenu';
 import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
+import DataTable from '../../shared/Components/UIElements/DataTable';
 
 const UsersView = () => {
     const [users, setUsers] = useState();
@@ -145,80 +146,72 @@ const UsersView = () => {
         </div>
     );
 
-    const UserCard = ({ user }) => {
-        const isSelected = selectedUserIds.includes(user._id);
-
-        const toggleSelection = () => {
-            setSelectedUserIds((prev) =>
-                isSelected ? prev.filter((id) => id !== user._id) : [...prev, user._id]
-            );
-        };
-
-        return (
-            <div className="p-4 hover:bg-gray-50 flex items-center justify-between">
-                <div className="flex items-center space-x-4">
-                    <input
-                        type="checkbox"
-                        checked={isSelected}
-                        onChange={toggleSelection}
-                        className="mr-2"
+    const getTableColumns = (role) => [
+        {
+            key: 'image',
+            label: '',
+            render: (user) => (
+                user.image ? (
+                    <img
+                        src={`${import.meta.env.VITE_BACKEND_URL}/${user.image}`}
+                        alt={user.name}
+                        className="size-10 rounded-full"
                     />
-                    {user.image ? (
-                        <img
-                            src={`${import.meta.env.VITE_BACKEND_URL}/${user.image}`}
-                            alt={user.name}
-                            className="w-10 h-10 rounded-full"
-                        />
-                    ) : (
-                        <div
-                            className={`w-10 h-10 rounded-full flex ${getRoleColor(user.role)} items-center justify-center font-medium`}
-                        >
-                            {getInitials(user.name)}
-                        </div>
-                    )}
-                    <div>
-                        <div className="flex gap-2">
-                            <h3 className="text-sm font-medium text-gray-900">{user.name}</h3>
-                            <span className={`hidden md:inline-block px-2.5 py-0.5 rounded-full text-xs font-medium h-6 ${getRoleColor(user.role)}`}>
-                                {
-                                    user.role === 'teachingGroupAdmin'
-                                        ? 'Admin Kelompok'
-                                        : user.role === 'teacher'
-                                            ? 'Guru'
-                                            : user.role === 'student'
-                                                ? 'Siswa'
-                                                : 'Admin Daerah'}</span>
-                        </div>
-                        {user.role !== 'student' && <p className="text-sm text-gray-500 hidden md:block">{user.email}</p>}
+                ) : (
+                    <div className={`size-10 rounded-full flex ${getRoleColor(user.role)} items-center justify-center font-medium`}>
+                        {getInitials(user.name)}
                     </div>
+                )
+            )
+        },
+        { key: 'name', label: 'Nama', sortable: true },
+        { key: 'email', label: 'Email', sortable: true },
+        { 
+            key: 'branch', 
+            label: 'Desa',
+            sortable: true,
+            render: (user) => user.teachingGroupId?.branchId?.name
+        },
+        { 
+            key: 'group', 
+            label: 'Kelompok',
+            sortable: true,
+            render: (user) => user.teachingGroupId?.name
+        },
+        {
+            key: 'actions',
+            label: 'Aksi',
+            render: (user) => (
+                <div className="flex gap-2">
+                    <button 
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/settings/users/${user._id}`);
+                        }}
+                        className="p-1 hover:bg-gray-100 rounded"
+                    >
+                        <Pencil className="w-4 h-4" />
+                    </button>
+                    <button 
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteUser(user._id);
+                        }}
+                        className="p-1 hover:bg-gray-100 rounded text-red-500"
+                    >
+                        <Trash className="w-4 h-4" />
+                    </button>
                 </div>
-                <div className="flex items-center space-x-4">
-                    <div className="text-right">
-                        <div className="text-sm text-gray-900 hidden md:block">{user.teachingGroupId.branchId.name}</div>
-                        <div className="text-xs text-gray-500 hidden md:block">{user.teachingGroupId.name}</div>
-                    </div>
-                    <div className="p-1 hover:bg-gray-100 rounded">
-                        <FloatingMenu
-                            buttons={[
-                                {
-                                    icon: Pencil,
-                                    label: 'Edit',
-                                    onClick: () => navigate(`/settings/users/${user._id}`),
-                                },
-                                {
-                                    icon: Trash,
-                                    label: 'Delete',
-                                    variant: 'danger',
-                                    onClick: () => handleDeleteUser(user._id),
-                                },
-                            ]}
-                        />
-                    </div>
-                </div>
-            </div>
-        );
-    };
+            )
+        }
+    ];
 
+    const getRoleTitle = (role) => ({
+        admin: 'Admin Daerah',
+        teachingGroupAdmin: 'Admin Kelompok',
+        teacher: 'Guru',
+        student: 'Siswa'
+    }[role]);
 
     return (
         <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">
@@ -269,57 +262,23 @@ const UsersView = () => {
                     </div>
                 )}
 
-                {users && (
-                    <>
-                        <div className="bg-white p-4 rounded-md shadow-sm mb-6 flex items-center space-x-4">
-                            <div className="flex-1 h-fit relative">
-                                <Search className="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                                <input
-                                    type="text"
-                                    placeholder="Search users..."
-                                    className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                />
-                            </div>
-                            <button className="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-50 flex items-center space-x-2">
-                                <Filter className="w-4 h-4" />
-                                <span>Filters</span>
-                                <ChevronDown className="w-4 h-4" />
-                            </button>
-                        </div>
+                {users && roleOrder.map((role) => {
+                    const roleUsers = users.users.filter((user) => user.role === role);
+                    if (roleUsers.length === 0) return null;
 
-                        <div className="bg-white rounded-md shadow-sm">
-                            {roleOrder.map((role) => {
-                                const roleUsers = users.users.filter((user) => user.role === role);
-                                return (
-                                    <div key={role} className="divide-y">
-                                        <div
-                                            className="bg-gray-100 px-4 py-2 font-semibold text-gray-700 cursor-pointer flex items-center justify-between"
-                                            onClick={() => toggleGroupVisibility(role)}
-                                        >
-                                            <span>{
-                                                role === 'teachingGroupAdmin'
-                                                    ? 'Admin Kelompok'
-                                                    : role === 'teacher'
-                                                        ? 'Guru'
-                                                        : role === 'student'
-                                                            ? 'Siswa'
-                                                            : 'Admin'}</span>
-                                            <ChevronDown
-                                                className={`w-4 h-4 transform transition-transform ${groupVisibility[role] ? '' : '-rotate-90'
-                                                    }`}
-                                            />
-                                        </div>
-                                        {groupVisibility[role] &&
-                                            roleUsers.map((user) => <UserCard key={user._id} user={user} />)}
-                                    </div>
-                                );
-                            })}
+                    return (
+                        <div key={role} className="mb-8">
+                            <h2 className="text-lg font-bold text-gray-900">{getRoleTitle(role)}</h2>
+                            <DataTable
+                                data={roleUsers}
+                                columns={getTableColumns(role)}
+                                searchableColumns={['name', 'email']}
+                                initialSort={{ key: 'name', direction: 'ascending' }}
+                                initialEntriesPerPage={5}
+                            />
                         </div>
-                    </>
-                )}
-
+                    );
+                })}
             </div>
         </div>
     );

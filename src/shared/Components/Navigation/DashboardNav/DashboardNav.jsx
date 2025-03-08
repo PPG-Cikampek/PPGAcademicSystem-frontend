@@ -4,7 +4,7 @@ import { AuthContext } from '../../Context/auth-context';
 
 import Sidebar from '../Sidebar/Sidebar';
 import Navbar from '../NavBar/Navbar';
-import { GraduationCap, Presentation, Users, House, Gauge, UserRoundPlus, UserCog, Layers2, FolderCog, CalendarCog, ArrowRightLeft } from 'lucide-react';
+import { GraduationCap, Presentation, Users, House, Gauge, UserRoundPlus, UserCog, Layers2, FolderCog, CalendarCog, BookOpenText } from 'lucide-react';
 
 const DashboardNav = ({ children }) => {
     const auth = useContext(AuthContext)
@@ -39,6 +39,11 @@ const DashboardNav = ({ children }) => {
                 link: '/performance',
                 icon: <Gauge />,
                 label: 'Performa Kehadiran',
+            },
+            {
+                link: '/munaqasyah',
+                icon: <BookOpenText />,
+                label: 'Munaqasyah',
             },
             {
                 link: null,
