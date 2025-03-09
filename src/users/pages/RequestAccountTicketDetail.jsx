@@ -19,7 +19,8 @@ const RequestAccountTicketDetail = () => {
         const fetchTicketData = async () => {
             try {
                 const responseData = await sendRequest(url);
-                setData(responseData);
+                setData(responseData[0].accountList);
+                console.log(JSON.stringify(responseData))
             } catch (err) { }
         };
         fetchTicketData();

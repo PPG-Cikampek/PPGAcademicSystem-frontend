@@ -3,13 +3,19 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { AuthContext } from '../../shared/Components/Context/auth-context';
 import useHttp from '../../shared/hooks/http-hook';
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
-import WarningCard from '../../shared/Components/UIElements/WarningCard';
 import DataTable from '../../shared/Components/UIElements/DataTable';
-import { PlusIcon } from 'lucide-react';
+import Modal from '../../shared/Components/UIElements/ModalBottomClose';
+
+import { Pencil, Trash, PlusIcon } from 'lucide-react';
+
 
 const QuestionBankView = () => {
     const [questions, setQuestions] = useState([])
+    const [modal, setModal] = useState({ title: '', message: '', onConfirm: null });
+    const [modalIsOpen, setModalIsOpen] = useState(false);
+
     const { error, isLoading, sendRequest, setError } = useHttp();
+
     const navigate = useNavigate();
     const auth = useContext(AuthContext);
     const classGrade = useParams().classGrade;
@@ -94,16 +100,6 @@ const QuestionBankView = () => {
                 </span>
             )
         },
-        // {
-        //     key: 'instruction',
-        //     label: 'Petunjuk Nilai',
-        //     sortable: true,
-        //     render: (question) => (
-        //         <span className="text-gray-600 text-sm">
-        //             {question.instruction}
-        //         </span>
-        //     )
-        // },
         {
             key: 'question',
             label: 'Pertanyaan',
@@ -124,11 +120,94 @@ const QuestionBankView = () => {
                 </div>
             )
         },
+        {
+            key: 'actions',
+            label: 'Aksi',
+            render: (question) => (
+                <div className="flex gap-2">
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/settings/users/${question._id}`);
+                        }}
+                        className="p-1 hover:bg-gray-100 rounded"
+                    >
+                        <Pencil className="w-4 h-4" />
+                    </button>
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteQuestion(question._id);
+                        }}
+                        className="p-1 hover:bg-gray-100 rounded text-red-500"
+                    >
+                        <Trash className="w-4 h-4" />
+                    </button>
+                </div>
+            )
+        }
     ];
+
+    const handleDeleteQuestion = (question) => {
+        const confirmDelete = async () => {
+            try {
+                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/munaqasyah/questions/${question._id}`, 'DELETE', null, {
+                    Authorization: 'Bearer ' + auth.token
+                });
+                setModal({ title: 'Berhasil!', message: responseData.message, onConfirm: null });
+                setQuestions((prevQuestions) => ({
+                    ...prevQuestions,
+                    questions: prevQuestions.questions.filter((quesiton) => quesiton._id !== question),
+                }));
+            } catch (err) {
+                // Error handled by useHttp
+            }
+        };
+        setModal({
+            title: 'Peringatan!',
+            message: 'Hapus Soal?',
+            onConfirm: confirmDelete,
+        });
+        setModalIsOpen(true);
+    };
+
+    const ModalFooter = () => (
+        <div className="flex gap-2 items-center">
+            <button
+                onClick={() => {
+                    setModalIsOpen(false)
+                }}
+                className={`${modal.onConfirm ? 'btn-danger-outline' : 'button-primary mt-0 '}`}
+            >
+                {modal.onConfirm ? 'Batal' : 'Tutup'}
+            </button>
+            {modal.onConfirm && (
+                <button onClick={modal.onConfirm} className="button-primary mt-0 ">
+                    Ya
+                </button>
+            )}
+        </div>
+    );
 
     return (
         <div className="min-h-screen px-4 py-8 md:p-8">
             <div className='max-w-6xl mx-auto'>
+                <Modal
+                    isOpen={modalIsOpen}
+                    onClose={() => setModalIsOpen(false)}
+                    title={modal.title}
+                    footer={<ModalFooter />}
+                >
+                    {isLoading && (
+                        <div className="flex justify-center mt-16">
+                            <LoadingCircle size={32} />
+                        </div>
+                    )}
+                    {!isLoading && (
+                        modal.message
+                    )}
+                </Modal>
+
                 <div className="flex flex-col justify-between items-stretch gap-2 mb-4">
                     <div className="flex items-center mb-6 gap-4">
                         <h1 className="text-2xl font-semibold text-gray-900">Bank Soal {classGrade}</h1>
@@ -157,6 +236,7 @@ const QuestionBankView = () => {
                         onRowClick={(question) => navigate(`/munaqasyah/question-bank/${classGrade}/${question._id}`)}
                         searchableColumns={['question', 'answer', 'semester', 'category', 'type']}
                         initialSort={{ key: 'type', direction: 'ascending' }}
+                        isLoading={isLoading}
                     />
                 )}
             </div>

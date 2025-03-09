@@ -89,7 +89,7 @@ const QuestionDetailView = () => {
                                 <p className="mt-1 text-gray-900">{question.semester === '1' ? 'Ganjil' : 'Genap'}</p>
                             </div>
                             <div>
-                                <h3 className="text-sm font-medium text-gray-500">Bobot Nilai</h3>
+                                <h3 className="text-sm font-medium text-gray-500">Bobot Nilai Maksimal</h3>
                                 <p className="mt-1 text-blue-600 font-medium">{question.maxScore} Poin</p>
                             </div>
                             <div>
@@ -100,7 +100,7 @@ const QuestionDetailView = () => {
 
                         <div className="border-t pt-4">
                             <h3 className="text-sm font-medium text-gray-500">Pertanyaan</h3>
-                            <p className="mt-1 text-gray-900">{question.question}</p>
+                            <p className="mt-1 text-gray-900 whitespace-pre-line">{question.question}</p>
                         </div>
 
                         <div className="border-t pt-4">

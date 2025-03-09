@@ -43,7 +43,7 @@ const DashboardNav = ({ children }) => {
             {
                 link: '/munaqasyah',
                 icon: <BookOpenText />,
-                label: 'Munaqasyah',
+                label: 'Munaqosah',
             },
             {
                 link: null,
@@ -54,6 +54,7 @@ const DashboardNav = ({ children }) => {
                     { link: '/settings/levels', label: 'Desa dan Kelompok', icon: <Layers2 /> },
                     { link: '/settings/academic', label: 'Tahun Ajaran', icon: <CalendarCog /> },
                     { link: '/settings/users', label: 'User', icon: <UserCog /> },
+                    { link: '/settings/requested-accounts', label: 'Permintaan Akun', icon: <UserRoundPlus /> },
                     // { link: '/settings/more', label: 'Lainnya', icon: <Settings /> },
                 ],
             },

@@ -37,7 +37,7 @@ const EmailVerifyView = () => {
                     <LoadingCircle size={32} />
                 </div>
             )}
-            {message || error && (
+            {(message || error) && (
                 <>
                     <img src={logo} alt="logo" className="size-24 self-center mb-4" />
                     <h1 className={`text-2xl font-bold self-center ${error && 'text-red-500'} `}>{message || error}</h1>

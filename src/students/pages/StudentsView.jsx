@@ -113,6 +113,7 @@ const StudentsView = () => {
                         onRowClick={(student) => navigate(`/dashboard/students/${student._id}`)}
                         searchableColumns={['name', 'nis']}
                         initialSort={{ key: 'name', direction: 'ascending' }}
+                        isLoading={isLoading}
                     />
                 )}
             </div>

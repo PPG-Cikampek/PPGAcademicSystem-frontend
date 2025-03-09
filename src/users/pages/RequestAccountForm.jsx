@@ -84,10 +84,10 @@ const RequestAccountForm = () => {
     const handleSubmit = async () => {
 
         const updatedData = {
+            teachingGroupId: auth.userTeachingGroupId,
             accountList: dataList.map(account => ({
                 ...account,
                 accountRole: accountType === 'student' ? 'student' : 'teacher',
-                teachingGroupId: auth.userTeachingGroupId
             }))
         };
 

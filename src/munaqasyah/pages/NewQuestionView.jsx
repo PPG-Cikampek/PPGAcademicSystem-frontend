@@ -56,16 +56,16 @@ const NewQuestionView = () => {
       type: 'radio',
       required: false,
       options:
-        [
-          { label: 'Ganjil', value: '1' },
-          { label: 'Genap', value: '2' },
-        ]
+      [
+        { label: 'Ganjil', value: '1' },
+        { label: 'Genap', value: '2' },
+      ]
     },
-    { name: 'maxScore', label: 'Skor Maksimal', type: 'number', required: false },
-    { name: 'scoreOptions', label: 'Opsi Skor', type: 'multi-input', required: false, inputType: 'number', },
-    { name: 'instruction', label: 'Petunjuk Nilai', placeholder: '', type: 'textarea', textAreaRows: 4, required: false },
     { name: 'question', label: 'Pertanyaan', placeholder: '', type: 'textarea', textAreaRows: 3, required: false },
     { name: 'answers', label: 'Jawaban (tambah utk pilihan ganda)', placeholder: '', type: 'multi-input', inputType: 'text', required: false },
+    { name: 'maxScore', label: 'Skor Maksimal', type: 'number', required: false },
+    { name: 'scoreOptions', label: 'Opsi Skor', type: 'multi-input', required: false, inputType: 'number', },
+    { name: 'instruction', label: 'Petunjuk Penilaian', placeholder: '', type: 'textarea', textAreaRows: 4, required: false },
   ]
 
 

@@ -8,17 +8,6 @@ import { AuthContext } from "./shared/Components/Context/auth-context";
 import { SidebarContext } from "./shared/Components/Context/sidebar-context";
 import { StudentAttendanceProvider } from "./teacher-role/scan/context/StudentAttendanceContext";
 import LoadingCircle from "./shared/Components/UIElements/LoadingCircle";
-import MaterialProgressView from "./teacher-role/materialProgress/pages/materialProgressView";
-import NewMaterialProgresslView from "./teacher-role/materialProgress/pages/NewMaterialProgressView";
-import RequestAccountView from "./users/pages/RequestAccountView";
-import RequestAccountForm from "./users/pages/RequestAccountForm";
-import RequestAccountTicketDetail from "./users/pages/RequestAccountTicketDetail";
-import StudentDashboardView from "./students/pages/StudentDashboardView";
-import MunaqasyahView from "./munaqasyah/pages/MunaqasyahView";
-import QuestionBankView from "./munaqasyah/pages/QuestionBankView";
-import SelectMunaqasyahClassView from "./munaqasyah/pages/SelectMunaqasyahClassView";
-import NewQuestionView from "./munaqasyah/pages/NewQuestionView";
-import QuestionDetailView from "./munaqasyah/pages/QuestionDetailView";
 
 const DashboardNav = lazy(() => import("./shared/Components/Navigation/DashboardNav/DashboardNav"));
 const DashboardView = lazy(() => import("./dashboard/pages/DashboardView"));
@@ -69,6 +58,18 @@ const EmailVerifyView = lazy(() => import("./users/pages/EmailVerifyView"));
 const NewJournalView = lazy(() => import("./teacher-role/journal/pages/NewJournalView"));
 const TeachingGroupPerformanceView = lazy(() => import("./performance/pages/TeachingGroupPerformanceView"));
 const TeacherPerformanceView = lazy(() => import("./performance/pages/TeacherPerformanceView"));
+const MaterialProgressView = lazy(() => import("./teacher-role/materialProgress/pages/materialProgressView"));
+const NewMaterialProgresslView = lazy(() => import("./teacher-role/materialProgress/pages/NewMaterialProgressView"));
+const RequestAccountView = lazy(() => import("./users/pages/RequestAccountView"));
+const RequestAccountForm = lazy(() => import("./users/pages/RequestAccountForm"));
+const RequestAccountTicketDetail = lazy(() => import("./users/pages/RequestAccountTicketDetail"));
+const StudentDashboardView = lazy(() => import("./students/pages/StudentDashboardView"));
+const MunaqasyahView = lazy(() => import("./munaqasyah/pages/MunaqasyahView"));
+const QuestionBankView = lazy(() => import("./munaqasyah/pages/QuestionBankView"));
+const SelectMunaqasyahClassView = lazy(() => import("./munaqasyah/pages/SelectMunaqasyahClassView"));
+const NewQuestionView = lazy(() => import("./munaqasyah/pages/NewQuestionView"));
+const QuestionDetailView = lazy(() => import("./munaqasyah/pages/QuestionDetailView"));
+const RequestedAccountView = lazy(() => import("./users/pages/RequestedAccountView"));
 
 function App() {
   const queryClient = new QueryClient();
@@ -327,6 +328,8 @@ function App() {
               <Route path='/settings/users/new' element={<NewUserView />} />
               <Route path='/settings/users/:userId' element={<UpdateUserView />} />
               <Route path='/settings/users/bulk-create' element={<BulkNewUsersAndStudentsView />} />
+              <Route path='/settings/requested-accounts' element={<RequestedAccountView />} />
+              <Route path='/settings/requestAccount/ticket/:ticketId' element={<RequestAccountTicketDetail />} />
               <Route path='/performance' element={<PerformanceView />} />
               <Route path='/munaqasyah' element={<MunaqasyahView />} />
               <Route path='/munaqasyah/question-bank' element={<SelectMunaqasyahClassView />} />
