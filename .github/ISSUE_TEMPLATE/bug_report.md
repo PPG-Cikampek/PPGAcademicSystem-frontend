@@ -1,11 +1,10 @@
-# Bug report
-
+---
 name: Bug Report
 about: Create a report to help us improve
 title: "[Bug]"
 labels: bug
 assignees: ''
-
+---
 
 ## Describe the bug (Required)
 *A clear and concise description of what the bug is.*
