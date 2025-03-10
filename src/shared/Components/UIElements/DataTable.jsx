@@ -1,3 +1,4 @@
+import { Filter, X } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
 const DataTable = ({
@@ -7,23 +8,38 @@ const DataTable = ({
     searchableColumns = [],
     initialSort = { key: null, direction: 'ascending' },
     initialEntriesPerPage = 10,
-    isLoading = false // Add isLoading prop
+    isLoading = false,
+    filterOptions = [], // Add this prop
 }) => {
     const [filteredData, setFilteredData] = useState(data);
     const [searchTerm, setSearchTerm] = useState('');
     const [entriesPerPage, setEntriesPerPage] = useState(initialEntriesPerPage);
     const [currentPage, setCurrentPage] = useState(1);
     const [sortConfig, setSortConfig] = useState(initialSort);
+    const [filters, setFilters] = useState({});
+    const [showFilters, setShowFilters] = useState(false);
 
     useEffect(() => {
-        const filtered = data.filter(item =>
+        let filtered = data.filter(item =>
             searchableColumns.some(column =>
                 item[column]?.toString().toLowerCase().includes(searchTerm.toLowerCase())
             )
         );
+
+        // Apply active filters
+        Object.entries(filters).forEach(([key, value]) => {
+            if (value) {
+                filtered = filtered.filter(item => {
+                    const column = columns.find(col => col.key === key);
+                    const itemValue = column.render ? column.render(item) : item[key];
+                    return itemValue === value;
+                });
+            }
+        });
+
         setFilteredData(filtered);
         setCurrentPage(1);
-    }, [searchTerm, data, searchableColumns]);
+    }, [searchTerm, data, searchableColumns, filters]);
 
     const sortData = (key) => {
         let direction = 'ascending';
@@ -33,10 +49,22 @@ const DataTable = ({
         setSortConfig({ key, direction });
 
         const sorted = [...filteredData].sort((a, b) => {
-            if (!a[key] || !b[key]) return 0;
+            // Get the column configuration for the current key
+            const column = columns.find(col => col.key === key);
+
+            // If the column has a custom render function, use it to get the sort value
+            const aValue = column.render ? column.render(a) : a[key];
+            const bValue = column.render ? column.render(b) : b[key];
+
+            // Handle null/undefined values
+            if (!aValue && !bValue) return 0;
+            if (!aValue) return 1;
+            if (!bValue) return -1;
+
+            // Compare the values
             return direction === 'ascending'
-                ? a[key].toString().localeCompare(b[key].toString())
-                : b[key].toString().localeCompare(a[key].toString());
+                ? aValue.toString().localeCompare(bValue.toString())
+                : bValue.toString().localeCompare(aValue.toString());
         });
         setFilteredData(sorted);
     };
@@ -66,9 +94,51 @@ const DataTable = ({
         </tr>
     );
 
+    const resetFilters = () => {
+        setFilters({});
+        setSearchTerm('');
+    };
+
+    const FilterCard = () => (
+        <div className={`w-full my-2 overflow-hidden transition-all duration-300 ${showFilters ? 'max-h-96' : 'max-h-0'}`}>
+            <div className="card-basic flex-col rounded-md m-0 border p-4">
+                <div className="flex items-center gap-2 mb-4">
+                    <h3 className="font-normal text-base">Filter Data</h3>
+                    <button
+                        onClick={resetFilters}
+                        className="btn-danger-outline"
+                    >
+                       
+                        Reset
+                    </button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {filterOptions.map(({ key, label, options }) => (
+                        <div key={key}>
+                            <label className="text-sm font-medium text-gray-700 mb-1">{label}</label>
+                            <select
+                                className="w-full border rounded-full px-2 py-2 text-sm focus:ring-1 focus:ring-primary focus:outline-none"
+                                value={filters[key] || ''}
+                                onChange={(e) => setFilters(prev => ({
+                                    ...prev,
+                                    [key]: e.target.value || undefined
+                                }))}
+                            >
+                                <option value="">Semua</option>
+                                {options.map(option => (
+                                    <option key={option} value={option}>{option}</option>
+                                ))}
+                            </select>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
+    );
+
     return (
         <>
-            <div className="flex justify-between items-center mb-4 flex-wrap gap-2">
+            <div className="flex flex-col md:flex-row md:justify-between mb-2 flex-wrap gap-2">
                 {isLoading ? (
                     <>
                         <div className="flex items-center gap-2">
@@ -93,18 +163,30 @@ const DataTable = ({
                             </select>
                             <span>item</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                            <span>Pencarian:</span>
-                            <input
-                                type="text"
-                                className="px-2 py-1 mb-1 border rounded-[4px] shadow-sm hover:ring-1 hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
-                            />
+                        <div className="flex flex-col md:flex-row w-full md:w-auto items-start md:items-center gap-2">
+                            <div className="flex items-center gap-2">
+                                <span>Pencarian:</span>
+                                <input
+                                    type="text"
+                                    className="px-2 py-1 border rounded-[4px] shadow-sm hover:ring-1 hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                />
+                            </div>
+                            {filterOptions.length > 0 && (
+                                <button
+                                    onClick={() => setShowFilters(!showFilters)}
+                                    className="btn-mobile-primary m-0 flex items-center gap-1"
+                                >
+                                    <Filter size={16} />
+                                    Filter
+                                </button>
+                            )}
                         </div>
                     </>
                 )}
             </div>
+            {filterOptions.length > 0 && <FilterCard />}
             <div className="bg-white shadow-sm rounded-md overflow-auto text-nowrap mb-4">
                 <table className="w-full">
                     <thead className="border-b">

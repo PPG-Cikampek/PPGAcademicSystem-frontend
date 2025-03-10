@@ -90,6 +90,37 @@ const StudentsView = () => {
         }
     ];
 
+    const filterOptions = [
+        {
+            key: 'isActive',
+            label: 'Status',
+            options: ['Aktif', 'Tidak Aktif']
+        },
+        {
+            key: 'isProfileComplete',
+            label: 'Kelengkapan Profil',
+            options: ['Lengkap', 'Lengkapi']
+        }
+    ];
+
+    if (auth.userRole === 'admin' && students?.length > 0) {
+        const branches = [...new Set(students.map(s => s?.userId?.teachingGroupId?.branchId?.name).filter(Boolean))];
+        const groups = [...new Set(students.map(s => s?.userId?.teachingGroupId?.name).filter(Boolean))];
+        
+        filterOptions.push(
+            {
+                key: 'branch',
+                label: 'Desa',
+                options: branches
+            },
+            {
+                key: 'group',
+                label: 'Kelompok',
+                options: groups
+            }
+        );
+    }
+
     return (
         <div className="min-h-screen px-4 py-8 md:p-8">
             <div className='max-w-6xl mx-auto'>
@@ -101,11 +132,6 @@ const StudentsView = () => {
                         onClear={() => setError(null)} 
                     />
                 </div>
-                {isLoading && (
-                    <div className="flex justify-center mt-16">
-                        <LoadingCircle size={32} />
-                    </div>
-                )}
                 {students && (
                     <DataTable
                         data={students}
@@ -114,6 +140,7 @@ const StudentsView = () => {
                         searchableColumns={['name', 'nis']}
                         initialSort={{ key: 'name', direction: 'ascending' }}
                         isLoading={isLoading}
+                        filterOptions={filterOptions}
                     />
                 )}
             </div>

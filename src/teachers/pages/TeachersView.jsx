@@ -83,11 +83,13 @@ const TeachersView = () => {
             { 
                 key: 'branch', 
                 label: 'Desa',
+                sortable: true,
                 render: (teacher) => teacher?.userId?.teachingGroupId?.branchId?.name
             },
             { 
                 key: 'group', 
                 label: 'Kelompok',
+                sortable: true,
                 render: (teacher) => teacher?.userId?.teachingGroupId?.name
             }
         ] : []),
@@ -101,6 +103,37 @@ const TeachersView = () => {
             )
         }
     ];
+
+    const filterOptions = [
+        {
+            key: 'status',
+            label: 'Status',
+            options: ['Aktif', 'Tidak Aktif']
+        },
+        {
+            key: 'isProfileComplete',
+            label: 'Kelengkapan Profil',
+            options: ['Lengkap', 'Lengkapi']
+        }
+    ];
+
+    if (auth.userRole === 'admin' && teachers?.length > 0) {
+        const branches = [...new Set(teachers.map(t => t?.userId?.teachingGroupId?.branchId?.name).filter(Boolean))];
+        const groups = [...new Set(teachers.map(t => t?.userId?.teachingGroupId?.name).filter(Boolean))];
+        
+        filterOptions.push(
+            {
+                key: 'branch',
+                label: 'Desa',
+                options: branches
+            },
+            {
+                key: 'group',
+                label: 'Kelompok',
+                options: groups
+            }
+        );
+    }
 
     return (
         <div className="min-h-screen px-4 py-8 md:p-8">
@@ -122,6 +155,7 @@ const TeachersView = () => {
                         searchableColumns={['name', 'nig']}
                         initialSort={{ key: 'name', direction: 'ascending' }}
                         isLoading={isLoading}
+                        filterOptions={filterOptions}
                     />
                 )}
             </div>
