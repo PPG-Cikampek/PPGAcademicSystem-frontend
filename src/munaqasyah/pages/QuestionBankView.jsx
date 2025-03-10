@@ -128,9 +128,9 @@ const QuestionBankView = () => {
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
-                            navigate(`/settings/users/${question._id}`);
+                            navigate(`/munaqasyah/question-bank/${classGrade}/${question._id}/update`);
                         }}
-                        className="p-1 hover:bg-gray-100 rounded"
+                        className="p-2 hover:bg-gray-100 rounded-full"
                     >
                         <Pencil className="w-4 h-4" />
                     </button>
@@ -139,7 +139,7 @@ const QuestionBankView = () => {
                             e.stopPropagation();
                             handleDeleteQuestion(question._id);
                         }}
-                        className="p-1 hover:bg-gray-100 rounded text-red-500"
+                        className="p-2 hover:bg-gray-100 rounded-full text-red-500"
                     >
                         <Trash className="w-4 h-4" />
                     </button>
@@ -148,17 +148,16 @@ const QuestionBankView = () => {
         }
     ];
 
-    const handleDeleteQuestion = (question) => {
+    const handleDeleteQuestion = (questionId) => {
         const confirmDelete = async () => {
             try {
-                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/munaqasyah/questions/${question._id}`, 'DELETE', null, {
+                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/munaqasyah/questions/${questionId}`, 'DELETE', null, {
+                    'Content-Type': 'application/json',
                     Authorization: 'Bearer ' + auth.token
                 });
+                console.log(responseData)
                 setModal({ title: 'Berhasil!', message: responseData.message, onConfirm: null });
-                setQuestions((prevQuestions) => ({
-                    ...prevQuestions,
-                    questions: prevQuestions.questions.filter((quesiton) => quesiton._id !== question),
-                }));
+                setQuestions(prevQuestions => prevQuestions.filter(question => question._id !== questionId));
             } catch (err) {
                 // Error handled by useHttp
             }

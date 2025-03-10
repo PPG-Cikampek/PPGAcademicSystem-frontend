@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import useHttp from '../../shared/hooks/http-hook';
@@ -7,6 +7,7 @@ import DynamicForm from '../../shared/Components/UIElements/DynamicForm';
 import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 import Modal from '../../shared/Components/UIElements/ModalBottomClose'
+import { AuthContext } from '../../shared/Components/Context/auth-context';
 
 
 const NewQuestionView = () => {
@@ -17,6 +18,7 @@ const NewQuestionView = () => {
 
   const navigate = useNavigate()
   const classGrade = useParams().classGrade;
+  const auth = useContext(AuthContext)
 
   const questionCategory = [
     { label: "Membaca Al-Qur'an/Tilawati", value: 'reciting' },
@@ -35,7 +37,7 @@ const NewQuestionView = () => {
       name: 'type',
       label: 'Tipe Soal',
       type: 'select',
-      required: false,
+      required: true,
       options:
         [
           { label: 'Pilihan Ganda', value: 'multipleChoices' },
@@ -47,25 +49,25 @@ const NewQuestionView = () => {
       name: 'category',
       label: 'Kategori Materi',
       type: 'select',
-      required: false,
+      required: true,
       options: questionCategory.map(({ label, value }) => ({ label, value }))
     },
     {
       name: 'semester',
       label: 'Semester',
       type: 'radio',
-      required: false,
+      required: true,
       options:
       [
         { label: 'Ganjil', value: '1' },
         { label: 'Genap', value: '2' },
       ]
     },
-    { name: 'question', label: 'Pertanyaan', placeholder: '', type: 'textarea', textAreaRows: 3, required: false },
+    { name: 'question', label: 'Pertanyaan', placeholder: '', type: 'textarea', textAreaRows: 4, required: false },
     { name: 'answers', label: 'Jawaban (tambah utk pilihan ganda)', placeholder: '', type: 'multi-input', inputType: 'text', required: false },
-    { name: 'maxScore', label: 'Skor Maksimal', type: 'number', required: false },
+    { name: 'maxScore', label: 'Skor Maksimal', type: 'number', required: true },
     { name: 'scoreOptions', label: 'Opsi Skor', type: 'multi-input', required: false, inputType: 'number', },
-    { name: 'instruction', label: 'Petunjuk Penilaian', placeholder: '', type: 'textarea', textAreaRows: 4, required: false },
+    { name: 'instruction', label: 'Petunjuk Penilaian', placeholder: '', type: 'textarea', textAreaRows: 5, required: false },
   ]
 
 
@@ -89,7 +91,8 @@ const NewQuestionView = () => {
     let responseData;
     try {
       responseData = await sendRequest(url, 'POST', body, {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + auth.token
       });
       setModalMessage(responseData.message)
       setModalIsOpen(true)

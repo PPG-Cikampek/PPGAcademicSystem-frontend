@@ -1,13 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect, useContext } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import useHttp from '../../shared/hooks/http-hook';
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
 
+import { Pencil, Trash } from 'lucide-react';
+import Modal from '../../shared/Components/UIElements/ModalBottomClose';
+import { AuthContext } from '../../shared/Components/Context/auth-context';
+
 const QuestionDetailView = () => {
     const [question, setQuestion] = useState(null);
     const { isLoading, error, sendRequest } = useHttp();
+    const [modal, setModal] = useState({ title: '', message: '', onConfirm: null });
+    const [modalIsOpen, setModalIsOpen] = useState(false);
+
     const { questionId } = useParams();
+    const navigate = useNavigate();
+    const auth = useContext(AuthContext)
 
     const getTypeName = (type) => ({
         multipleChoices: 'Pilihan Ganda',
@@ -39,18 +48,69 @@ const QuestionDetailView = () => {
     }[grade]);
 
     useEffect(() => {
+        let isActive = true;
+
         const fetchQuestion = async () => {
             try {
                 const responseData = await sendRequest(
                     `${import.meta.env.VITE_BACKEND_URL}/munaqasyah/questions/${questionId}`
                 );
-                setQuestion(responseData.question);
+                if (isActive) {
+                    setQuestion(responseData.question);
+                }
             } catch (err) {
                 // Error handled by useHttp
             }
         };
         fetchQuestion();
+
+        return () => {
+            isActive = false;
+        };
     }, [sendRequest, questionId]);
+
+    const handleDeleteQuestion = (questionId) => {
+        const confirmDelete = async () => {
+            try {
+                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/munaqasyah/questions/${questionId}`, 'DELETE', null, {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer ' + auth.token
+                });
+                setModal({
+                    title: 'Berhasil!',
+                    message: responseData.message,
+                    onConfirm: null
+                });
+            } catch (err) {
+                // Error handled by useHttp
+            }
+        };
+        setModal({
+            title: 'Peringatan!',
+            message: 'Hapus Soal?',
+            onConfirm: confirmDelete,
+        });
+        setModalIsOpen(true);
+    };
+
+    const ModalFooter = () => (
+        <div className="flex gap-2 items-center">
+            <button
+                onClick={() => {
+                    setModalIsOpen(false)
+                    !error && navigate(-1);
+                }}
+                className={`${modal.onConfirm ? 'btn-danger-outline' : 'button-primary mt-0 '}`}
+            >
+                {modal.onConfirm ? 'Batal' : 'Tutup'}
+            </button>
+            {modal.onConfirm && (
+                <button onClick={modal.onConfirm} className="button-primary mt-0 ">
+                    Ya
+                </button>
+            )}
+        </div>
+    );
 
     if (isLoading) {
         return (
@@ -71,7 +131,45 @@ const QuestionDetailView = () => {
     return (
         <div className="min-h-screen px-4 py-8 md:p-8">
             <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-sm p-6">
-                <h1 className="text-2xl font-semibold text-gray-900 mb-6">Detail Soal</h1>
+                <Modal
+                    isOpen={modalIsOpen}
+                    onClose={() => setModalIsOpen(false)}
+                    title={modal.title}
+                    footer={<ModalFooter />}
+                >
+                    {isLoading && (
+                        <div className="flex justify-center mt-16">
+                            <LoadingCircle size={32} />
+                        </div>
+                    )}
+                    {!isLoading && (
+                        modal.message
+                    )}
+                </Modal>
+
+                <div className="flex gap-2 mb-6 items-center">
+                    <h1 className="text-2xl font-semibold text-gray-900">Detail Soal</h1>
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/munaqasyah/question-bank/${question.classGrade}/${questionId}/update`);
+                        }}
+                        className="button-primary m-0 pl-3 gap-1"
+                    >
+                        <Pencil className="w-4 h-4" />
+                        Edit
+                    </button>
+                    <button
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            handleDeleteQuestion(questionId);
+                        }}
+                        className="button-danger m-0 pl-3 gap-1"
+                    >
+                        <Trash className="w-4 h-4" />
+                        Hapus
+                    </button>
+                </div>
 
                 <div className="space-y-6">
                     <div className="flex flex-col gap-4">

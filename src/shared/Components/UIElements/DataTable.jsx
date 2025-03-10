@@ -108,7 +108,7 @@ const DataTable = ({
                         onClick={resetFilters}
                         className="btn-danger-outline"
                     >
-                       
+
                         Reset
                     </button>
                 </div>
@@ -224,7 +224,7 @@ const DataTable = ({
                                         className="hover:bg-gray-50 hover:cursor-pointer transition"
                                     >
                                         {columns.map(({ key, render }) => (
-                                            <td key={key} className="p-2 md:p-4">
+                                            <td key={key} className={`${key === 'actions' ? 'p-2' : 'p-2 md:p-4'}`}>
                                                 {render ? render(item) : item[key]}
                                             </td>
                                         ))}

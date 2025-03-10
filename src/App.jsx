@@ -8,6 +8,7 @@ import { AuthContext } from "./shared/Components/Context/auth-context";
 import { SidebarContext } from "./shared/Components/Context/sidebar-context";
 import { StudentAttendanceProvider } from "./teacher-role/scan/context/StudentAttendanceContext";
 import LoadingCircle from "./shared/Components/UIElements/LoadingCircle";
+import UpdateQuestionView from "./munaqasyah/pages/UpdateQuestionView";
 
 const DashboardNav = lazy(() => import("./shared/Components/Navigation/DashboardNav/DashboardNav"));
 const DashboardView = lazy(() => import("./dashboard/pages/DashboardView"));
@@ -336,6 +337,7 @@ function App() {
               <Route path='/munaqasyah/question-bank/:classGrade' element={<QuestionBankView />} />
               <Route path='/munaqasyah/question-bank/:classGrade/new' element={<NewQuestionView />} />
               <Route path='/munaqasyah/question-bank/:classGrade/:questionId' element={<QuestionDetailView />} />
+              <Route path='/munaqasyah/question-bank/:classGrade/:questionId/update' element={<UpdateQuestionView />} />
             </>
           )}
           <Route path="*" element={<Navigate to="/dashboard" />} />
