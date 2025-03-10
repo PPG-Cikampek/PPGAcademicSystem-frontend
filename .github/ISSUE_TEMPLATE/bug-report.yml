@@ -7,8 +7,6 @@ body:
     value: |
       **IMPORTANT**
       Please only submit technical bug reports here. This is not a place to make feature requests or suggestions.
-      For that please visit our suggestions site: https://suggestions.revolutionarygamesstudio.com/
-      Or our community forums for longer discussions: https://community.revolutionarygamesstudio.com/
 
 - type: textarea
   attributes:
@@ -53,21 +51,6 @@ body:
       - OS: Windows 10
       - Graphics card: OpenGL ES 3.0 Renderer: GeForce GTX 1080 Ti/PCIe/SSE2
       - Thrive: 0.6.0
-  validations:
-    required: true
-
-- type: textarea
-  attributes:
-    label: Game Logs
-    description: |
-      Please use a text hosting service (for example https://pastebin.com/) to submit your logs.
-      You can copy the launcher output or the contents of `log.txt`.
-      You can find these log files by reading the game log to see their location.
-      For example:
-      ```
-      Mono: Logfile is: /home/hhyyrylainen/.local/share/godot/mono/mono_logs/2020_07_21 23.10.26 (265121).txt
-      Game logs are written to: /home/hhyyrylainen/.local/share/Thrive/logs latest log is 'log.txt'
-      ```
   validations:
     required: true
 
