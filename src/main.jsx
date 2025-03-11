@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 import MaintenanceView from './maintenance/pages/MaintenanceView.jsx';
-import { useVersionCheck } from './hooks/useVersionCheck';
+import { useVersionCheck } from './shared/hooks/useVersionCheck.js';
 
 const AppWrapper = () => {
   useVersionCheck();

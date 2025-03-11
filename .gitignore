@@ -133,3 +133,4 @@ dist
 
 # Version counter file
 .version-counter
+public/version.json
