@@ -149,10 +149,12 @@ const ProfileView = () => {
                         Authorization: 'Bearer ' + auth.token
                     }
                 );
+                setModal({ title: 'Berhasil!', message: response.message, onConfirm: null });
                 console.log(response);
-            } catch (err) { }
+            } catch (err) {
+                setModal({ title: 'Gagal!', message: err.message, onConfirm: null });
+            }
         }
-
         setModal({ title: 'Ubah Password?', message: "Apakah anda yakin untuk mengubah password?", onConfirm: updatePassword });
         setModalIsOpen(true);
     };
