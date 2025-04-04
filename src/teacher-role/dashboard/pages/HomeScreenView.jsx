@@ -12,6 +12,7 @@ import CurrentTime from '../components/CurrentTime';
 import LoadingCircle from '../../../shared/Components/UIElements/LoadingCircle';
 import SequentialAnimation from '../../shared/Components/Animation/SequentialAnimation';
 import InfoCard from '../../shared/Components/UIElements/InfoCard';
+import SkeletonLoader from '../../../shared/Components/UIElements/SkeletonLoader';
 
 const HomeScreenView = () => {
     const auth = useContext(AuthContext);
@@ -70,8 +71,19 @@ const HomeScreenView = () => {
                 <Profile user={data} isLoading={isLoading} />
             </div>
             {!data && isLoading && (
-                < div className="flex justify-center mt-44">
-                    <LoadingCircle size={32} />
+                <div className="mt-44 px-4">
+                    <SkeletonLoader 
+                        variant="rectangular"
+                        height="200px"
+                        className="rounded-lg max-w-xl mx-auto"
+                    />
+                    <div className="mt-4 max-w-xl mx-auto">
+                        <SkeletonLoader 
+                            variant="text"
+                            count={3}
+                            className="max-w-[80%]"
+                        />
+                    </div>
                 </div>
             )}
             {data && !isLoading && (

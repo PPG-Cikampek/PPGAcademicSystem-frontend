@@ -4,6 +4,7 @@ import useHttp from '../../shared/hooks/http-hook';
 import { AuthContext } from '../../shared/Components/Context/auth-context';
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 import Modal from "../../shared/Components/UIElements/ModalBottomClose";
+import SkeletonLoader from '../../shared/Components/UIElements/SkeletonLoader';
 
 import { LineChart, Trash, LockOpen, Lock, Clock, Users, GraduationCap, Building, PlusIcon, KeyRound } from 'lucide-react'
 import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
@@ -174,8 +175,19 @@ const ClassDetailView = () => {
                 </Modal>
 
                 {(!classData || isLoading) && !modalIsOpen && (
-                    <div className="flex justify-center mt-16">
-                        <LoadingCircle size={32} />
+                    <div className="flex flex-col gap-6 mt-16 px-4">
+                        <SkeletonLoader 
+                            variant="text"
+                            width="200px"
+                            height="32px"
+                            className="mb-4"
+                        />
+                        <SkeletonLoader 
+                            variant="rectangular"
+                            height="100px"
+                            className="rounded-lg"
+                            count={3}
+                        />
                     </div>
                 )}
 
@@ -385,4 +397,4 @@ const ClassDetailView = () => {
     );
 };
 
-export default ClassDetailView
+export default ClassDetailView;

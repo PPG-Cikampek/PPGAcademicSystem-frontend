@@ -4,7 +4,7 @@ import useHttp from '../../shared/hooks/http-hook';
 import { AuthContext } from '../../shared/Components/Context/auth-context';
 
 import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
-import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
+import SkeletonLoader from '../../shared/Components/UIElements/SkeletonLoader';
 import { Icon } from '@iconify-icon/react'
 import { Pencil, QrCode, RefreshCcw, ArrowDownToLine } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
@@ -84,8 +84,26 @@ const StudentDetailView = () => {
     return (
         <div className="min-h-screen bg-gray-50 p-4 md:p-8 pb-24">
             {isLoading && (
-                <div className="flex justify-center mt-16">
-                    <LoadingCircle size={32} />
+                <div className="flex flex-col gap-6 mt-16 px-4">
+                    <div className="flex gap-4">
+                        <SkeletonLoader 
+                            variant="circular"
+                            width="120px"
+                            height="120px"
+                        />
+                        <div className="flex-1">
+                            <SkeletonLoader 
+                                variant="text"
+                                count={3}
+                                className="max-w-[90%]"
+                            />
+                        </div>
+                    </div>
+                    <SkeletonLoader 
+                        variant="rectangular"
+                        height="200px"
+                        className="rounded-lg"
+                    />
                 </div>
             )}
             {!isLoading && studentDetails.length > 0 && studentInfo && (

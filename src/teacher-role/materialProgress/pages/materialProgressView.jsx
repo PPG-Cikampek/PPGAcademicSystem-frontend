@@ -6,7 +6,7 @@ import FloatingButton from '../../shared/Components/UIElements/FloatingButton';
 import useHttp from '../../../shared/hooks/http-hook';
 import { AuthContext } from '../../../shared/Components/Context/auth-context';
 import ErrorCard from '../../../shared/Components/UIElements/ErrorCard';
-import LoadingCircle from '../../../shared/Components/UIElements/LoadingCircle';
+import SkeletonLoader from '../../../shared/Components/UIElements/SkeletonLoader';
 import InfoCard from '../../shared/Components/UIElements/InfoCard';
 
 const getMonday = (date) => {
@@ -102,8 +102,13 @@ const MaterialProgressView = () => {
             </div>
 
             {isLoading && (
-                <div className="flex justify-center mt-16">
-                    <LoadingCircle size={32} />
+                <div className="flex flex-col gap-4 mt-16 mx-4">
+                    <SkeletonLoader 
+                        variant="rectangular"
+                        height="120px"
+                        className="rounded-lg"
+                        count={3}
+                    />
                 </div>
             )}
 

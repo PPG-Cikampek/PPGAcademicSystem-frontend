@@ -10,7 +10,7 @@ import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 import { ChevronDown, ChevronRight, MapPin, Building, PlusIcon, Pencil, Trash } from 'lucide-react';
 import FloatingMenu from '../../shared/Components/UIElements/FloatingMenu';
 import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
-
+import SkeletonLoader from '../../shared/Components/UIElements/SkeletonLoader';
 
 const LevelsView = () => {
     const [modal, setModal] = useState({ title: '', message: '', onConfirm: null });
@@ -172,8 +172,13 @@ const LevelsView = () => {
                 </Modal>
 
                 {!data && isLoading && (
-                    < div className="flex justify-center mt-16">
-                        <LoadingCircle size={32} />
+                    <div className="flex flex-col gap-4 mt-16 px-4">
+                        <SkeletonLoader 
+                            variant="rectangular"
+                            height="60px"
+                            className="rounded-lg"
+                            count={4}
+                        />
                     </div>
                 )}
 
