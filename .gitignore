@@ -137,5 +137,4 @@ public/version.json
 deploy.sh
 .firebase
 .firebaserc
-firebase.json
 .firebase/

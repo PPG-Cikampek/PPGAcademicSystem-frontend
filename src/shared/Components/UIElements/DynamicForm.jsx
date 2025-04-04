@@ -177,23 +177,38 @@ const DynamicForm = ({ logo, title, subtitle, fields = [], onSubmit, button, cus
                                     <div className="space-y-2">
                                         {value.map((item, index) => (
                                             <div key={index} className="flex gap-2">
-                                                <input
-                                                    type={field.inputType || 'text'}
-                                                    value={item}
-                                                    onChange={(e) => {
-                                                        const newValues = [...value];
-                                                        newValues[index] = field.inputType === 'number'
-                                                            ? e.target.value === '' ? '' : Number(e.target.value)
-                                                            : e.target.value;
-                                                        onChange(newValues);
-                                                    }}
-                                                    min={field.inputType === 'number' ? (field.min || 0) : undefined}
-                                                    max={field.inputType === 'number' ? field.max : undefined}
-                                                    step={field.inputType === 'number' ? (field.step || 1) : undefined}
-                                                    placeholder={field.placeholder || ''}
-                                                    className="w-full p-2 border rounded-[4px] shadow-sm hover:ring-1 hover:ring-primary 
-                                                        focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
-                                                />
+                                                {field.inputType === 'textarea' ? (
+                                                    <textarea
+                                                        value={item}
+                                                        rows={field.textAreaRows || 2}
+                                                        onChange={(e) => {
+                                                            const newValues = [...value];
+                                                            newValues[index] = e.target.value;
+                                                            onChange(newValues);
+                                                        }}
+                                                        placeholder={field.placeholder || ''}
+                                                        className="w-full p-2 border rounded-[4px] shadow-sm hover:ring-1 hover:ring-primary 
+                                                            focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
+                                                    />
+                                                ) : (
+                                                    <input
+                                                        type={field.inputType || 'text'}
+                                                        value={item}
+                                                        onChange={(e) => {
+                                                            const newValues = [...value];
+                                                            newValues[index] = field.inputType === 'number'
+                                                                ? e.target.value === '' ? '' : Number(e.target.value)
+                                                                : e.target.value;
+                                                            onChange(newValues);
+                                                        }}
+                                                        min={field.inputType === 'number' ? (field.min || 0) : undefined}
+                                                        max={field.inputType === 'number' ? field.max : undefined}
+                                                        step={field.inputType === 'number' ? (field.step || 1) : undefined}
+                                                        placeholder={field.placeholder || ''}
+                                                        className="w-full p-2 border rounded-[4px] shadow-sm hover:ring-1 hover:ring-primary 
+                                                            focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
+                                                    />
+                                                )}
                                                 <button
                                                     type="button"
                                                     onClick={() => {

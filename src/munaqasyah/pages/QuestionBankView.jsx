@@ -72,17 +72,14 @@ const QuestionBankView = () => {
             key: 'type',
             label: 'Tipe Soal',
             sortable: true,
-            render: (question) => (
-                <span className={`px-2 py-1 rounded-full text-sm ${getTypeStyle(question.type)}`}>
-                    {getTypeName(question.type)}
-                </span>
-            )
+            cellStyle: (question) => `px-2 py-1 rounded-full text-sm ${getTypeStyle(question.type)}`,
+            render: (question) => getTypeName(question.type)
         },
         {
             key: 'category',
             label: 'Kategori Materi',
             sortable: true,
-            render: (question) => <span className="font-medium">{getCategoryName(question.category)}</span>
+            render: (question) => getCategoryName(question.category)
         },
         {
             key: 'semester',
@@ -94,11 +91,8 @@ const QuestionBankView = () => {
             key: 'maxScore',
             label: 'Bobot Nilai',
             sortable: true,
-            render: (question) => (
-                <span className="font-medium text-blue-600">
-                    {question.maxScore} Poin
-                </span>
-            )
+            cellStyle: () => 'font-medium text-blue-600',
+            render: (question) => `${question.maxScore} Poin`
         },
         {
             key: 'question',
@@ -147,6 +141,46 @@ const QuestionBankView = () => {
             )
         }
     ];
+
+    const filterOptions = [
+        {
+            key: 'semester',
+            label: 'Semester',
+            options: ['Ganjil', 'Genap']
+        }
+    ];
+    console.log(filterOptions)
+
+    if (questions?.length > 0) {
+        console.log(JSON.stringify(questions))
+        const types = [...new Set(questions.map(t => getTypeName(t?.type)).filter(Boolean))];
+        const categories = [...new Set(questions.map(t => getCategoryName(t?.category)).filter(Boolean))];
+
+        const maxScores = [...new Set(questions.map(t => t?.maxScore + ' Poin').filter(Boolean))];
+
+        filterOptions.unshift(
+            {
+                key: 'type',
+                label: 'Tipe Soal',
+                options: types
+            },
+            {
+                key: 'category',
+                label: 'Kategori Materi',
+                options: categories
+            }
+        );
+
+        filterOptions.push(
+            {
+                key: 'maxScore',
+                label: 'Bobot Nilai',
+                options: maxScores
+            }
+        )
+
+        console.log(filterOptions)
+    }
 
     const handleDeleteQuestion = (questionId) => {
         const confirmDelete = async () => {
@@ -236,6 +270,7 @@ const QuestionBankView = () => {
                         searchableColumns={['question', 'answer', 'semester', 'category', 'type']}
                         initialSort={{ key: 'type', direction: 'ascending' }}
                         isLoading={isLoading}
+                        filterOptions={filterOptions}
                     />
                 )}
             </div>

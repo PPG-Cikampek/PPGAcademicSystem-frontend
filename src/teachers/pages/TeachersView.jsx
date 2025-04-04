@@ -9,6 +9,7 @@ import { Trash2, Search, Users, Pencil, Trash, ChevronDown, Filter, PlusIcon } f
 import FloatingMenu from '../../shared/Components/UIElements/FloatingMenu';
 import WarningCard from '../../shared/Components/UIElements/WarningCard';
 import DataTable from '../../shared/Components/UIElements/DataTable';
+import { filter } from 'compression';
 
 const TeachersView = () => {
     const [teachers, setTeachers] = useState()
@@ -71,11 +72,10 @@ const TeachersView = () => {
         {
             key: 'status',
             label: 'Status',
-            render: (teacher) => (
-                <div className={`py-1 px-2 text-sm text-center w-min border rounded-md ${teacher.positionEndDate ? 'text-red-500 bg-red-100' : 'text-green-500 bg-green-100'}`}>
-                    {teacher.positionEndDate ? 'Tidak Aktif' : 'Aktif'}
-                </div>
-            )
+            render: (teacher) => teacher.positionEndDate ? 'Tidak Aktif' : 'Aktif',
+            cellStyle: (teacher) => `py-1 px-2 text-sm text-center w-min border rounded-md ${
+                teacher.positionEndDate ? 'text-red-500 bg-red-100' : 'text-green-500 bg-green-100'
+            }`
         },
         { key: 'nig', label: 'NIG', sortable: true },
         { key: 'name', label: 'Nama', sortable: true },
@@ -96,11 +96,8 @@ const TeachersView = () => {
         {
             key: 'isProfileComplete',
             label: 'Profile',
-            render: (teacher) => (
-                <span className={teacher.isProfileComplete ? 'text-green-500' : 'text-red-500 hover:underline cursor-pointer'}>
-                    {teacher.isProfileComplete ? 'Lengkap' : 'Lengkapi'}
-                </span>
-            )
+            render: (teacher) => teacher.isProfileComplete ? 'Lengkap' : 'Lengkapi',
+            cellStyle: (teacher) => `${teacher.isProfileComplete ? 'text-green-500' : 'text-red-500 hover:underline cursor-pointer'}`
         }
     ];
 
@@ -133,6 +130,8 @@ const TeachersView = () => {
                 options: groups
             }
         );
+
+        console.log(filterOptions)
     }
 
     return (

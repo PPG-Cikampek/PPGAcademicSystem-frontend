@@ -223,9 +223,11 @@ const DataTable = ({
                                         onClick={() => onRowClick && onRowClick(item)}
                                         className="hover:bg-gray-50 hover:cursor-pointer transition"
                                     >
-                                        {columns.map(({ key, render }) => (
+                                        {columns.map(({ key, render, cellStyle }) => (
                                             <td key={key} className={`${key === 'actions' ? 'p-2' : 'p-2 md:p-4'}`}>
-                                                {render ? render(item) : item[key]}
+                                                <span className={cellStyle?.(item)}>
+                                                    {render ? render(item) : item[key]}
+                                                </span>
                                             </td>
                                         ))}
                                     </tr>

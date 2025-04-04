@@ -54,13 +54,10 @@ const StudentsView = () => {
             key: 'isActive',
             label: 'Status',
             sortable: true,
-            render: (student) => (
-                <div className={`py-1 px-2 text-sm text-center w-min border rounded-md ${
-                    !student.isActive ? 'text-red-500 bg-red-100' : 'text-green-500 bg-green-100'
-                }`}>
-                    {!student.isActive ? 'Tidak Aktif' : 'Aktif'}
-                </div>
-            )
+            render: (student) => !student.isActive ? 'Tidak Aktif' : 'Aktif',
+            cellStyle: (student) => `py-1 px-2 text-sm text-center w-min border rounded-md ${
+                !student.isActive ? 'text-red-500 bg-red-100' : 'text-green-500 bg-green-100'
+            }`
         }] : []),
         { key: 'nis', label: 'NIS', sortable: true },
         { key: 'name', label: 'Nama', sortable: true },
@@ -82,11 +79,8 @@ const StudentsView = () => {
             key: 'isProfileComplete',
             label: 'Profile',
             sortable: true,
-            render: (student) => (
-                <span className={student.isProfileComplete ? 'text-green-500' : 'text-red-500 hover:underline cursor-pointer'}>
-                    {student.isProfileComplete ? 'Lengkap' : 'Lengkapi'}
-                </span>
-            )
+            render: (student) => student.isProfileComplete ? 'Lengkap' : 'Lengkapi',
+            cellStyle: (student) => `${student.isProfileComplete ? 'text-green-500' : 'text-red-500 hover:underline cursor-pointer'}`
         }
     ];
 
