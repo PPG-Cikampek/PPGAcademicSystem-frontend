@@ -34,23 +34,51 @@ const QuestionBankView = () => {
         }
     };
 
+    const getStatusStyle = (type) => {
+        switch (type) {
+            case 'active':
+                return 'text-green-500';
+            case 'inactive':
+                return 'text-gray-500';
+            case 'checkNeeded':
+                return 'text-red-500';
+            default:
+                return 'text-red-500';
+        }
+    };
+
     const getTypeName = (type) => ({
         multipleChoices: 'Pilihan Ganda',
         shortAnswer: 'Jawab Cermat',
         practice: 'Praktik',
     }[type]);
 
-    const getCategoryName = (category) => ({
-        reciting: "Membaca Al-Qur'an/Tilawati",
-        writing: "Menulis Arab",
-        quranTafsir: "Tafsir Al-Qur'an",
-        hadithTafsir: "Tafsir Hadits",
-        practice: "Praktek Ibadah",
-        moralManner: "Akhlak dan Tata Krama",
-        memorizing: "Hafalan",
-        knowledge: "Keilmuan dan Kefahaman Agama",
-        independence: "Kemandirian",
-    }[category]);
+    const getStatusName = (status) => {
+        const statusMap = {
+            active: "Aktif",
+            inactive: "Non-aktif",
+            checkneeded: "Periksa!",
+        };
+        return statusMap[status] || 'Periksa!';
+    };
+
+    const getCategoryName = (category) => {
+        const categoryMap = {
+            reciting: "Membaca Al-Qur'an/Tilawati",
+            writing: "Menulis Arab",
+            quranTafsir: "Tafsir Al-Qur'an",
+            hadithTafsir: "Tafsir Hadits",
+            practice: "Praktek Ibadah",
+            moralManner: "Akhlak dan Tata Krama",
+            memorizingSurah: "Hafalan Surat-surat Al-Quran",
+            memorizingHadith: "Hafalan Hadist",
+            memorizingDua: "Hafalan Do'a",
+            memorizingBeautifulName: "Hafalan Asmaul Husna",
+            knowledge: "Keilmuan dan Kefahaman Agama",
+            independence: "Kemandirian",
+        };
+        return categoryMap[category] || 'kosong';
+    };
 
     useEffect(() => {
         const url = `${import.meta.env.VITE_BACKEND_URL}/munaqasyah/questions/class/${classGrade}`;
@@ -68,6 +96,13 @@ const QuestionBankView = () => {
     }, [sendRequest]);
 
     const columns = [
+        {
+            key: 'status',
+            label: 'Status',
+            sortable: true,
+            cellStyle: (question) => `text-sm ${getStatusStyle(question.status)}`,
+            render: (question) => getStatusName(question.status)
+        },
         {
             key: 'type',
             label: 'Tipe Soal',
@@ -159,6 +194,11 @@ const QuestionBankView = () => {
         const maxScores = [...new Set(questions.map(t => t?.maxScore + ' Poin').filter(Boolean))];
 
         filterOptions.unshift(
+            {
+                key: 'status',
+                label: 'Status',
+                options: ['Aktif', 'Non-aktif', 'Periksa!']
+            },
             {
                 key: 'type',
                 label: 'Tipe Soal',

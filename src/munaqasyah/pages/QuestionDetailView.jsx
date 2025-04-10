@@ -18,23 +18,51 @@ const QuestionDetailView = () => {
     const navigate = useNavigate();
     const auth = useContext(AuthContext)
 
+    const getStatusStyle = (type) => {
+        switch (type) {
+            case 'active':
+                return 'text-green-500';
+            case 'inactive':
+                return 'text-gray-500';
+            case 'checkNeeded':
+                return 'text-red-500';
+            default:
+                return 'text-red-500';
+        }
+    };
+
+    const getStatusName = (status) => {
+        const statusMap = {
+            active: "Aktif",
+            inactive: "Non-aktif",
+            checkneeded: "Periksa!",
+        };
+        return statusMap[status] || 'Periksa!';
+    };
+
     const getTypeName = (type) => ({
         multipleChoices: 'Pilihan Ganda',
         shortAnswer: 'Jawab Cermat',
         practice: 'Praktik',
     }[type]);
 
-    const getCategoryName = (category) => ({
-        reciting: "Membaca Al-Qur'an/Tilawati",
-        writing: "Menulis Arab",
-        quranTafsir: "Tafsir Al-Qur'an",
-        hadithTafsir: "Tafsir Hadits",
-        practice: "Praktek Ibadah",
-        moralManner: "Akhlak dan Tata Krama",
-        memorizing: "Hafalan",
-        knowledge: "Keilmuan dan Kefahaman Agama",
-        independence: "Kemandirian",
-    }[category]);
+    const getCategoryName = (category) => {
+        const categoryMap = {
+            reciting: "Membaca Al-Qur'an/Tilawati",
+            writing: "Menulis Arab",
+            quranTafsir: "Tafsir Al-Qur'an",
+            hadithTafsir: "Tafsir Hadits",
+            practice: "Praktek Ibadah",
+            moralManner: "Akhlak dan Tata Krama",
+            memorizingSurah: "Hafalan Surat-surat Al-Quran",
+            memorizingHadith: "Hafalan Hadist",
+            memorizingDua: "Hafalan Do'a",
+            memorizingBeautifulName: "Hafalan Asmaul Husna",
+            knowledge: "Keilmuan dan Kefahaman Agama",
+            independence: "Kemandirian",
+        };
+        return categoryMap[category] || 'kosong';
+    };
 
     const getClassGrade = (grade) => ({
         'pra-paud': 'Kelas Pra-Paud',
@@ -93,12 +121,38 @@ const QuestionDetailView = () => {
         setModalIsOpen(true);
     };
 
+    const handleUpdateQuestionStatus = (questionId, status) => {
+        const confirmDelete = async () => {
+            const body = JSON.stringify({ status: status });
+            try {
+                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/munaqasyah/questions/${questionId}/status`, 'PATCH', body, {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer ' + auth.token
+                });
+                setQuestion({ ...question, status: status });
+                setModal({
+                    title: 'Berhasil!',
+                    message: responseData.message,
+                    onConfirm: null
+                });
+            } catch (err) {
+                // Error handled by useHttp
+            }
+        };
+        setModal({
+            title: 'Peringatan!',
+            message: 'Ubah Status Soal?',
+            onConfirm: confirmDelete,
+        });
+        setModalIsOpen(true);
+    };
+
     const ModalFooter = () => (
         <div className="flex gap-2 items-center">
             <button
                 onClick={() => {
                     setModalIsOpen(false)
-                    !error && navigate(-1);
+                    // !error && navigate(-1);
                 }}
                 className={`${modal.onConfirm ? 'btn-danger-outline' : 'button-primary mt-0 '}`}
             >
@@ -147,7 +201,7 @@ const QuestionDetailView = () => {
                     )}
                 </Modal>
 
-                <div className="flex gap-2 mb-6 items-center">
+                <div className="flex flex-col md:flex-row  gap-2 mb-6 md:items-center">
                     <h1 className="text-2xl font-semibold text-gray-900">Detail Soal</h1>
                     <button
                         onClick={(e) => {
@@ -169,11 +223,51 @@ const QuestionDetailView = () => {
                         <Trash className="w-4 h-4" />
                         Hapus
                     </button>
+                    {
+                        question.status !== 'active' &&
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleUpdateQuestionStatus(questionId, 'active');
+                            }}
+                            className="button-danger border-green-600 hover:bg-green-600 focus:ring-green-600 m-0 pl-3 gap-1"
+                        >
+                            Aktifkan
+                        </button>
+                    }
+                    {
+                        question.status !== 'inactive' && question.status !== 'checkneeded' &&
+                        < button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleUpdateQuestionStatus(questionId, 'inactive');
+                            }}
+                            className="button-danger border-gray-600 hover:bg-gray-600 focus:ring-gray-600 m-0 pl-3 gap-1"
+                        >
+                            Nonaktifkan
+                        </button>
+                    }
+                    {
+                        question.status !== 'checkneeded' &&
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                handleUpdateQuestionStatus(questionId, 'checkneeded');
+                            }}
+                            className="button-danger border-yellow-600 hover:bg-yellow-600 focus:ring-yellow-600 m-0 pl-3 gap-1"
+                        >
+                            Tandai Periksa
+                        </button>
+                    }
                 </div>
 
                 <div className="space-y-6">
                     <div className="flex flex-col gap-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <h3 className="text-sm font-medium text-gray-500">Status</h3>
+                                <p className={`${getStatusStyle(question.status)}`}>{getStatusName(question.status)}</p>
+                            </div>
                             <div>
                                 <h3 className="text-sm font-medium text-gray-500">Tipe Soal</h3>
                                 <p className="mt-1 text-gray-900">{getTypeName(question.type)}</p>
@@ -235,7 +329,7 @@ const QuestionDetailView = () => {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 
