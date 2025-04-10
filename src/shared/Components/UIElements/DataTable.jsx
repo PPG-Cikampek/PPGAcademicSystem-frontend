@@ -9,7 +9,15 @@ const DataTable = ({
     initialSort = { key: null, direction: 'ascending' },
     initialEntriesPerPage = 10,
     isLoading = false,
-    filterOptions = [], // Add this prop
+    filterOptions = [],
+    config = {
+        showFilter: true,
+        showSearch: true,
+        showTopEntries: true,
+        showBottomEntries: true,
+        showPagination: true,
+        entriesOptions: [5, 10, 25, 50, 100]
+    }
 }) => {
     const [filteredData, setFilteredData] = useState(data);
     const [searchTerm, setSearchTerm] = useState('');
@@ -26,7 +34,6 @@ const DataTable = ({
             )
         );
 
-        // Apply active filters
         Object.entries(filters).forEach(([key, value]) => {
             if (value) {
                 filtered = filtered.filter(item => {
@@ -49,19 +56,14 @@ const DataTable = ({
         setSortConfig({ key, direction });
 
         const sorted = [...filteredData].sort((a, b) => {
-            // Get the column configuration for the current key
             const column = columns.find(col => col.key === key);
-
-            // If the column has a custom render function, use it to get the sort value
             const aValue = column.render ? column.render(a) : a[key];
             const bValue = column.render ? column.render(b) : b[key];
 
-            // Handle null/undefined values
             if (!aValue && !bValue) return 0;
             if (!aValue) return 1;
             if (!bValue) return -1;
 
-            // Compare the values
             return direction === 'ascending'
                 ? aValue.toString().localeCompare(bValue.toString())
                 : bValue.toString().localeCompare(aValue.toString());
@@ -69,9 +71,11 @@ const DataTable = ({
         setFilteredData(sorted);
     };
 
-    const indexOfLastItem = currentPage * entriesPerPage;
-    const indexOfFirstItem = indexOfLastItem - entriesPerPage;
-    const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+    const indexOfLastItem = config.showPagination ? currentPage * entriesPerPage : filteredData.length;
+    const indexOfFirstItem = config.showPagination ? indexOfLastItem - entriesPerPage : 0;
+    const currentItems = config.showPagination 
+        ? filteredData.slice(indexOfFirstItem, indexOfLastItem)
+        : filteredData;
     const totalPages = Math.ceil(filteredData.length / entriesPerPage);
 
     const SkeletonRow = () => (
@@ -108,7 +112,6 @@ const DataTable = ({
                         onClick={resetFilters}
                         className="btn-danger-outline"
                     >
-
                         Reset
                     </button>
                 </div>
@@ -150,30 +153,34 @@ const DataTable = ({
                     </>
                 ) : (
                     <>
-                        <div className="flex items-center gap-2">
-                            <span>Tampilkan</span>
-                            <select
-                                className="border rounded px-2 py-1"
-                                value={entriesPerPage}
-                                onChange={(e) => setEntriesPerPage(Number(e.target.value))}
-                            >
-                                {[5, 10, 25, 50, 100].map(value => (
-                                    <option key={value} value={value}>{value}</option>
-                                ))}
-                            </select>
-                            <span>item</span>
-                        </div>
-                        <div className="flex flex-col md:flex-row w-full md:w-auto items-start md:items-center gap-2">
+                        {config.showTopEntries && (
                             <div className="flex items-center gap-2">
-                                <span>Pencarian:</span>
-                                <input
-                                    type="text"
-                                    className="px-2 py-1 border rounded-[4px] shadow-sm hover:ring-1 hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
-                                    value={searchTerm}
-                                    onChange={(e) => setSearchTerm(e.target.value)}
-                                />
+                                <span>Tampilkan</span>
+                                <select
+                                    className="border rounded px-2 py-1"
+                                    value={entriesPerPage}
+                                    onChange={(e) => setEntriesPerPage(Number(e.target.value))}
+                                >
+                                    {config.entriesOptions.map(value => (
+                                        <option key={value} value={value}>{value}</option>
+                                    ))}
+                                </select>
+                                <span>item</span>
                             </div>
-                            {filterOptions.length > 0 && (
+                        )}
+                        <div className="flex flex-col md:flex-row w-full md:w-auto items-start md:items-center gap-2">
+                            {config.showSearch && (
+                                <div className="flex items-center gap-2">
+                                    <span>Pencarian:</span>
+                                    <input
+                                        type="text"
+                                        className="px-2 py-1 border rounded-[4px] shadow-sm hover:ring-1 hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                    />
+                                </div>
+                            )}
+                            {config.showFilter && filterOptions.length > 0 && (
                                 <button
                                     onClick={() => setShowFilters(!showFilters)}
                                     className="btn-mobile-primary m-0 flex items-center gap-1"
@@ -186,7 +193,7 @@ const DataTable = ({
                     </>
                 )}
             </div>
-            {filterOptions.length > 0 && <FilterCard />}
+            {config.showFilter && filterOptions.length > 0 && <FilterCard />}
             <div className="bg-white shadow-sm rounded-md overflow-auto text-nowrap mb-4">
                 <table className="w-full">
                     <thead className="border-b">
@@ -255,28 +262,32 @@ const DataTable = ({
                     </>
                 ) : (
                     <>
-                        <div>
-                            {filteredData.length === 0
-                                ? "Menampilkan 0 - 0 dari 0 item"
-                                : `Menampilkan ${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, filteredData.length)} dari ${filteredData.length} item`
-                            }
-                        </div>
-                        <div className="flex gap-2">
-                            <button
-                                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                                disabled={currentPage === 1 || filteredData.length === 0}
-                                className="btn-primary-outline"
-                            >
-                                Sebelumnya
-                            </button>
-                            <button
-                                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                                disabled={currentPage === totalPages || filteredData.length === 0}
-                                className="btn-primary-outline"
-                            >
-                                Berikutnya
-                            </button>
-                        </div>
+                        {config.showBottomEntries && (
+                            <div>
+                                {filteredData.length === 0
+                                    ? "Menampilkan 0 - 0 dari 0 item"
+                                    : `Menampilkan ${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, filteredData.length)} dari ${filteredData.length} item`
+                                }
+                            </div>
+                        )}
+                        {config.showPagination && (
+                            <div className="flex gap-2">
+                                <button
+                                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                                    disabled={currentPage === 1 || filteredData.length === 0}
+                                    className="btn-primary-outline"
+                                >
+                                    Sebelumnya
+                                </button>
+                                <button
+                                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                                    disabled={currentPage === totalPages || filteredData.length === 0}
+                                    className="btn-primary-outline"
+                                >
+                                    Berikutnya
+                                </button>
+                            </div>
+                        )}
                     </>
                 )}
             </div>

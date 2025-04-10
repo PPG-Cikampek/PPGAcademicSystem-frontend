@@ -3,21 +3,15 @@ import { Link, useNavigate } from 'react-router-dom';
 import useHttp from '../../shared/hooks/http-hook';
 import { AuthContext } from '../../shared/Components/Context/auth-context';
 
-import Modal from '../../shared/Components/UIElements/ModalBottomClose';
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
-import { Trash2, Search, Users, Pencil, Trash, ChevronDown, Filter, PlusIcon } from 'lucide-react';
-import FloatingMenu from '../../shared/Components/UIElements/FloatingMenu';
 import WarningCard from '../../shared/Components/UIElements/WarningCard';
 import DataTable from '../../shared/Components/UIElements/DataTable';
-import { filter } from 'compression';
 
 const TeachersView = () => {
     const [teachers, setTeachers] = useState()
-    const [searchTerm, setSearchTerm] = useState('');
     const [modal, setModal] = useState({ title: '', message: '', onConfirm: null });
     const { isLoading, sendRequest } = useHttp();
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const navigate = useNavigate();
     const auth = useContext(AuthContext);
