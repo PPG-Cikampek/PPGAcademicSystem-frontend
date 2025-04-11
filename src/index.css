@@ -53,6 +53,10 @@ html {
     @apply p-2 px-4 ring-2 ring-primary-subtle hover:bg-primary hover:ring-primary hover:text-white rounded-[5px] disabled:opacity-60 disabled:hover:cursor-not-allowed transition-all duration-150
   }
 
+  .btn-neutral-outline {
+    @apply p-2 px-4 ring-2 ring-primary-subtle hover:bg-gray-500 hover:ring-gray-500 hover:text-white rounded-[5px] disabled:opacity-60 disabled:hover:cursor-not-allowed transition-all duration-150
+  }
+
   .btn-secondary-outline-sharp {
     @apply p-2 px-4 hover:ring-1 hover:ring-primary-subtle focus:bg-primary-subtle focus:ring-primary-subtle rounded-[2px] transition-all duration-150
   }

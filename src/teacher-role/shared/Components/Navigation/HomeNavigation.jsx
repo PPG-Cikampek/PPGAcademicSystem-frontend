@@ -4,19 +4,12 @@ import { AuthContext } from '../../../../shared/Components/Context/auth-context'
 
 import BottomNav from './BottomNav';
 import Sidebar from '../../../../shared/Components/Navigation/Sidebar/Sidebar';
-import { GraduationCap, Notebook, Users, Presentation, Gauge, CalendarCog, Settings } from 'lucide-react';
+import { GraduationCap, Notebook, Users, Presentation, Gauge, CalendarCog, Settings, BookOpenText } from 'lucide-react';
 
 
 const HomeNavigation = ({ children }) => {
 
     const auth = useContext(AuthContext);
-
-    // console.log(auth.userId)
-    // console.log(auth.userName)
-    // console.log(auth.userRole)
-    // console.log(auth.userTeachingGroupId)
-    // console.log(auth.currentTeachingGroupYear || 'no active year')
-    // console.log(auth.userClassIds || 'no classes')
 
     const links = auth.userRole === 'teacher' ?
         [
@@ -41,6 +34,11 @@ const HomeNavigation = ({ children }) => {
                 label: 'Peserta Didik',
             },
             {
+                link: '/munaqasyah',
+                icon: <BookOpenText />,
+                label: 'Munaqosah',
+            },
+            {
                 link: '/performances',
                 icon: <Gauge />,
                 label: 'Performa Kehadiran',
@@ -55,10 +53,17 @@ const HomeNavigation = ({ children }) => {
                 icon: <Settings />,
                 label: 'Pengaturan Akun',
             },
-        ] :
+        ] : auth.userRole === 'student' ?
         [
             {
                 link: `/dashboard/students/${auth.userId}`,
+                icon: <GraduationCap />,
+                label: auth.userName,
+            },
+        ] : 
+        [
+            {
+                link: `/dashboard/user/${auth.userId}`,
                 icon: <GraduationCap />,
                 label: auth.userName,
             },

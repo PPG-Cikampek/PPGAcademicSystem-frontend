@@ -63,16 +63,16 @@ const NewQuestionView = () => {
         { label: 'Genap', value: '2' },
       ]
     },
-    { name: 'question', label: 'Pertanyaan', placeholder: '', type: 'textarea', textAreaRows: 4, required: false },
-    { name: 'answers', label: 'Jawaban (tambah utk pilihan ganda)', placeholder: '', type: 'multi-input', inputType: 'textarea', textAreaRows: 2, required: false },
+    { name: 'question', label: 'Pertanyaan', placeholder: '', type: 'textarea', textAreaRows: 4, required: true },
+    { name: 'answers', label: 'Jawaban (tambah utk pilihan ganda)', placeholder: '', type: 'multi-input', inputType: 'textarea', textAreaRows: 3, required: false },
     { name: 'maxScore', label: 'Skor Maksimal', type: 'number', required: true },
-    { name: 'scoreOptions', label: 'Opsi Skor', type: 'multi-input', required: false, inputType: 'number', },
-    { name: 'instruction', label: 'Petunjuk Penilaian', placeholder: '', type: 'textarea', textAreaRows: 5, required: false },
+    { name: 'scoreOptions', label: 'Opsi Skor', type: 'multi-input', required: true, inputType: 'number', },
+    { name: 'instruction', label: 'Petunjuk Penilaian', placeholder: '', type: 'textarea', textAreaRows: 5, required: true },
   ]
 
 
   const handleFormSubmit = async (data) => {
-    const url = `${import.meta.env.VITE_BACKEND_URL}/munaqasyah/questions/`;
+    const url = `${import.meta.env.VITE_BACKEND_URL}/munaqasyahs/questions/`;
 
     const body = JSON.stringify({
       classGrade: classGrade,

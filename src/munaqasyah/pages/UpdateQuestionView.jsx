@@ -23,7 +23,7 @@ const UpdateQuestionView = () => {
 
     useEffect(() => {
         const fetchQuestion = async () => {
-            const url = `${import.meta.env.VITE_BACKEND_URL}/munaqasyah/questions/${questionId}`
+            const url = `${import.meta.env.VITE_BACKEND_URL}/munaqasyahs/questions/${questionId}`
 
             try {
                 const responseData = await sendRequest(url);
@@ -80,7 +80,7 @@ const UpdateQuestionView = () => {
             value: loadedQuestion?.semester || ''
         },
         { name: 'question', label: 'Pertanyaan', placeholder: '', type: 'textarea', textAreaRows: 4, required: false, value: loadedQuestion?.question || '' },
-        { name: 'answers', label: 'Jawaban (tambah utk pilihan ganda)', placeholder: '', type: 'multi-input', inputType: 'text', required: false, value: loadedQuestion?.answers || '' },
+        { name: 'answers', label: 'Jawaban (tambah utk pilihan ganda)', placeholder: '', type: 'multi-input', inputType: 'textarea', textAreaRows: 3, required: false, value: loadedQuestion?.answers || '' },
         { name: 'maxScore', label: 'Skor Maksimal', type: 'number', required: false, value: loadedQuestion?.maxScore || '' },
         { name: 'scoreOptions', label: 'Opsi Skor', type: 'multi-input', required: false, inputType: 'number', value: loadedQuestion?.scoreOptions || '' },
         { name: 'instruction', label: 'Petunjuk Penilaian', placeholder: '', type: 'textarea', textAreaRows: 5, required: false, value: loadedQuestion?.instruction || '' },
@@ -88,7 +88,7 @@ const UpdateQuestionView = () => {
 
 
     const handleFormSubmit = async (data) => {
-        const url = `${import.meta.env.VITE_BACKEND_URL}/munaqasyah/questions/${questionId}`;
+        const url = `${import.meta.env.VITE_BACKEND_URL}/munaqasyahs/questions/${questionId}`;
 
         const body = JSON.stringify({
             type: data.type,

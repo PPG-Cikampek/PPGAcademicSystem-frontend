@@ -55,9 +55,12 @@ const NewTeachingGroupYearView = () => {
                 setAcademicYears(updatedData.academicYears);
 
             } catch (err) {
-                // Error is already handled by useHttp
+                setModal({
+                    title: `Gagal!`,
+                    message: err.message,
+                    onConfirm: null,
+                });
             }
-
         };
         setModal({
             title: `Konfirmasi Pendaftaran`,

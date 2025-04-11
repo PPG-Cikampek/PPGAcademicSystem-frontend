@@ -10,7 +10,7 @@ const SelectMunaqasyahClassView = () => {
 
     useEffect(() => {
         const fetchClasses = async () => {
-            const url = `${import.meta.env.VITE_BACKEND_URL}/munaqasyah/classes`
+            const url = `${import.meta.env.VITE_BACKEND_URL}/munaqasyahs/classes`
             try {
                 const responseData = await sendRequest(url)
                 console.log(responseData)

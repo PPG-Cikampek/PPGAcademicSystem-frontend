@@ -8,7 +8,6 @@ import { AuthContext } from "./shared/Components/Context/auth-context";
 import { SidebarContext } from "./shared/Components/Context/sidebar-context";
 import { StudentAttendanceProvider } from "./teacher-role/scan/context/StudentAttendanceContext";
 import LoadingCircle from "./shared/Components/UIElements/LoadingCircle";
-import UpdateQuestionView from "./munaqasyah/pages/UpdateQuestionView";
 
 const DashboardNav = lazy(() => import("./shared/Components/Navigation/DashboardNav/DashboardNav"));
 const DashboardView = lazy(() => import("./dashboard/pages/DashboardView"));
@@ -71,6 +70,10 @@ const SelectMunaqasyahClassView = lazy(() => import("./munaqasyah/pages/SelectMu
 const NewQuestionView = lazy(() => import("./munaqasyah/pages/NewQuestionView"));
 const QuestionDetailView = lazy(() => import("./munaqasyah/pages/QuestionDetailView"));
 const RequestedAccountView = lazy(() => import("./users/pages/RequestedAccountView"));
+const UpdateQuestionView = lazy(() => import("./munaqasyah/pages/UpdateQuestionView"));
+const TeachingGroupMunaqasyahView = lazy(() => import("./munaqasyah/pages/TeachingGroupMunaqasyahView"));
+const MunaqasyahClassList = lazy(() => import("./munaqasyah/components/MunaqasyahClassList"));
+const MunaqasyahByClassView = lazy(() => import("./munaqasyah/pages/MunaqasyahByClassView"));
 
 function App() {
   const queryClient = new QueryClient();
@@ -250,6 +253,25 @@ function App() {
         </StudentAttendanceProvider>
       </QueryClientProvider>
     )
+  } else if (token && userRole === 'munaqisy') {
+    routes = (
+      <HomeNavigation>
+        <Routes>
+          <Route path='/dashboard/students' element=
+            {
+              <PageHeader>
+                <StudentsView />
+              </PageHeader>
+            } />
+          <Route path='/dashboard/students/:studentId' element=
+            {
+              <PageHeader>
+                <StudentDetailView />
+              </PageHeader>
+            } />
+        </Routes>
+      </HomeNavigation>
+    )
   } else if (token && userRole === 'student') {
     routes = (
       <HomeNavigation >
@@ -313,6 +335,9 @@ function App() {
               <Route path='/dashboard/classes/:classId/add-students' element={<AddStudentToClassView />} />
               <Route path='/dashboard/classes/:classId/add-teachers' element={<AddTeacherToClassView />} />
               <Route path='/performance' element={<TeachingGroupPerformanceView />} />
+              <Route path='/munaqasyah' element={<TeachingGroupMunaqasyahView />} />
+              <Route path='/munaqasyah/:teachingGroupYearId' element={<MunaqasyahClassList />} />
+              <Route path='/munaqasyah/class/:classId' element={<MunaqasyahByClassView />} />
             </>
           )}
           {userRole === 'admin' && (

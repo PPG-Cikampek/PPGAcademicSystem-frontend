@@ -81,7 +81,7 @@ const QuestionBankView = () => {
     };
 
     useEffect(() => {
-        const url = `${import.meta.env.VITE_BACKEND_URL}/munaqasyah/questions/class/${classGrade}`;
+        const url = `${import.meta.env.VITE_BACKEND_URL}/munaqasyahs/questions/class/${classGrade}`;
 
         const fetchQuestions = async () => {
             try {
@@ -225,7 +225,7 @@ const QuestionBankView = () => {
     const handleDeleteQuestion = (questionId) => {
         const confirmDelete = async () => {
             try {
-                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/munaqasyah/questions/${questionId}`, 'DELETE', null, {
+                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/munaqasyahs/questions/${questionId}`, 'DELETE', null, {
                     'Content-Type': 'application/json',
                     Authorization: 'Bearer ' + auth.token
                 });

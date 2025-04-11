@@ -9,7 +9,7 @@ const BottomNav = () => {
     const navLinks = [
         { id: 1, label: 'Home', path: '/', icon: <Home size={24} />, end: true },
         { id: 2, label: 'Absen', path: '/scan', icon: <Icon icon="uil:qrcode-scan" width="24" height="24" />, },
-        { id: 3, label: 'Materi', path: '/materialProgress', icon: <BookOpenText size={24} /> },
+        { id: 3, label: 'Materi', path: '/materialProgress', icon: <Icon icon="bi:journal-check" width="24" height="24" /> },
     ];
 
     return (

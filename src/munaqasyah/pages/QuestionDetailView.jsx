@@ -81,7 +81,7 @@ const QuestionDetailView = () => {
         const fetchQuestion = async () => {
             try {
                 const responseData = await sendRequest(
-                    `${import.meta.env.VITE_BACKEND_URL}/munaqasyah/questions/${questionId}`
+                    `${import.meta.env.VITE_BACKEND_URL}/munaqasyahs/questions/${questionId}`
                 );
                 if (isActive) {
                     setQuestion(responseData.question);
@@ -100,7 +100,7 @@ const QuestionDetailView = () => {
     const handleDeleteQuestion = (questionId) => {
         const confirmDelete = async () => {
             try {
-                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/munaqasyah/questions/${questionId}`, 'DELETE', null, {
+                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/munaqasyahs/questions/${questionId}`, 'DELETE', null, {
                     'Content-Type': 'application/json',
                     Authorization: 'Bearer ' + auth.token
                 });
@@ -125,7 +125,7 @@ const QuestionDetailView = () => {
         const confirmDelete = async () => {
             const body = JSON.stringify({ status: status });
             try {
-                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/munaqasyah/questions/${questionId}/status`, 'PATCH', body, {
+                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/munaqasyahs/questions/${questionId}/status`, 'PATCH', body, {
                     'Content-Type': 'application/json',
                     Authorization: 'Bearer ' + auth.token
                 });

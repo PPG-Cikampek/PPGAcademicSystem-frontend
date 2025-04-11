@@ -8,6 +8,7 @@ const AcademicYearCard = ({ year, expanded, onToggle, onActivate, onStartMunaqas
     const transformedData = year.teachingGroupYears.map(group => ({
         name: group.teachingGroupId.name,
         isActive: group.isActive,
+        isMunaqasyahActive: group.isMunaqasyahActive,
         _id: group._id
     }));
 
@@ -30,8 +31,8 @@ const AcademicYearCard = ({ year, expanded, onToggle, onActivate, onStartMunaqas
                 key: 'isMunaqasyahActive',
                 label: 'Munaqosah',
                 sortable: true,
-                render: (item) => item.isMunaqasyahActive ? 'Aktif' : 'Nonaktif',
-                cellStyle: (item) => `py-1 px-2 text-sm text-center w-min ${item.isMunaqasyahActive ? 'text-green-500' : 'text-red-500'
+                render: (item) => item.isMunaqasyahActive ? 'Sedang Berjalan' : 'Belum Dimulai',
+                cellStyle: (item) => `py-1 px-2 text-sm text-center w-min ${item.isMunaqasyahActive ? 'text-blue-500' : 'text-red-500'
                     }`
             }] : [{
                 key: 'isMunaqasyahActive',

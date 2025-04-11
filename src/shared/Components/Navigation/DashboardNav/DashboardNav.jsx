@@ -95,6 +95,7 @@ const DashboardNav = ({ children }) => {
                 end: true,
                 subOptions: [
                     { link: '/settings/academic', label: 'Tahun Ajaran Kelompok', icon: <CalendarCog /> },
+                    { link: '/munaqasyah', label: 'Munaqosah',  icon: <BookOpenText />},
                     // { link: '/settings/transfer-students', label: 'Mutasi & Pindah Sambung', icon: <ArrowRightLeft size={24}/> },
                     { link: '/settings/requestAccount', label: 'Permintaan Akun', icon: <UserRoundPlus /> },
                     // { link: '/settings/more', label: 'Lainnya', icon: <Settings /> },
