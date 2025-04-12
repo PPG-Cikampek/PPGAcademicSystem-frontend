@@ -1,6 +1,5 @@
 // StudentAttendanceContext.jsx
 import React, { createContext, useReducer, useEffect } from 'react';
-import useHttp from '../../../shared/hooks/http-hook';
 
 const StudentAttendanceContext = createContext();
 

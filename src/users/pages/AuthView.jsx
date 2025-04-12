@@ -64,6 +64,7 @@ const AuthView = () => {
 
             console.log('logging IN')
             console.log(responseData)
+            console.log(teachingGroupYearData)
 
             const classIds = teacherData?.teacher?.classIds.map(item => item._id) || []
 
@@ -74,6 +75,7 @@ const AuthView = () => {
                 responseData.user.teachingGroupId.branchId.id,
                 responseData.user.teachingGroupId.id,
                 activeAcademicYear?.academicYearId?.name || null,
+                activeAcademicYear?._id || null,
                 classIds,
                 responseData.token
             );

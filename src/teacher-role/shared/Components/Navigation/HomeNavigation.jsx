@@ -34,7 +34,7 @@ const HomeNavigation = ({ children }) => {
                 label: 'Peserta Didik',
             },
             {
-                link: '/munaqasyah',
+                link: '/munaqasyah/scanner',
                 icon: <BookOpenText />,
                 label: 'Munaqosah',
             },

@@ -8,6 +8,9 @@ import { AuthContext } from "./shared/Components/Context/auth-context";
 import { SidebarContext } from "./shared/Components/Context/sidebar-context";
 import { StudentAttendanceProvider } from "./teacher-role/scan/context/StudentAttendanceContext";
 import LoadingCircle from "./shared/Components/UIElements/LoadingCircle";
+import MunaqasyahScannerView from "./munaqisy/pages/MunaqasyahScannerView";
+import StudentScoresView from "./munaqisy/pages/StudentScoresView";
+import { MunaqasyahScoreProvider } from "./munaqisy/context/MunaqasyahScoreContext";
 
 const DashboardNav = lazy(() => import("./shared/Components/Navigation/DashboardNav/DashboardNav"));
 const DashboardView = lazy(() => import("./dashboard/pages/DashboardView"));
@@ -79,7 +82,7 @@ function App() {
   const queryClient = new QueryClient();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
-  const { token, login, logout, userId, userRole, userName, userBranchId, userTeachingGroupId, currentTeachingGroupYear, userClassIds, setAttributes } = useAuth();
+  const { token, login, logout, userId, userRole, userName, userBranchId, userTeachingGroupId, currentTeachingGroupYear, currentTeachingGroupYearId, userClassIds, setAttributes } = useAuth();
 
 
   useEffect(() => {
@@ -108,169 +111,185 @@ function App() {
     routes = (
       <QueryClientProvider client={queryClient}>
         <StudentAttendanceProvider>
-          <HomeNavigation>
-            <Routes>
-              <Route path='/' element={<HomeScreenView />} />
-              <Route path='/scan' element={<ScannerView />} />
-              <Route path='/scan/select-class' element={<SelectClassView />} />
-              <Route path='/profile/:userId' element={
-                <PageHeader>
-                  <ProfileView />
-                </PageHeader>
-              } />
-              <Route path='/attendance/history/' element=
-                {
-                  <PageHeader>
-                    <AttendanceHistoryView />
-                  </PageHeader>
-                } />
-              <Route path='/scan/class/:classId' element={<ScannerView />} />
-              <Route path='/attendance/history/class/:classId' element=
-                {
-                  <PageHeader>
-                    <AttendanceHistoryViewByClass />
-                  </PageHeader>
-                } />
-              <Route path='/attendance/history/class/:classId/:attendancId' element=
-                {
-                  <PageHeader>
-                    <AttendanceHistoryViewByClass />
-                  </PageHeader>
-                } />
-              <Route path='/attendance/history/class/:classId/:attendanceId/edit' element=
-                {
-                  <PageHeader>
-                    <UpdateAttendanceView />
-                  </PageHeader>
-                } />
-              <Route path='/materialProgress' element=
-                {
-                  <PageHeader>
-                    <MaterialProgressView />
-                  </PageHeader>
-                } />
-              <Route path='/materialProgress/new' element=
-                {
-                  <PageHeader>
-                    <NewMaterialProgresslView />
-                  </PageHeader>
-                } />
-              <Route path='/journal' element=
-                {
-                  <PageHeader>
-                    <JournalView />
-                  </PageHeader>
-                } />
-              <Route path='/journal/new' element=
-                {
-                  <PageHeader>
-                    <NewJournalView />
-                  </PageHeader>
-                } />
-              <Route path='/dashboard/teachers/:teacherId' element=
-                {
-                  <PageHeader>
-                    <TeacherDetailView />
-                  </PageHeader>
-                } />
-              <Route path='/dashboard/teachers/:id/update' element=
-                {
-                  <PageHeader>
-                    <UpdateTeacherView />
-                  </PageHeader>
-                } />
-              <Route path='/dashboard/students' element=
-                {
-                  <PageHeader>
-                    <StudentsView />
-                  </PageHeader>
-                } />
-              <Route path='/dashboard/students/:studentId' element=
-                {
-                  <PageHeader>
-                    <StudentDetailView />
-                  </PageHeader>
-                } />
-              <Route path='/dashboard/students/:studentId/update' element=
-                {
-                  <PageHeader>
-                    <UpdateStudentView />
-                  </PageHeader>
-                } />
-              <Route path='/dashboard/academic' element=
-                {
-                  <PageHeader>
-                    <TeachingGroupYearsView />
-                  </PageHeader>
-                } />
-              <Route path='/dashboard/classes/:classId' element=
-                {
-                  <PageHeader>
-                    <ClassDetailView />
-                  </PageHeader>
-                } />
-              <Route path='/dashboard/classes/:classId/add-students' element=
-                {
-                  <PageHeader>
-                    <AddStudentToClassView />
-                  </PageHeader>
-                } />
-              <Route path='/settings/academic/classes/new' element=
-                {
-                  <PageHeader>
-                    <NewClassView />
-                  </PageHeader>
-                } />
-              <Route path='/performances' element=
-                {
-                  <PageHeader>
-                    <Suspense
-                      fallback={
-                        <div className="flex justify-center mt-16">
-                          <LoadingCircle size={32} />
-                        </div>
-                      }>
-                      <TeacherPerformanceView />
-                    </Suspense>
-                  </PageHeader>
-                } />
-              <Route path='/performances/student/:studentId' element=
-                {
-                  <PageHeader>
-                    <StudentReportView />
-                  </PageHeader>
-                } />
-              <Route path='/settings/profile/:userId' element=
-                {
+          <MunaqasyahScoreProvider>
+            <HomeNavigation>
+              <Routes>
+                <Route path='/' element={<HomeScreenView />} />
+                <Route path='/scan' element={<ScannerView />} />
+                <Route path='/scan/select-class' element={<SelectClassView />} />
+                <Route path='/profile/:userId' element={
                   <PageHeader>
                     <ProfileView />
                   </PageHeader>
                 } />
-              <Route path='/verify-email/:token' element={<EmailVerifyView />} />
-              <Route path="*" element={<Navigate to="/" />} />
-            </Routes>
-          </HomeNavigation>
+                <Route path='/attendance/history/' element=
+                  {
+                    <PageHeader>
+                      <AttendanceHistoryView />
+                    </PageHeader>
+                  } />
+                <Route path='/scan/class/:classId' element={<ScannerView />} />
+                <Route path='/attendance/history/class/:classId' element=
+                  {
+                    <PageHeader>
+                      <AttendanceHistoryViewByClass />
+                    </PageHeader>
+                  } />
+                <Route path='/attendance/history/class/:classId/:attendancId' element=
+                  {
+                    <PageHeader>
+                      <AttendanceHistoryViewByClass />
+                    </PageHeader>
+                  } />
+                <Route path='/attendance/history/class/:classId/:attendanceId/edit' element=
+                  {
+                    <PageHeader>
+                      <UpdateAttendanceView />
+                    </PageHeader>
+                  } />
+                <Route path='/materialProgress' element=
+                  {
+                    <PageHeader>
+                      <MaterialProgressView />
+                    </PageHeader>
+                  } />
+                <Route path='/materialProgress/new' element=
+                  {
+                    <PageHeader>
+                      <NewMaterialProgresslView />
+                    </PageHeader>
+                  } />
+                <Route path='/journal' element=
+                  {
+                    <PageHeader>
+                      <JournalView />
+                    </PageHeader>
+                  } />
+                <Route path='/journal/new' element=
+                  {
+                    <PageHeader>
+                      <NewJournalView />
+                    </PageHeader>
+                  } />
+                <Route path='/dashboard/teachers/:teacherId' element=
+                  {
+                    <PageHeader>
+                      <TeacherDetailView />
+                    </PageHeader>
+                  } />
+                <Route path='/dashboard/teachers/:id/update' element=
+                  {
+                    <PageHeader>
+                      <UpdateTeacherView />
+                    </PageHeader>
+                  } />
+                <Route path='/dashboard/students' element=
+                  {
+                    <PageHeader>
+                      <StudentsView />
+                    </PageHeader>
+                  } />
+                <Route path='/dashboard/students/:studentId' element=
+                  {
+                    <PageHeader>
+                      <StudentDetailView />
+                    </PageHeader>
+                  } />
+                <Route path='/dashboard/students/:studentId/update' element=
+                  {
+                    <PageHeader>
+                      <UpdateStudentView />
+                    </PageHeader>
+                  } />
+                <Route path='/dashboard/academic' element=
+                  {
+                    <PageHeader>
+                      <TeachingGroupYearsView />
+                    </PageHeader>
+                  } />
+                <Route path='/dashboard/classes/:classId' element=
+                  {
+                    <PageHeader>
+                      <ClassDetailView />
+                    </PageHeader>
+                  } />
+                <Route path='/dashboard/classes/:classId/add-students' element=
+                  {
+                    <PageHeader>
+                      <AddStudentToClassView />
+                    </PageHeader>
+                  } />
+                <Route path='/munaqasyah/scanner' element=
+                  {
+                    <PageHeader>
+                      <MunaqasyahScannerView />
+                    </PageHeader>
+                  } />
+                <Route path='/munaqasyah/student' element=
+                  {
+                    <PageHeader>
+                      <StudentScoresView />
+                    </PageHeader>
+                  } />
+                <Route path='/settings/academic/classes/new' element=
+                  {
+                    <PageHeader>
+                      <NewClassView />
+                    </PageHeader>
+                  } />
+                <Route path='/performances' element=
+                  {
+                    <PageHeader>
+                      <Suspense
+                        fallback={
+                          <div className="flex justify-center mt-16">
+                            <LoadingCircle size={32} />
+                          </div>
+                        }>
+                        <TeacherPerformanceView />
+                      </Suspense>
+                    </PageHeader>
+                  } />
+                <Route path='/performances/student/:studentId' element=
+                  {
+                    <PageHeader>
+                      <StudentReportView />
+                    </PageHeader>
+                  } />
+                <Route path='/settings/profile/:userId' element=
+                  {
+                    <PageHeader>
+                      <ProfileView />
+                    </PageHeader>
+                  } />
+                <Route path='/verify-email/:token' element={<EmailVerifyView />} />
+                <Route path="*" element={<Navigate to="/" />} />
+              </Routes>
+            </HomeNavigation>
+          </MunaqasyahScoreProvider>
         </StudentAttendanceProvider>
       </QueryClientProvider>
     )
   } else if (token && userRole === 'munaqisy') {
     routes = (
-      <HomeNavigation>
-        <Routes>
-          <Route path='/dashboard/students' element=
-            {
-              <PageHeader>
-                <StudentsView />
-              </PageHeader>
-            } />
-          <Route path='/dashboard/students/:studentId' element=
-            {
-              <PageHeader>
-                <StudentDetailView />
-              </PageHeader>
-            } />
-        </Routes>
-      </HomeNavigation>
+      <MunaqasyahScoreProvider>
+        <HomeNavigation>
+          <Routes>
+            <Route path='/dashboard/students' element=
+              {
+                <PageHeader>
+                  <StudentsView />
+                </PageHeader>
+              } />
+            <Route path='/dashboard/students/:studentId' element=
+              {
+                <PageHeader>
+                  <StudentDetailView />
+                </PageHeader>
+              } />
+          </Routes>
+        </HomeNavigation>
+      </MunaqasyahScoreProvider>
     )
   } else if (token && userRole === 'student') {
     routes = (
@@ -383,7 +402,7 @@ function App() {
 
   return (
     <SidebarContext.Provider value={{ isSidebarOpen: isSidebarOpen, toggle: toggle }}>
-      <AuthContext.Provider value={{ isLoggedIn: !!token, userRole, userId, userName, userBranchId, userTeachingGroupId, currentTeachingGroupYear, userClassIds, token, login, setAttributes, logout }}>
+      <AuthContext.Provider value={{ isLoggedIn: !!token, userRole, userId, userName, userBranchId, userTeachingGroupId, currentTeachingGroupYear, currentTeachingGroupYearId, userClassIds, token, login, setAttributes, logout }}>
         <Router future={{
           v7_startTransition: true,
           v7_relativeSplatPath: true

@@ -11,7 +11,6 @@ import StatusBar from '../components/StatusBar';
 import AttendedStudents from '../components/AttendedStudents';
 import SequentialAnimation from '../../shared/Components/Animation/SequentialAnimation';
 
-import Modal from '../../../shared/Components/UIElements/ModalBottomClose';
 import LoadingCircle from '../../../shared/Components/UIElements/LoadingCircle';
 import { useNavigate, useParams } from 'react-router-dom';
 import InfoCard from '../../shared/Components/UIElements/InfoCard';

@@ -122,7 +122,7 @@ const TeachingGroupMunaqasyahView = () => {
 
                     teachingGroupYears.map(year => (
                         <Link key={year._id} to={`/munaqasyah/${year._id}`}>
-                            <div className={`card-basic hover:bg-gray-100 active:bg-gray-100 hover:cursor-pointer rounded-md justify-start m-0 transition-all duration-200 my-4 ${year.academicYearId.isActive === false && 'opacity-50 hover:bg-white'}`} >
+                            <div className={`card-basic hover:bg-gray-100 active:bg-gray-100 hover:cursor-pointer rounded-md justify-start m-0 transition-all duration-200 my-4`} >
                                 <div
                                     // onClick={() => toggleyear(year._id)}
                                     className="flex items-center space-x-4 "

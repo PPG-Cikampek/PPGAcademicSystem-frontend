@@ -43,7 +43,7 @@ const HomeScreenView = () => {
         }
         const responseData = await response.json();
 
-        console.log(responseData)
+        // console.log(responseData)
 
         const classIds = responseData.teacher?.classIds.map(item => item._id) || []
 
@@ -63,7 +63,7 @@ const HomeScreenView = () => {
 
     let activeClassCount = 0;
     // console.log(JSON.stringify(data))
-    console.log(data)
+    // console.log(data)
 
     return (
         <div className="flex flex-col pb-12">
@@ -96,9 +96,9 @@ const HomeScreenView = () => {
                         <div className="mb-2">
                             {data.classIds.map((item, index) => {
                                 const isClassInTeachingGroupYear = item?.teachingGroupYearId?.academicYearId?.isActive
-                                console.log(item)
+                                // console.log(item)
                                 if (isClassInTeachingGroupYear) {
-                                    console.log(item)
+                                    // console.log(item)
                                     activeClassCount++;
                                     return <Dashboard key={index} data={item} />
                                 }

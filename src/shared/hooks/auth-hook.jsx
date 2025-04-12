@@ -11,9 +11,10 @@ export const useAuth = () => {
     const [userBranchId, setUserBranchId] = useState(null);
     const [userTeachingGroupId, setUserTeachingGroupId] = useState(null);
     const [currentTeachingGroupYear, setCurrentTeachingGroupYear] = useState(null);
+    const [currentTeachingGroupYearId, setCurrentTeachingGroupYearId] = useState(null);
     const [userClassIds, setUserClassIds] = useState([]);
 
-    const login = useCallback((uId, role, name, branchId, teachingGroupId, currentTeachingGroupYear, userClassIds, token, expirationDate) => {
+    const login = useCallback((uId, role, name, branchId, teachingGroupId, currentTeachingGroupYear, currentTeachingGroupYearId, userClassIds, token, expirationDate) => {
         if (role === 'teachingGroupAdmin') {
             setUserRole('admin kelompok')
         } else {
@@ -25,6 +26,7 @@ export const useAuth = () => {
         setUserBranchId(branchId)
         setUserTeachingGroupId(teachingGroupId)
         setCurrentTeachingGroupYear(currentTeachingGroupYear)
+        setCurrentTeachingGroupYearId(currentTeachingGroupYearId)
         setUserClassIds(userClassIds)
 
         const tokenExpirationDate = expirationDate || new Date(new Date().getTime() + 1000 * 60 * 60 * 2)
@@ -38,6 +40,7 @@ export const useAuth = () => {
                 branchId: branchId,
                 teachingGroupId: teachingGroupId,
                 currentTeachingGroupYear: currentTeachingGroupYear,
+                currentTeachingGroupYearId: currentTeachingGroupYearId,
                 userClassIds: userClassIds,
                 token: token,
                 expiration: tokenExpirationDate.toISOString()
@@ -53,6 +56,7 @@ export const useAuth = () => {
         setUserBranchId(null)
         setUserTeachingGroupId(null)
         setCurrentTeachingGroupYear(null)
+        setCurrentTeachingGroupYearId(null)
         setUserClassIds(null)
 
         setTokenExpirationDate(null)
@@ -71,7 +75,18 @@ export const useAuth = () => {
     useEffect(() => {
         const storedData = JSON.parse(localStorage.getItem('userData'));
         if (storedData && storedData.token && new Date(storedData.expiration) > new Date()) {
-            login(storedData.userId, storedData.role, storedData.name, storedData.branchId, storedData.teachingGroupId, storedData.currentTeachingGroupYear, storedData.userClassIds, storedData.token, new Date(storedData.expiration))
+            login(
+                storedData.userId,
+                storedData.role,
+                storedData.name,
+                storedData.branchId,
+                storedData.teachingGroupId,
+                storedData.currentTeachingGroupYear,
+                storedData.currentTeachingGroupYearId,
+                storedData.userClassIds,
+                storedData.token,
+                new Date(storedData.expiration)
+            )
         }
     }, [login]);
 
@@ -81,5 +96,5 @@ export const useAuth = () => {
         setUserClassIds(userClassIds)
     }, []);
 
-    return { token, login, logout, userId, userRole, userName, userBranchId, userTeachingGroupId, currentTeachingGroupYear, userClassIds, setAttributes }
+    return { token, login, logout, userId, userRole, userName, userBranchId, userTeachingGroupId, currentTeachingGroupYear, currentTeachingGroupYearId, userClassIds, setAttributes }
 }
