@@ -30,14 +30,9 @@ const ScannerView = () => {
         setIsLoading(true);
 
         let attendanceDate
-        if (classId) {
-            attendanceDate = new Date().toLocaleDateString('en-CA');
-            fetchAttendanceData(classId, attendanceDate, dispatch);
-            // } else if (classIds.length > 0 && classIds.length === 1) {
-            //     navigate(`/scan/class/${classIds[0]}`);
-        } else {
-            navigate(`/scan/select-class`);
-        }
+        attendanceDate = new Date().toLocaleDateString('en-CA');
+        fetchAttendanceData(classId, attendanceDate, dispatch);
+
         setIsLoading(false);
     }, [classIds, classId]); // Added `attendanceCreated` to dependencies
 
@@ -61,7 +56,7 @@ const ScannerView = () => {
         setIsLoading(false);
     };
 
-    console.log(state)
+    // console.log(state)
 
     return (
         <div className='flex flex-col pb-24'>

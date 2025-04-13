@@ -127,8 +127,8 @@ const fetchAttendanceData = async (classId, attendanceDate, dispatch) => {
     const attendanceUrl = `${import.meta.env.VITE_BACKEND_URL}/attendances/${classId}`;
 
     const body = JSON.stringify({ date: attendanceDate })
-    console.log(body)
-    console.log(attendanceUrl)
+    // console.log(body)
+    // console.log(attendanceUrl)
 
     try {
         const response = await fetch(attendanceUrl, {
@@ -146,7 +146,7 @@ const fetchAttendanceData = async (classId, attendanceDate, dispatch) => {
             ...obj,
             isSelected: false, // Add isSelected property to each object
         }));
-        console.log(formattedData)
+        // console.log(formattedData)
         dispatch({ type: 'SET_STUDENT_LIST', payload: formattedData });
     } catch (error) {
         console.error('Error fetching attendance data:', error);
@@ -166,7 +166,7 @@ const fetchAttendanceData = async (classId, attendanceDate, dispatch) => {
         }
         const data = await response.json();
 
-        console.log(data)
+        // console.log(data)
 
         dispatch({ type: 'SET_CLASS_START_TIME', payload: data.class.startTime });
         dispatch({ type: 'SET_IS_ACTIVE_YEAR_ACTIVATED', payload: data.class.teachingGroupYearId.isActive });

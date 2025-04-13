@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 import useHttp from '../../../shared/hooks/http-hook'
 import { AuthContext } from '../../../shared/Components/Context/auth-context'
@@ -61,13 +61,13 @@ const SelectClassView = () => {
                                 if (isClassInTeachingGroupYear) {
                                     activeClassCount++
                                     return (
-                                        <li
-                                            onClick={() => navigate(`/scan/class/${classItem._id}`)}
+                                        <Link
+                                            to={`/scan/class/${classItem._id}`}
                                             key={classItem._id}
                                             className='border border-gray-300 px-6 py-3 bg-white rounded-full active:bg-gray-200'
                                         >
                                             {classItem.name}
-                                        </li>
+                                        </Link>
                                     )
                                 }
                             })}

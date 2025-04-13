@@ -1,5 +1,5 @@
 import React, { useContext, useRef, useState, useEffect } from 'react';
-import { useBlocker } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import useHttp from '../../../shared/hooks/http-hook';
 
@@ -11,86 +11,120 @@ import StudentInitial from '../../../shared/Components/UIElements/StudentInitial
 
 import { motion, AnimatePresence } from 'framer-motion';
 import LoadingCircle from '../../../shared/Components/UIElements/LoadingCircle';
+import { GeneralContext } from '../../../shared/Components/Context/general-context';
 
 
 const AttendedStudents = () => {
     const { state, dispatch } = useContext(StudentAttendanceContext);
-    const prevStudentList = useRef(state.studentList);
+    const prevStudentList = useRef([]);
     const { isLoading, error, sendRequest } = useHttp();
     const [showViolationsMenu, setShowViolationsMenu] = useState({});
     const [showNotesField, setShowNotesField] = useState({});
     const [unsavedChanges, setUnsavedChanges] = useState(0);
 
-    // Handle window/tab close
+    const general = useContext(GeneralContext);
+    const navigate = useNavigate();
+
+    // Initialize prevStudentList on mount and track student list
+    useEffect(() => {
+        if (prevStudentList.current.length === 0 && state.studentList.length > 0) {
+            prevStudentList.current = JSON.parse(JSON.stringify(state.studentList));
+        }
+    }, [state.studentList]);
+
+    // Calculate changes on student list updates with deep comparison
+    useEffect(() => {
+        const hasChanged = (current, prev) => {
+            return (
+                prev.status !== current.status ||
+                JSON.stringify(prev.attributes) !== JSON.stringify(current.attributes) ||
+                JSON.stringify(prev.violations) !== JSON.stringify(current.violations) ||
+                prev.teachersNotes !== current.teachersNotes
+            );
+        };
+
+        let changes = 0;
+        state.studentList.forEach((student, index) => {
+            const prevStudent = prevStudentList.current[index];
+            if (prevStudent && hasChanged(student, prevStudent)) {
+                changes++;
+            }
+        });
+
+        setUnsavedChanges(changes);
+
+        if (changes > 0) {
+            general.setMessage(`Perubahan untuk ${changes} siswa belum disimpan!`);
+        } else {
+            general.setMessage(false);
+        }
+    }, [state.studentList, general]);
+
+    // Add event listener for page reload/close
     useEffect(() => {
         const handleBeforeUnload = (e) => {
             if (unsavedChanges > 0) {
                 e.preventDefault();
-                e.returnValue = "You have unsaved changes. Are you sure you want to leave?";
+                e.returnValue = 'You have unsaved changes. Are you sure you want to leave?';
                 return e.returnValue;
             }
         };
 
         window.addEventListener('beforeunload', handleBeforeUnload);
-        return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+
+        return () => {
+            window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
     }, [unsavedChanges]);
 
-    // Calculate changes on student list updates
-    useEffect(() => {
-        let changes = 0;
-        state.studentList.forEach((student, index) => {
-            const prevStudent = prevStudentList.current[index];
-            if (
-                prevStudent &&
-                (
-                    prevStudent.status !== student.status ||
-                    prevStudent.attributes !== student.attributes ||
-                    prevStudent.violations !== student.violations ||
-                    prevStudent.teachersNotes !== student.teachersNotes
-                )
-            ) {
-                changes++;
-            }
-        });
-        setUnsavedChanges(changes);
-    }, [state.studentList]);
+    function BlockNavigation() {
+        useEffect(() => {
+            window.history.pushState(null, document.title, window.location.href);
+
+            const handlePopState = () => {
+                window.history.pushState(null, document.title, window.location.href);
+                alert(`Perubahan untuk ${unsavedChanges} siswa belum disimpan!`);
+            };
+
+            window.addEventListener('popstate', handlePopState);
+            return () => window.removeEventListener('popstate', handlePopState);
+        }, []);
+
+        return null;
+    }
 
     const handleSave = async () => {
-        const changedStatuses = [];
-        state.studentList.forEach((student, index) => {
+        const changedStatuses = state.studentList.filter((student, index) => {
             const prevStudent = prevStudentList.current[index];
-            if (
-                prevStudent &&
-                (
-                    prevStudent.status !== student.status ||
-                    prevStudent.attributes !== student.attributes ||
-                    prevStudent.violations !== student.violations ||
-                    prevStudent.teachersNotes !== student.teachersNotes
-                )
-            ) {
-                changedStatuses.push({
-                    attendanceId: student._id,
-                    status: student.status,
-                    attributes: student.attributes,
-                    violations: student.violations,
-                    teachersNotes: student.teachersNotes,
-                    timestamp: student.timestamp,
-                });
-            }
-        });
+            return prevStudent && (
+                prevStudent.status !== student.status ||
+                JSON.stringify(prevStudent.attributes) !== JSON.stringify(student.attributes) ||
+                JSON.stringify(prevStudent.violations) !== JSON.stringify(student.violations) ||
+                prevStudent.teachersNotes !== student.teachersNotes
+            );
+        }).map(student => ({
+            attendanceId: student._id,
+            status: student.status,
+            attributes: student.attributes,
+            violations: student.violations,
+            teachersNotes: student.teachersNotes,
+            timestamp: student.timestamp,
+        }));
 
         if (changedStatuses.length > 0) {
             try {
-                const url = `${import.meta.env.VITE_BACKEND_URL}/attendances/`
-                const body = JSON.stringify({ updates: changedStatuses })
+                const url = `${import.meta.env.VITE_BACKEND_URL}/attendances/`;
+                const body = JSON.stringify({ updates: changedStatuses });
 
                 const response = await sendRequest(url, 'PATCH', body, {
                     'Content-Type': 'application/json'
                 });
 
-                console.log('Successfully updated statuses:', response);
-                prevStudentList.current = state.studentList;
+                // Update prevStudentList with deep clone after successful save
+                prevStudentList.current = JSON.parse(JSON.stringify(state.studentList));
                 setUnsavedChanges(0);
+                general.setMessage(false);
+
             } catch (error) {
                 console.error('Error updating statuses:', error);
             }
@@ -150,6 +184,7 @@ const AttendedStudents = () => {
 
     return (
         <div className="card-basic mx-4 flex-col box-border">
+            {unsavedChanges > 0 && <BlockNavigation />}
             <div className="flex items-center gap-3">
                 <h1 className='text-lg font-medium'>Daftar Hadir</h1>
                 {state.studentList.length !== 0 && (
@@ -162,11 +197,11 @@ const AttendedStudents = () => {
                         error ? (
                             <Icon icon="mdi:cloud-alert-outline" width="24" height="24" />
                         ) : (
-                            <div className='flex items-center gap-2'>
+                            <div className={`flex items-center gap-1 duration-300 ${unsavedChanges > 0 ? 'text-red-500 animate-bounce' : 'text-blue-500 animate-pulse'}`}>
                                 <Icon icon={unsavedChanges > 0 ? "lucide:circle-alert" : "ci:cloud-check"} width="24" height="24" />
-                                <span className='text-xs text-gray-600'>
-                                    {unsavedChanges > 0 
-                                        ? `Perubahan belum disimpan` 
+                                <span className={`text-xs`}>
+                                    {unsavedChanges > 0
+                                        ? `Perubahan belum disimpan`
                                         : 'Perubahan tersimpan'}
                                 </span>
                             </div>
