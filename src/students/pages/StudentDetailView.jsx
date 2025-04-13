@@ -6,7 +6,7 @@ import { AuthContext } from '../../shared/Components/Context/auth-context';
 import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
 import SkeletonLoader from '../../shared/Components/UIElements/SkeletonLoader';
 import { Icon } from '@iconify-icon/react'
-import { Pencil, QrCode, RefreshCcw, ArrowDownToLine } from 'lucide-react';
+import { Pencil, QrCode, Undo2, ArrowDownToLine } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 
 const StudentDetailView = () => {
@@ -138,7 +138,7 @@ const StudentDetailView = () => {
                                             className="absolute bottom-1 right-1 bg-white p-2 rounded-full border border-gray-300"
                                             onClick={() => setShowQRCode(prev => !prev)}
                                         >
-                                            {showQRCode ? <RefreshCcw className="w-6 h-6" /> : <QrCode className="w-6 h-6" />}
+                                            {showQRCode ? <Undo2 className="w-6 h-6" /> : <QrCode className="w-6 h-6" />}
                                         </button>
                                         <button
                                             className="absolute bottom-1 right-14 bg-white p-2 rounded-full border border-gray-300"
