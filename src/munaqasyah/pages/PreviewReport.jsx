@@ -30,7 +30,7 @@ const PreviewReport = () => {
         <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">
             <div className="max-w-6xl mx-auto">
                 <h1 className="text-2xl font-semibold text-gray-900 mb-4">Preview Raport: {studentName}</h1>
-                <div className="card-basic rounded-md">
+                <div className="card-basic rounded-md mx-0">
                     <iframe
                         src={pdfUrl}
                         title="PDF Preview"

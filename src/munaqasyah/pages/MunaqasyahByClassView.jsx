@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
 import jsPDF from 'jspdf';
 import { applyPlugin, autoTable } from 'jspdf-autotable';
+import IndonesianNumberConverter from '../../shared/Utilities/numberToWordConverter';
 applyPlugin(jsPDF);
 
 const MunaqasyahByClassView = () => {
@@ -35,22 +36,51 @@ const MunaqasyahByClassView = () => {
 
     const generatePDFContent = (studentName, studentScores) => {
         const doc = new jsPDF();
-        doc.setFontSize(16);
-        doc.text(`Raport: ${studentName}`, 10, 10);
 
-        const tableData = scoreCategories.map(category => [
+        const pageHeight =
+            doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
+        const pageWidth =
+            doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
+        console.log(pageHeight + "," + pageWidth);
+
+        doc.setFont("Calibri", "bold");
+        doc.setFontSize(14);
+        doc.text("LAPORAN PENILAIAN HASIL BELAJAR SISWA", pageWidth / 2, 16, {
+            align: "center"
+        });
+
+        doc.setFont("Calibri", "normal");
+        doc.setFontSize(12);
+        doc.text(`Nama Siswa  : ${studentName}`, pageWidth / 10, 25);
+        doc.text("Nomor Induk :", pageWidth / 10, 30);
+        doc.text("Kelas/Semester:", pageWidth / 10 * 6, 25);
+        doc.text("Tahun Pelajaran:", pageWidth / 10 * 6, 30);
+
+        const tableData = scoreCategories.map((category, index) => [
+            index + 1,
             category.label,
             studentScores[category.key]?.score || '-',
-            studentScores[category.key]?.examinerUserId?.name || '-',
-            studentScores[category.key]?.timestamp
-                ? new Date(studentScores[category.key].timestamp).toLocaleString()
-                : '-'
+            IndonesianNumberConverter(studentScores[category.key]?.score) || '-'
         ]);
 
         doc.autoTable({
-            head: [['Kategori', 'Skor', 'Penguji', 'Waktu']],
+            head: [['No', 'Mata Pelajaran', 'Angka', 'Huruf']],
             body: tableData,
-            startY: 20
+            startY: 35,
+            styles: {
+            cellPadding: 2,
+            headStyles: {
+                halign: 'center'
+            }
+            },
+            zebra: true,
+            zebraColor: [245, 245, 245],
+            columnStyles: {
+            0: { cellWidth: 15, halign: 'center' },
+            1: { cellWidth: 75 },
+            2: { cellWidth: 20 },
+            3: { cellWidth: 75, halign: 'center' }
+            }
         });
 
         return doc;
