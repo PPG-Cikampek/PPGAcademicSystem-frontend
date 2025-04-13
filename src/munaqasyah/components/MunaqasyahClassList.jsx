@@ -16,7 +16,7 @@ const MunaqasyahClassList = () => {
             try {
                 const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/scores/classes/${teachingGroupYearId}`);
                 setClasses(responseData.classes);
-                console.log(responseData.classes)
+                console.log(responseData)
                 console.log(JSON.stringify(responseData.classes))
 
             } catch (err) {

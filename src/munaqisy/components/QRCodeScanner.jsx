@@ -2,14 +2,16 @@ import React, { useRef, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import QrScanner from 'qr-scanner';
 import beep from '../../assets/audios/store-scanner-beep-90395.mp3';
+import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 
 const QRCodeScanner = () => {
     const videoRef = useRef(null);
     const beepRef = useRef(null);
     const navigate = useNavigate();
-    const [scannedData, setScannedData] = useState(null);
     const [scanning, setScanning] = useState(false);
     const [cooldown, setCooldown] = useState(false);
+    const [status, setStatus] = useState('Initializing...');
+    const [retryCount, setRetryCount] = useState(0);
 
     useEffect(() => {
         let qrScanner;
@@ -27,23 +29,33 @@ const QRCodeScanner = () => {
                 );
 
                 try {
+                    setStatus('Sedang mengakses kamera...');
                     await qrScanner.start();
+                    setStatus('Membaca kode QR...');
                     setScanning(true);
                 } catch (error) {
                     console.error('Camera access denied or unavailable:', error);
+                    setStatus('Camera error: ' + error.message);
+                    
+                    // Retry once if error occurs
+                    if (retryCount === 0) {
+                        setStatus('Sedang mencoba ulang...');
+                        setRetryCount(1);
+                        setTimeout(setupScanner, 2000);
+                    }
                 }
             } else {
-                console.error('Video element not found');
+                setStatus('Error: Element video tidak ditemukan!');
             }
         };
 
         setupScanner();
 
         return () => {
-            qrScanner?.destroy();
             setScanning(false);
+            qrScanner?.destroy();
         };
-    }, [cooldown]);
+    }, [cooldown, retryCount]);
 
     const handleScan = async (data) => {
         if (!data) return;
@@ -78,12 +90,18 @@ const QRCodeScanner = () => {
                     className="absolute inset-0 w-full h-full object-cover"
                     playsInline
                 />
-                <div className="absolute inset-[8.25%] w-5/6 h-5/6 pointer-events-none">
-                    <div className="absolute top-0 left-0 w-12 h-12 border-t-4 border-l-4 border-white"></div>
-                    <div className="absolute top-0 right-0 w-12 h-12 border-t-4 border-r-4 border-white"></div>
-                    <div className="absolute bottom-0 left-0 w-12 h-12 border-b-4 border-l-4 border-white"></div>
-                    <div className="absolute bottom-0 right-0 w-12 h-12 border-b-4 border-r-4 border-white"></div>
-                </div>
+                {cooldown || !scanning ? (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                        <p className="text-white text-center px-4">{status}</p>
+                    </div>
+                ) : (
+                    <div className="absolute inset-[8.25%] w-5/6 h-5/6 pointer-events-none">
+                        <div className="absolute top-0 left-0 w-12 h-12 border-t-4 border-l-4 border-white"></div>
+                        <div className="absolute top-0 right-0 w-12 h-12 border-t-4 border-r-4 border-white"></div>
+                        <div className="absolute bottom-0 left-0 w-12 h-12 border-b-4 border-l-4 border-white"></div>
+                        <div className="absolute bottom-0 right-0 w-12 h-12 border-b-4 border-r-4 border-white"></div>
+                    </div>
+                )}
             </div>
             <audio ref={beepRef} src={beep} preload="auto" />
         </div>

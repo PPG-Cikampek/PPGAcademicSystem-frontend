@@ -1,13 +1,17 @@
-import React, { useState, useMemo } from 'react'
-import { useLocation } from 'react-router-dom'
+import React, { useState, useMemo } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
+import jsPDF from 'jspdf';
+import { applyPlugin, autoTable } from 'jspdf-autotable';
+applyPlugin(jsPDF);
 
 const MunaqasyahByClassView = () => {
     const [expandedCards, setExpandedCards] = useState({});
-    const location = useLocation()
-    const { scores } = location.state || { scores: [] }
+    const location = useLocation();
+    const navigate = useNavigate();
+    const { scores } = location.state || { scores: [] };
 
-    const expandedCount = useMemo(() => 
+    const expandedCount = useMemo(() =>
         Object.values(expandedCards).filter(Boolean).length,
         [expandedCards]
     );
@@ -24,11 +28,46 @@ const MunaqasyahByClassView = () => {
     };
 
     const calculateAverage = (score) => {
-        const values = scoreCategories.map(category => score[category.key]);
+        const values = scoreCategories.map(category => score[category.key].score);
         const sum = values.reduce((a, b) => a + b, 0);
         return (sum / values.length).toFixed(1);
     };
-    
+
+    const generatePDFContent = (studentName, studentScores) => {
+        const doc = new jsPDF();
+        doc.setFontSize(16);
+        doc.text(`Raport: ${studentName}`, 10, 10);
+
+        const tableData = scoreCategories.map(category => [
+            category.label,
+            studentScores[category.key]?.score || '-',
+            studentScores[category.key]?.examinerUserId?.name || '-',
+            studentScores[category.key]?.timestamp
+                ? new Date(studentScores[category.key].timestamp).toLocaleString()
+                : '-'
+        ]);
+
+        doc.autoTable({
+            head: [['Kategori', 'Skor', 'Penguji', 'Waktu']],
+            body: tableData,
+            startY: 20
+        });
+
+        return doc;
+    };
+
+    const downloadReport = (studentName, studentScores) => {
+        const doc = generatePDFContent(studentName, studentScores);
+        doc.save(`${studentName}_Raport.pdf`);
+    };
+
+    const previewReport = (studentName, studentScores) => {
+        const doc = generatePDFContent(studentName, studentScores);
+        const pdfBlob = doc.output('blob');
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        navigate('/munaqasyah/student/score', { state: { pdfUrl, studentName } });
+    };
+
     const scoreCategories = [
         { key: 'reciting', label: "Membaca Al-Qur'an/Tilawati" },
         { key: 'writing', label: 'Menulis Arab' },
@@ -69,13 +108,31 @@ const MunaqasyahByClassView = () => {
                                 className="cursor-pointer p-6 hover:bg-gray-50 transition-colors duration-200"
                             >
                                 <div className="flex justify-between items-center">
-                                    <div className="flex md:flex-col gap-2 items-center md:items-start">
+                                    <div className="flex flex-col gap-2 items-start">
                                         <h2 className="text-lg font-medium text-gray-800">
                                             {score.studentId.name}
                                         </h2>
                                         <span className="text-base text-gray-500">
                                             Rata-rata: {calculateAverage(score)}
                                         </span>
+                                        <div className="flex gap-2 my-2 md:my-0">
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    downloadReport(score.studentId.name, score);
+                                                }}
+                                                className='btn-primary-outline m-0 text-gray-700'>
+                                                Unduh Raport
+                                            </button>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    previewReport(score.studentId.name, score);
+                                                }}
+                                                className='btn-primary-outline m-0 text-gray-700 hidden md:block'>
+                                                Lihat Raport
+                                            </button>
+                                        </div>
                                     </div>
                                     <ChevronDown
                                         className={`w-5 h-5 text-gray-500 transition-transform duration-200
@@ -91,7 +148,7 @@ const MunaqasyahByClassView = () => {
                                         {scoreCategories.map(category => (
                                             <div key={category.key} className="flex justify-between items-center p-2 bg-white rounded border">
                                                 <span className="text-gray-600">{category.label}</span>
-                                                <span className="font-medium text-gray-800">{score[category.key]}</span>
+                                                <span className="font-medium text-gray-800">{score[category.key].score}</span>
                                             </div>
                                         ))}
                                     </div>
@@ -102,7 +159,7 @@ const MunaqasyahByClassView = () => {
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default MunaqasyahByClassView
+export default MunaqasyahByClassView;

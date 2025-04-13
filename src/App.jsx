@@ -11,6 +11,8 @@ import LoadingCircle from "./shared/Components/UIElements/LoadingCircle";
 import MunaqasyahScannerView from "./munaqisy/pages/MunaqasyahScannerView";
 import StudentScoresView from "./munaqisy/pages/StudentScoresView";
 import { MunaqasyahScoreProvider } from "./munaqisy/context/MunaqasyahScoreContext";
+import QuestionView from "./munaqisy/pages/QuestionView";
+import PreviewReport from "./munaqasyah/pages/PreviewReport";
 
 const DashboardNav = lazy(() => import("./shared/Components/Navigation/DashboardNav/DashboardNav"));
 const DashboardView = lazy(() => import("./dashboard/pages/DashboardView"));
@@ -231,6 +233,12 @@ function App() {
                       <StudentScoresView />
                     </PageHeader>
                   } />
+                  <Route path='/munaqasyah/examination' element=
+                  {
+                    <PageHeader>
+                      <QuestionView />
+                    </PageHeader>
+                  } />
                 <Route path='/settings/academic/classes/new' element=
                   {
                     <PageHeader>
@@ -342,6 +350,7 @@ function App() {
           <Route path='/dashboard/teachers/:teacherId' element={<TeacherDetailView />} />
           <Route path='/dashboard/teachers/:id/update' element={<UpdateTeacherView />} />
           <Route path='/performances/student/:studentId' element={<StudentReportView />} />
+          <Route path='/munaqasyah/student/score' element={<PreviewReport />} />
           {userRole === 'admin kelompok' && (
             <>
               <Route path='/settings/academic' element={<TeachingGroupYearsView />} />
