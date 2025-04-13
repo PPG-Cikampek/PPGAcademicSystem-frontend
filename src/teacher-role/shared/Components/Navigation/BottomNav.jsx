@@ -1,16 +1,26 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { NavLink } from 'react-router-dom';
-import { Home, BookOpenText } from 'lucide-react';
+import { Home } from 'lucide-react';
 import { Icon } from '@iconify-icon/react'
+import { GeneralContext } from '../../../../shared/Components/Context/general-context';
 
 
 const BottomNav = () => {
-
+    const general = useContext(GeneralContext)
     const navLinks = [
         { id: 1, label: 'Home', path: '/', icon: <Home size={24} />, end: true },
-        { id: 2, label: 'Absen', path: '/scan', icon: <Icon icon="uil:qrcode-scan" width="24" height="24" />, },
+        { id: 2, label: 'Absen', path: '/scan/select-class', icon: <Icon icon="uil:qrcode-scan" width="24" height="24" />, },
         { id: 3, label: 'Materi', path: '/materialProgress', icon: <Icon icon="bi:journal-check" width="24" height="24" /> },
     ];
+
+    const handleNavigation = (e) => {
+        if (general.navigateBlockMessage) {
+            if (general.navigateBlockMessage !== true) {
+                e.preventDefault();
+                alert(general.navigateBlockMessage);
+            }
+        }
+    }
 
     return (
         <div className="bg-white border-t border-gray-200 flex flex-grow justify-around items-center h-16 fixed bottom-0 w-full transition-all duration-300">
@@ -19,6 +29,7 @@ const BottomNav = () => {
                     <NavLink
                         to={link.path}
                         end={link.end}
+                        onClick={handleNavigation}
                         className={({ isActive }) => `
                                         flex flex-col items-center hover:bg-gray-100 
                                         focus:outline-none focus:ring-primary-subtle 

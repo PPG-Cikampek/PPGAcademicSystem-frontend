@@ -6,11 +6,12 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useAuth } from "./shared/hooks/auth-hook";
 import { AuthContext } from "./shared/Components/Context/auth-context";
 import { SidebarContext } from "./shared/Components/Context/sidebar-context";
+import { GeneralContext } from "./shared/Components/Context/general-context";
 import { StudentAttendanceProvider } from "./teacher-role/scan/context/StudentAttendanceContext";
+import { MunaqasyahScoreProvider } from "./munaqisy/context/MunaqasyahScoreContext";
 import LoadingCircle from "./shared/Components/UIElements/LoadingCircle";
 import MunaqasyahScannerView from "./munaqisy/pages/MunaqasyahScannerView";
 import StudentScoresView from "./munaqisy/pages/StudentScoresView";
-import { MunaqasyahScoreProvider } from "./munaqisy/context/MunaqasyahScoreContext";
 import QuestionView from "./munaqisy/pages/QuestionView";
 import PreviewReport from "./munaqasyah/pages/PreviewReport";
 
@@ -83,6 +84,7 @@ const MunaqasyahByClassView = lazy(() => import("./munaqasyah/pages/MunaqasyahBy
 function App() {
   const queryClient = new QueryClient();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [navigateBlockMessage, setNavigateBlockMessage] = useState(true);
 
   const { token, login, logout, userId, userRole, userName, userBranchId, userTeachingGroupId, currentTeachingGroupYear, currentTeachingGroupYearId, userClassIds, setAttributes } = useAuth();
 
@@ -108,6 +110,10 @@ function App() {
     setIsSidebarOpen((prev) => !prev);
   })
 
+  const setMessage = useCallback((msg) => {
+    setNavigateBlockMessage(msg || '');
+  }, []);
+
   let routes;
   if (token && userRole === 'teacher') {
     routes = (
@@ -130,7 +136,11 @@ function App() {
                       <AttendanceHistoryView />
                     </PageHeader>
                   } />
-                <Route path='/scan/class/:classId' element={<ScannerView />} />
+                <Route path='/scan/class/:classId' element={
+                  <PageHeader>
+                    <ScannerView />
+                  </PageHeader>
+                } />
                 <Route path='/attendance/history/class/:classId' element=
                   {
                     <PageHeader>
@@ -233,7 +243,7 @@ function App() {
                       <StudentScoresView />
                     </PageHeader>
                   } />
-                  <Route path='/munaqasyah/examination' element=
+                <Route path='/munaqasyah/examination' element=
                   {
                     <PageHeader>
                       <QuestionView />
@@ -410,25 +420,27 @@ function App() {
   }
 
   return (
-    <SidebarContext.Provider value={{ isSidebarOpen: isSidebarOpen, toggle: toggle }}>
-      <AuthContext.Provider value={{ isLoggedIn: !!token, userRole, userId, userName, userBranchId, userTeachingGroupId, currentTeachingGroupYear, currentTeachingGroupYearId, userClassIds, token, login, setAttributes, logout }}>
-        <Router future={{
-          v7_startTransition: true,
-          v7_relativeSplatPath: true
-        }}>
-          <main className="h-auto">
-            <Suspense
-              fallback={
-                <div className="flex justify-center mt-16">
-                  <LoadingCircle size={32} />
-                </div>
-              }>
-              {routes}
-            </Suspense>
-          </main>
-        </Router>
-      </AuthContext.Provider>
-    </SidebarContext.Provider>
+    <GeneralContext.Provider value={{ navigateBlockMessage: navigateBlockMessage, setMessage: setMessage }}>
+      <SidebarContext.Provider value={{ isSidebarOpen: isSidebarOpen, toggle: toggle }}>
+        <AuthContext.Provider value={{ isLoggedIn: !!token, userRole, userId, userName, userBranchId, userTeachingGroupId, currentTeachingGroupYear, currentTeachingGroupYearId, userClassIds, token, login, setAttributes, logout }}>
+          <Router future={{
+            v7_startTransition: true,
+            v7_relativeSplatPath: true
+          }}>
+            <main className="h-auto">
+              <Suspense
+                fallback={
+                  <div className="flex justify-center mt-16">
+                    <LoadingCircle size={32} />
+                  </div>
+                }>
+                {routes}
+              </Suspense>
+            </main>
+          </Router>
+        </AuthContext.Provider>
+      </SidebarContext.Provider>
+    </GeneralContext.Provider>
   )
 }
 
