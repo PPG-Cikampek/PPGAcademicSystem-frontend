@@ -6,12 +6,14 @@ import { LogOut } from 'lucide-react';
 import logo from '../../../../assets/logos/ppgcikampek.webp';
 
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { GeneralContext } from '../../Context/general-context';
 
 const Sidebar = ({ linksList, children }) => {
     const [expandedMenu, setExpandedMenu] = useState(null);
 
     const sidebar = useContext(SidebarContext);
     const auth = useContext(AuthContext);
+    const general = useContext(GeneralContext)
 
     const sidebarHandler = () => {
         sidebar.toggle();
@@ -20,6 +22,15 @@ const Sidebar = ({ linksList, children }) => {
     const toggleSubMenu = (menu) => {
         setExpandedMenu((prev) => (prev === menu ? null : menu));
     };
+
+    const handleNavigation = (e) => {
+        if (general.navigateBlockMessage) {
+            if (general.navigateBlockMessage !== true) {
+                e.preventDefault();
+                alert(general.navigateBlockMessage);
+            }
+        }
+    }
 
     return (
         <div className="relative h-full md:flex">
@@ -54,6 +65,7 @@ const Sidebar = ({ linksList, children }) => {
                                     to={link.link ? link.link : null}
                                     end={link.end}
                                     onClick={() => {
+                                        handleNavigation()
                                         if (link.subOptions) {
                                             toggleSubMenu(link.label);
                                         } else if (sidebar.isSidebarOpen && !window.matchMedia('(min-width: 768px)').matches) {
@@ -99,6 +111,7 @@ const Sidebar = ({ linksList, children }) => {
                                                     // onClick={sidebarHandler}
                                                     className={({ isActive }) => ` flex items-center px-4 py-2 text-sm hover:bg-gray-100 focus:outline-none focus:ring-primary-subtle ${isActive ? 'bg-gray-100 text-primary font-medium' : 'text-gray-800'} `}
                                                     onClick={() => {
+                                                        handleNavigation()
                                                         if (sidebar.isSidebarOpen && !window.matchMedia('(min-width: 768px)').matches) {
                                                             sidebarHandler();
                                                         }
