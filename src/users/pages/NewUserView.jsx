@@ -47,13 +47,14 @@ const NewUserView = () => {
                 },
                 {
                     name: 'role',
-                    label: 'Level Akun',
+                    label: 'Role Akun',
                     type: 'select',
                     required: true,
                     options:
                         [
                             { label: 'Admin', value: 'admin' },
                             { label: 'Admin Kelompok', value: 'teachingGroupAdmin' },
+                            { label: 'Kurikulum', value: 'curriculum' },
                         ]
 
                 },
@@ -80,7 +81,8 @@ const NewUserView = () => {
                 role: 'teacher',
                 teachingGroupName: data.teachingGroupName,
                 teacherDetails: {
-                    nig: data.nig
+                    nig: data.nig,
+                    position: data.position
                 }
             });
 
@@ -103,13 +105,13 @@ const NewUserView = () => {
         const updatedList = adminFields.filter((item) => item.name !== 'nig' && item.name !== 'role'); // Removing the object
 
         const newObject = { name: 'nig', label: 'NIG Guru', placeholder: '00001234', type: 'text', required: true };
-        // const newObject2 = { name: 'position', label: 'Posisi', placeholder: 'Guru', type: 'select', required: true, options:
-        //     [
-        //         { label: 'Guru', value: 'teacher' },
-        //         { label: 'Asisten', value: 'assistant' },
-        //     ]};
+        const newObject2 = { name: 'position', label: 'Posisi', placeholder: 'Guru', type: 'select', required: true, options:
+            [
+                { label: 'Guru', value: 'teacher' },
+                { label: 'Munaqis', value: 'munaqisy' },
+            ]};
         // const newObject2 = { name: 'role', label: 'Jenis Akun', placeholder: 'Guru', value: 'teacher', type: 'text', disabled: true };
-        setAdminFields([...updatedList, newObject]); // Adding the new object to the list
+        setAdminFields([...updatedList, newObject, newObject2]); // Adding the new object to the list
     };
 
     // Function to remove an object by its `id`
@@ -175,7 +177,7 @@ const NewUserView = () => {
                     {error && <ErrorCard error={error} onClear={() => setError(null)} />}
                 </div>
                 <DynamicForm
-                    title={isAccountForAdmin ? 'Tambah Akun Admin' : 'Tambah Akun Guru'}
+                    title={isAccountForAdmin ? 'Tambah Akun' : 'Tambah Akun Guru'}
                     subtitle={'Sistem Akademik Digital'}
                     fields={adminFields || [
                         { name: 'name', label: 'Name', placeholder: 'Nama Lengkap', type: 'text', required: true },

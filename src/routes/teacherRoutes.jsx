@@ -1,5 +1,5 @@
 import React, { lazy } from 'react';
-import { QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { StudentAttendanceProvider } from '../teacher-role/scan/context/StudentAttendanceContext';
 import { MunaqasyahScoreProvider } from '../munaqisy/context/MunaqasyahScoreContext';
 import MunaqasyahScannerView from '../munaqisy/pages/MunaqasyahScannerView';
@@ -30,6 +30,9 @@ const NewJournalView = lazy(() => import("../teacher-role/journal/pages/NewJourn
 const TeacherPerformanceView = lazy(() => import("../performance/pages/TeacherPerformanceView"));
 const MaterialProgressView = lazy(() => import("../teacher-role/materialProgress/pages/materialProgressView"));
 const NewMaterialProgresslView = lazy(() => import("../teacher-role/materialProgress/pages/NewMaterialProgressView"));
+
+
+const queryClient = new QueryClient();
 
 export const teacherRoutes = [
     { path: '/', element: <HomeScreenView /> },

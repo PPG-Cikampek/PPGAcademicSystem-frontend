@@ -12,7 +12,6 @@ import DataTable from '../../shared/Components/UIElements/DataTable';
 
 const UsersView = () => {
     const [users, setUsers] = useState();
-    const [searchTerm, setSearchTerm] = useState('');
     const [modal, setModal] = useState({ title: '', message: '', onConfirm: null });
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [selectedUserIds, setSelectedUserIds] = useState([]);
@@ -21,9 +20,10 @@ const UsersView = () => {
         teachingGroupAdmin: true,
         teacher: true,
         student: true,
+        curriculum: true,
     });
 
-    const roleOrder = ['admin', 'teachingGroupAdmin', 'teacher', 'student'];
+    const roleOrder = ['admin', 'teachingGroupAdmin', 'teacher', 'student', 'curriculum'];
 
     const { isLoading, error, sendRequest, setError } = useHttp();
     const navigate = useNavigate();
@@ -51,6 +51,7 @@ const UsersView = () => {
             teachingGroupAdmin: 'bg-orange-100 text-orange-700',
             teacher: 'bg-violet-100 text-violet-700',
             student: 'bg-blue-100 text-blue-700',
+            curriculum: 'bg-green-100 text-green-700',
         };
         return roles[role] || 'bg-gray-100 text-gray-700';
     };
@@ -166,14 +167,14 @@ const UsersView = () => {
         },
         { key: 'name', label: 'Nama', sortable: true },
         { key: 'email', label: 'Email', sortable: true },
-        { 
-            key: 'branch', 
+        {
+            key: 'branch',
             label: 'Desa',
             sortable: true,
             render: (user) => user.teachingGroupId?.branchId?.name
         },
-        { 
-            key: 'group', 
+        {
+            key: 'group',
             label: 'Kelompok',
             sortable: true,
             render: (user) => user.teachingGroupId?.name
@@ -183,7 +184,7 @@ const UsersView = () => {
             label: 'Aksi',
             render: (user) => (
                 <div className="flex gap-2">
-                    <button 
+                    <button
                         onClick={(e) => {
                             e.stopPropagation();
                             navigate(`/settings/users/${user._id}`);
@@ -192,7 +193,7 @@ const UsersView = () => {
                     >
                         <Pencil className="w-4 h-4" />
                     </button>
-                    <button 
+                    <button
                         onClick={(e) => {
                             e.stopPropagation();
                             handleDeleteUser(user._id);
@@ -210,7 +211,8 @@ const UsersView = () => {
         admin: 'Admin Daerah',
         teachingGroupAdmin: 'Admin Kelompok',
         teacher: 'Guru',
-        student: 'Siswa'
+        student: 'Siswa',
+        curriculum: 'Tim Kurikulum'
     }[role]);
 
     return (
@@ -275,7 +277,16 @@ const UsersView = () => {
                                 searchableColumns={['name', 'email']}
                                 initialSort={{ key: 'name', direction: 'ascending' }}
                                 initialEntriesPerPage={5}
+                                config={{
+                                    showSearch: true,
+                                    showTopEntries: true,
+                                    showBottomEntries: true,
+                                    showPagination: true,
+                                    clickeableRows: false,
+                                    entriesOptions: [5, 10, 20, 30]
+                                }}
                             />
+                            <hr className='my-8' />
                         </div>
                     );
                 })}

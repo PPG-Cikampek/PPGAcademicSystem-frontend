@@ -1,5 +1,6 @@
 import React, { lazy } from 'react';
 import PreviewReport from '../munaqasyah/pages/PreviewReport';
+import QuestionPackageView from '../munaqasyah/pages/QuestionPackageView';
 
 const DashboardNav = lazy(() => import("../shared/Components/Navigation/DashboardNav/DashboardNav"));
 const DashboardView = lazy(() => import("../dashboard/pages/DashboardView"));
@@ -74,6 +75,7 @@ export const adminRoutes = [
     { path: '/munaqasyah/question-bank/:classGrade/new', element: <NewQuestionView /> },
     { path: '/munaqasyah/question-bank/:classGrade/:questionId', element: <QuestionDetailView /> },
     { path: '/munaqasyah/question-bank/:classGrade/:questionId/update', element: <UpdateQuestionView /> },
+    { path: '/munaqasyah/question-package', element: <QuestionPackageView/> },
 ];
 
 export const AdminRouteWrapper = ({ children }) => (

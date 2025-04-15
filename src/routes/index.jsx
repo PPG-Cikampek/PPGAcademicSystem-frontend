@@ -3,6 +3,8 @@ import { adminRoutes, AdminRouteWrapper } from './adminRoutes.jsx';
 import { munaqisyRoutes, MunaqisyRouteWrapper } from './munaqisyRoutes.jsx';
 import { studentRoutes, StudentRouteWrapper } from './studentRoutes.jsx';
 import { teachingGroupAdminRoutes, TeachingGroupAdminRouteWrapper } from './teachingGroupAdminRoutes.jsx';
+import { curriculumRoutes, CurriculumRouteWrapper } from './curriculumRoutes.jsx';
+
 import AuthView from '../users/pages/AuthView.jsx';
 import PasswordResetView from '../users/pages/PasswordResetView.jsx';
 import EmailVerifyView from '../users/pages/EmailVerifyView.jsx';
@@ -33,6 +35,11 @@ const getRouteConfig = (userRole) => {
             return {
                 routes: adminRoutes,
                 Wrapper: AdminRouteWrapper
+            };
+        case 'curriculum':
+            return {
+                routes: curriculumRoutes,
+                Wrapper: CurriculumRouteWrapper
             };
         default:
             return {
