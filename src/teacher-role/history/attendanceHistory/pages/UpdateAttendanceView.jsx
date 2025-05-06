@@ -55,7 +55,7 @@ const UpdateAttendanceView = () => {
             });
         } catch (err) { }
 
-        setModal({ title: 'Berhasil!', message: responseData.message, onConfirm: () => navigate(-2) });
+        setModal({ title: 'Berhasil!', message: responseData.message, onConfirm: () => navigate(-1) });
         setModalIsOpen(true)
     };
 

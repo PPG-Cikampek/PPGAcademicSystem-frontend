@@ -6,7 +6,6 @@ import useHttp from '../../shared/hooks/http-hook';
 
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 import Modal from "../../shared/Components/UIElements/ModalBottomClose";
-import BackButton from "../../shared/Components/UIElements/BackButton";
 
 const NewTeachingGroupYearView = () => {
     const [modal, setModal] = useState({ title: '', message: '', onConfirm: null });

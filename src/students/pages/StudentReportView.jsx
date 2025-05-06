@@ -7,10 +7,7 @@ import logo from '../../assets/logos/ppgcikampek.png';
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 
 import { ArrowDownToLine } from 'lucide-react';
-import PieChart from '../../performance/components/PieChart';
-import ReactPDFChart from 'react-pdf-charts';
 import PerformanceReportChart from '../../performance/components/PerformanceReportChart';
-import { set } from 'react-hook-form';
 
 const violationTranslations = {
     attribute: "Perlengkapan Belajar",
