@@ -27,7 +27,10 @@ const NewQuestionView = () => {
     { label: "Tafsir Hadits", value: 'hadithTafsir' },
     { label: "Praktek Ibadah", value: 'practice' },
     { label: "Akhlak dan Tata Krama", value: 'moralManner' },
-    { label: "Hafalan", value: 'memorizing' },
+    { label: 'Hafalan Surat-surat Al-Quran', value: 'memorizingSurah' },
+    { label: 'Hafalan Hadits', value: 'memorizingHadith' },
+    { label: "Hafalan Do'a", value: 'memorizingDua' },
+    { label: 'Hafalan Asmaul Husna', value: 'memorizingBeautifulName' },
     { label: "Keilmuan dan Kefahaman Agama", value: 'knowledge' },
     { label: "Kemandirian", value: 'independence' },
   ]
@@ -58,10 +61,31 @@ const NewQuestionView = () => {
       type: 'radio',
       required: true,
       options:
-      [
-        { label: 'Ganjil', value: '1' },
-        { label: 'Genap', value: '2' },
-      ]
+        [
+          { label: 'Ganjil', value: '1' },
+          { label: 'Genap', value: '2' },
+        ]
+    },
+    {
+      name: 'curriculumMonth',
+      label: 'Materi Bulan',
+      type: 'select',
+      required: true,
+      options:
+        [
+          { label: 'Januari', value: '1' },
+          { label: 'Februari', value: '2' },
+          { label: 'Maret', value: '3' },
+          { label: 'April', value: '4' },
+          { label: 'Mei', value: '5' },
+          { label: 'Juni', value: '6' },
+          { label: 'Juli', value: '7' },
+          { label: 'Agustus', value: '8' },
+          { label: 'September', value: '9' },
+          { label: 'Oktober', value: '10' },
+          { label: 'November', value: '11' },
+          { label: 'Desember', value: '12' },
+        ]
     },
     { name: 'question', label: 'Pertanyaan', placeholder: '', type: 'textarea', textAreaRows: 4, required: true },
     { name: 'answers', label: 'Jawaban (tambah utk pilihan ganda)', placeholder: '', type: 'multi-input', inputType: 'textarea', textAreaRows: 3, required: false },
@@ -79,6 +103,7 @@ const NewQuestionView = () => {
       type: data.type,
       category: data.category,
       semester: data.semester,
+      curriculumMonth: data.curriculumMonth,
       maxScore: data.maxScore,
       scoreOptions: data.scoreOptions,
       instruction: data.instruction,

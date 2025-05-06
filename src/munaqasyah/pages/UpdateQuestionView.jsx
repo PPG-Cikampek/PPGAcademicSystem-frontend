@@ -40,7 +40,10 @@ const UpdateQuestionView = () => {
         { label: "Tafsir Hadits", value: 'hadithTafsir' },
         { label: "Praktek Ibadah", value: 'practice' },
         { label: "Akhlak dan Tata Krama", value: 'moralManner' },
-        { label: "Hafalan", value: 'memorizing' },
+        { label: 'Hafalan Surat-surat Al-Quran', value: 'memorizingSurah' },
+        { label: 'Hafalan Hadits', value: 'memorizingHadith' },
+        { label: "Hafalan Do'a", value: 'memorizingDua' },
+        { label: 'Hafalan Asmaul Husna', value: 'memorizingBeautifulName' },
         { label: "Keilmuan dan Kefahaman Agama", value: 'knowledge' },
         { label: "Kemandirian", value: 'independence' },
     ]
@@ -79,6 +82,29 @@ const UpdateQuestionView = () => {
                 ],
             value: loadedQuestion?.semester || ''
         },
+        {
+            name: 'curriculumMonth',
+            label: 'Materi Bulan',
+            type: 'select',
+            required: true,
+            options:
+                [
+                    { label: 'Januari', value: '1' },
+                    { label: 'Februari', value: '2' },
+                    { label: 'Maret', value: '3' },
+                    { label: 'April', value: '4' },
+                    { label: 'Mei', value: '5' },
+                    { label: 'Juni', value: '6' },
+                    { label: 'Juli', value: '7' },
+                    { label: 'Agustus', value: '8' },
+                    { label: 'September', value: '9' },
+                    { label: 'Oktober', value: '10' },
+                    { label: 'November', value: '11' },
+                    { label: 'Desember', value: '12' },
+                ],
+            value: loadedQuestion?.curriculumMonth || ''
+
+        },
         { name: 'question', label: 'Pertanyaan', placeholder: '', type: 'textarea', textAreaRows: 4, required: false, value: loadedQuestion?.question || '' },
         { name: 'answers', label: 'Jawaban (tambah utk pilihan ganda)', placeholder: '', type: 'multi-input', inputType: 'textarea', textAreaRows: 3, required: false, value: loadedQuestion?.answers || '' },
         { name: 'maxScore', label: 'Skor Maksimal', type: 'number', required: false, value: loadedQuestion?.maxScore || '' },
@@ -94,6 +120,7 @@ const UpdateQuestionView = () => {
             type: data.type,
             category: data.category,
             semester: data.semester,
+            curriculumMonth: data.curriculumMonth,
             maxScore: data.maxScore,
             scoreOptions: data.scoreOptions,
             instruction: data.instruction,
