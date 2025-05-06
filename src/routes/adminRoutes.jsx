@@ -1,6 +1,5 @@
 import React, { lazy } from 'react';
 import PreviewReport from '../munaqasyah/pages/PreviewReport';
-import QuestionPackageView from '../munaqasyah/pages/QuestionPackageView';
 
 const DashboardNav = lazy(() => import("../shared/Components/Navigation/DashboardNav/DashboardNav"));
 const DashboardView = lazy(() => import("../dashboard/pages/DashboardView"));
@@ -37,6 +36,8 @@ const NewQuestionView = lazy(() => import("../munaqasyah/pages/NewQuestionView")
 const QuestionDetailView = lazy(() => import("../munaqasyah/pages/QuestionDetailView"));
 const RequestedAccountView = lazy(() => import("../users/pages/RequestedAccountView"));
 const UpdateQuestionView = lazy(() => import("../munaqasyah/pages/UpdateQuestionView"));
+const QuestionPackageView = lazy(() => import('../munaqasyah/pages/QuestionPackageView'));
+const CategoryPackageView = lazy(() => import('../munaqasyah/pages/CategoryPackageView'));
 
 export const adminRoutes = [
     { path: '/verify-email/:token', element: <EmailVerifyView /> },
@@ -76,6 +77,7 @@ export const adminRoutes = [
     { path: '/munaqasyah/question-bank/:classGrade/:questionId', element: <QuestionDetailView /> },
     { path: '/munaqasyah/question-bank/:classGrade/:questionId/update', element: <UpdateQuestionView /> },
     { path: '/munaqasyah/question-package', element: <QuestionPackageView/> },
+    { path: '/munaqasyah/question-package/class', element: <CategoryPackageView/> },
 ];
 
 export const AdminRouteWrapper = ({ children }) => (

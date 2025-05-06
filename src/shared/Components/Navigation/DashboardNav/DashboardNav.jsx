@@ -60,7 +60,7 @@ const DashboardNav = ({ children }) => {
             },
 
         ];
-    } else {
+    } else if (auth.userRole === 'admin kelompok') {
         links = [
             {
                 link: '/dashboard',
@@ -102,6 +102,20 @@ const DashboardNav = ({ children }) => {
                 ],
             },
         ];
+    } else if (auth.userRole === 'curriculum') {
+        links = [
+            {
+                link: '/dashboard',
+                icon: <House />,
+                label: 'Dashboard',
+                end: true,
+            },
+            {
+                link: '/munaqasyah',
+                icon: <BookOpenText />,
+                label: 'Munaqosah',
+            },
+        ]
     }
 
     return (
