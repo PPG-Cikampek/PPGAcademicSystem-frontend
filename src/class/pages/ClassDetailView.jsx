@@ -249,7 +249,8 @@ const ClassDetailView = () => {
                             </div>
                             <div className="flex items-center space-x-2 text-gray-600">
                                 <LineChart className="h-5 w-5" />
-                                <span>{attendanceCount(classData.class)} / {classData.class.teachingGroupYearId.semesterTarget} Pertemuan Terlaksana</span>
+                                {/* <span>{attendanceCount(classData.class)} / {classData.class.teachingGroupYearId.semesterTarget} Pertemuan Terlaksana</span> */}
+                                <span>{attendanceCount(classData.class)} Pertemuan Terlaksana</span>
                             </div>
                         </div>
 
