@@ -2,9 +2,11 @@ import React, { lazy } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { StudentAttendanceProvider } from '../teacher-role/scan/context/StudentAttendanceContext';
 import { MunaqasyahScoreProvider } from '../munaqisy/context/MunaqasyahScoreContext';
-import MunaqasyahScannerView from '../munaqisy/pages/MunaqasyahScannerView';
-import StudentScoresView from '../munaqisy/pages/StudentScoresView';
-import QuestionView from '../munaqisy/pages/QuestionView';
+
+
+const MunaqasyahScannerView = lazy(() => import('../munaqisy/pages/MunaqasyahScannerView'));
+const StudentScoresView = lazy(() => import('../munaqisy/pages/StudentScoresView'));
+const QuestionView = lazy(() => import('../munaqisy/pages/QuestionView'));
 
 const StudentsView = lazy(() => import("../students/pages/StudentsView"));
 const StudentDetailView = lazy(() => import("../students/pages/StudentDetailView"));

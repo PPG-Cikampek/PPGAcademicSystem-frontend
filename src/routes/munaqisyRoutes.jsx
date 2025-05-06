@@ -1,9 +1,9 @@
 import React, { lazy } from 'react';
 import { MunaqasyahScoreProvider } from '../munaqisy/context/MunaqasyahScoreContext';
 
-import PageHeader from '../teacher-role/shared/Components/Navigation/PageHeader';
-import StudentsView from '../students/pages/StudentsView';
-import StudentDetailView from '../students/pages/StudentDetailView';
+const PageHeader = lazy(() => import('../teacher-role/shared/Components/Navigation/PageHeader'));
+const StudentsView = lazy(() => import('../students/pages/StudentsView'));
+const StudentDetailView = lazy(() => import('../students/pages/StudentDetailView'));
 
 const HomeScreenView = lazy(() => import('../teacher-role/dashboard/pages/HomeScreenView'));
 const HomeNavigation = lazy(() => import('../teacher-role/shared/Components/Navigation/HomeNavigation'));

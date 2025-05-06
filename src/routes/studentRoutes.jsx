@@ -1,10 +1,11 @@
 import React, { lazy } from 'react';
-import PageHeader from '../teacher-role/shared/Components/Navigation/PageHeader';
-import HomeNavigation from '../teacher-role/shared/Components/Navigation/HomeNavigation';
-import StudentDashboardView from '../students/pages/StudentDashboardView';
-import StudentDetailView from '../students/pages/StudentDetailView';
-import UpdateStudentView from '../students/pages/UpdateStudentView';
-import ProfileView from '../users/pages/ProfileView';
+
+const PageHeader = lazy(() => import('../teacher-role/shared/Components/Navigation/PageHeader'));
+const HomeNavigation = lazy(() => import('../teacher-role/shared/Components/Navigation/HomeNavigation'));
+const StudentDashboardView = lazy(() => import('../students/pages/StudentDashboardView'));
+const StudentDetailView = lazy(() => import('../students/pages/StudentDetailView'));
+const UpdateStudentView = lazy(() => import('../students/pages/UpdateStudentView'));
+const ProfileView = lazy(() => import('../users/pages/ProfileView'));
 
 export const studentRoutes = [
     {
