@@ -291,7 +291,7 @@ const ClassDetailView = () => {
                                                         <img
                                                             src={teacher?.image ? `${import.meta.env.VITE_BACKEND_URL}/${teacher.image}` : "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"}
                                                             alt={teacher.name}
-                                                            className="w-10 h-10 rounded-full min-w-10"
+                                                            className="w-10 h-10 rounded-full min-w-10 border border-gray-200 bg-white"
                                                         />
                                                     ) : (
                                                         <div
@@ -359,7 +359,7 @@ const ClassDetailView = () => {
                                                         <img
                                                             src={student?.image ? `${import.meta.env.VITE_BACKEND_URL}/${student.image}` : "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"}
                                                             alt={student.name}
-                                                            className="w-10 h-10 rounded-full min-w-10"
+                                                            className="w-10 h-10 rounded-full min-w-10 border border-gray-200 bg-white"
                                                         />
                                                     ) : (
                                                         <div

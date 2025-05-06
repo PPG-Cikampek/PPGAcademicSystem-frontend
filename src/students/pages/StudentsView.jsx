@@ -40,7 +40,7 @@ const StudentsView = () => {
                     <img
                         src={`${import.meta.env.VITE_BACKEND_URL}/${student.image}`}
                         alt={student.name}
-                        className="size-10 rounded-full m-auto shrink-0"
+                        className="size-10 rounded-full m-auto shrink-0 border border-gray-200 bg-white"
                     />
                 ) : (
                     <StudentInitial 

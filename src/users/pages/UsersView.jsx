@@ -156,7 +156,7 @@ const UsersView = () => {
                     <img
                         src={`${import.meta.env.VITE_BACKEND_URL}/${user.image}`}
                         alt={user.name}
-                        className="size-10 rounded-full"
+                        className="size-10 rounded-full border border-gray-200 bg-white"
                     />
                 ) : (
                     <div className={`size-10 rounded-full flex ${getRoleColor(user.role)} items-center justify-center font-medium`}>

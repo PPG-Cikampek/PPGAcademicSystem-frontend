@@ -54,7 +54,7 @@ const TeachersView = () => {
                     <img
                         src={`${import.meta.env.VITE_BACKEND_URL}/${teacher.image}`}
                         alt={teacher.name}
-                        className="size-10 rounded-full m-auto min-w-10"
+                        className="size-10 rounded-full m-auto min-w-10 border border-gray-200 bg-white"
                     />
                 ) : (
                     <div className="size-10 rounded-full bg-blue-200 text-blue-500 flex items-center justify-center font-medium m-auto">

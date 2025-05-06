@@ -252,7 +252,7 @@ const AttendedStudents = () => {
                                     <img
                                         src={`${import.meta.env.VITE_BACKEND_URL}/${student.studentId.image}`}
                                         alt="Profile"
-                                        className="rounded-full size-10 shrink-0"
+                                        className="rounded-full size-10 shrink-0 border border-gray-200 bg-white"
                                     />
                                 ) : (
                                     <StudentInitial studentName={student.studentId.name} clsName={`size-10 rounded-full bg-blue-200 text-blue-500 flex items-center justify-center font-medium`} />

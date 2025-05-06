@@ -159,7 +159,7 @@ const AddTeacherToClassView = () => {
                                                         <img
                                                             src={teacher?.image ? `${import.meta.env.VITE_BACKEND_URL}/${teacher.image}` : "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"}
                                                             alt={teacher.name}
-                                                            className="w-10 h-10 rounded-full hidden md:block"
+                                                            className="w-10 h-10 rounded-full border border-gray-200 bg-white"
                                                         />
                                                     ) : (
                                                         <div

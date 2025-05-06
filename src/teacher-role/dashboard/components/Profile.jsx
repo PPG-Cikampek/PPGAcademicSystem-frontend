@@ -26,7 +26,7 @@ const Profile = ({ user, isLoading }) => {
                         onClick={sidebarHandler}
                         src={`${import.meta.env.VITE_BACKEND_URL}/${user.image}`}
                         alt={user.name}
-                        className="w-12 h-12 rounded-full  focus:bg-gray-200 hover:outline-none hover:ring-1 hover:ring-offset-1 hover:ring-gray-400"
+                        className="w-12 h-12 rounded-full border border-gray-200 bg-white focus:bg-gray-200 hover:outline-none hover:ring-1 hover:ring-offset-1 hover:ring-gray-400"
                     />
                 ) : (
                     <div

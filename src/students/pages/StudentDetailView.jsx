@@ -129,7 +129,7 @@ const StudentDetailView = () => {
                                     <img
                                         src={studentInfo?.image ? `${import.meta.env.VITE_BACKEND_URL}/${studentInfo.image}` : "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"}
                                         alt="Profile"
-                                        className="mt-2 rounded-md size-48 md:size-64 shrink-0"
+                                        className="mt-2 rounded-md size-48 md:size-64 shrink-0 bg-white"
                                     />
                                 )}
                                 {auth.userRole !== 'teacher' && auth.userRole !== 'student' && studentData.isProfileComplete === true && (

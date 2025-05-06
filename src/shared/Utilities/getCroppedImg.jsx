@@ -10,6 +10,9 @@ export default function getCroppedImg(imageSrc, pixelCrop) {
       canvas.width = pixelCrop.width;
       canvas.height = pixelCrop.height;
 
+      // Ensure canvas is transparent before drawing
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
       ctx.drawImage(
         image,
         pixelCrop.x,
@@ -22,14 +25,15 @@ export default function getCroppedImg(imageSrc, pixelCrop) {
         pixelCrop.height
       );
 
+      // Export as PNG to preserve transparency
       canvas.toBlob(blob => {
         if (!blob) {
           reject(new Error('Canvas is empty'));
           return;
         }
-        blob.name = 'cropped.jpg';
+        blob.name = 'cropped.png';
         resolve(URL.createObjectURL(blob));
-      }, 'image/jpeg');
+      }, 'image/png');
     };
     image.onerror = () => {
       reject(new Error('Image load error'));

@@ -85,7 +85,7 @@ const StudentScoresView = () => {
                                             <img
                                                 src={`${import.meta.env.VITE_BACKEND_URL}/${state.studentData.image}`}
                                                 alt="Profile"
-                                                className="rounded-full size-10 shrink-0"
+                                                className="rounded-full size-10 shrink-0 border border-gray-200 bg-white"
                                             />
                                         ) : (
                                             <StudentInitial studentName={state.studentData.name} clsName={`size-10 rounded-full bg-blue-200 text-blue-500 flex items-center justify-center font-medium`} />

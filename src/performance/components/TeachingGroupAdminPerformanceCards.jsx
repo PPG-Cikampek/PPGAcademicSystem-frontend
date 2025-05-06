@@ -384,7 +384,7 @@ const TeachingGroupAdminPerformanceCards = ({ data, violationData, initialView, 
                                         <img
                                             src={student?.image ? `${import.meta.env.VITE_BACKEND_URL}/${student.image}` : "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"}
                                             alt={student.name}
-                                            className="size-14 rounded-full m-auto shrink-0"
+                                            className="size-14 rounded-full m-auto shrink-0 border border-gray-200 bg-white"
                                         />
                                     ) : (
                                         <StudentInitial studentName={student.name} clsName={`size-14 rounded-full bg-blue-200 text-blue-500 flex items-center justify-center font-medium m-auto shrink-0 grow-0`} />
