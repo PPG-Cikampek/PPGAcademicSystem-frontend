@@ -64,6 +64,24 @@ const QuestionDetailView = () => {
         return categoryMap[category] || 'kosong';
     };
 
+    const getMothName = (month) => {
+        const monthMap = {
+            1: "Januari",
+            2: "Februari",
+            3: "Maret",
+            4: "April",
+            5: "Mei",
+            6: "Juni",
+            7: "Juli",
+            8: "Agustus",
+            9: "September",
+            10: "Oktober",
+            11: "November",
+            12: "Desember"
+        };
+        return monthMap[month] || 'kosong';
+    };
+
     const getClassGrade = (grade) => ({
         'pra-paud': 'Kelas Pra-Paud',
         'paud': 'Kelas Paud',
@@ -85,6 +103,7 @@ const QuestionDetailView = () => {
                 );
                 if (isActive) {
                     setQuestion(responseData.question);
+                    console.log(responseData)
                 }
             } catch (err) {
                 // Error handled by useHttp
@@ -281,6 +300,10 @@ const QuestionDetailView = () => {
                                 <p className="mt-1 text-gray-900">{question.semester === '1' ? 'Ganjil' : 'Genap'}</p>
                             </div>
                             <div>
+                                <h3 className="text-sm font-medium text-gray-500">Bulan Materi</h3>
+                                <p className="mt-1 text-gray-900">{getMothName(question.curriculumMonth)}</p>
+                            </div>
+                            <div>
                                 <h3 className="text-sm font-medium text-gray-500">Bobot Nilai Maksimal</h3>
                                 <p className="mt-1 text-blue-600 font-medium">{question.maxScore} Poin</p>
                             </div>
@@ -292,20 +315,20 @@ const QuestionDetailView = () => {
 
                         <div className="border-t pt-4">
                             <h3 className="text-sm font-medium text-gray-500">Pertanyaan</h3>
-                            <p className="mt-1 text-gray-900 whitespace-pre-line">{question.question}</p>
+                            <p className="font-lpmq mt-1 text-gray-900 whitespace-pre-line">{question.question}</p>
                         </div>
 
                         <div className="border-t pt-4">
                             <h3 className="text-sm font-medium text-gray-500">Jawaban</h3>
                             {question.answers.map((answer, index) => (
-                                <p key={index} className="mt-1 text-gray-900">{answer}</p>
+                                <p key={index} className="font-lpmq mt-1 text-gray-900 whitespace-pre-line">{answer}</p>
                             ))}
                         </div>
 
                         {question.instruction && (
                             <div className="border-t pt-4">
                                 <h3 className="text-sm font-medium text-gray-500">Petunjuk Penilaian</h3>
-                                <pre className="mt-1 text-gray-900 whitespace-pre-wrap font-sans">
+                                <pre className="mt-1 text-gray-900 whitespace-pre-line font-sans">
                                     {question.instruction}
                                 </pre>
                             </div>

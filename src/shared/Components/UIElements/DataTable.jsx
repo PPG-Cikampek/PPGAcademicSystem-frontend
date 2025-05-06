@@ -16,6 +16,7 @@ const DataTable = ({
         showTopEntries: true,
         showBottomEntries: true,
         showPagination: true,
+        clickableRows: true,
         entriesOptions: [5, 10, 25, 50, 100]
     }
 }) => {
@@ -73,7 +74,7 @@ const DataTable = ({
 
     const indexOfLastItem = config.showPagination ? currentPage * entriesPerPage : filteredData.length;
     const indexOfFirstItem = config.showPagination ? indexOfLastItem - entriesPerPage : 0;
-    const currentItems = config.showPagination 
+    const currentItems = config.showPagination
         ? filteredData.slice(indexOfFirstItem, indexOfLastItem)
         : filteredData;
     const totalPages = Math.ceil(filteredData.length / entriesPerPage);
@@ -228,7 +229,7 @@ const DataTable = ({
                                     <tr
                                         key={index}
                                         onClick={() => onRowClick && onRowClick(item)}
-                                        className="hover:bg-gray-50 hover:cursor-pointer transition"
+                                        className={`${config.clickableRows && 'hover:bg-gray-50 hover:cursor-pointer'}  transition`}
                                     >
                                         {columns.map(({ key, render, cellStyle }) => (
                                             <td key={key} className={`${key === 'actions' ? 'p-2' : 'p-2 md:p-4'}`}>

@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
 import jsPDF from 'jspdf';
-import { applyPlugin, autoTable } from 'jspdf-autotable';
+import { applyPlugin } from 'jspdf-autotable';
 import IndonesianNumberConverter from '../../shared/Utilities/numberToWordConverter';
 applyPlugin(jsPDF);
 
@@ -10,7 +10,36 @@ const MunaqasyahByClassView = () => {
     const [expandedCards, setExpandedCards] = useState({});
     const location = useLocation();
     const navigate = useNavigate();
-    const { scores } = location.state || { scores: [] };
+    const { scores: rawScores } = location.state || { scores: [] };
+
+    const scoreCategories = [
+        { key: 'reciting', label: "Membaca Al-Qur'an/Tilawati" },
+        { key: 'writing', label: 'Menulis Arab' },
+        { key: 'quranTafsir', label: 'Tafsir Al-Quran' },
+        { key: 'hadithTafsir', label: 'Tafsir Hadits' },
+        { key: 'practice', label: 'Praktik Ibadah' },
+        { key: 'moralManner', label: 'Akhlak dan Tata Krama' },
+        { key: 'memorizingSurah', label: 'Surat-surat Al-Quran' },
+        { key: 'memorizingHadith', label: 'Hafalan Hadits' },
+        { key: 'memorizingDua', label: "Hafalan Do'a" },
+        { key: 'memorizingBeautifulName', label: 'Hafalan Asmaul Husna' },
+        { key: 'knowledge', label: 'Keilmuan dan Kefahaman Agama' },
+        { key: 'independence', label: 'Kemandirian' }
+    ];
+
+    // Normalize scores to minimum 60
+    const scores = useMemo(() => {
+        return rawScores.map(score => ({
+            ...score,
+            ...scoreCategories.reduce((acc, category) => ({
+                ...acc,
+                [category.key]: {
+                    ...score[category.key],
+                    score: score[category.key].score < 60 ? 60 : score[category.key].score
+                }
+            }), {})
+        }));
+    }, [rawScores]);
 
     const expandedCount = useMemo(() =>
         Object.values(expandedCards).filter(Boolean).length,
@@ -68,18 +97,18 @@ const MunaqasyahByClassView = () => {
             body: tableData,
             startY: 35,
             styles: {
-            cellPadding: 2,
-            headStyles: {
-                halign: 'center'
-            }
+                cellPadding: 2,
+                headStyles: {
+                    halign: 'center'
+                }
             },
             zebra: true,
             zebraColor: [245, 245, 245],
             columnStyles: {
-            0: { cellWidth: 15, halign: 'center' },
-            1: { cellWidth: 75 },
-            2: { cellWidth: 20 },
-            3: { cellWidth: 75, halign: 'center' }
+                0: { cellWidth: 15, halign: 'center' },
+                1: { cellWidth: 75 },
+                2: { cellWidth: 20 },
+                3: { cellWidth: 75, halign: 'center' }
             }
         });
 
@@ -97,21 +126,6 @@ const MunaqasyahByClassView = () => {
         const pdfUrl = URL.createObjectURL(pdfBlob);
         navigate('/munaqasyah/student/score', { state: { pdfUrl, studentName } });
     };
-
-    const scoreCategories = [
-        { key: 'reciting', label: "Membaca Al-Qur'an/Tilawati" },
-        { key: 'writing', label: 'Menulis Arab' },
-        { key: 'quranTafsir', label: 'Tafsir Al-Quran' },
-        { key: 'hadithTafsir', label: 'Tafsir Hadits' },
-        { key: 'practice', label: 'Praktik Ibadah' },
-        { key: 'moralManner', label: 'Akhlak dan Tata Krama' },
-        { key: 'memorizingSurah', label: 'Surat-surat Al-Quran' },
-        { key: 'memorizingHadith', label: 'Hafalan Hadits' },
-        { key: 'memorizingDua', label: "Hafalan Do'a" },
-        { key: 'memorizingBeautifulName', label: 'Hafalan Asmaul Husna' },
-        { key: 'knowledge', label: 'Keilmuan dan Kefahaman Agama' },
-        { key: 'independence', label: 'Kemandirian' }
-    ];
 
     return (
         <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">

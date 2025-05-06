@@ -80,6 +80,24 @@ const QuestionBankView = () => {
         return categoryMap[category] || 'kosong';
     };
 
+    const getMothName = (month) => {
+        const monthMap = {
+            1: "Januari",
+            2: "Februari",
+            3: "Maret",
+            4: "April",
+            5: "Mei",
+            6: "Juni",
+            7: "Juli",
+            8: "Agustus",
+            9: "September",
+            10: "Oktober",
+            11: "November",
+            12: "Desember"
+        };
+        return monthMap[month] || 'kosong';
+    };
+
     useEffect(() => {
         const url = `${import.meta.env.VITE_BACKEND_URL}/munaqasyahs/questions/class/${classGrade}`;
 
@@ -87,7 +105,7 @@ const QuestionBankView = () => {
             try {
                 const responseData = await sendRequest(url);
                 setQuestions(responseData.questions);
-                console.log(responseData.questions);
+                console.log(responseData);
             } catch (err) {
                 // Error is handled by useHttp
             }
@@ -123,10 +141,16 @@ const QuestionBankView = () => {
             render: (question) => question.semester === '1' ? 'Ganjil' : 'Genap'
         },
         {
+            key: 'curriculumMonth',
+            label: 'Bulan Materi',
+            sortable: true,
+            render: (question) => getMothName(question.curriculumMonth)
+        },
+        {
             key: 'maxScore',
             label: 'Bobot Nilai',
             sortable: true,
-            cellStyle: () => 'font-medium text-blue-600',
+            cellStyle: () => 'font-medium text-blue-600 font-lpmq',
             render: (question) => `${question.maxScore} Poin`
         },
         {
@@ -134,7 +158,7 @@ const QuestionBankView = () => {
             label: 'Pertanyaan',
             sortable: true,
             render: (question) => (
-                <div className="max-w-md truncate">
+                <div className="max-w-md truncate font-lpmq">
                     {question.question}
                 </div>
             )
@@ -144,7 +168,7 @@ const QuestionBankView = () => {
             label: 'Jawaban',
             sortable: true,
             render: (question) => (
-                <div className="max-w-md truncate text-gray-600">
+                <div className="max-w-md truncate text-gray-600 font-lpmq">
                     {question.answers[0]}
                 </div>
             )
@@ -184,10 +208,10 @@ const QuestionBankView = () => {
             options: ['Ganjil', 'Genap']
         }
     ];
-    console.log(filterOptions)
+    // console.log(filterOptions)
 
     if (questions?.length > 0) {
-        console.log(JSON.stringify(questions))
+        // console.log(JSON.stringify(questions))
         const types = [...new Set(questions.map(t => getTypeName(t?.type)).filter(Boolean))];
         const categories = [...new Set(questions.map(t => getCategoryName(t?.category)).filter(Boolean))];
 
@@ -219,7 +243,7 @@ const QuestionBankView = () => {
             }
         )
 
-        console.log(filterOptions)
+        // console.log(filterOptions)
     }
 
     const handleDeleteQuestion = (questionId) => {
@@ -283,7 +307,7 @@ const QuestionBankView = () => {
 
                 <div className="flex flex-col justify-between items-stretch gap-2 mb-4">
                     <div className="flex items-center mb-6 gap-4">
-                        <h1 className="text-2xl font-semibold text-gray-900">Bank Soal {classGrade}</h1>
+                        <h1 className="text-2xl font-semibold text-gray-900">Bank Soal Kelas {classGrade.charAt(0).toUpperCase() + classGrade.slice(1)}</h1>
                         <Link to={`/munaqasyah/question-bank/${classGrade}/new`}>
                             <button className="inline-flex items-center pr-4 pl-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors duration-200">
                                 <PlusIcon className="w-4 h-4 mr-2" />
@@ -291,11 +315,6 @@ const QuestionBankView = () => {
                             </button>
                         </Link>
                     </div>
-                    {/* <WarningCard
-                        className="items-center justify-start"
-                        warning="Penambahan Peserta Didik Baru Supaya Menghubungi Daerah!"
-                        onClear={() => setError(null)}
-                    /> */}
                 </div>
                 {isLoading && (
                     <div className="flex justify-center mt-16">
