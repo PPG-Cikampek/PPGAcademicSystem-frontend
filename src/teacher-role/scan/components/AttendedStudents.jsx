@@ -267,11 +267,11 @@ const AttendedStudents = () => {
                                     value={student.status || ''}
                                     onChange={(e) => handleStatusChange(student.studentId.nis, e.target.value)}
                                     className="border p-1 rounded-full active:ring-2 active:ring-blue-300 h-min"
-                                    disabled={student.status === "Hadir" || student.status === "Terlambat"}
+                                    // disabled={student.status === "Hadir" || student.status === "Terlambat"}
                                 >
                                     <option value={null}>Tanpa Keterangan</option>
-                                    <option value="Hadir" disabled={true}>Hadir</option>
-                                    <option value="Terlambat" disabled={true}>Terlambat</option>
+                                    <option value="Hadir">Hadir</option>
+                                    <option value="Terlambat">Terlambat</option>
                                     <option value="Sakit">Sakit</option>
                                     <option value="Izin">Izin</option>
                                 </select>
