@@ -149,6 +149,7 @@ const TeachersView = () => {
                         initialSort={{ key: 'name', direction: 'ascending' }}
                         isLoading={isLoading}
                         filterOptions={filterOptions}
+                        tableId="teachers-table" // <-- Add unique tableId
                     />
                 )}
             </div>

@@ -135,6 +135,7 @@ const StudentsView = () => {
                         initialSort={{ key: 'name', direction: 'ascending' }}
                         isLoading={isLoading}
                         filterOptions={filterOptions}
+                        tableId="students-table" // <-- Add unique tableId
                     />
                 )}
             </div>

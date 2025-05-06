@@ -191,6 +191,7 @@ const RequestedAccountView = () => {
             searchableColumns={['ticketId', 'status']}
             isLoading={isLoading}
             initialSort={{ key: 'createdTime', direction: 'descending' }}
+            tableId="requestAccount-table" // <-- Add unique tableId
           />
         )}
       </div>

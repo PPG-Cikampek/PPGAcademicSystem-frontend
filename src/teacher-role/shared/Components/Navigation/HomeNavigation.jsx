@@ -33,11 +33,11 @@ const HomeNavigation = ({ children }) => {
                 icon: <Users />,
                 label: 'Peserta Didik',
             },
-            // {
-            //     link: '/munaqasyah/scanner',
-            //     icon: <BookOpenText />,
-            //     label: 'Munaqosah',
-            // },
+            {
+                link: '/munaqasyah/scanner',
+                icon: <BookOpenText />,
+                label: 'Munaqosah',
+            },
             {
                 link: '/performances',
                 icon: <Gauge />,

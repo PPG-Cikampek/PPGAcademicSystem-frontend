@@ -330,6 +330,7 @@ const QuestionBankView = () => {
                         initialSort={{ key: 'type', direction: 'ascending' }}
                         isLoading={isLoading}
                         filterOptions={filterOptions}
+                        tableId={`questionsBank-table-${classGrade}`} // <-- Add unique tableId
                     />
                 )}
             </div>

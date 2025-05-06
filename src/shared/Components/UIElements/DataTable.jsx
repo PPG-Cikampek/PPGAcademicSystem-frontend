@@ -1,5 +1,5 @@
 import { Filter, X } from 'lucide-react';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 
 const DataTable = ({
     data,
@@ -18,23 +18,49 @@ const DataTable = ({
         showPagination: true,
         clickableRows: true,
         entriesOptions: [5, 10, 25, 50, 100]
-    }
+    },
+    tableId
 }) => {
-    const [filteredData, setFilteredData] = useState(data);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [entriesPerPage, setEntriesPerPage] = useState(initialEntriesPerPage);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [sortConfig, setSortConfig] = useState(initialSort);
-    const [filters, setFilters] = useState({});
+    const storageKey = tableId ? `datatable-state-${tableId}` : null;
+
+    const loadPersistedState = () => {
+        if (!storageKey) return {};
+        try {
+            const persisted = localStorage.getItem(storageKey);
+            return persisted ? JSON.parse(persisted) : {};
+        } catch {
+            return {};
+        }
+    };
+
+    const persisted = loadPersistedState();
+
+    const [searchTerm, setSearchTerm] = useState(persisted.searchTerm ?? '');
+    const [entriesPerPage, setEntriesPerPage] = useState(persisted.entriesPerPage ?? initialEntriesPerPage);
+    const [currentPage, setCurrentPage] = useState(persisted.currentPage ?? 1);
+    const [sortConfig, setSortConfig] = useState(persisted.sortConfig ?? initialSort);
+    const [filters, setFilters] = useState(persisted.filters ?? {});
     const [showFilters, setShowFilters] = useState(false);
 
     useEffect(() => {
+        if (!storageKey) return;
+        console.log(currentPage)
+        console.log(persisted)
+        localStorage.setItem(storageKey, JSON.stringify({
+            searchTerm,
+            entriesPerPage,
+            currentPage,
+            sortConfig,
+            filters
+        }));
+    }, [searchTerm, entriesPerPage, currentPage, sortConfig, filters, storageKey]);
+
+    const filteredData = useMemo(() => {
         let filtered = data.filter(item =>
             searchableColumns.some(column =>
                 item[column]?.toString().toLowerCase().includes(searchTerm.toLowerCase())
             )
         );
-
         Object.entries(filters).forEach(([key, value]) => {
             if (value) {
                 filtered = filtered.filter(item => {
@@ -44,10 +70,38 @@ const DataTable = ({
                 });
             }
         });
+        return filtered;
+    }, [data, searchableColumns, searchTerm, filters, columns]);
 
-        setFilteredData(filtered);
-        setCurrentPage(1);
-    }, [searchTerm, data, searchableColumns, filters]);
+    const sortedData = useMemo(() => {
+        if (!sortConfig.key) return filteredData;
+        const column = columns.find(col => col.key === sortConfig.key);
+        if (!column) return filteredData;
+        const sorted = [...filteredData].sort((a, b) => {
+            const aValue = column.render ? column.render(a) : a[sortConfig.key];
+            const bValue = column.render ? column.render(b) : b[sortConfig.key];
+            if (!aValue && !bValue) return 0;
+            if (!aValue) return 1;
+            if (!bValue) return -1;
+            return sortConfig.direction === 'ascending'
+                ? aValue.toString().localeCompare(bValue.toString())
+                : bValue.toString().localeCompare(aValue.toString());
+        });
+        return sorted;
+    }, [filteredData, columns, sortConfig]);
+
+    const totalPages = Math.ceil(sortedData.length / entriesPerPage);
+    const indexOfLastItem = config.showPagination ? currentPage * entriesPerPage : sortedData.length;
+    const indexOfFirstItem = config.showPagination ? indexOfLastItem - entriesPerPage : 0;
+    const currentItems = config.showPagination
+        ? sortedData.slice(indexOfFirstItem, indexOfLastItem)
+        : sortedData;
+
+    // useEffect(() => {
+    //     if (currentPage > totalPages) {
+    //         setCurrentPage(totalPages === 0 ? 1 : totalPages);
+    //     }
+    // }, [totalPages, currentPage]);
 
     const sortData = (key) => {
         let direction = 'ascending';
@@ -55,29 +109,7 @@ const DataTable = ({
             direction = 'descending';
         }
         setSortConfig({ key, direction });
-
-        const sorted = [...filteredData].sort((a, b) => {
-            const column = columns.find(col => col.key === key);
-            const aValue = column.render ? column.render(a) : a[key];
-            const bValue = column.render ? column.render(b) : b[key];
-
-            if (!aValue && !bValue) return 0;
-            if (!aValue) return 1;
-            if (!bValue) return -1;
-
-            return direction === 'ascending'
-                ? aValue.toString().localeCompare(bValue.toString())
-                : bValue.toString().localeCompare(aValue.toString());
-        });
-        setFilteredData(sorted);
     };
-
-    const indexOfLastItem = config.showPagination ? currentPage * entriesPerPage : filteredData.length;
-    const indexOfFirstItem = config.showPagination ? indexOfLastItem - entriesPerPage : 0;
-    const currentItems = config.showPagination
-        ? filteredData.slice(indexOfFirstItem, indexOfLastItem)
-        : filteredData;
-    const totalPages = Math.ceil(filteredData.length / entriesPerPage);
 
     const SkeletonRow = () => (
         <tr className="animate-pulse">
@@ -102,6 +134,8 @@ const DataTable = ({
     const resetFilters = () => {
         setFilters({});
         setSearchTerm('');
+        setCurrentPage(1);
+        setSortConfig(initialSort);
     };
 
     const FilterCard = () => (
@@ -265,9 +299,9 @@ const DataTable = ({
                     <>
                         {config.showBottomEntries && (
                             <div>
-                                {filteredData.length === 0
+                                {sortedData.length === 0
                                     ? "Menampilkan 0 - 0 dari 0 item"
-                                    : `Menampilkan ${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, filteredData.length)} dari ${filteredData.length} item`
+                                    : `Menampilkan ${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, sortedData.length)} dari ${sortedData.length} item`
                                 }
                             </div>
                         )}
@@ -275,14 +309,14 @@ const DataTable = ({
                             <div className="flex gap-2">
                                 <button
                                     onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                                    disabled={currentPage === 1 || filteredData.length === 0}
+                                    disabled={currentPage === 1 || sortedData.length === 0}
                                     className="btn-primary-outline"
                                 >
                                     Sebelumnya
                                 </button>
                                 <button
                                     onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                                    disabled={currentPage === totalPages || filteredData.length === 0}
+                                    disabled={currentPage === totalPages || sortedData.length === 0}
                                     className="btn-primary-outline"
                                 >
                                     Berikutnya

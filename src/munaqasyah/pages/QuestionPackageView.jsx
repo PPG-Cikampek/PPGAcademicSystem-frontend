@@ -248,6 +248,7 @@ const QuestionPackageView = () => {
                             clickableRows: false,
                             entriesOptions: [5, 10, 25, 50, 100]
                         }}
+                        tableId="packages-table"
                     />
                 )}
             </div>

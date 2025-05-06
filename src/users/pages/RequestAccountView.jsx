@@ -169,6 +169,7 @@ const RequestAccountView = () => {
                         searchableColumns={['ticketId', 'status']}
                         isLoading={isLoading}
                         initialSort={{ key: 'createdTime', direction: 'descending' }}
+                        tableId="requestAccount-table" // <-- Add unique tableId
                     />
                 )}
                 <h2 className='text-xl font-bold my-12 mb-4'>Buat Permintaan Akun</h2>

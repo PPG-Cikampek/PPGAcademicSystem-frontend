@@ -285,6 +285,7 @@ const UsersView = () => {
                                     clickeableRows: false,
                                     entriesOptions: [5, 10, 20, 30]
                                 }}
+                                tableId={`users-table-${role}`}
                             />
                             <hr className='my-8' />
                         </div>
