@@ -2,6 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'LPMQ';
+  src: url('./assets/fonts/LPMQ-IsepMisbah.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
 html {
   @apply font-sans;
 }
@@ -17,12 +25,16 @@ html {
     border-radius: 5px;
   }
 
+  .font-lpmq {
+    font-family: 'LPMQ', sans-serif;
+  }
+
   table {
-    @apply border border-gray-200 
+    @apply border border-gray-200
   }
 
   .card-interactive {
-    @apply mt-4 p-4 flex justify-center rounded-3xl md:mx-8 bg-white shadow-sm ring-1 ring-gray-200 transition ease-out hover:-translate-y-1 hover:scale-[1.025]  hover:cursor-pointer hover:shadow-lg duration-200
+    @apply mt-4 p-4 flex justify-center rounded-3xl md:mx-8 bg-white shadow-sm ring-1 ring-gray-200 transition ease-out hover:-translate-y-1 hover:scale-[1.025] hover:cursor-pointer hover:shadow-lg duration-200
   }
 
   .card-basic {
@@ -94,4 +106,3 @@ html {
 body {
   @apply bg-gray-50 text-sm font-normal h-full;
 }
-
