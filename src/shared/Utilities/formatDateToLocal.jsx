@@ -1,9 +1,9 @@
-export const formatDate = (date, withTime = false ) => {
+export const formatDate = (date, withDay = true, withTime = false) => {
     if (!(date instanceof Date)) {
         date = new Date(date);
     }
     return date.toLocaleDateString('id-ID', {
-        weekday: 'long',
+        ...(withDay && { weekday: 'long' }),
         day: '2-digit',
         month: 'long',
         year: 'numeric',

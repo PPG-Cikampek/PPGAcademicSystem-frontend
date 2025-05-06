@@ -39,6 +39,7 @@ export function useVersionCheck() {
           
           if (currentVersion !== data.version) {
             console.log('New version detected. Clearing cache and reloading...');
+            setTimeout(1000)
             await clearCacheAndReload();
           }
         }

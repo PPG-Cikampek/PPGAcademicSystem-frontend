@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
 import { SidebarContext } from '../../Context/sidebar-context';
 import { AuthContext } from '../../Context/auth-context';
@@ -7,9 +7,20 @@ import logo from '../../../../assets/logos/ppgcikampek.webp';
 
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { GeneralContext } from '../../Context/general-context';
+import { formatDate } from '../../../Utilities/formatDateToLocal';
 
 const Sidebar = ({ linksList, children }) => {
     const [expandedMenu, setExpandedMenu] = useState(null);
+    const [version, setVersion] = useState(null);
+
+    useEffect(() => {
+        const fetchVersion = async () => {
+            const response = await fetch('/version.json?t=' + new Date().getTime());
+            const data = await response.json();
+            setVersion(data);
+        };
+        fetchVersion();
+    }, []);
 
     const sidebar = useContext(SidebarContext);
     const auth = useContext(AuthContext);
@@ -53,9 +64,24 @@ const Sidebar = ({ linksList, children }) => {
                     ${sidebar.isSidebarOpen ? 'w-64 translate-x-0 opacity-100' : 'w-16 -translate-x-full md:translate-x-0'}
                 `}
             >
-                <div className={`m-2 mb-6 flex items-center justify-start gap-2 border-gray-200`}>
-                    <img src={logo} className={`font-normal size-12`} />
-                    <span className={`shrink-0 text-2xl font-semibold text-primary ${sidebar.isSidebarOpen ? 'block' : 'hidden'}`}>PPG Cikampek</span>
+                <div className={`m-2 mb-6 flex flex-col items-center justify-start gap-2 border-gray-200`}>
+                    <div className="flex items-center gap-2">
+                        <img src={logo} className={`font-normal size-12`} />
+                        <div className="flex flex-col gap-0">
+                            <span className={`shrink-0 text-2xl font-semibold text-primary overflow-clip ${sidebar.isSidebarOpen ? 'block' : 'hidden'}`}>PPG Cikampek</span>
+                            {version && sidebar.isSidebarOpen && (
+                                <span className="text-sm">
+                                    v{version.version} - {formatDate(new Date(version.timestamp * 1000), false)}
+                                    {/* v{version.version}-{version.timestamp} */}
+                                </span>
+                            )}
+                            {/* {version && sidebar.isSidebarOpen && (
+                                <span className="text-sm">
+                                    terakhir diperbarui pada {formatDate(new Date(version.timestamp * 1000))}
+                                    </span>
+                            )} */}
+                        </div>
+                    </div>
                 </div>
                 <nav className={`mt-4 ${sidebar.isSidebarOpen ? 'min-w-64' : ''}`}>
                     <ul className="mt-4 space-}y-2">
