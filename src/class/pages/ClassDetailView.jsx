@@ -289,8 +289,8 @@ const ClassDetailView = () => {
                                                 <td className="p-4 ">
                                                     {teacher.image ? (
                                                         <img
-                                                            src={teacher?.image ? `${import.meta.env.VITE_BACKEND_URL}/${teacher.image}` : "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"}
-                                                            alt={teacher.name}
+                                                        src={teacher.thumbnail ? teacher.thumbnail : `${import.meta.env.VITE_BACKEND_URL}/${teacher.image}`}
+                                                        alt={teacher.name}
                                                             className="w-10 h-10 rounded-full min-w-10 border border-gray-200 bg-white"
                                                         />
                                                     ) : (
@@ -357,8 +357,8 @@ const ClassDetailView = () => {
                                                 <td className="p-4">
                                                     {student.image ? (
                                                         <img
-                                                            src={student?.image ? `${import.meta.env.VITE_BACKEND_URL}/${student.image}` : "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"}
-                                                            alt={student.name}
+                                                        src={student.thumbnail ? student.thumbnail : `${import.meta.env.VITE_BACKEND_URL}/${student.image}`}
+                                                        alt={student.name}
                                                             className="w-10 h-10 rounded-full min-w-10 border border-gray-200 bg-white"
                                                         />
                                                     ) : (

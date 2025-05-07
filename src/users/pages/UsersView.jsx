@@ -154,7 +154,7 @@ const UsersView = () => {
             render: (user) => (
                 user.image ? (
                     <img
-                        src={`${import.meta.env.VITE_BACKEND_URL}/${user.image}`}
+                        src={user.thumbnail ? user.thumbnail : `${import.meta.env.VITE_BACKEND_URL}/${user.image}`}
                         alt={user.name}
                         className="size-10 rounded-full border border-gray-200 bg-white"
                     />

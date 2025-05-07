@@ -382,7 +382,7 @@ const TeachingGroupAdminPerformanceCards = ({ data, violationData, initialView, 
                                 <div className="flex gap-3 items-center">
                                     {student.image ? (
                                         <img
-                                            src={student?.image ? `${import.meta.env.VITE_BACKEND_URL}/${student.image}` : "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"}
+                                            src={student.thumbnail ? student.thumbnail : `${import.meta.env.VITE_BACKEND_URL}/${student.image}`}
                                             alt={student.name}
                                             className="size-14 rounded-full m-auto shrink-0 border border-gray-200 bg-white"
                                         />

@@ -12,6 +12,7 @@ import Modal from "../../shared/Components/UIElements/ModalBottomClose";
 import FileUpload from '../../shared/Components/FormElements/FileUpload';
 
 import { Icon } from '@iconify-icon/react'
+import generateBase64Thumbnail from '../../shared/Utilities/generateBase64Thumbnail';
 
 const UpdateTeacherView = () => {
     const [modal, setModal] = useState({ title: '', message: '', onConfirm: null });
@@ -64,9 +65,19 @@ const UpdateTeacherView = () => {
 
         if (croppedImage) {
             formData.append('image', croppedImage);
+            // Generate and append base64 thumbnail
+            try {
+                const base64Thumb = await generateBase64Thumbnail(croppedImage, 128);
+                formData.append('thumbnail', base64Thumb);
+            } catch (err) {
+                setError("Gagal membuat thumbnail!");
+                throw err;
+            }
         } else {
-            setError("Tidak ada foto yang dipilih!");
-            throw new Error('Tidak ada foto yang dipilih!');
+            if (auth.userRole !== 'admin') {
+                setError("Tidak ada foto yang dipilih!");
+                throw new Error('Tidak ada foto yang dipilih!');
+            }
         }
 
         console.log(data);

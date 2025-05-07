@@ -11,6 +11,7 @@ import FileUpload from '../../shared/Components/FormElements/FileUpload';
 import DynamicForm from '../../shared/Components/UIElements/DynamicForm';
 import Modal from '../../shared/Components/UIElements/ModalBottomClose';
 import WarningCard from '../../shared/Components/UIElements/WarningCard';
+import generateBase64Thumbnail from '../../shared/Utilities/generateBase64Thumbnail';
 
 const ProfileView = () => {
     const [modal, setModal] = useState({ title: '', message: '', onConfirm: null });
@@ -43,7 +44,23 @@ const ProfileView = () => {
 
     const saveImageHandler = async () => {
         const formData = new FormData();
-        formData.append('image', pickedFile);
+        if (pickedFile) {
+            formData.append('image', pickedFile);
+            // Generate and append base64 thumbnail
+            try {
+                const base64Thumb = await generateBase64Thumbnail(pickedFile, 128);
+                formData.append('thumbnail', base64Thumb);
+            } catch (err) {
+                setError("Gagal membuat thumbnail!");
+                throw err;
+            }
+        } else {
+            if (auth.userRole !== 'admin') {
+                setError("Tidak ada foto yang dipilih!");
+                throw new Error('Tidak ada foto yang dipilih!');
+            }
+        }
+
         try {
             const response = await sendRequest(
                 `${import.meta.env.VITE_BACKEND_URL}/users/image-upload/${auth.userId}`,

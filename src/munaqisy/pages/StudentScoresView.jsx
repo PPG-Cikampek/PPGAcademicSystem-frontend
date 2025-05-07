@@ -83,7 +83,7 @@ const StudentScoresView = () => {
                                     <div className="flex gap-2 items-center">
                                         {state.studentData.image ? (
                                             <img
-                                                src={`${import.meta.env.VITE_BACKEND_URL}/${state.studentData.image}`}
+                                                src={state.studentData.thumbnail ? state.studentData.thumbnail : `${import.meta.env.VITE_BACKEND_URL}/${state.studentData.image}`}
                                                 alt="Profile"
                                                 className="rounded-full size-10 shrink-0 border border-gray-200 bg-white"
                                             />

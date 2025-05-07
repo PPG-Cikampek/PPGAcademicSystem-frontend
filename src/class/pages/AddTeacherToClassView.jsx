@@ -157,8 +157,8 @@ const AddTeacherToClassView = () => {
                                                 <div className="flex gap-4 items-center">
                                                     {teacher.image ? (
                                                         <img
-                                                            src={teacher?.image ? `${import.meta.env.VITE_BACKEND_URL}/${teacher.image}` : "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"}
-                                                            alt={teacher.name}
+                                                        src={teacher.thumbnail ? teacher.thumbnail : `${import.meta.env.VITE_BACKEND_URL}/${teacher.image}`}
+                                                        alt={teacher.name}
                                                             className="w-10 h-10 rounded-full border border-gray-200 bg-white"
                                                         />
                                                     ) : (

@@ -250,8 +250,8 @@ const AttendedStudents = () => {
                             <div className="flex gap-2 items-center mb-2">
                                 {student.studentId.image ? (
                                     <img
-                                        src={`${import.meta.env.VITE_BACKEND_URL}/${student.studentId.image}`}
-                                        alt="Profile"
+                                    src={student.studentId.thumbnail ? student.studentId.thumbnail : `${import.meta.env.VITE_BACKEND_URL}/${student.studentId.image}`}
+                                    alt="Profile"
                                         className="rounded-full size-10 shrink-0 border border-gray-200 bg-white"
                                     />
                                 ) : (

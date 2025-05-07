@@ -38,7 +38,7 @@ const StudentsView = () => {
             render: (student) => (
                 student.image ? (
                     <img
-                        src={`${import.meta.env.VITE_BACKEND_URL}/${student.image}`}
+                        src={student.thumbnail ? student.thumbnail : `${import.meta.env.VITE_BACKEND_URL}/${student.image}`}
                         alt={student.name}
                         className="size-10 rounded-full m-auto shrink-0 border border-gray-200 bg-white"
                     />
