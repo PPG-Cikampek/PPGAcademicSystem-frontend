@@ -48,9 +48,9 @@ const DashboardView = () => {
                 {error && <ErrorCard error={error} onClear={() => setError(null)} />}
 
                 {!isLoading && dashboardData && (
-                    <div className="flex md:flex-row flex-wrap justify-between md:justify-start gap-4 md:gap-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8">
                         {dashboardData.Desa &&
-                            <div className='card-interactive rounded-md gap-4 md:gap-8 flex-grow items-center justify-start border-0 border-b-4 border-secondary md:p-8 m-0 min-h-16 min-w-40 max-w-[10.5rem] md:min-h-40 md:min-w-80 md:max-w-96'>
+                            <div className='card-interactive rounded-md gap-4 md:gap-8 flex items-center justify-start border-0 border-b-4 border-secondary md:p-8 m-0 w-full h-full'>
                                 <Layers className="size-8 md:size-10" />
                                 <div className="flex flex-col">
                                     <h1 className="text-lg md:text-3xl font-bold">{dashboardData.Desa && dashboardData.Desa}</h1>
@@ -59,7 +59,7 @@ const DashboardView = () => {
                             </div>
                         }
                         {dashboardData.Kelompok &&
-                            <div className='card-interactive rounded-md gap-4 md:gap-8 flex-grow items-center justify-start border-0 border-b-4 border-secondary md:p-8 m-0 min-h-16 min-w-40 max-w-[10.5rem] md:min-h-40 md:min-w-80 md:max-w-96'>
+                            <div className='card-interactive rounded-md gap-4 md:gap-8 flex items-center justify-start border-0 border-b-4 border-secondary md:p-8 m-0 w-full h-full'>
                                 <Layers2 className="size-8 md:size-10" />
                                 <div className="flex flex-col">
                                     <h1 className="text-lg md:text-3xl font-bold">{dashboardData.Kelompok && dashboardData.Kelompok}</h1>
@@ -67,28 +67,28 @@ const DashboardView = () => {
                                 </div>
                             </div>
                         }
-                        <div className='card-interactive rounded-md gap-4 md:gap-8 flex-grow items-center justify-start border-0 border-b-4 border-secondary md:p-8 m-0 min-h-16 min-w-40 max-w-[10.5rem] md:min-h-40 md:min-w-80 md:max-w-96'>
+                        <div className='card-interactive rounded-md gap-4 md:gap-8 flex items-center justify-start border-0 border-b-4 border-secondary md:p-8 m-0 w-full h-full'>
                             <Presentation className="size-8 md:size-10" />
                             <div className="flex flex-col">
                                 <h1 className="text-lg md:text-3xl font-bold">{dashboardData.Kelas && dashboardData.Kelas}</h1>
                                 <p className="">{"Kelas"}</p>
                             </div>
                         </div>
-                        <div className='card-interactive rounded-md gap-4 md:gap-8 flex-grow items-center justify-start border-0 border-b-4 border-secondary md:p-8 m-0 min-h-16 min-w-40 max-w-[10.5rem] md:min-h-40 md:min-w-80 md:max-w-96'>
+                        <div className='card-interactive rounded-md gap-4 md:gap-8 flex items-center justify-start border-0 border-b-4 border-secondary md:p-8 m-0 w-full h-full'>
                             <Users className="size-8 md:size-10" />
                             <div className="flex flex-col">
                                 <h1 className="text-lg md:text-3xl font-bold">{dashboardData["Peserta Didik"] && dashboardData["Peserta Didik"]}</h1>
                                 <p className="">{"Peserta Didik"}</p>
                             </div>
                         </div>
-                        <div className='card-interactive rounded-md gap-4 md:gap-8 flex-grow items-center justify-start border-0 border-b-4 border-secondary md:p-8 m-0 min-h-16 min-w-40 max-w-[10.5rem] md:min-h-40 md:min-w-80 md:max-w-96'>
+                        <div className='card-interactive rounded-md gap-4 md:gap-8 flex items-center justify-start border-0 border-b-4 border-secondary md:p-8 m-0 w-full h-full'>
                             <GraduationCap className="size-8 md:size-10" />
                             <div className="flex flex-col">
                                 <h1 className="text-lg md:text-3xl font-bold">{dashboardData["Tenaga Pendidik"] && dashboardData["Tenaga Pendidik"]}</h1>
                                 <p className="">{"Tenaga Pendidik"}</p>
                             </div>
                         </div>
-                        <div className='card-interactive rounded-md gap-4 md:gap-8 flex-grow items-center justify-start border-0 border-b-4 border-secondary md:p-8 m-0 min-h-16 min-w-40 max-w-[10.5rem] md:min-h-40 md:min-w-80 md:max-w-96'>
+                        <div className='card-interactive rounded-md gap-4 md:gap-8 flex items-center justify-start border-0 border-b-4 border-secondary md:p-8 m-0 w-full h-full'>
                             <Gauge className="size-8 md:size-10" />
                             <div className="flex flex-col">
                                 <h1 className="text-lg md:text-3xl font-bold">{dashboardData.Kehadiran && dashboardData.Kehadiran.toFixed(1)}{dashboardData.Kehadiran ? "%" : "-" }</h1>
