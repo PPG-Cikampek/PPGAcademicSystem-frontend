@@ -52,7 +52,7 @@ const TeachersView = () => {
             render: (teacher) => (
                 teacher.image ? (
                     <img
-                        src={`${import.meta.env.VITE_BACKEND_URL}/${teacher.image}`}
+                        src={teacher.thumbnail ? teacher.thumbnail : `${import.meta.env.VITE_BACKEND_URL}/${teacher.image}`}
                         alt={teacher.name}
                         className="size-10 rounded-full m-auto min-w-10 border border-gray-200 bg-white"
                     />
@@ -67,21 +67,20 @@ const TeachersView = () => {
             key: 'status',
             label: 'Status',
             render: (teacher) => teacher.positionEndDate ? 'Tidak Aktif' : 'Aktif',
-            cellStyle: (teacher) => `py-1 px-2 text-sm text-center w-min border rounded-md ${
-                teacher.positionEndDate ? 'text-red-500 bg-red-100' : 'text-green-500 bg-green-100'
-            }`
+            cellStyle: (teacher) => `py-1 px-2 text-sm text-center w-min border rounded-md ${teacher.positionEndDate ? 'text-red-500 bg-red-100' : 'text-green-500 bg-green-100'
+                }`
         },
         { key: 'nig', label: 'NIG', sortable: true },
         { key: 'name', label: 'Nama', sortable: true },
         ...(auth.userRole === 'admin' ? [
-            { 
-                key: 'branch', 
+            {
+                key: 'branch',
                 label: 'Desa',
                 sortable: true,
                 render: (teacher) => teacher?.userId?.teachingGroupId?.branchId?.name
             },
-            { 
-                key: 'group', 
+            {
+                key: 'group',
                 label: 'Kelompok',
                 sortable: true,
                 render: (teacher) => teacher?.userId?.teachingGroupId?.name
@@ -111,7 +110,7 @@ const TeachersView = () => {
     if (auth.userRole === 'admin' && teachers?.length > 0) {
         const branches = [...new Set(teachers.map(t => t?.userId?.teachingGroupId?.branchId?.name).filter(Boolean))];
         const groups = [...new Set(teachers.map(t => t?.userId?.teachingGroupId?.name).filter(Boolean))];
-        
+
         filterOptions.push(
             {
                 key: 'branch',
