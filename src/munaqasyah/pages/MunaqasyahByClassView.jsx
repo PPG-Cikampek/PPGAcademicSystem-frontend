@@ -92,25 +92,47 @@ const MunaqasyahByClassView = () => {
             IndonesianNumberConverter(studentScores[category.key]?.score) || '-'
         ]);
 
+        doc.setFontSize(11);
         doc.autoTable({
-            head: [['No', 'Mata Pelajaran', 'Angka', 'Huruf']],
+            head: [['No', 'Mata Pelajaran', 'Angka', 'Huruf', 'Rata-rata Kelas']],
             body: tableData,
             startY: 35,
+            headStyles: {
+                textColor: [0, 0, 0],
+                fillColor: [255, 255, 255],
+                lineColor: 0,
+                lineWidth: 0.01,
+                font: 'times',
+                // fontSize: 12,
+                fontStyle: 'bold',
+                halign: 'center',
+            },
             styles: {
+                lineColor: 0,
+                lineWidth: 0.01,
                 cellPadding: 2,
-                headStyles: {
-                    halign: 'center'
-                }
+                // headStyles: {
+                //     halign: 'center'
+                // }
             },
             zebra: true,
             zebraColor: [245, 245, 245],
             columnStyles: {
-                0: { cellWidth: 15, halign: 'center' },
-                1: { cellWidth: 75 },
-                2: { cellWidth: 20 },
-                3: { cellWidth: 75, halign: 'center' }
+                0: { cellWidth: 10, halign: 'center' },
+                1: { cellWidth: 70 },
+                2: { cellWidth: 17, halign: 'center' },
+                3: { cellWidth: 60, halign: 'center' },
+                4: { cellWidth: 23, halign: 'center' }
             }
         });
+
+        doc.setFontSize(12);
+        doc.text(`Diberikan tanggal: `, pageWidth / 10, 235);
+        doc.text("Orang Tua/Wali", pageWidth / 10 * 1.5, 240);
+        doc.text("Wali Kelas", pageWidth / 10 * 7, 240);
+
+        doc.text("_______________", pageWidth / 10 * 1.5, 270);
+        doc.text("_______________", pageWidth / 10 * 7, 270);
 
         return doc;
     };

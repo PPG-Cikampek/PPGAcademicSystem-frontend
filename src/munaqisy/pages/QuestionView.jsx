@@ -115,7 +115,7 @@ const QuestionView = () => {
                             </div>
                             <div className="mt-4">
                                 <div className="font-medium text-gray-700 mb-2">Nilai:</div>
-                                <div className="flex gap-3">
+                                <div className="flex flex-wrap gap-3">
                                     {question.scoreOptions.map((score, idx) => (
                                         <motion.div
                                             key={idx}
