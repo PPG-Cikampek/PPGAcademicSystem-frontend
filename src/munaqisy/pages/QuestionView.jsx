@@ -3,6 +3,7 @@ import { useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import useHttp from '../../shared/hooks/http-hook';
 import { MunaqasyahScoreContext } from '../context/MunaqasyahScoreContext';
+import getCategoryName from '../../munaqasyah/utilities/getCategoryName';
 
 const QuestionView = () => {
     const [examQuestions, setExamQuestions] = useState()
@@ -94,27 +95,27 @@ const QuestionView = () => {
                                 <div className="text-lg font-semibold">Pertanyaan {index + 1}</div>
                                 <div className="flex flex-col">
                                     <div className="text-blue-600 font-medium">Nilai Maksimal: {question.maxScore}</div>
-                                    <div className="text-sm text-gray-500"> Tipe Soal: {question.type} </div>
+                                    <div className="text-sm text-gray-500 whitespace-pre-line"> Tipe Soal: {getCategoryName(question.type)} </div>
                                 </div>
                             </div>
                             <div className="mt-2">
-                                <div className="font-medium text-gray-700">Petunjuk:</div>
-                                <div className="mt-1 text-gray-600">{question.instruction}</div>
+                                <div className="font-semibold text-gray-700">Petunjuk:</div>
+                                <div className="mt-1 text-gray-600 whitespace-pre-line">{question.instruction}</div>
                             </div>
                             <div className="mt-2">
-                                <div className="font-medium text-gray-700">Pertanyaan:</div>
-                                <div className="mt-1 text-gray-600">{question.question}</div>
+                                <div className="font-semibold text-gray-700">Pertanyaan:</div>
+                                <div className="mt-1 text-gray-600 whitespace-pre-line">{question.question}</div>
                             </div>
                             <div className="mt-2">
-                                <div className="font-medium text-gray-700">Jawaban yang Benar:</div>
+                                <div className="font-semibold text-gray-700">Jawaban yang Benar:</div>
                                 <ul className="mt-1 text-gray-600 list-disc pl-4">
                                     {question.answers.map((answer, idx) => (
-                                        <li key={idx}>{answer}</li>
+                                        <li key={idx} className='whitespace-pre-line'>{answer}</li>
                                     ))}
                                 </ul>
                             </div>
                             <div className="mt-4">
-                                <div className="font-medium text-gray-700 mb-2">Nilai:</div>
+                                <div className="font-semibold text-gray-700 mb-2">Nilai:</div>
                                 <div className="flex flex-wrap gap-3">
                                     {question.scoreOptions.map((score, idx) => (
                                         <motion.div

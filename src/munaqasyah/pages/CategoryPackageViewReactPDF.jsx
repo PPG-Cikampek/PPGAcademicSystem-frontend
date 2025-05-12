@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Document, Page, Text, View, StyleSheet, Font, PDFViewer, Image } from '@react-pdf/renderer';
 import useHttp from '../../shared/hooks/http-hook';
+
+import getCategoryName from '../utilities/getCategoryName';
 import logo from '../../assets/logos/ppgcikampek-whitebg.jpg';
 
 // Register fonts if needed
@@ -83,24 +85,6 @@ const styles = StyleSheet.create({
     color: '#666',
   },
 });
-
-const getCategoryName = (category) => {
-  const categoryMap = {
-    reciting: "Membaca Al-Qur'an/Tilawati",
-    writing: "Menulis Arab",
-    quranTafsir: "Tafsir Al-Qur'an",
-    hadithTafsir: "Tafsir Hadits",
-    practice: "Praktek Ibadah",
-    moralManner: "Akhlak dan Tata Krama",
-    memorizingSurah: "Hafalan Surat-surat Al-Quran",
-    memorizingHadith: "Hafalan Hadist",
-    memorizingDua: "Hafalan Do'a",
-    memorizingBeautifulName: "Hafalan Asmaul Husna",
-    knowledge: "Keilmuan dan Kefahaman Agama",
-    independence: "Kemandirian",
-  };
-  return categoryMap[category] || 'kosong';
-};
 
 const MunaqasyahPDF = ({ questionsData, state }) => {
   if (!questionsData || !questionsData.classes) return null;

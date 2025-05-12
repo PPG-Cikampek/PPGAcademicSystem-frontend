@@ -4,6 +4,7 @@ import useHttp from '../../shared/hooks/http-hook';
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
 
+import getCategoryName from '../utilities/getCategoryName';
 import { Pencil, Trash } from 'lucide-react';
 import Modal from '../../shared/Components/UIElements/ModalBottomClose';
 import { AuthContext } from '../../shared/Components/Context/auth-context';
@@ -45,24 +46,6 @@ const QuestionDetailView = () => {
         shortAnswer: 'Jawab Cermat',
         practice: 'Praktik',
     }[type]);
-
-    const getCategoryName = (category) => {
-        const categoryMap = {
-            reciting: "Membaca Al-Qur'an/Tilawati",
-            writing: "Menulis Arab",
-            quranTafsir: "Tafsir Al-Qur'an",
-            hadithTafsir: "Tafsir Hadits",
-            practice: "Praktek Ibadah",
-            moralManner: "Akhlak dan Tata Krama",
-            memorizingSurah: "Hafalan Surat-surat Al-Quran",
-            memorizingHadith: "Hafalan Hadist",
-            memorizingDua: "Hafalan Do'a",
-            memorizingBeautifulName: "Hafalan Asmaul Husna",
-            knowledge: "Keilmuan dan Kefahaman Agama",
-            independence: "Kemandirian",
-        };
-        return categoryMap[category] || 'kosong';
-    };
 
     const getMothName = (month) => {
         const monthMap = {
