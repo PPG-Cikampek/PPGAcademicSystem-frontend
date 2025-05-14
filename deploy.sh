@@ -1,23 +1,29 @@
 #!/bin/bash
 
-# Create version counter file if it doesn't exist
-if [ ! -f .version-counter ]; then
-    echo "0" > .version-counter
+# Read current version from version.json, or default to 1.0.0 if not found
+if [ -f public/version.json ]; then
+    VERSION=$(grep -oP '"version":\s*"\K[0-9]+\.[0-9]+\.[0-9]+' public/version.json)
+else
+    VERSION="1.0.0"
 fi
 
-# Read and increment version counter
-COUNTER=$(($(cat .version-counter) + 1))
-echo $COUNTER > .version-counter
+# Split version into major, minor, patch
+IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+
+# Increment patch
+PATCH=$((PATCH + 1))
+
+NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
 
 # Update version.json with new version number
-echo "{\"version\": \"1.0.${COUNTER}\", \"timestamp\": \"$(date +%s)\"}" > public/version.json
+echo "{\"version\": \"${NEW_VERSION}\", \"timestamp\": \"$(date +%s)\"}" > public/version.json
 
 # Build the app
 echo "Building App..."
 npm run build
 echo "Building successful!"
 
-echo "Deploying version 1.0.${COUNTER}..."
+echo "Deploying version ${NEW_VERSION}..."
 # Deploy to Firebase
 firebase deploy
 echo "Deploy successful!"

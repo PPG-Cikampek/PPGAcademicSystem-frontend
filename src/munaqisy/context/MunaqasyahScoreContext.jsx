@@ -101,9 +101,12 @@ const fetchScoreData = async (studentNis, teachingGroupYearId, dispatch) => {
 
         console.log(data.scores[0])
         console.log(data.scores[0].studentId)
+        console.log(data)
 
-        dispatch({ type: 'SET_SCORE_DATA', payload: data.scores[0] });
-        dispatch({ type: 'SET_STUDENT_DATA', payload: data.scores[0].studentId });
+        const student = { ...data.scores[0].studentId, className: data.scores[0].classId.name };
+
+        await dispatch({ type: 'SET_SCORE_DATA', payload: data.scores[0] });
+        await dispatch({ type: 'SET_STUDENT_DATA', payload: student });
 
     } catch (error) {
         console.error('Error fetching attendance data:', error);

@@ -5,7 +5,7 @@ import ScoreCard from './ScoreCard';
 
 const ScoreList = ({ categories, studentScore, onCategoryClick }) => {
     return (
-        <div className="flex flex-col px-4 bg-gray-50 border-t border-gray-200">
+        <div className="flex flex-col px-4">
             <SequentialAnimation variant={2}>
                 {categories.map((category) => (
                     <ScoreCard

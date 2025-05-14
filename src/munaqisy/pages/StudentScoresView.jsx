@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import StudentInitial from '../../shared/Components/UIElements/StudentInitial';
 import SequentialAnimation from '../../teacher-role/shared/Components/Animation/SequentialAnimation';
 import ScoreList from '../components/ScoreList';
+import SkeletonLoader from '../../shared/Components/UIElements/SkeletonLoader';
 
 const StudentScoresView = () => {
     const { isLoading, error, sendRequest, setError, setIsLoading } = useHttp();
@@ -74,9 +75,33 @@ const StudentScoresView = () => {
     return (
         <div className="min-h-screen bg-gray-50 ">
             <h1 className="text-2xl font-semibold text-gray-900 p-4">Munaqosah</h1>
-            {!isLoading && state.studentScore && state.studentData && (
-                <div className='flex flex-col pb-24'>
+            {isLoading ? (
+                <div className="flex flex-col pb-24">
                     <div className="card-basic justify-between mt-0 mx-4 pr-8 box-border">
+                        <div className="flex flex-col">
+                            <div className="flex-1 h-fit">
+                                <div className="flex gap-2 items-center">
+                                    <SkeletonLoader variant="circular" width={40} height={40} />
+                                    <div className="flex flex-col justify-end">
+                                        <SkeletonLoader width={100} height={16} className="mb-1" />
+                                        <SkeletonLoader width={60} height={12} />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <SkeletonLoader width={80} height={16} className="self-center mt-2" />
+                    </div>
+                    <div className="mt-4 mx-4">
+                        {scoreCategories.map((cat, idx) => (
+                            <div key={cat.key} className="mb-2">
+                                <SkeletonLoader width={220} height={32} />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            ) : (!isLoading && state.studentScore && state.studentData && (
+                <div className='flex flex-col pb-24'>
+                    <div className="card-basic justify-between items-center mt-0 mx-4 pr-8 box-border">
                         <SequentialAnimation variant={1}>
                             <div className="flex flex-col">
                                 <div className="flex-1 h-fit">
@@ -99,10 +124,7 @@ const StudentScoresView = () => {
                             </div>
                         </SequentialAnimation>
                         <SequentialAnimation variant={1}>
-                            <div className="flex flex-col items-center">
-                                <div className="uppercase font-semibold">Grade</div>
-                                <div className="text-xs text-gray-800">A</div>
-                            </div>
+                            <div className="uppercase font-semibold self-center">{state.studentData.className}</div>
                         </SequentialAnimation>
                     </div>
                     <ScoreList
@@ -111,7 +133,7 @@ const StudentScoresView = () => {
                         onCategoryClick={handleCategoryClick}
                     />
                 </div>
-            )}
+            ))}
         </div>
     );
 };
