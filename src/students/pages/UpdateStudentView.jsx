@@ -51,7 +51,8 @@ const UpdateStudentView = () => {
                 { name: 'name', label: 'Nama Lengkap', placeholder: 'Nama Lengkap', type: 'text', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.name || '' },
                 { name: 'dateOfBirth', label: 'Tanggal Lahir', placeholder: 'Desa', type: 'date', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedDate || '' },
                 { name: 'gender', label: 'Jenis Kelamin', type: 'select', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.gender || '', options: [{ label: 'Laki-Laki', value: 'male' }, { label: 'Perempuan', value: 'female' }] },
-                { name: 'parentName', label: 'Nama Orang Tua', type: 'text', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.parentName || '' },
+                { name: 'parentName', label: 'Nama Orang Tua/Wali', type: 'text', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.parentName || '' },
+                { name: 'parentPhone', label: 'Nomor WA Orang Tua/Wali', type: 'phone', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.parentPhone || '' },
                 { name: 'address', label: 'Alamat', type: 'textarea', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.address || '' },
             ])
         } else {
@@ -59,7 +60,8 @@ const UpdateStudentView = () => {
                 { name: 'name', label: 'Nama Lengkap', placeholder: 'Nama Lengkap', type: 'text', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.name || '' },
                 { name: 'dateOfBirth', label: 'Tanggal Lahir', placeholder: 'Desa', type: 'date', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedDate || '' },
                 { name: 'gender', label: 'Jenis Kelamin', type: 'select', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.gender || '', options: [{ label: 'Laki-Laki', value: 'male' }, { label: 'Perempuan', value: 'female' }] },
-                { name: 'parentName', label: 'Nama Orang Tua', type: 'text', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.parentName || '' },
+                { name: 'parentName', label: 'Nama Orang Tua/Wali', type: 'text', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.parentName || '' },
+                { name: 'parentPhone', label: 'Nomor WA Orang Tua/Wali', type: 'phone', placeholder: '8123456789', type: 'phone', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.parentPhone || '' },
                 { name: 'address', label: 'Alamat', type: 'textarea', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.address || '' },
             ])
         }
@@ -70,10 +72,11 @@ const UpdateStudentView = () => {
         const formData = new FormData();
 
         auth.userRole === 'admin' && formData.append('nis', data.nis);
-        formData.append('name', data.name);
+        formData.append('name', data.name.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()));
         formData.append('dateOfBirth', data.dateOfBirth);
         formData.append('gender', data.gender);
         formData.append('parentName', data.parentName);
+        formData.append('parentPhone', data.parentPhone);
         formData.append('address', data.address);
 
 
@@ -88,7 +91,7 @@ const UpdateStudentView = () => {
                 throw err;
             }
         } else {
-            if (auth.userRole !== 'admin') {
+            if (auth.userRole !== 'admin' && !loadedStudent.image) {
                 setError("Tidak ada foto yang dipilih!");
                 throw new Error('Tidak ada foto yang dipilih!');
             }

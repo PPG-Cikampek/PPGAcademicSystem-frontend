@@ -6,7 +6,7 @@ import { AuthContext } from '../../shared/Components/Context/auth-context';
 import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
 import SkeletonLoader from '../../shared/Components/UIElements/SkeletonLoader';
 import { Icon } from '@iconify-icon/react'
-import { Pencil, QrCode, Undo2, ArrowDownToLine } from 'lucide-react';
+import { Pencil, QrCode, Undo2, ArrowDownToLine, Phone } from 'lucide-react';
 import { QRCodeCanvas } from 'qrcode.react';
 
 const StudentDetailView = () => {
@@ -43,7 +43,8 @@ const StudentDetailView = () => {
                     { label: 'NIS', value: responseData.student.nis, icon: <Icon icon="icon-park-outline:id-card-h" width="24" height="24" /> },
                     { label: 'Tanggal Lahir', value: formatDate(responseData.student.dateOfBirth), icon: <Icon icon="material-symbols:date-range-outline" width="24" height="24" /> },
                     { label: 'Jenis Kelamin', value: responseData.student.gender === 'male' ? 'Laki-laki' : 'Perempuan', icon: <Icon icon="tabler:gender-bigender" width="24" height="24" /> },
-                    { label: 'Nama Orang Tua', value: responseData.student.parentName, icon: <Icon icon="ri:parent-line" width="24" height="24" /> },
+                    { label: 'Nama Orang Tua/Wali', value: responseData.student.parentName, icon: <Icon icon="ri:parent-line" width="24" height="24" /> },
+                    { label: 'Nomor WA Orang Tua/Wali', value: responseData.student.parentPhone ? "0" + responseData.student.parentPhone : "kosong", icon: <Icon icon="lucide:phone" width="24" height="24" /> },
                     { label: 'Alamat', value: responseData.student.address, icon: <Icon icon="ph:map-pin-bold" width="24" height="24" /> }
                 ]);
 
