@@ -1,37 +1,27 @@
-import React, { useState, useEffect, useContext } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { AuthContext } from '../../shared/Components/Context/auth-context'
-import { attendanceCount } from '../../shared/Utilities/attendanceCount'
-import useHttp from '../../shared/hooks/http-hook'
-import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle'
-
+import React from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import DataTable from '../../shared/Components/UIElements/DataTable'
 
 const ClassesView = () => {
-    const [classes, setClasses] = useState()
-    const { isLoading, error, sendRequest } = useHttp()
-
+    const location = useLocation();
     const navigate = useNavigate();
-    const auth = useContext(AuthContext);
-    console.log(auth.userTeachingGroupId)
+    const classes = location.state?.classes || [];
+    console.log(classes)
 
-    useEffect(() => {
-        const url = auth.userRole === 'admin'
-            ? `${import.meta.env.VITE_BACKEND_URL}/classes`
-            : `${import.meta.env.VITE_BACKEND_URL}/classes/teaching-group/${auth.userTeachingGroupId}`;
+    const columns = [
+        { key: 'name', label: 'Nama Kelas', sortable: true },
+        { key: 'startTime', label: 'Waktu Mulai', sortable: true },
+        { key: 'teachingGroupId', label: 'Kelompok', sortable: true },
+        { key: 'teachers', label: 'Guru', sortable: true, render: (row) => row.teachers },
+        { key: 'students', label: 'Siswa', sortable: true, render: (row) => row.students },
+        { key: 'attendances', label: 'Pertemuan', sortable: true, render: (row) => row.attendances },
+    ];
 
-        const fetchClasses = async () => {
-            console.log(url)
-            try {
-                const responseData = await sendRequest(url);
-                setClasses(responseData.classes);
-                console.log(JSON.stringify(responseData.classes))
-            } catch (err) {
-                // Error is handled by useHttp
-            }
-        };
-        fetchClasses();
-    }, [sendRequest]);
-
+    const filterOptions = [
+        { key: 'name', label: 'Nama Kelas', options: Array.from(new Set(classes.map(c => c.name))) },
+        { key: 'startTime', label: 'Waktu Mulai', options: Array.from(new Set(classes.map(c => c.startTime))) },
+        { key: 'teachingGroupId', label: 'Kelompok', options: Array.from(new Set(classes.map(c => c.teachingGroupId))) },
+    ];
 
     return (
         <div className="min-h-screen px-4 py-8 md:p-8">
@@ -39,47 +29,19 @@ const ClassesView = () => {
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-2xl font-semibold text-gray-900">Daftar Kelas</h1>
                 </div>
-                {isLoading && (
-                    <div className="flex justify-center mt-16">
-                        <LoadingCircle size={32} />
-                    </div>
-                )}
-                {classes && (
-                    <div className="bg-white shadow-sm rounded-md overflow-auto text-nowrap">
-                        <table className="w-full">
-                            <thead className=" border-b">
-                                <tr>
-                                    <th className="p-2 md:p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama</th>
-                                    <th className="p-2 md:p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Waktu Mulai</th>
-                                    <th className="p-2 md:p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Guru</th>
-                                    <th className="p-2 md:p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Siswa</th>
-                                    <th className="p-2 md:p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pertemuan</th>
-                                </tr>
-                            </thead>
-                            <tbody className="divide-y divide-gray-200">
-                                {classes.map((cls) => (
-                                    <tr onClick={() => navigate(`/dashboard/classes/${cls._id}`)} key={cls._id} className="hover:bg-gray-50 hover:cursor-pointer transition">
-                                        <td className="p-2 md:p-4 text-sm text-gray-900">{cls.name}</td>
-                                        <td className="p-2 md:p-4 text-sm text-gray-900">{cls.startTime}</td>
-                                        <td className="p-2 md:p-4 text-sm text-gray-500">{cls.teachers.length}</td>
-                                        <td className="p-2 md:p-4 text-sm text-gray-500">{cls.students.length}</td>
-                                        <td className={`p-2 md:p-4 text-sm text-gray-900`}>{attendanceCount(cls)}</td>
-                                    </tr>
-                                ))}
-                                {classes.length === 0 && (
-                                    <tr>
-                                        <td colSpan={8} className='p-4 text-center italic text-gray-500'>
-                                            Tidak ada data
-                                        </td>
-                                    </tr>
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
+                <DataTable
+                    data={classes}
+                    columns={columns}
+                    onRowClick={(cls) => navigate(`/dashboard/classes/${cls._id}`)}
+                    searchableColumns={['name', 'teachingGroupId']}
+                    initialSort={{ key: 'name', direction: 'ascending' }}
+                    isLoading={false}
+                    filterOptions={filterOptions}
+                    tableId="classes-by-academic-year"
+                />
             </div>
         </div>
-    );
+    )
 }
 
 export default ClassesView

@@ -1,5 +1,6 @@
 import React, { lazy } from 'react';
 import PreviewReport from '../munaqasyah/pages/PreviewReport';
+import ClassesViewByAcademicYear from '../class/pages/ClassesViewByAcademicYear';
 
 const DashboardNav = lazy(() => import("../shared/Components/Navigation/DashboardNav/DashboardNav"));
 const DashboardView = lazy(() => import("../dashboard/pages/DashboardView"));
@@ -43,8 +44,9 @@ export const adminRoutes = [
     { path: '/verify-email/:token', element: <EmailVerifyView /> },
     { path: '/profile/:userId', element: <ProfileView /> },
     { path: '/dashboard', element: <DashboardView /> },
-    { path: '/dashboard/classes', element: <ClassesView /> },
-    { path: '/dashboard/classes/:classId', element: <ClassDetailView /> },
+    { path: '/dashboard/classes', element: <ClassesViewByAcademicYear/> },
+    { path: '/dashboard/classes/academic-year', element: <ClassesView /> },
+    { path: '/dashboard/classes/academic-year/:classId', element: <ClassDetailView /> },
     { path: '/dashboard/students', element: <StudentsView /> },
     { path: '/dashboard/students/new', element: <NewStudentView /> },
     { path: '/dashboard/students/:studentId', element: <StudentDetailView /> },
