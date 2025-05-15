@@ -81,7 +81,7 @@ const ScannerView = () => {
                             >
                                 Buat daftar hadir hari ini
                             </button>
-                            {state.isTeachingGroupYearActivated === false ? (<span className='text-danger'>Tahun ajaran belum aktif, hubungi Kelompok!</span>) : ''}
+                            {state.isTeachingGroupYearActivated === false ? (<span className='text-danger'>Tahun ajaran belum aktif, hubungi PJP Kelompok!</span>) : ''}
                         </div>
                     )}
                     {state.studentList.length !== 0 && !isLoading && (
@@ -92,7 +92,7 @@ const ScannerView = () => {
                                 </div>)}
                             {state.isTeachingGroupYearActivated === false
                                 ? (<InfoCard className={'mx-4 my-12'}>
-                                    <p>Tahun ajaran belum aktif, hubungi Kelompok!</p>
+                                    <p>Tahun ajaran belum aktif, hubungi PJP Kelompok!</p>
                                 </InfoCard>)
                                 : ''}
                         </>

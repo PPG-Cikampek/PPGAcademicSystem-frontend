@@ -130,9 +130,9 @@ const PerformanceCards = ({ data }) => {
                             {/* <p className="text-sm text-gray-600">
                                 Total Pertemuan: {branch.attendances.length / branch.uniqueStudents.size} hari
                             </p> */}
-                            <p className="text-sm text-gray-600">
+                            {/* <p className="text-sm text-gray-600">
                                 Target Semester: {branch.semesterTarget} hari
-                            </p>
+                            </p> */}
                         </div>
                         <div className="flex flex-wrap gap-2 items-center">
                             {calculateStats(
@@ -179,9 +179,9 @@ const PerformanceCards = ({ data }) => {
             >
                 <div className="mx-8 flex flex-col">
                     <h2 className="text-xl font-bold">Kelompok {branchName}</h2>
-                    <p className="text-sm text-gray-600">
+                    {/* <p className="text-sm text-gray-600">
                         Target Semester: {teachingGroupYear.semesterTarget} hari
-                    </p>
+                    </p> */}
                 </div>
 
                 {teachingGroups.map(teachingGroup => (
@@ -200,12 +200,12 @@ const PerformanceCards = ({ data }) => {
                                 Jumlah Siswa: {teachingGroup.uniqueStudents} siswa
                             </p>
                             <p className="text-sm text-gray-600">
-                            Total Pertemuan: {teachingGroup.attendances.length / teachingGroup.uniqueStudents} hari
-                            Total Pertemuan: {attendanceCount(teachingGroup)} hari
-                            </p> 
-                             <p className="text-sm text-gray-600">
-                                Target Semester: {teachingGroup.semesterTarget} hari
+                                Total Pertemuan: {teachingGroup.attendances.length / teachingGroup.uniqueStudents} hari
+                                Total Pertemuan: {attendanceCount(teachingGroup)} hari
                             </p>
+                            {/* <p className="text-sm text-gray-600">
+                                Target Semester: {teachingGroup.semesterTarget} hari
+                            </p> */}
                         </div>
                         <div className="flex flex-wrap gap-2 items-center">
                             {/* {calculateStats(
@@ -250,9 +250,9 @@ const PerformanceCards = ({ data }) => {
             >
                 <div className="mx-8 flex flex-col">
                     <h2 className="text-xl font-bold">Kelompok {teachingGroupName}</h2>
-                    <p className="text-sm text-gray-600">
+                    {/* <p className="text-sm text-gray-600">
                         Target Semester: {teachingGroupYear.semesterTarget} hari
-                    </p>
+                    </p> */}
                 </div>
 
                 {classes.map(cls => (
@@ -325,9 +325,9 @@ const PerformanceCards = ({ data }) => {
             >
                 <div className="mx-8 flex flex-col">
                     <h2 className="text-xl font-bold">Kelompok {selectedClassData.name}</h2>
-                    <p className="text-sm text-gray-600">
+                    {/* <p className="text-sm text-gray-600">
                         Target Semester: {teachingGroupYear.semesterTarget} hari
-                    </p>
+                    </p> */}
                 </div>
                 {students.map(student => (
                     <motion.div

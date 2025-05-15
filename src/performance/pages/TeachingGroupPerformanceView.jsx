@@ -196,9 +196,9 @@ const TeachingGroupPerformanceView = () => {
                 {teachingGroupData && (
                   <div className={`flex flex-col`}>
                     <h2 className="text-xl font-bold">Kelompok {teachingGroupData.teachingGroupName}</h2>
-                    {teachingGroupData.semesterTarget && (<p className="text-sm text-gray-600">
+                    {/* {teachingGroupData.semesterTarget && (<p className="text-sm text-gray-600">
                       Target Semester: {teachingGroupData.semesterTarget} hari
-                    </p>)}
+                    </p>)} */}
                   </div>
                 )}
                 {overallAttendances && !isLoading && selectedAcademicYear && (<button className='button-primary m-0 self-center' onClick={() => handlePrint()}>Print ke PDF</button>)}

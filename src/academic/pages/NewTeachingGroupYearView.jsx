@@ -120,7 +120,7 @@ const NewTeachingGroupYearView = () => {
                     <>
                         {academicYears.length === 0 && (
                             <div className="bg-white rounded-md shadow-md p-6 border border-gray-200">
-                                <p className="text-gray-700 text-center">Daerah belum membuat tahun ajaran. Hubungi pihak terkait</p>
+                                <p className="text-gray-700 text-center">Daerah belum membuat tahun ajaran. Hubungi Operator Daerah!</p>
 
                             </div>
                         )}

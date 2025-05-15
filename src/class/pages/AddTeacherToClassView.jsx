@@ -133,7 +133,7 @@ const AddTeacherToClassView = () => {
                     <>
                         {teachers.length === 0 && (
                             <div className="bg-white rounded-md shadow-md p-6 border border-gray-200">
-                                <p className="text-gray-700 text-center">Daerah belum menyediakan tenaga pendidik. Hubungi pihak terkait</p>
+                                <p className="text-gray-700 text-center">Belum ada daftar guru. Buat permintaan akun terlebih dahulu!</p>
 
                             </div>
                         )}

@@ -122,7 +122,7 @@ const StudentsView = () => {
                     <h1 className="text-2xl font-semibold text-gray-900">Daftar Peserta Didik</h1>
                     <WarningCard 
                         className="items-center justify-start" 
-                        warning="Penambahan Peserta Didik Baru Supaya Menghubungi Daerah!" 
+                        warning="Penambahan peserta didik Baru dapat dilakukan melalui fitur Permintaan Akun" 
                         onClear={() => setError(null)} 
                     />
                 </div>

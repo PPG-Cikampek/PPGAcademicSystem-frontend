@@ -132,7 +132,7 @@ const TeachersView = () => {
             <div className='max-w-6xl mx-auto'>
                 <div className="flex flex-col justify-between items-start gap-2 mb-4">
                     <h1 className="text-2xl font-semibold text-gray-900">Daftar Tenaga Pendidik</h1>
-                    <WarningCard className="items-center justify-start" warning="Penambahan Tenaga Pendidik Baru Supaya Menghubungi Daerah!" onClear={() => setError(null)} />
+                    <WarningCard className="items-center justify-start" warning="Penambahan tenaga pendidik baru dapat dilakukan melalui fitur Permintaan Akun." onClear={() => setError(null)} />
                 </div>
                 {isLoading && (
                     <div className="flex justify-center mt-16">
