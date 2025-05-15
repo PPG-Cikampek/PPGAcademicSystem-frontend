@@ -238,7 +238,7 @@ const AttendedStudents = () => {
                                 type="checkbox"
                                 checked={!!student.isSelected}
                                 onChange={() => handleCheckboxChange(student.studentId.nis)}
-                                className="peer h-4 w-4 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border border-slate-300 checked:bg-primary checked:border-primary"
+                                className="peer h-4 w-4 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border bg-white border-slate-300 checked:bg-primary checked:border-primary"
                                 id={student.studentId.nis}
                                 disabled={student.status === "Hadir" || student.status === "Terlambat"}
                             />
@@ -400,14 +400,14 @@ const AttendedStudents = () => {
                     <div className='flex gap-2'>
                         <button
                             onClick={() => applyBulkStatus('Sakit')}
-                            className="btn-mobile-secondary-outline"
+                            className="btn-mobile-secondary-outline rounded-full"
                             disabled={state.studentList.filter(student => student.isSelected === true).length === 0}
                         >
                             Sakit
                         </button>
                         <button
                             onClick={() => applyBulkStatus('Izin')}
-                            className="btn-mobile-danger-outline"
+                            className="btn-mobile-danger-outline rounded-full"
                             disabled={state.studentList.filter(student => student.isSelected === true).length === 0}
                         >
                             Izin
@@ -415,8 +415,8 @@ const AttendedStudents = () => {
                     </div>
                     <button
                         onClick={handleSave}
-                        className="btn-mobile-primary"
-                        disabled={isLoading}
+                        className="btn-mobile-primary-round"
+                        disabled={isLoading || unsavedChanges === 0}
                     >
                         {isLoading ? (<LoadingCircle>Menyimpan...</LoadingCircle>) : 'Simpan'}
                     </button>
