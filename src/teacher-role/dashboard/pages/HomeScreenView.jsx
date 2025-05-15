@@ -16,15 +16,8 @@ import SkeletonLoader from '../../../shared/Components/UIElements/SkeletonLoader
 
 const HomeScreenView = () => {
     const auth = useContext(AuthContext);
-    const { state, dispatch } = useContext(StudentAttendanceContext);
 
-    const getPositionName = {
-        branchTeacher: 'MT Desa',
-        teachingGroupTeacher: 'MT Kelompok',
-        localTeacher: 'MS',
-        assistant: 'Asisten',
-    }
-
+    
     // console.log(auth.isLoggedIn)
     // console.log(auth.userId)
     // console.log(auth.userRole)
@@ -72,13 +65,13 @@ const HomeScreenView = () => {
             </div>
             {!data && isLoading && (
                 <div className="mt-44 px-4">
-                    <SkeletonLoader 
+                    <SkeletonLoader
                         variant="rectangular"
                         height="200px"
                         className="rounded-lg max-w-xl mx-auto"
                     />
                     <div className="mt-4 max-w-xl mx-auto">
-                        <SkeletonLoader 
+                        <SkeletonLoader
                             variant="text"
                             count={3}
                             className="max-w-[80%]"
@@ -89,10 +82,27 @@ const HomeScreenView = () => {
             {data && !isLoading && (
                 <SequentialAnimation>
                     <div className="mt-16 flex-1 h-fit p-4">
-                        <div className="card-basic rounded-md flex-col mb-2">
-                            <h1 className="text-xl font-medium mb-2">{getPositionName[data.position] || data.position}</h1>
+                        {/* <div>
+                            <p className='font-urdu font-light text-center text-3xl mt-4 mb-2'>
+                                السلام عليكم
+                            </p>
+                        </div> */}
+
+                        <div>
+                            <p className='text-lg font-medium mt-4 mb-1'>
+                                Assalamu'alaikum, {data.name?.split(' ').slice(0, 2).join(' ')}!
+                            </p>
+                            <hr className='mb-2' />
                             <CurrentTime />
                         </div>
+
+                        {/* <div className="card-basic mt-2 rounded-md flex-col mb-2">
+                            <h1 className="text-xl font-medium mb-2">{getPositionName[data.position] || 'Guru'}</h1>
+                            <CurrentTime />
+                        </div> */}
+
+
+
                         <div className="mb-2">
                             {data.classIds.map((item, index) => {
                                 const isClassInTeachingGroupYear = item?.teachingGroupYearId?.academicYearId?.isActive

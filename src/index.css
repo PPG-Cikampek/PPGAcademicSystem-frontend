@@ -9,6 +9,13 @@
   font-style: normal;
 }
 
+@font-face {
+  font-family: 'urdu';
+  src: url('./assets/fonts/UrdTypeb.ttf') format('truetype');
+  /* font-weight: bold; */
+  /* font-style: normal; */
+}
+
 
 html {
   @apply font-sans;
@@ -27,6 +34,10 @@ html {
 
   .font-lpmq {
     font-family: 'LPMQ', sans-serif;
+  }
+
+  .font-urdu {
+    font-family: 'urdu', sans-serif;
   }
 
   table {
