@@ -4,6 +4,7 @@ import SequentialAnimation from '../../teacher-role/shared/Components/Animation/
 import ScoreCard from './ScoreCard';
 
 const ScoreList = ({ categories, studentScore, onCategoryClick }) => {
+    // console.log(studentScore);
     return (
         <div className="flex flex-col px-4">
             <SequentialAnimation variant={2}>
@@ -11,7 +12,7 @@ const ScoreList = ({ categories, studentScore, onCategoryClick }) => {
                     <ScoreCard
                         key={category.key}
                         category={category}
-                        score={studentScore && studentScore[category.key]}
+                        score={studentScore[category.key]}
                         onClick={() => onCategoryClick(category)}
                     />
                 ))}

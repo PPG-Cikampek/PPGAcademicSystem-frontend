@@ -34,8 +34,8 @@ const StudentScoresView = () => {
     useEffect(() => {
         setIsLoading(true);
 
-        console.log(state.studentScore);
-        console.log(state.studentData);
+        // console.log(state.studentScore);
+        // console.log(state.studentData);
 
         setIsLoading(false);
     }, [state.studentScore, state.studentData]);
@@ -127,11 +127,13 @@ const StudentScoresView = () => {
                             <div className="uppercase font-semibold self-center">{state.studentData.className}</div>
                         </SequentialAnimation>
                     </div>
-                    <ScoreList
-                        categories={scoreCategories}
-                        studentScore={state.studentScore}
-                        onCategoryClick={handleCategoryClick}
-                    />
+                    {state.studentScore && (
+                        <ScoreList
+                            categories={scoreCategories}
+                            studentScore={state.studentScore}
+                            onCategoryClick={handleCategoryClick}
+                        />
+                    )}
                 </div>
             ))}
         </div>

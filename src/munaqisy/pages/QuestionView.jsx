@@ -1,26 +1,32 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import useHttp from '../../shared/hooks/http-hook';
 import { MunaqasyahScoreContext } from '../context/MunaqasyahScoreContext';
 import getCategoryName from '../../munaqasyah/utilities/getCategoryName';
+import Modal from '../../shared/Components/UIElements/ModalBottomClose';
+import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
+import { set } from 'react-hook-form';
 
 const QuestionView = () => {
     const [examQuestions, setExamQuestions] = useState()
     const [selectedScores, setSelectedScores] = useState({});
     const [totalScore, setTotalScore] = useState()
+    const [modal, setModal] = useState({ title: '', message: '', onConfirm: null });
+    const [modalIsOpen, setModalIsOpen] = useState(false);
 
     const { isLoading, error, sendRequest, setError, setIsLoading } = useHttp();
 
     const { state, dispatch, patchScoreData } = useContext(MunaqasyahScoreContext);
 
+    const navigate = useNavigate();
     const location = useLocation();
     const data = location.state?.data;
 
     // console.log(data);
 
     useEffect(() => {
-        console.log(state.studentScore)
+        // console.log(state.studentScore)
 
         const url = `${import.meta.env.VITE_BACKEND_URL}/munaqasyahs/examination/questions?semester=${data.semester}&classGrade=${data.classGrade}&category=${data.categoryData.key}`
 
@@ -28,7 +34,7 @@ const QuestionView = () => {
             try {
                 const responseData = await sendRequest(url, 'GET', null, { 'Content-Type': 'application/json' });
                 setExamQuestions(responseData)
-                console.log(responseData)
+                // console.log(responseData)
             } catch (err) {
                 console.log(err)
             }
@@ -64,10 +70,15 @@ const QuestionView = () => {
     const handleFinish = async () => {
         if (!totalScore && totalScore !== 0) {
             setError('Please provide scores for all questions');
+            setModal({
+                title: 'Gagal!',
+                message: 'Berikan nilai untuk semua pertanyaan!',
+                onConfirm: null
+            });
+            setModalIsOpen(true);
             return;
         }
 
-        setIsLoading(true);
         try {
             // Add your API call here to save the final score
             console.log('Saving total score:', totalScore);
@@ -76,12 +87,61 @@ const QuestionView = () => {
             setError(err.message || 'Failed to save scores');
         }
 
-        patchScoreData(state)
-        setIsLoading(false);
+        setModal({
+            title: 'Konfirmasi!',
+            message: 'Simpan Nilai?',
+            onConfirm: () => {
+                setIsLoading(true)
+                patchScoreData(state)
+                setIsLoading(false)
+                setModal({
+                    title: 'Berhasil!',
+                    message: 'Berhasil menyimpan nilai!',
+                    onConfirm: null
+                });
+            },
+        });
+
+        setModalIsOpen(true);
     };
+
+    const ModalFooter = () => (
+        <div className="flex gap-2 items-center">
+            <button
+                onClick={() => {
+                    setModalIsOpen(false);
+                    !error && navigate(-1);
+                }}
+                className={`${modal.onConfirm ? 'btn-danger-outline' : 'button-primary mt-0 '}`}
+            >
+                {modal.onConfirm ? 'Batal' : 'Tutup'}
+            </button>
+            {modal.onConfirm && (
+                <button onClick={modal.onConfirm} className="button-primary mt-0 ">
+                    Ya
+                </button>
+            )}
+        </div>
+    );
 
     return (
         <div className="min-h-screen bg-gray-50 ">
+            <Modal
+                isOpen={modalIsOpen}
+                onClose={() => setModalIsOpen(false)}
+                title={modal.title}
+                footer={<ModalFooter />}
+            >
+                {isLoading && (
+                    <div className="flex justify-center mt-16">
+                        <LoadingCircle size={32} />
+                    </div>
+                )}
+                {!isLoading && (
+                    modal.message
+                )}
+            </Modal>
+
             <div className='flex flex-col pb-24 my-6'>
                 <div className="card-basic flex-col justify-between mt-0 mx-4 pr-8 box-border">
                     <div className="text-lg uppercase font-semibold">{data.categoryData.label}</div>
@@ -106,14 +166,16 @@ const QuestionView = () => {
                                 <div className="font-semibold text-gray-700">Pertanyaan:</div>
                                 <div className="mt-1 text-gray-600 whitespace-pre-line">{question.question}</div>
                             </div>
-                            <div className="mt-2">
-                                <div className="font-semibold text-gray-700">Jawaban yang Benar:</div>
-                                <ul className="mt-1 text-gray-600 list-disc pl-4">
-                                    {question.answers.map((answer, idx) => (
-                                        <li key={idx} className='whitespace-pre-line'>{answer}</li>
-                                    ))}
-                                </ul>
-                            </div>
+                            {question.answers.length > 0 && (
+                                <div className="mt-2">
+                                    <div className="font-semibold text-gray-700">Jawaban yang Benar:</div>
+                                    <ul className="mt-1 text-gray-600 list-disc pl-4">
+                                        {question.answers.map((answer, idx) => (
+                                            <li key={idx} className='whitespace-pre-line'>{answer}</li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            )}
                             <div className="mt-4">
                                 <div className="font-semibold text-gray-700 mb-2">Nilai:</div>
                                 <div className="flex flex-wrap gap-3">
@@ -144,7 +206,7 @@ const QuestionView = () => {
                         onClick={handleFinish}
                         className="button-primary w-full"
                     >
-                        Selesai
+                        Simpan Nilai
                     </button>
                 </div>
             </div>
