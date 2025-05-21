@@ -6,7 +6,6 @@ import useHttp from '../../shared/hooks/http-hook';
 import Modal from '../../shared/Components/UIElements/ModalBottomClose';
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 import { Search, Users, Pencil, Trash, ChevronDown, Filter, PlusIcon } from 'lucide-react';
-import FloatingMenu from '../../shared/Components/UIElements/FloatingMenu';
 import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
 import DataTable from '../../shared/Components/UIElements/DataTable';
 
@@ -23,7 +22,7 @@ const UsersView = () => {
         curriculum: true,
     });
 
-    const roleOrder = ['admin', 'teachingGroupAdmin', 'teacher', 'student', 'curriculum'];
+    const roleOrder = ['admin', 'teachingGroupAdmin', 'teacher', 'student', 'curriculum', 'munaqisy'];
 
     const { isLoading, error, sendRequest, setError } = useHttp();
     const navigate = useNavigate();
@@ -52,6 +51,7 @@ const UsersView = () => {
             teacher: 'bg-violet-100 text-violet-700',
             student: 'bg-blue-100 text-blue-700',
             curriculum: 'bg-green-100 text-green-700',
+            munaqisy: 'bg-orange-100 text-orange-700',
         };
         return roles[role] || 'bg-gray-100 text-gray-700';
     };
@@ -212,7 +212,8 @@ const UsersView = () => {
         teachingGroupAdmin: 'Admin Kelompok',
         teacher: 'Guru',
         student: 'Siswa',
-        curriculum: 'Tim Kurikulum'
+        curriculum: 'Tim Kurikulum',
+        munaqisy: 'Munaqis'
     }[role]);
 
     return (
@@ -267,6 +268,7 @@ const UsersView = () => {
                 {users && roleOrder.map((role) => {
                     const roleUsers = users.users.filter((user) => user.role === role);
                     if (roleUsers.length === 0) return null;
+                    console.log(roleUsers);
 
                     return (
                         <div key={role} className="mb-8">
