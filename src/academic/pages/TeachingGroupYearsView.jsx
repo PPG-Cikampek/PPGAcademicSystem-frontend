@@ -297,11 +297,11 @@ const TeachingGroupYearsView = () => {
                           </div>
                         )}
                       </div>
-                      {year.semesterTarget && (
+                      {/* {year.semesterTarget && (
                         <div className='mt-2 text-gray-700'>
                           Target Pertemuan dalam Semester: {year.semesterTarget}
                         </div>
-                      )}
+                      )} */}
                       <div className='mt-2 text-gray-700'>
                         Jumlah Kelas: {year.classes.length}
                       </div>

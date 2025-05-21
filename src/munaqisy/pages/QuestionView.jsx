@@ -164,14 +164,14 @@ const QuestionView = () => {
                             </div>
                             <div className="mt-2">
                                 <div className="font-semibold text-gray-700">Pertanyaan:</div>
-                                <div className="mt-1 text-gray-600 whitespace-pre-line">{question.question}</div>
+                                <div className="mt-1 text-gray-600 whitespace-pre-line font-lpmq">{question.question}</div>
                             </div>
                             {question.answers.length > 0 && (
                                 <div className="mt-2">
                                     <div className="font-semibold text-gray-700">Jawaban yang Benar:</div>
                                     <ul className="mt-1 text-gray-600 list-disc pl-4">
                                         {question.answers.map((answer, idx) => (
-                                            <li key={idx} className='whitespace-pre-line'>{answer}</li>
+                                            <li key={idx} className='whitespace-pre-line font-lpmq'>{answer}</li>
                                         ))}
                                     </ul>
                                 </div>
