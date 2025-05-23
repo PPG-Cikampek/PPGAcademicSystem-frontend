@@ -3,15 +3,26 @@ import { NavLink } from 'react-router-dom';
 import { Home } from 'lucide-react';
 import { Icon } from '@iconify-icon/react'
 import { GeneralContext } from '../../../../shared/Components/Context/general-context';
+import { AuthContext } from '../../../../shared/Components/Context/auth-context';
 
 
 const BottomNav = () => {
     const general = useContext(GeneralContext)
-    const navLinks = [
-        { id: 1, label: 'Home', path: '/', icon: <Home size={24} />, end: true },
-        { id: 2, label: 'Absen', path: '/scan/select-class', icon: <Icon icon="uil:qrcode-scan" width="24" height="24" />, },
-        { id: 3, label: 'Materi', path: '/materialProgress', icon: <Icon icon="bi:journal-check" width="24" height="24" /> },
-    ];
+    const auth = useContext(AuthContext);
+
+    const navLinks =
+        auth.userRole === 'teacher' ?
+            [
+                { id: 1, label: 'Home', path: '/', icon: <Home size={24} />, end: true },
+                { id: 2, label: 'Absen', path: '/scan/select-class', icon: <Icon icon="uil:qrcode-scan" width="24" height="24" />, },
+                { id: 3, label: 'Materi', path: '/materialProgress', icon: <Icon icon="bi:journal-check" width="24" height="24" /> },
+            ] : auth.userRole === 'munaqisy' ?
+                [
+                    { id: 2, label: 'Munaqosah', path: '/munaqasyah/scanner', icon: <Icon icon="uil:qrcode-scan" width="24" height="24" />, },
+                ] :
+                [
+
+                ]
 
     const handleNavigation = (e) => {
         if (general.navigateBlockMessage) {

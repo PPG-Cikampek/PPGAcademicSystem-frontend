@@ -8,6 +8,7 @@ import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 import { Search, Users, Pencil, Trash, ChevronDown, Filter, PlusIcon } from 'lucide-react';
 import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
 import DataTable from '../../shared/Components/UIElements/DataTable';
+import getUserRoleTitle from '../../shared/Utilities/getUserRoleTitle';
 
 const UsersView = () => {
     const [users, setUsers] = useState();
@@ -207,15 +208,6 @@ const UsersView = () => {
         }
     ];
 
-    const getRoleTitle = (role) => ({
-        admin: 'Admin Daerah',
-        teachingGroupAdmin: 'Admin Kelompok',
-        teacher: 'Guru',
-        student: 'Siswa',
-        curriculum: 'Tim Kurikulum',
-        munaqisy: 'Munaqis'
-    }[role]);
-
     return (
         <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">
             <div className="max-w-6xl mx-auto">
@@ -272,7 +264,7 @@ const UsersView = () => {
 
                     return (
                         <div key={role} className="mb-8">
-                            <h2 className="text-lg font-bold text-gray-900">{getRoleTitle(role)}</h2>
+                            <h2 className="text-lg font-bold text-gray-900">{getUserRoleTitle(role)}</h2>
                             <DataTable
                                 data={roleUsers}
                                 columns={getTableColumns(role)}

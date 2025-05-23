@@ -9,7 +9,6 @@ import Profile from '../components/Profile';
 import Dashboard from '../components/Dashboard';
 import CurrentTime from '../components/CurrentTime';
 
-import LoadingCircle from '../../../shared/Components/UIElements/LoadingCircle';
 import SequentialAnimation from '../../shared/Components/Animation/SequentialAnimation';
 import InfoCard from '../../shared/Components/UIElements/InfoCard';
 import SkeletonLoader from '../../../shared/Components/UIElements/SkeletonLoader';
@@ -17,7 +16,7 @@ import SkeletonLoader from '../../../shared/Components/UIElements/SkeletonLoader
 const HomeScreenView = () => {
     const auth = useContext(AuthContext);
 
-    
+
     // console.log(auth.isLoggedIn)
     // console.log(auth.userId)
     // console.log(auth.userRole)
@@ -102,24 +101,25 @@ const HomeScreenView = () => {
                         </div> */}
 
 
-
-                        <div className="mb-2">
-                            {data.classIds.map((item, index) => {
-                                const isClassInTeachingGroupYear = item?.teachingGroupYearId?.academicYearId?.isActive
-                                // console.log(item)
-                                if (isClassInTeachingGroupYear) {
+                        {auth.userRole === 'teacher' && (
+                            <div className="mb-2">
+                                {data.classIds.map((item, index) => {
+                                    const isClassInTeachingGroupYear = item?.teachingGroupYearId?.academicYearId?.isActive
                                     // console.log(item)
-                                    activeClassCount++;
-                                    return <Dashboard key={index} data={item} />
-                                }
-                            })}
-                            {activeClassCount === 0 && (
-                                <InfoCard>
-                                    <p>Belum terdaftar di kelas manapun. Hubungi PJP Kelompok!</p>
-                                    {/* <p>Buat kelas baru di <Link to={'/dashboard/academic'} className='active:text-blue-400 underline'>pengaturan akademik</Link></p> */}
-                                </InfoCard>
-                            )}
-                        </div>
+                                    if (isClassInTeachingGroupYear) {
+                                        // console.log(item)
+                                        activeClassCount++;
+                                        return <Dashboard key={index} data={item} />
+                                    }
+                                })}
+                                {activeClassCount === 0 && (
+                                    <InfoCard>
+                                        <p>Belum terdaftar di kelas manapun. Hubungi PJP Kelompok!</p>
+                                        {/* <p>Buat kelas baru di <Link to={'/dashboard/academic'} className='active:text-blue-400 underline'>pengaturan akademik</Link></p> */}
+                                    </InfoCard>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </SequentialAnimation>
             )}

@@ -7,6 +7,7 @@ import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 import { Icon } from '@iconify-icon/react'
 import { Pencil } from 'lucide-react';
+import getTeacherPositionName from '../../shared/Utilities/getTeacherPositionName';
 
 const TeacherDetailView = () => {
     const { isLoading, sendRequest } = useHttp();
@@ -62,7 +63,7 @@ const TeacherDetailView = () => {
                     { label: 'Tanggal Lahir', value: formatDate(responseData.teacher.dateOfBirth), icon: <Icon icon="material-symbols:date-range-outline" width="24" height="24" /> },
                     { label: 'Jenis Kelamin', value: responseData.teacher.gender? (responseData.teacher.gender === 'male' ? 'Laki-laki' : 'Perempuan') : '', icon: <Icon icon="tabler:gender-bigender" width="24" height="24" /> },
                     { label: 'Domisili', value: responseData.teacher.address, icon: <Icon icon="ph:map-pin-bold" width="24" height="24" /> },
-                    { label: 'Posisi', value: mapPosition(responseData.teacher.position), icon: <Icon icon="material-symbols:category-outline-rounded" width="24" height="24" /> },
+                    { label: 'Posisi', value: getTeacherPositionName(responseData.teacher.position), icon: <Icon icon="material-symbols:category-outline-rounded" width="24" height="24" /> },
                     { label: 'Mulai Masa Tugas', value: formatDate(responseData.teacher.positionStartDate), icon: <Icon icon="lucide:briefcase" width="24" height="24" /> },
                 ]);
 

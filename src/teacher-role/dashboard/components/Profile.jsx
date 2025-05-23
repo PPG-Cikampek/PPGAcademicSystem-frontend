@@ -55,7 +55,7 @@ const Profile = ({ user, isLoading }) => {
                     )}
                     {!isLoading && (
                         <>
-                            <h1 className="text-xl font-medium">{getPositionName[user.position] || 'Guru'}</h1>
+                            <h1 className="text-xl font-medium">{getPositionName[user.position] || 'Munaqis'}</h1>
                             {/* <h2 className="text-xl font-medium">{user.name || 'Unknown'}</h2>
                             <h3 className='font-normal text-gray-600'>
                                 {user.userId?.teachingGroupId?.branchId?.name || 'No Branch'} - {user.userId?.teachingGroupId?.name || 'No TeachingGroup'}

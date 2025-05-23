@@ -1,40 +1,63 @@
 import React, { lazy } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
 import { MunaqasyahScoreProvider } from '../munaqisy/context/MunaqasyahScoreContext';
+import ProfileView from '../users/pages/ProfileView';
+import MunaqasyahScannerView from '../munaqisy/pages/MunaqasyahScannerView';
+import StudentScoresView from '../munaqisy/pages/StudentScoresView';
+import QuestionView from '../munaqisy/pages/QuestionView';
 
 const PageHeader = lazy(() => import('../teacher-role/shared/Components/Navigation/PageHeader'));
-const StudentsView = lazy(() => import('../students/pages/StudentsView'));
-const StudentDetailView = lazy(() => import('../students/pages/StudentDetailView'));
 
 const HomeScreenView = lazy(() => import('../teacher-role/dashboard/pages/HomeScreenView'));
 const HomeNavigation = lazy(() => import('../teacher-role/shared/Components/Navigation/HomeNavigation'));
 
+
+const queryClient = new QueryClient();
+
 export const munaqisyRoutes = [
     { path: '/', element: <HomeScreenView /> },
     {
-        path: '/dashboard/students',
-        element:
-            (
-                <PageHeader>
-                    <StudentsView />
-                </PageHeader>
-            )
+        path: '/settings/profile/:userId',
+        element: (
+            <PageHeader>
+                <ProfileView />
+            </PageHeader>
+        )
     },
     {
-        path: '/dashboard/students/:studentId',
-        element:
-            (
-                <PageHeader>
-                    <StudentDetailView />
-                </PageHeader>
-            )
-    }
+        path: '/munaqasyah/scanner',
+        element: (
+            <PageHeader>
+                <MunaqasyahScannerView/>
+            </PageHeader>
+        )
+    },
+    {
+        path: '/munaqasyah/student',
+        element: (
+            <PageHeader>
+                <StudentScoresView />
+            </PageHeader>
+        )
+    },
+    {
+        path: '/munaqasyah/examination',
+        element: (
+            <PageHeader>
+                <QuestionView />
+            </PageHeader>
+        )
+    },
 ]
 
 
 export const MunaqisyRouteWrapper = ({ children }) => (
-    <MunaqasyahScoreProvider>
-        <HomeNavigation>
-            {children}
-        </HomeNavigation>
-    </MunaqasyahScoreProvider>
+    <QueryClientProvider client={new QueryClient()}>
+        <MunaqasyahScoreProvider>
+            <HomeNavigation>
+                {children}
+            </HomeNavigation>
+        </MunaqasyahScoreProvider>
+    </QueryClientProvider>
 );

@@ -79,7 +79,7 @@ const NewUserView = () => {
                 name: data.name,
                 email: data.email,
                 password: data.password,
-                role: 'teacher',
+                role: data.position,
                 teachingGroupName: data.teachingGroupName,
                 teacherDetails: {
                     nig: data.nig,
@@ -106,11 +106,11 @@ const NewUserView = () => {
         const updatedList = adminFields.filter((item) => item.name !== 'nig' && item.name !== 'role'); // Removing the object
 
         const newObject = { name: 'nig', label: 'NIG Guru', placeholder: '00001234', type: 'text', required: true };
-        // const newObject2 = { name: 'position', label: 'Posisi', placeholder: 'Guru', type: 'select', required: true, options:
-        //     [
-        //         { label: 'Guru', value: 'teacher' },
-        //         { label: 'Munaqis', value: 'munaqisy' },
-        //     ]};
+        const newObject2 = { name: 'position', label: 'Posisi', placeholder: 'Guru', type: 'select', required: true, options:
+            [
+                { label: 'Guru', value: 'teacher' },
+                { label: 'Munaqis', value: 'munaqisy' },
+            ]};
         // const newObject2 = { name: 'role', label: 'Jenis Akun', placeholder: 'Guru', value: 'teacher', type: 'text', disabled: true };
         setAdminFields([...updatedList, newObject, newObject2]); // Adding the new object to the list
     };

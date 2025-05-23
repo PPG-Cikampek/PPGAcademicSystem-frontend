@@ -26,6 +26,8 @@ const Sidebar = ({ linksList, children }) => {
     const auth = useContext(AuthContext);
     const general = useContext(GeneralContext)
 
+    console.log(auth.userRole)
+
     const sidebarHandler = () => {
         sidebar.toggle();
     };
@@ -155,7 +157,7 @@ const Sidebar = ({ linksList, children }) => {
                         ))}
                     </ul>
                 </nav>
-                {auth.userRole === 'teacher' && (
+                {(auth.userRole === 'teacher' || auth.userRole === 'munaqisy' || auth.userRole === 'student') && (
                     <div className="flex items-center justify-end p-4">
                         <button
                             onClick={auth.logout}

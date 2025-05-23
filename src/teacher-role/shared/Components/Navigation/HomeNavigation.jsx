@@ -54,27 +54,32 @@ const HomeNavigation = ({ children }) => {
                 label: 'Pengaturan Akun',
             },
         ] : auth.userRole === 'student' ?
-        [
-            {
-                link: `/dashboard/students/${auth.userId}`,
-                icon: <GraduationCap />,
-                label: auth.userName,
-            },
-        ] : 
-        [
-            {
-                link: `/dashboard/user/${auth.userId}`,
-                icon: <GraduationCap />,
-                label: auth.userName,
-            },
-        ]
+            [
+                {
+                    link: `/dashboard/students/${auth.userId}`,
+                    icon: <GraduationCap />,
+                    label: auth.userName,
+                },
+            ] :
+            [
+                // {
+                //     link: `/dashboard/user/${auth.userId}`,
+                //     icon: <GraduationCap />,
+                //     label: auth.userName,
+                // },
+                {
+                    link: `/settings/profile/` + auth.userId,
+                    icon: <Settings />,
+                    label: 'Pengaturan Akun',
+                },
+            ]
 
     return (
         <Sidebar
             linksList={links}
         >
             {children}
-            {auth.userRole === 'teacher' && <BottomNav />}
+            <BottomNav />
         </Sidebar>
 
     )

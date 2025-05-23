@@ -6,10 +6,10 @@ import { AuthContext } from '../../shared/Components/Context/auth-context';
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 import WarningCard from '../../shared/Components/UIElements/WarningCard';
 import DataTable from '../../shared/Components/UIElements/DataTable';
+import getTeacherPositionName from '../../shared/Utilities/getTeacherPositionName';
 
 const TeachersView = () => {
     const [teachers, setTeachers] = useState()
-    const [modal, setModal] = useState({ title: '', message: '', onConfirm: null });
     const { isLoading, sendRequest } = useHttp();
 
 
@@ -69,6 +69,12 @@ const TeachersView = () => {
             render: (teacher) => teacher.positionEndDate ? 'Tidak Aktif' : 'Aktif',
             cellStyle: (teacher) => `py-1 px-2 text-sm text-center w-min border rounded-md ${teacher.positionEndDate ? 'text-red-500 bg-red-100' : 'text-green-500 bg-green-100'
                 }`
+        },
+        {
+            key: 'position',
+            label: 'Dapukan',
+            sortable: true,
+            render: (teacher) => getTeacherPositionName(teacher.position),
         },
         { key: 'nig', label: 'NIG', sortable: true },
         { key: 'name', label: 'Nama', sortable: true },
