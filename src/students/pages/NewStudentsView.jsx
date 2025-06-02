@@ -9,8 +9,6 @@ import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 import Modal from '../../shared/Components/UIElements/ModalBottomClose'
 
 
-
-
 const NewStudentView = () => {
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [modalMessage, setModalMessage] = useState(false);

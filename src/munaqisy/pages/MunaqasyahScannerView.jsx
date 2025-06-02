@@ -51,10 +51,15 @@ const MunaqasyahScannerView = () => {
                     {state.isTeachingGroupYearMunaqasyahStarted === true ?
                         (< div className='card-basic m-4'>
                             <QRCodeScanner />
-                        </div>) : state.isTeachingGroupYearMunaqasyahStarted === false && (
+                        </div>) : state.isTeachingGroupYearMunaqasyahStarted === false ? (
                             <InfoCard className={'mx-4 my-12'}>
                                 <p>Munaqosah Belum Dimulai!</p>
-                            </InfoCard>)}
+                            </InfoCard>)
+                            : auth.currentTeachingGroupYear === null && (
+                                <InfoCard className={'mx-4 my-12'}>
+                                    <p>Tidak ada tahun ajaran aktif, hubungi PJP kelompok!</p>
+                                </InfoCard>
+                            ) }
                 </SequentialAnimation>
             )}
         </div >

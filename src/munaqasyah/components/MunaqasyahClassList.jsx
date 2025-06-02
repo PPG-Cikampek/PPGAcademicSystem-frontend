@@ -14,10 +14,10 @@ const MunaqasyahClassList = () => {
     useEffect(() => {
         const fetchClasses = async () => {
             try {
-                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/scores/classes/${teachingGroupYearId}`);
+                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/scores/teachingGroupYear/${teachingGroupYearId}`);
                 setClasses(responseData.classes);
                 console.log(responseData)
-                console.log(JSON.stringify(responseData.classes))
+                // console.log(JSON.stringify(responseData.classes))
 
             } catch (err) {
                 // Error is handled by useHttp  
@@ -42,12 +42,11 @@ const MunaqasyahClassList = () => {
 
                 {error && <ErrorCard error={error} />}
 
-                {classes && !isLoading && (
-                    classes.map(cls => (
+                {classes && !isLoading && (classes.map(cls => (
+                    <div key={cls.classId._id}>
                         <Link
-                            key={cls._id}
-                            to={`/munaqasyah/class/${cls._id}`}
-                            state={{ scores: cls.scores }}
+                            to={`/munaqasyah/class/${cls.classId._id}`}
+                            state={{ teachingGroupYearId }}
                         >
                             <div className={`card-basic hover:bg-gray-100 active:bg-gray-100 hover:cursor-pointer rounded-md justify-start m-0 transition-all duration-200 my-4`}>
                                 <div className="flex items-center space-x-4">
@@ -59,7 +58,8 @@ const MunaqasyahClassList = () => {
                                 </div>
                             </div>
                         </Link>
-                    ))
+                    </div>
+                ))
 
                 )}
             </div>

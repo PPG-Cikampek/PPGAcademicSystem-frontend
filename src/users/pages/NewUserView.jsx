@@ -25,8 +25,9 @@ const NewUserView = () => {
     useEffect(() => {
         const fetchTeachingGroups = async () => {
             try {
-                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/levels/branches/teaching-groupes`);
+                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/levels/branches/teaching-groupes?populate=branchId`);
                 setLoadedTeachingGroups(responseData.teachingGroups);
+                console.log(responseData.teachingGroups);
             } catch (err) { }
         };
         fetchTeachingGroups();
@@ -39,25 +40,27 @@ const NewUserView = () => {
                 { name: 'email', label: 'Email', placeholder: 'contoh@email.com', type: 'email', required: true },
                 { name: 'password', label: 'Password', placeholder: 'min 8 karakter', type: 'password', required: true },
                 {
-                    name: 'teachingGroupName',
+                    name: 'teachingGroupId',
                     label: 'Kelompok',
                     type: 'select',
                     required: true,
-                    options: loadedTeachingGroups.map(({ name }) => ({ label: name, value: name }))
+                    options: loadedTeachingGroups
+                        .map(group => ({
+                            label: `${group.branchId?.name || 'Unknown Branch'} - ${group.name}`,
+                            value: group.id
+                        }))
+                        .sort((a, b) => a.label.localeCompare(b.label))
                 },
                 {
                     name: 'role',
                     label: 'Role Akun',
                     type: 'select',
                     required: true,
-                    options:
-                        [
-                            { label: 'Admin', value: 'admin' },
-                            { label: 'Admin Kelompok', value: 'teachingGroupAdmin' },
-                            { label: 'Kurikulum', value: 'curriculum' },
-                            { label: 'Munaqis', value: 'munaqisy' },
-                        ]
-
+                    options: [
+                        { label: 'Admin', value: 'admin' },
+                        { label: 'Admin Kelompok', value: 'teachingGroupAdmin' },
+                        { label: 'Kurikulum', value: 'curriculum' },
+                    ]
                 },
 
             ]);
@@ -73,14 +76,14 @@ const NewUserView = () => {
                 email: data.email,
                 password: data.password,
                 role: data.role,
-                teachingGroupName: data.teachingGroupName
+                teachingGroupId: data.teachingGroupId
             }
             : {
                 name: data.name,
                 email: data.email,
                 password: data.password,
                 role: data.position,
-                teachingGroupName: data.teachingGroupName,
+                teachingGroupId: data.teachingGroupId,
                 teacherDetails: {
                     nig: data.nig,
                     position: data.position
@@ -106,11 +109,13 @@ const NewUserView = () => {
         const updatedList = adminFields.filter((item) => item.name !== 'nig' && item.name !== 'role'); // Removing the object
 
         const newObject = { name: 'nig', label: 'NIG Guru', placeholder: '00001234', type: 'text', required: true };
-        const newObject2 = { name: 'position', label: 'Posisi', placeholder: 'Guru', type: 'select', required: true, options:
-            [
-                { label: 'Guru', value: 'teacher' },
-                { label: 'Munaqis', value: 'munaqisy' },
-            ]};
+        const newObject2 = {
+            name: 'position', label: 'Posisi', placeholder: 'Guru', type: 'select', required: true, options:
+                [
+                    { label: 'Guru', value: 'teacher' },
+                    { label: 'Munaqis', value: 'munaqisy' },
+                ]
+        };
         // const newObject2 = { name: 'role', label: 'Jenis Akun', placeholder: 'Guru', value: 'teacher', type: 'text', disabled: true };
         setAdminFields([...updatedList, newObject, newObject2]); // Adding the new object to the list
     };

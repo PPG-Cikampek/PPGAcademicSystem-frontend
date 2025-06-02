@@ -44,8 +44,8 @@ const DataTable = ({
 
     useEffect(() => {
         if (!storageKey) return;
-        console.log(currentPage)
-        console.log(persisted)
+        // console.log(currentPage)
+        // console.log(persisted)
         localStorage.setItem(storageKey, JSON.stringify({
             searchTerm,
             entriesPerPage,

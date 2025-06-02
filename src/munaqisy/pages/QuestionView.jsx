@@ -3,10 +3,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import useHttp from '../../shared/hooks/http-hook';
 import { MunaqasyahScoreContext } from '../context/MunaqasyahScoreContext';
-import getCategoryName from '../../munaqasyah/utilities/getCategoryName';
 import Modal from '../../shared/Components/UIElements/ModalBottomClose';
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
-import { set } from 'react-hook-form';
+import getMunaqasyahQuestionTypeName from '../../munaqasyah/utilities/getMunaqasyahQuestionTypeName';
 
 const QuestionView = () => {
     const [examQuestions, setExamQuestions] = useState()
@@ -34,7 +33,7 @@ const QuestionView = () => {
             try {
                 const responseData = await sendRequest(url, 'GET', null, { 'Content-Type': 'application/json' });
                 setExamQuestions(responseData)
-                // console.log(responseData)
+                console.log(responseData)
             } catch (err) {
                 console.log(err)
             }
@@ -155,7 +154,7 @@ const QuestionView = () => {
                                 <div className="text-lg font-semibold">Pertanyaan {index + 1}</div>
                                 <div className="flex flex-col">
                                     <div className="text-blue-600 font-medium">Nilai Maksimal: {question.maxScore}</div>
-                                    <div className="text-sm text-gray-500 whitespace-pre-line"> Tipe Soal: {getCategoryName(question.type)} </div>
+                                    <div className="text-sm text-gray-500 whitespace-pre-line"> Tipe Soal: {getMunaqasyahQuestionTypeName(question.type)} </div>
                                 </div>
                             </div>
                             <div className="mt-2">
@@ -164,14 +163,20 @@ const QuestionView = () => {
                             </div>
                             <div className="mt-2">
                                 <div className="font-semibold text-gray-700">Pertanyaan:</div>
-                                <div className="mt-1 text-gray-600 whitespace-pre-line font-lpmq">{question.question}</div>
+                                <div className="mt-1 text-gray-600 whitespace-pre-line font-lpmq text-base">{question.question}</div>
                             </div>
-                            {question.answers.length > 0 && (
+                            {question.type !== 'multipleChoices' && question.answers[0] !== '' && (
+                                <div className="mt-2">
+                                    <div className="font-semibold text-gray-700">Jawaban yang Benar:</div>
+                                    <div className='whitespace-pre-line font-lpmq text-base'>{question.answers[0]}</div>
+                                </div>
+                            )}
+                            {question.type === 'multipleChoices' && question.answers[0] !== '' && (
                                 <div className="mt-2">
                                     <div className="font-semibold text-gray-700">Jawaban yang Benar:</div>
                                     <ul className="mt-1 text-gray-600 list-disc pl-4">
                                         {question.answers.map((answer, idx) => (
-                                            <li key={idx} className='whitespace-pre-line font-lpmq'>{answer}</li>
+                                            <li key={idx} className='whitespace-pre-line font-lpmq text-base'>{answer}</li>
                                         ))}
                                     </ul>
                                 </div>

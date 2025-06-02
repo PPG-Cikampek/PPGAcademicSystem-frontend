@@ -42,6 +42,8 @@ const AuthView = () => {
                 'Content-Type': 'application/json'
             });
 
+            console.log(responseData.user.teachingGroupId.id)
+
             try {
                 teachingGroupYearData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/teachingGroupYears/teachingGroup/${responseData.user.teachingGroupId.id}`)
             } catch (err) { }
@@ -52,7 +54,7 @@ const AuthView = () => {
             }
 
             let teacherData
-            if (responseData.user.role === 'teacher') {
+            if (responseData.user.role === 'teacher' || responseData.user.role === 'munaqisy') {
                 try {
                     teacherData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/teachers/user/${responseData.user.id}`)
                     console.log(teacherData)

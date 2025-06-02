@@ -1,16 +1,35 @@
-import React, { useState, useMemo } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import React, { useState, useMemo, useEffect } from 'react';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
-import jsPDF from 'jspdf';
-import { applyPlugin } from 'jspdf-autotable';
-import IndonesianNumberConverter from '../../shared/Utilities/numberToWordConverter';
-applyPlugin(jsPDF);
+import { generatePDFContent } from '../components/StudentReportPDF';
+import useHttp from '../../shared/hooks/http-hook';
 
 const MunaqasyahByClassView = () => {
     const [expandedCards, setExpandedCards] = useState({});
     const location = useLocation();
     const navigate = useNavigate();
-    const { scores: rawScores } = location.state || { scores: [] };
+    const { isLoading, error, sendRequest } = useHttp();
+    const [teachingGroupYearId, setteachingGroupYearId] = useState(location.state?.teachingGroupYearId || []);
+    const [rawScores, setRawScores] = useState([]);
+    const classId = useParams().classId;
+
+
+    // Periodically fetch latest scores
+    useEffect(() => {
+        let intervalId;
+        const fetchScores = async () => {
+            try {
+                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/scores/teachingGroupYear/${teachingGroupYearId}?classId=${classId}${classId}`);
+                setRawScores(responseData.classes[0].scores);
+                // console.log(responseData.classes[0].scores);
+            } catch (err) {
+                // Error handled by useHttp
+            }
+        };
+        fetchScores();
+        intervalId = setInterval(fetchScores, 3000); // every 10 seconds
+        return () => clearInterval(intervalId);
+    }, [sendRequest, classId]);
 
     const scoreCategories = [
         { key: 'reciting', label: "Membaca Al-Qur'an/Tilawati" },
@@ -19,7 +38,7 @@ const MunaqasyahByClassView = () => {
         { key: 'hadithTafsir', label: 'Tafsir Hadits' },
         { key: 'practice', label: 'Praktik Ibadah' },
         { key: 'moralManner', label: 'Akhlak dan Tata Krama' },
-        { key: 'memorizingSurah', label: 'Surat-surat Al-Quran' },
+        { key: 'memorizingSurah', label: 'Hafalan Surat-surat Al-Quran' },
         { key: 'memorizingHadith', label: 'Hafalan Hadits' },
         { key: 'memorizingDua', label: "Hafalan Do'a" },
         { key: 'memorizingBeautifulName', label: 'Hafalan Asmaul Husna' },
@@ -35,7 +54,11 @@ const MunaqasyahByClassView = () => {
                 ...acc,
                 [category.key]: {
                     ...score[category.key],
-                    score: score[category.key].score < 60 ? 60 : score[category.key].score
+                    score: (score[category.key]?.score < 60 && score[category.key]?.score > 0)
+                        ? 60
+                        : score[category.key]?.score === 0
+                            ? null
+                            : score[category.key]?.score,
                 }
             }), {})
         }));
@@ -57,103 +80,31 @@ const MunaqasyahByClassView = () => {
         setExpandedCards({});
     };
 
+    // Use rawScores for display and average calculation
     const calculateAverage = (score) => {
-        const values = scoreCategories.map(category => score[category.key].score);
+        const values = scoreCategories.map(category => score[category.key]?.score ?? 0);
         const sum = values.reduce((a, b) => a + b, 0);
         return (sum / values.length).toFixed(1);
     };
 
-    const generatePDFContent = (studentName, studentScores) => {
-        const doc = new jsPDF();
-
-        const pageHeight =
-            doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
-        const pageWidth =
-            doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
-        console.log(pageHeight + "," + pageWidth);
-
-        doc.setFont("Calibri", "bold");
-        doc.setFontSize(14);
-        doc.text("LAPORAN PENILAIAN HASIL BELAJAR SISWA", pageWidth / 2, 16, {
-            align: "center"
-        });
-
-        doc.setFont("Calibri", "normal");
-        doc.setFontSize(12);
-        doc.text(`Nama Siswa  : ${studentName}`, pageWidth / 10, 25);
-        doc.text("Nomor Induk :", pageWidth / 10, 30);
-        doc.text("Kelas/Semester:", pageWidth / 10 * 6, 25);
-        doc.text("Tahun Pelajaran:", pageWidth / 10 * 6, 30);
-
-        const tableData = scoreCategories.map((category, index) => [
-            index + 1,
-            category.label,
-            studentScores[category.key]?.score || '-',
-            IndonesianNumberConverter(studentScores[category.key]?.score) || '-'
-        ]);
-
-        doc.setFontSize(11);
-        doc.autoTable({
-            head: [['No', 'Mata Pelajaran', 'Angka', 'Huruf', 'Rata-rata Kelas']],
-            body: tableData,
-            startY: 35,
-            headStyles: {
-                textColor: [0, 0, 0],
-                fillColor: [255, 255, 255],
-                lineColor: 0,
-                lineWidth: 0.01,
-                font: 'times',
-                // fontSize: 12,
-                fontStyle: 'bold',
-                halign: 'center',
-            },
-            styles: {
-                lineColor: 0,
-                lineWidth: 0.01,
-                cellPadding: 2,
-                // headStyles: {
-                //     halign: 'center'
-                // }
-            },
-            zebra: true,
-            zebraColor: [245, 245, 245],
-            columnStyles: {
-                0: { cellWidth: 10, halign: 'center' },
-                1: { cellWidth: 70 },
-                2: { cellWidth: 17, halign: 'center' },
-                3: { cellWidth: 60, halign: 'center' },
-                4: { cellWidth: 23, halign: 'center' }
-            }
-        });
-
-        doc.setFontSize(12);
-        doc.text(`Diberikan tanggal: `, pageWidth / 10, 235);
-        doc.text("Orang Tua/Wali", pageWidth / 10 * 1.5, 240);
-        doc.text("Wali Kelas", pageWidth / 10 * 7, 240);
-
-        doc.text("_______________", pageWidth / 10 * 1.5, 270);
-        doc.text("_______________", pageWidth / 10 * 7, 270);
-
-        return doc;
+    const downloadReport = (studentName, studentScores, studentNis, grade, academicYearName) => {
+        const doc = generatePDFContent(studentName, studentScores, scoreCategories, studentNis, grade, academicYearName);
+        const safeYear = academicYearName.replace(/[/\\:*?"<>|]/g, '-');
+        doc.save(`Raport_${studentName}_${safeYear}.pdf`);
     };
 
-    const downloadReport = (studentName, studentScores) => {
-        const doc = generatePDFContent(studentName, studentScores);
-        doc.save(`${studentName}_Raport.pdf`);
-    };
-
-    const previewReport = (studentName, studentScores) => {
-        const doc = generatePDFContent(studentName, studentScores);
+    const previewReport = (studentName, studentScores, studentNis, grade, academicYearName) => {
+        const doc = generatePDFContent(studentName, studentScores, scoreCategories, studentNis, grade, academicYearName);
         const pdfBlob = doc.output('blob');
         const pdfUrl = URL.createObjectURL(pdfBlob);
-        navigate('/munaqasyah/student/score', { state: { pdfUrl, studentName } });
+        navigate('/munaqasyah/student/score', { state: { pdfUrl, studentName, academicYearName } });
     };
 
     return (
         <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">
             <div className="max-w-6xl mx-auto">
                 <div className="flex justify-between items-center mb-6 h-9">
-                    <h1 className="text-2xl font-semibold text-gray-900">{scores[0]?.classId.name}</h1>
+                    <h1 className="text-2xl font-semibold text-gray-900">{rawScores[0]?.classId.name}</h1>
                     {expandedCount >= 2 && (
                         <button
                             onClick={collapseAll}
@@ -164,7 +115,7 @@ const MunaqasyahByClassView = () => {
                     )}
                 </div>
                 <div className="flex flex-col gap-4">
-                    {scores.map((score) => (
+                    {rawScores.map((score, idx) => (
                         <div
                             key={score._id}
                             className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200"
@@ -181,22 +132,42 @@ const MunaqasyahByClassView = () => {
                                         <span className="text-base text-gray-500">
                                             Rata-rata: {calculateAverage(score)}
                                         </span>
-                                        <div className="flex gap-2 my-2 md:my-0">
+                                        <div className="flex flex-col md:flex-row gap-2 my-2 md:my-0">
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    downloadReport(score.studentId.name, score);
+                                                    // Use normalized score for PDF
+                                                    downloadReport(score.studentId.name, scores[idx], score.studentNis, score.classId.name, score.teachingGroupYearId.academicYearId.name);
                                                 }}
                                                 className='btn-primary-outline m-0 text-gray-700'>
-                                                Unduh Raport
+                                                Unduh Raport Orang Tua
                                             </button>
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();
-                                                    previewReport(score.studentId.name, score);
+                                                    // Use normalized score for PDF
+                                                    previewReport(score.studentId.name, scores[idx], score.studentNis, score.classId.name, score.teachingGroupYearId.academicYearId.name);
                                                 }}
                                                 className='btn-primary-outline m-0 text-gray-700 hidden md:block'>
-                                                Lihat Raport
+                                                Lihat Raport Orang Tua
+                                            </button>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    // Use raw score for PDF
+                                                    downloadReport(score.studentId.name, rawScores[idx], score.studentNis, score.classId.name, score.teachingGroupYearId.academicYearId.name);
+                                                }}
+                                                className='btn-primary-outline m-0 text-gray-700'>
+                                                Unduh Raport Pengurus
+                                            </button>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    // Use raw score for PDF
+                                                    previewReport(score.studentId.name, rawScores[idx], score.studentNis, score.classId.name, score.teachingGroupYearId.academicYearId.name);
+                                                }}
+                                                className='btn-primary-outline m-0 text-gray-700 hidden md:block'>
+                                                Lihat Raport Pengurus
                                             </button>
                                         </div>
                                     </div>
@@ -214,7 +185,9 @@ const MunaqasyahByClassView = () => {
                                         {scoreCategories.map(category => (
                                             <div key={category.key} className="flex justify-between items-center p-2 bg-white rounded border">
                                                 <span className="text-gray-600">{category.label}</span>
-                                                <span className="font-medium text-gray-800">{score[category.key].score}</span>
+                                                <span className="font-medium text-gray-800">
+                                                    {score[category.key]?.score > 0 ? score[category.key]?.score : '-'}
+                                                </span>
                                             </div>
                                         ))}
                                     </div>

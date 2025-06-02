@@ -260,7 +260,7 @@ const UsersView = () => {
                 {users && roleOrder.map((role) => {
                     const roleUsers = users.users.filter((user) => user.role === role);
                     if (roleUsers.length === 0) return null;
-                    console.log(roleUsers);
+                    // console.log(roleUsers);
 
                     return (
                         <div key={role} className="mb-8">

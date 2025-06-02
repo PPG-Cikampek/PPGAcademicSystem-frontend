@@ -17,18 +17,13 @@ const BulkNewUsersAndStudentsView = () => {
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [modalMessage, setModalMessage] = useState(false);
 
-    const [count, setCount] = useState('');
-    const [teachingGroupName, setTeachingGroupName] = useState('');
-    const [role, setRole] = useState('student');
-    const [message, setMessage] = useState('');
-
     const navigate = useNavigate()
     const auth = useContext(AuthContext)
 
     useEffect(() => {
         const fetchTeachingGroups = async () => {
             try {
-                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/levels/branches/teaching-groupes`);
+                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/levels/branches/teaching-groupes?populate=branchId`);
                 setLoadedTeachingGroups(responseData.teachingGroups);
             } catch (err) { }
         };
@@ -41,11 +36,16 @@ const BulkNewUsersAndStudentsView = () => {
                 { name: 'count', label: 'Jumlah Siswa', placeholder: '0', type: 'number', required: true },
                 { name: 'year', type: 'year', label: 'Tahun', value: new Date().getFullYear(), required: true },
                 {
-                    name: 'teachingGroupName',
+                    name: 'teachingGroupId',
                     label: 'Kelompok',
                     type: 'select',
                     required: true,
-                    options: loadedTeachingGroups.map(({ name }) => ({ label: name, value: name }))
+                    options: loadedTeachingGroups
+                        .map(group => ({
+                            label: `${group.branchId?.name || 'Unknown Branch'} - ${group.name}`,
+                            value: group.id
+                        }))
+                        .sort((a, b) => a.label.localeCompare(b.label))
                 },
 
             ]);
@@ -61,9 +61,10 @@ const BulkNewUsersAndStudentsView = () => {
         const url = `${import.meta.env.VITE_BACKEND_URL}/users/bulk-create`;
 
         const body = JSON.stringify({
+            teachingGroupId: data.teachingGroupId,
             year: data.year,
             count: data.count,
-            teachingGroupName: data.teachingGroupName,
+            // teachingGroupName: data.teachingGroupName,
             role: 'student',
         });
 

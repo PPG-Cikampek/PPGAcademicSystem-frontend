@@ -5,7 +5,7 @@ import logo from '../../assets/logos/ppgcikampek.webp';
 
 const MaintenanceView = () => {
     // Set your target date here
-    const targetDate = new Date('2025-02-10T07:00:00');
+    const targetDate = new Date('2025-05-26T07:00:00');
     const [timeLeft, setTimeLeft] = useState({
         days: 0,
         hours: 0,
@@ -50,7 +50,7 @@ const MaintenanceView = () => {
                     Sistem Akademik PPG Cikampek sedang dalam proses pemeliharan sistem untuk peningkatan pelayanan. Mohon maaf atas ketidaknyamanannya.
                 </p>
 
-                <p className="md:text-2xl text-xl text-center text-gray-600 animate-slide-up">
+                <p className="md:text-2xl text-xl text-center text-gray-600 animate-slide-up font-lpmq">
                     الحمد لله جزا كم الله خيرا
                 </p>
 

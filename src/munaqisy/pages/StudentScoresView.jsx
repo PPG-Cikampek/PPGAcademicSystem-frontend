@@ -31,14 +31,14 @@ const StudentScoresView = () => {
         setIsLoading(false);
     }, [teachingGroupYearId, scannedData]);
 
-    useEffect(() => {
-        setIsLoading(true);
+    // useEffect(() => {
+    //     setIsLoading(true);
 
-        // console.log(state.studentScore);
-        // console.log(state.studentData);
+    //     // console.log(state.studentScore);
+    //     // console.log(state.studentData);
 
-        setIsLoading(false);
-    }, [state.studentScore, state.studentData]);
+    //     setIsLoading(false);
+    // }, [state.studentScore, state.studentData]);
 
     const scoreCategories = [
         { key: 'reciting', label: "Membaca Al-Qur'an/Tilawati" },
@@ -54,6 +54,12 @@ const StudentScoresView = () => {
         { key: 'knowledge', label: 'Keilmuan dan Kefahaman Agama' },
         { key: 'independence', label: 'Kemandirian' }
     ];
+
+    // Determine which categories to show based on className
+    let filteredScoreCategories = scoreCategories;
+    if (state.studentData && state.studentData.className && !/(5|6)/.test(state.studentData.className)) {
+        filteredScoreCategories = scoreCategories.filter(cat => !['independence', 'quranTafsir', 'hadithTafsir', 'memorizingHadith'].includes(cat.key));
+    }
 
     const handleCategoryClick = (category) => {
         const data = {
@@ -92,7 +98,7 @@ const StudentScoresView = () => {
                         <SkeletonLoader width={80} height={16} className="self-center mt-2" />
                     </div>
                     <div className="mt-4 mx-4">
-                        {scoreCategories.map((cat, idx) => (
+                        {filteredScoreCategories.map((cat, idx) => (
                             <div key={cat.key} className="mb-2">
                                 <SkeletonLoader width={220} height={32} />
                             </div>
@@ -129,7 +135,7 @@ const StudentScoresView = () => {
                     </div>
                     {state.studentScore && (
                         <ScoreList
-                            categories={scoreCategories}
+                            categories={filteredScoreCategories}
                             studentScore={state.studentScore}
                             onCategoryClick={handleCategoryClick}
                         />

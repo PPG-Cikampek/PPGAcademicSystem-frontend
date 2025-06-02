@@ -119,14 +119,10 @@ const TeachingGroupMunaqasyahView = () => {
                 {error && <ErrorCard error={error} />}
 
                 {teachingGroupYears && !isLoading && (
-
-                    teachingGroupYears.map(year => (
-                        <Link key={year._id} to={`/munaqasyah/${year._id}`}>
+                    teachingGroupYears.map(year => {
+                        const content = (
                             <div className={`card-basic hover:bg-gray-100 active:bg-gray-100 hover:cursor-pointer rounded-md justify-start m-0 transition-all duration-200 my-4`} >
-                                <div
-                                    // onClick={() => toggleyear(year._id)}
-                                    className="flex items-center space-x-4 "
-                                >
+                                <div className="flex items-center space-x-4 ">
                                     <div className="flex-1 h-fit"  >
                                         <div className='flex items-center gap-2'>
                                             <h2 className="text-xl text-gray-900">{year.name}</h2>
@@ -138,7 +134,6 @@ const TeachingGroupMunaqasyahView = () => {
                                             Status Munaqosah:
                                         </div>
                                         <div className='text-gray-500'>
-                                            {console.log(year.academicYearId)}
                                             {year.academicYearId.isMunaqasyahActive ? (
                                                 year.isMunaqasyahActive ? (
                                                     <div className='text-green-500'>
@@ -164,7 +159,7 @@ const TeachingGroupMunaqasyahView = () => {
                                         </div>
 
                                         <div>
-                                            {year.academicYearId.isMunaqasyahActive === true && year.isMunaqasyahActive !== true && (
+                                            {year.academicYearId.isMunaqasyahActive === true && year.isMunaqasyahActive !== true && year.isActive === true && (
                                                 <button
                                                     className='btn-primary-outline mt-2'
                                                     onClick={(e) => {
@@ -175,12 +170,34 @@ const TeachingGroupMunaqasyahView = () => {
                                                     Mulai Munaqosah
                                                 </button>
                                             )}
+                                            {year.academicYearId.isMunaqasyahActive === true && year.isMunaqasyahActive !== true && year.isActive !== true && (
+                                                <div className='inline-flex items-center text-red-500 gap-1'>
+                                                    <CircleAlert />
+                                                    Tahun ajaran kelompok belum aktif!
+                                                </div>
+                                            )}
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </Link>
-                    ))
+                        );
+
+                        return year.isMunaqasyahActive ? (
+                            <Link key={year._id} to={`/munaqasyah/${year._id}`}>
+                                {content}
+                            </Link>
+                        ) : (
+                            <div key={year._id}>
+                                {content}
+                            </div>
+                        );
+                    })
+                )}
+
+                {teachingGroupYears && teachingGroupYears.length === 0 && (
+                    <div className="bg-white rounded-md shadow-md p-6 border border-gray-200">
+                        <p className="text-gray-700 text-center">Belum ada tahun ajaran terdaftar.</p>
+                    </div>
                 )}
             </div>
         </div>
