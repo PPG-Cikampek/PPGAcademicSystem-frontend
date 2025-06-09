@@ -91,7 +91,7 @@ const QuestionView = () => {
             message: 'Simpan Nilai?',
             onConfirm: () => {
                 setIsLoading(true)
-                patchScoreData(state)
+                patchScoreData(state.studentScore)
                 setIsLoading(false)
                 setModal({
                     title: 'Berhasil!',

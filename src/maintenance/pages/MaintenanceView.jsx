@@ -5,7 +5,7 @@ import logo from '../../assets/logos/ppgcikampek.webp';
 
 const MaintenanceView = () => {
     // Set your target date here
-    const targetDate = new Date('2025-05-26T07:00:00');
+    const targetDate = new Date('2025-06-09T08:00:00');
     const [timeLeft, setTimeLeft] = useState({
         days: 0,
         hours: 0,

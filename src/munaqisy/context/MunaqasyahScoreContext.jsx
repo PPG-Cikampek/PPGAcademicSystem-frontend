@@ -82,7 +82,7 @@ const fetchYearData = async (teachingGroupYearId, dispatch) => {
 
 };
 
-const fetchScoreData = async (studentNis, teachingGroupYearId, dispatch) => {
+const fetchScoreData = async (studentNis, teachingGroupYearId, dispatch, userId) => {
     const url = `${import.meta.env.VITE_BACKEND_URL}/scores?teachingGroupYearId=${teachingGroupYearId}&&studentNis=${studentNis}`;
     const header = {
         'Content-Type': 'application/json',
@@ -99,6 +99,8 @@ const fetchScoreData = async (studentNis, teachingGroupYearId, dispatch) => {
         }
         const data = await response.json();
 
+        if (data.scores[0].isBeingScored === "false") { data.scores[0].isBeingScored = userId; }
+
         console.log(data.scores[0])
         console.log(data.scores[0].studentId)
         console.log(data)
@@ -108,29 +110,32 @@ const fetchScoreData = async (studentNis, teachingGroupYearId, dispatch) => {
         await dispatch({ type: 'SET_SCORE_DATA', payload: data.scores[0] });
         await dispatch({ type: 'SET_STUDENT_DATA', payload: student });
 
+        patchScoreData(data.scores[0]);
+
     } catch (error) {
         console.error('Error fetching attendance data:', error);
     }
-
 };
 
-const patchScoreData = async (state) => {
-    const url = `${import.meta.env.VITE_BACKEND_URL}/scores/${state.studentScore.id}`;
+const patchScoreData = async (scoreData) => {
+    const url = `${import.meta.env.VITE_BACKEND_URL}/scores/${scoreData.id}`;
     const header = {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${JSON.parse(localStorage.getItem('userData')).token}`
     }
 
+    // console.log(state.studentScore)
+
     try {
         const response = await fetch(url, {
             method: 'PATCH',
             headers: header,
-            body: JSON.stringify(state.studentScore)
+            body: JSON.stringify(scoreData)
         });
         if (!response.ok) {
             throw new Error('Failed to fetch data');
         }
-        const data = await response.json();
+        const result = await response.json();
 
         // dispatch({ type: 'SET_STATUS', payload: data.message });
 

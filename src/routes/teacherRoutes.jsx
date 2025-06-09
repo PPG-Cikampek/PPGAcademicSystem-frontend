@@ -187,17 +187,13 @@ export const teacherRoutes = [
     {
         path: '/munaqasyah/scanner',
         element: (
-            <PageHeader>
                 <MunaqasyahScannerView />
-            </PageHeader>
         )
     },
     {
         path: '/munaqasyah/student',
         element: (
-            <PageHeader>
                 <StudentScoresView />
-            </PageHeader>
         )
     },
     {

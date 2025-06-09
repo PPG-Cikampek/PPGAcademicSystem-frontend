@@ -26,7 +26,7 @@ const Sidebar = ({ linksList, children }) => {
     const auth = useContext(AuthContext);
     const general = useContext(GeneralContext)
 
-    console.log(auth.userRole)
+    // console.log(auth.userRole)
 
     const sidebarHandler = () => {
         sidebar.toggle();
