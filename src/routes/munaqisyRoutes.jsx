@@ -28,17 +28,13 @@ export const munaqisyRoutes = [
     {
         path: '/munaqasyah/scanner',
         element: (
-            <PageHeader>
-                <MunaqasyahScannerView/>
-            </PageHeader>
+            <MunaqasyahScannerView />
         )
     },
     {
         path: '/munaqasyah/student',
         element: (
-            <PageHeader>
-                <StudentScoresView />
-            </PageHeader>
+            <StudentScoresView />
         )
     },
     {

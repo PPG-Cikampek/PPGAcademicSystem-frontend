@@ -87,13 +87,13 @@ const RequestedAccountView = () => {
       key: 'userName',
       label: 'Nama',
       sortable: true,
-      render: (item) => item.userId.name
+      render: (item) => item.userId?.name || ' Tidak Diketahui',
     },
     {
       key: 'teachingGroupName',
       label: 'Kelompok',
       sortable: true,
-      render: (item) => item.teachingGroupId.name
+      render: (item) => item.teachingGroupId?.name || ' Tidak Diketahui',
     },
     {
       key: 'createdTime',

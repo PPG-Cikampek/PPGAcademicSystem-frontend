@@ -19,9 +19,11 @@ const MunaqasyahByClassView = () => {
         let intervalId;
         const fetchScores = async () => {
             try {
-                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/scores/teachingGroupYear/${teachingGroupYearId}?classId=${classId}${classId}`);
-                setRawScores(responseData.classes[0].scores);
-                // console.log(responseData.classes[0].scores);
+                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/scores/teachingGroupYear/${teachingGroupYearId}?classId=${classId}`);
+                const matchedClass = responseData.classes.find(cls => cls.classId._id === classId);
+                if (matchedClass) {
+                    setRawScores(matchedClass.scores);
+                }
             } catch (err) {
                 // Error handled by useHttp
             }

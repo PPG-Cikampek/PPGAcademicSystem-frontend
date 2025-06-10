@@ -1,44 +1,75 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../shared/Components/Context/auth-context';
 import useHttp from '../../shared/hooks/http-hook';
 import { MunaqasyahScoreContext } from '../context/MunaqasyahScoreContext';
 
-import { motion, AnimatePresence } from 'framer-motion';
 import StudentInitial from '../../shared/Components/UIElements/StudentInitial';
 import SequentialAnimation from '../../teacher-role/shared/Components/Animation/SequentialAnimation';
 import ScoreList from '../components/ScoreList';
 import SkeletonLoader from '../../shared/Components/UIElements/SkeletonLoader';
+import { GeneralContext } from '../../shared/Components/Context/general-context';
 
 const StudentScoresView = () => {
     const { isLoading, error, sendRequest, setError, setIsLoading } = useHttp();
 
-    const { state, dispatch, fetchYearData, fetchScoreData } = useContext(MunaqasyahScoreContext);
+    const { state, dispatch, fetchYearData, fetchScoreData, patchScoreData } = useContext(MunaqasyahScoreContext);
 
     const location = useLocation();
     const scannedData = location.state?.scannedData;
 
+    const general = useContext(GeneralContext);
     const auth = useContext(AuthContext);
     const teachingGroupYearId = auth.currentTeachingGroupYearId;
 
     const navigate = useNavigate();
 
+    // Add dataLoaded state
+    const [dataLoaded, setDataLoaded] = useState(false);
+
     useEffect(() => {
-        setIsLoading(true);
-
-        fetchScoreData(scannedData, teachingGroupYearId, dispatch);
-
-        setIsLoading(false);
+        let isMounted = true;
+        general.setMessage('Pilih "Selesai" untuk kembali!'); // Clear any previous messages
+        dispatch({ type: 'SET_SCORE_DATA', payload: [] });
+        dispatch({ type: 'SET_STUDENT_DATA', payload: [] });
+        setDataLoaded(false); // Reset before fetching
+        const fetchData = async () => {
+            setIsLoading(true);
+            try {
+                await fetchScoreData(scannedData, teachingGroupYearId, dispatch, auth.userId);
+                if (isMounted) setDataLoaded(true); // Set to true after fetch
+            } finally {
+                if (isMounted) setIsLoading(false);
+            }
+        };
+        if (teachingGroupYearId && scannedData) {
+            fetchData();
+        }
+        return () => { isMounted = false; };
     }, [teachingGroupYearId, scannedData]);
 
-    // useEffect(() => {
-    //     setIsLoading(true);
-
-    //     // console.log(state.studentScore);
-    //     // console.log(state.studentData);
-
-    //     setIsLoading(false);
-    // }, [state.studentScore, state.studentData]);
+    useEffect(() => {
+        // Guard: only check after data is loaded and valid
+        if (
+            dataLoaded &&
+            state.studentScore &&
+            state.studentScore.isBeingScored !== undefined &&
+            state.studentScore.isBeingScored !== null &&
+            auth.userId
+        ) {
+            console.log(state.studentScore.isBeingScored, auth.userId);
+            if (
+                state.studentScore.isBeingScored !== auth.userId
+            ) {
+                // Clear context state before navigating back to scanner
+                navigate(`/munaqasyah/scanner`, {
+                    state: {
+                        errorMessage: "Siswa ini sedang dinilai oleh munaqis lain!",
+                    }
+                });
+            }
+        }
+    }, [dataLoaded, state.studentScore, auth.userId, navigate]);
 
     const scoreCategories = [
         { key: 'reciting', label: "Membaca Al-Qur'an/Tilawati" },
@@ -78,9 +109,34 @@ const StudentScoresView = () => {
         console.log(data)
     };
 
+    const handleFinish = async () => {
+        // Patch score with isBeingScored = "false"
+        if (state.studentScore && state.studentScore.id) {
+            const updatedScore = { ...state.studentScore, isBeingScored: "false" };
+            await patchScoreData(updatedScore); // patchScoreData is in context
+        }
+        // Navigate back to scanner
+        navigate(`/munaqasyah/scanner`, {
+            state: {
+                message: "Penilaian selesai, silakan scan siswa berikutnya."
+            }
+        });
+    };
+
     return (
         <div className="min-h-screen bg-gray-50 ">
-            <h1 className="text-2xl font-semibold text-gray-900 p-4">Munaqosah</h1>
+            <div className="flex items-center justify-between p-4">
+                <h1 className="text-2xl font-semibold text-gray-900 mr-4">Munaqosah</h1>
+                <button
+                    className="button-primary m-0"
+                    onClick={() => {
+                        handleFinish()
+                        general.setMessage(true);
+                    }}
+                >
+                    Selesai
+                </button>
+            </div>
             {isLoading ? (
                 <div className="flex flex-col pb-24">
                     <div className="card-basic justify-between mt-0 mx-4 pr-8 box-border">

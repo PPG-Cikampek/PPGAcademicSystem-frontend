@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import QrScanner from 'qr-scanner';
 import beep from '../../assets/audios/store-scanner-beep-90395.mp3';
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
+import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
 
-const QRCodeScanner = () => {
+const QRCodeScanner = ({ errorMessage }) => {
     const videoRef = useRef(null);
     const beepRef = useRef(null);
     const navigate = useNavigate();
@@ -12,6 +13,9 @@ const QRCodeScanner = () => {
     const [cooldown, setCooldown] = useState(false);
     const [status, setStatus] = useState('Initializing...');
     const [retryCount, setRetryCount] = useState(0);
+
+    const [err, setErr] = useState(errorMessage || "");
+    // console.log('Error message:', err);
 
     useEffect(() => {
         let qrScanner;
@@ -36,7 +40,7 @@ const QRCodeScanner = () => {
                 } catch (error) {
                     console.error('Camera access denied or unavailable:', error);
                     setStatus('Camera error: ' + error.message);
-                    
+
                     // Retry once if error occurs
                     if (retryCount === 0) {
                         setStatus('Sedang mencoba ulang...');
@@ -69,6 +73,7 @@ const QRCodeScanner = () => {
             });
         }
 
+        setErr(null);
         // Navigate to verification page with scanned data
         navigate('/munaqasyah/student', {
             state: {
@@ -84,6 +89,11 @@ const QRCodeScanner = () => {
 
     return (
         <div className="flex flex-col items-center justify-center h-full w-full p-4">
+            {err && (
+                <div className="mb-4">
+                    <ErrorCard error={err} />
+                </div>
+            )}
             <div className="relative w-72 h-72 border-2 border-gray-700 shadow-md rounded-md overflow-hidden">
                 <video
                     ref={videoRef}
