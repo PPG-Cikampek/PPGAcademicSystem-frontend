@@ -134,6 +134,7 @@ dist
 public/version.json
 
 # deployment files
+connect_vps.sh
 deploy.sh
 .firebase
 .firebaserc
