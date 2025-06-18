@@ -18,7 +18,7 @@ const JournalView = lazy(() => import("../teacher-role/journal/pages/JournalView
 const PageHeader = lazy(() => import("../teacher-role/shared/Components/Navigation/PageHeader"));
 const AttendanceHistoryView = lazy(() => import("../teacher-role/history/attendanceHistory/pages/AttendanceHistoryView"));
 const AttendanceHistoryViewByClass = lazy(() => import("../teacher-role/history/attendanceHistory/pages/AttendanceHistoryViewByClass"));
-const TeachingGroupYearsView = lazy(() => import("../academic/pages/TeachingGroupYearsView"));
+const BranchYearsView = lazy(() => import("../academic/pages/BranchYearsView"));
 const NewClassView = lazy(() => import("../class/pages/NewClassView"));
 const ClassDetailView = lazy(() => import("../class/pages/ClassDetailView"));
 const AddStudentToClassView = lazy(() => import("../class/pages/AddStudentToClassView"));
@@ -164,7 +164,7 @@ export const teacherRoutes = [
         path: '/dashboard/academic',
         element: (
             <PageHeader>
-                <TeachingGroupYearsView />
+                <BranchYearsView />
             </PageHeader>
         )
     },
@@ -205,7 +205,7 @@ export const teacherRoutes = [
         )
     },
     {
-        path: '/settings/academic/classes/new',
+        path: '/academic/classes/new',
         element: (
             <PageHeader>
                 <NewClassView />

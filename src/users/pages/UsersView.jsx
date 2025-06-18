@@ -17,13 +17,14 @@ const UsersView = () => {
     const [selectedUserIds, setSelectedUserIds] = useState([]);
     const [groupVisibility, setGroupVisibility] = useState({
         admin: true,
-        teachingGroupAdmin: true,
+        BranchAdmin: true,
+        subBranchAdmin: true,
         teacher: true,
         student: true,
         curriculum: true,
     });
 
-    const roleOrder = ['admin', 'teachingGroupAdmin', 'teacher', 'student', 'curriculum', 'munaqisy'];
+    const roleOrder = ['admin', 'branchAdmin', 'subBranchAdmin', 'teacher', 'student', 'curriculum', 'munaqisy'];
 
     const { isLoading, error, sendRequest, setError } = useHttp();
     const navigate = useNavigate();
@@ -48,11 +49,12 @@ const UsersView = () => {
     const getRoleColor = (role) => {
         const roles = {
             admin: 'bg-red-100 text-red-700',
-            teachingGroupAdmin: 'bg-orange-100 text-orange-700',
+            branchAdmin: 'bg-orange-100 text-orange-700',
+            subBranchAdmin: 'bg-yellow-100 text-yellow-700',
             teacher: 'bg-violet-100 text-violet-700',
             student: 'bg-blue-100 text-blue-700',
             curriculum: 'bg-green-100 text-green-700',
-            munaqisy: 'bg-orange-100 text-orange-700',
+            munaqisy: 'bg-pink-100 text-pink-700',
         };
         return roles[role] || 'bg-gray-100 text-gray-700';
     };
@@ -172,13 +174,13 @@ const UsersView = () => {
             key: 'branch',
             label: 'Desa',
             sortable: true,
-            render: (user) => user.teachingGroupId?.branchId?.name
+            render: (user) => user.subBranchId?.branchId?.name
         },
         {
             key: 'group',
             label: 'Kelompok',
             sortable: true,
-            render: (user) => user.teachingGroupId?.name
+            render: (user) => user.subBranchId?.name
         },
         {
             key: 'actions',

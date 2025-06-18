@@ -22,7 +22,6 @@ const DataTable = ({
     tableId
 }) => {
     const storageKey = tableId ? `datatable-state-${tableId}` : null;
-
     const loadPersistedState = () => {
         if (!storageKey) return {};
         try {
@@ -236,11 +235,11 @@ const DataTable = ({
                             <SkeletonHeader />
                         ) : (
                             <tr>
-                                {columns.map(({ key, label, sortable }) => (
+                                {columns.map(({ key, label, sortable, headerAlign }) => (
                                     <th
                                         key={key}
                                         onClick={() => sortable && sortData(key)}
-                                        className={`min-w-14 p-2 md:p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${sortable ? 'cursor-pointer hover:bg-gray-50' : ''
+                                        className={`min-w-14 p-2 md:p-4 text-xs font-medium text-gray-500 uppercase tracking-wider ${sortable ? 'cursor-pointer hover:bg-gray-50' : ''} ${headerAlign === 'center' ? 'text-center' : headerAlign === 'right' ? 'text-right' : 'text-left'
                                             }`}
                                     >
                                         {label}
@@ -263,10 +262,11 @@ const DataTable = ({
                                     <tr
                                         key={index}
                                         onClick={() => onRowClick && onRowClick(item)}
-                                        className={`${config.clickableRows && 'hover:bg-gray-50 hover:cursor-pointer'}  transition`}
+                                        className={`${config.clickableRows === true ? 'hover:bg-gray-50 hover:cursor-pointer' : ''}  transition`}
                                     >
-                                        {columns.map(({ key, render, cellStyle }) => (
-                                            <td key={key} className={`${key === 'actions' ? 'p-2' : 'p-2 md:p-4'}`}>
+                                        {columns.map(({ key, render, cellStyle, cellAlign }) => (
+                                            <td key={key} className={`${key === 'actions' ? 'p-1' : 'p-1 md:p-2'} ${cellAlign === 'center' ? 'text-center' : cellAlign === 'right' ? 'text-right' : 'text-left'
+                                                }`}>
                                                 <span className={cellStyle?.(item)}>
                                                     {render ? render(item) : item[key]}
                                                 </span>

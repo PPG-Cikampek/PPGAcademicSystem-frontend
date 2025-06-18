@@ -1,52 +1,49 @@
-import React, { useContext, useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 import useHttp from '../../shared/hooks/http-hook';
 import DynamicForm from '../../shared/Components/UIElements/DynamicForm';
 
 import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
-import Modal from '../../shared/Components/UIElements/ModalBottomClose';
+import Modal from '../../shared/Components/UIElements/ModalBottomClose'
 
 
-const UpdateLevelView = () => {
+const NewTeachingGroupView = () => {
     const [modal, setModal] = useState({ title: '', message: '', onConfirm: null });
     const [modalIsOpen, setModalIsOpen] = useState(false);
-    const { isLoading, error, sendRequest, setError } = useHttp();
+
     const [isTransitioning, setIsTransitioning] = useState(false);
-    const [loadedLevel, setLoadedLevel] = useState();
+    const { isLoading, error, sendRequest, setError } = useHttp();
 
-    const subBranchId = useParams().subBranchId
+    // const auth = useContext(AuthContext);
     const navigate = useNavigate()
+    const location = useLocation()
+    const { state } = location;
 
+    const teachingGroupFields = [
+        { name: 'teachingGroupName', label: 'Nama KBM', type: 'text', required: true },
+        { name: 'address', label: 'Tempat Kegiatan KBM', type: 'text', required: true },
+    ]
 
-    useEffect(() => {
-        const fetchSubBranch = async () => {
-            try {
-                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/levels/branches/sub-branches/${subBranchId}`)
-                setLoadedLevel(responseData.subBranch)
-                console.log(responseData)
-                console.log(responseData.subBranch)
-            } catch (err) { }
-        }
-        fetchSubBranch();
-    }, [sendRequest])
 
     const handleFormSubmit = async (data) => {
-        const url = `${import.meta.env.VITE_BACKEND_URL}/levels/branches/sub-branches/${subBranchId}`
+        const url = `${import.meta.env.VITE_BACKEND_URL}/teachingGroups/`
 
-        const body = JSON.stringify({ name: data.name, address: data.address });
+        const body = JSON.stringify({
+            name: data.teachingGroupName,
+            address: data.address,
+            branchYearId: state
+        });
 
-        console.log(body)
-
-        let responseData
+        let responseData;
         try {
-            responseData = await sendRequest(url, 'PATCH', body, {
+            responseData = await sendRequest(url, 'POST', body, {
                 'Content-Type': 'application/json'
             });
-
         } catch (err) {
-            // Error is already handled by useHttp
+            setModal({ title: 'Gagal!', message: err.message, onConfirm: null });
+            setModalIsOpen(true)
         }
         setModal({ title: 'Berhasil!', message: responseData.message, onConfirm: null });
         setModalIsOpen(true)
@@ -57,7 +54,7 @@ const UpdateLevelView = () => {
             <button
                 onClick={() => {
                     setModalIsOpen(false)
-                    !error && navigate(-1)
+                    navigate(-1)
                 }}
                 className={`${modal.onConfirm ? 'btn-danger-outline' : 'button-primary mt-0 '}`}
             >
@@ -73,13 +70,6 @@ const UpdateLevelView = () => {
 
     return (
         <div className="m-auto max-w-md mt-14 md:mt-8">
-
-            {!loadedLevel && isLoading && (
-                < div className="flex justify-center mt-16">
-                    <LoadingCircle size={32} />
-                </div>
-            )}
-
             <Modal
                 isOpen={modalIsOpen}
                 onClose={() => setModalIsOpen(false)}
@@ -96,16 +86,13 @@ const UpdateLevelView = () => {
                 )}
             </Modal>
 
+            {error && <ErrorCard error={error} onClear={() => setError(null)} />}
 
             <div className={`pb-24 transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
-                {error && <ErrorCard error={error} onClear={() => setError(null)} />}
                 <DynamicForm
-                    title='Update Data Kelompok'
+                    title='Tambah KBM'
                     subtitle={'Sistem Akademik Digital'}
-                    fields={[
-                        { name: 'name', label: 'Nama Kelompok', placeholder: 'Nama Lengkap', type: 'text', required: true, value: loadedLevel?.name || '' },
-                        { name: 'address', label: 'Alamat', type: 'textarea', required: true, value: loadedLevel?.address || '' },
-                    ]}
+                    fields={teachingGroupFields}
                     onSubmit={handleFormSubmit}
                     disabled={isLoading}
                     reset={false}
@@ -117,24 +104,14 @@ const UpdateLevelView = () => {
                                 className={`button-primary ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                                 disabled={isLoading}
                             >
-                                {isLoading ? (<LoadingCircle>Processing...</LoadingCircle>) : ('Update')}
+                                {isLoading ? (<LoadingCircle>Processing...</LoadingCircle>) : ('Tambah')}
                             </button>
-                            {/* <button
-                                type="button"
-                                onClick={handleToggle}
-                                className="button-secondary"
-                                disabled={isLoading}
-                            >
-                                {isAdmin ? 'Masuk Generus' : 'Masuk Pengurus'}
-                            </button> */}
                         </div>
                     }
                 />
             </div>
-        </div>
+        </div >
     );
 };
 
-export default UpdateLevelView;
-
-
+export default NewTeachingGroupView;

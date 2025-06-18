@@ -22,8 +22,8 @@ const HomeScreenView = () => {
     // console.log(auth.userRole)
     // console.log(auth.userName)
     // console.log(auth.userBranchId)
-    // console.log(auth.userTeachingGroupId)
-    // console.log(auth.currentTeachingGroupYear)
+    // console.log(auth.userSubBranchId)
+    // console.log(auth.currentSubBranchYear)
     // console.log(auth.userClassIds)
     // console.log(auth.token)
 
@@ -35,13 +35,13 @@ const HomeScreenView = () => {
         }
         const responseData = await response.json();
 
-        // console.log(responseData)
+        console.log(responseData)
 
         const classIds = responseData.teacher?.classIds.map(item => item._id) || []
 
         auth.setAttributes(
-            responseData.teacher?.userId?.teachingGroupId?.branchId?.id,
-            responseData.teacher?.userId?.teachingGroupId?.id,
+            responseData.teacher?.userId?.subBranchId?.branchId?.id,
+            responseData.teacher?.userId?.subBranchId?.id,
             classIds
         )
         return responseData.teacher;
@@ -104,9 +104,9 @@ const HomeScreenView = () => {
                         {auth.userRole === 'teacher' && (
                             <div className="mb-2">
                                 {data.classIds.map((item, index) => {
-                                    const isClassInTeachingGroupYear = item?.teachingGroupYearId?.academicYearId?.isActive
+                                    const isClassInActiveAcademicYear = item?.teachingGroupId?.branchYearId?.academicYearId?.isActive
                                     // console.log(item)
-                                    if (isClassInTeachingGroupYear) {
+                                    if (isClassInActiveAcademicYear) {
                                         // console.log(item)
                                         activeClassCount++;
                                         return <Dashboard key={index} data={item} />

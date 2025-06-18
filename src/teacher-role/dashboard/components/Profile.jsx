@@ -20,7 +20,7 @@ const Profile = ({ user, isLoading }) => {
 
     const getPositionName = {
         branchTeacher: 'MT Desa',
-        teachingGroupTeacher: 'MT Kelompok',
+        subBranchTeacher: 'MT Kelompok',
         localTeacher: 'MS',
         assistant: 'Asisten',
     }
@@ -55,10 +55,10 @@ const Profile = ({ user, isLoading }) => {
                     )}
                     {!isLoading && (
                         <>
-                            <h1 className="text-xl font-medium">{getPositionName[user.position] || 'Munaqis'}</h1>
+                            <h1 className="text-xl font-medium">{getPositionName[user.position] || 'Guru'}</h1>
                             {/* <h2 className="text-xl font-medium">{user.name || 'Unknown'}</h2>
                             <h3 className='font-normal text-gray-600'>
-                                {user.userId?.teachingGroupId?.branchId?.name || 'No Branch'} - {user.userId?.teachingGroupId?.name || 'No TeachingGroup'}
+                                {user.userId?.subBranchId?.branchId?.name || 'No Branch'} - {user.userId?.subBranchId?.name || 'No SubBranch'}
                             </h3> */}
                         </>
                     )}

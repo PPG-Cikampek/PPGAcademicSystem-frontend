@@ -18,7 +18,7 @@ const AddTeacherToClassView = () => {
 
     const navigate = useNavigate()
     const auth = useContext(AuthContext)
-    const targetTeachingGroupId = auth.userTeachingGroupId
+    const targetSubBranchId = auth.userSubBranchId
 
     const classId = useParams().classId;
     const targetClassId = classId
@@ -26,7 +26,7 @@ const AddTeacherToClassView = () => {
     useEffect(() => {
         const loadedTeachers = async () => {
             try {
-                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/teachers/teaching-group/${targetTeachingGroupId}`);
+                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/teachers/sub-branch/${targetSubBranchId}`);
                 setTeachers(responseData.teachers);
             } catch (err) {
                 // Error handled by useHttp
@@ -49,7 +49,7 @@ const AddTeacherToClassView = () => {
                 });
                 setModal({ title: 'Berhasil!', message: responseData.message, onConfirm: null });
 
-                const updatedData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/teachers/teaching-group/${targetTeachingGroupId}`);
+                const updatedData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/teachers/sub-branch/${targetSubBranchId}`);
                 setTeachers(updatedData.teachers);
 
             } catch (err) {

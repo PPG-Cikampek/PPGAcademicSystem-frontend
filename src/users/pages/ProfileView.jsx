@@ -277,8 +277,8 @@ const ProfileView = () => {
                                 <div className="mb-4">
                                     <h2 className="text-xl font-medium text-gray-800">{userData.name}</h2>
                                     <div className='text-gray-600 flex flex-wrap items-center mb-2 md:mb-0 md:gap-2'>{userData.email} {userData.isEmailVerified ? <Icon icon="tdesign:verified" width="18" height="18" style={{ "color": "#06ff00" }} /> : <div onClick={handleEmailVerification} className='p-1 border rounded-md border-red-500 text-gray-500 active:text-primary hover:cursor-pointer italic flex items-center'>Belum verifikasi <Icon icon="ci:triangle-warning" width="16" height="16" style={{ "color": "#ff0000" }} /></div>}</div>
-                                    <p className='text-gray-600'>Desa {userData?.teachingGroupId?.branchId?.name}</p>
-                                    <p className='text-gray-600'>Kelompok {userData?.teachingGroupId?.name || ''}</p>
+                                    <p className='text-gray-600'>Desa {userData?.subBranchId?.branchId?.name}</p>
+                                    <p className='text-gray-600'>Kelompok {userData?.subBranchId?.name || ''}</p>
                                 </div>
                             )}
                             <div className="my-4">

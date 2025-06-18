@@ -154,7 +154,7 @@ const UpdateTeacherView = () => {
                             name: 'position', label: 'Posisi', placeholder: 'Guru', type: 'select', required: true, disabled: isLoading, value: loadedTeacher?.position || '',
                             options: [
                                 { label: 'MT Desa', value: 'branchTeacher' },
-                                { label: 'MT Kelompok', value: 'teachingGroupTeacher' },
+                                { label: 'MT Kelompok', value: 'subBranchTeacher' },
                                 { label: 'MS', value: 'localTeacher' },
                                 { label: 'Asisten', value: 'assistant' }
                             ]

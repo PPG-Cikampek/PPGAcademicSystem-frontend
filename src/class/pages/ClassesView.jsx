@@ -11,7 +11,7 @@ const ClassesView = () => {
     const columns = [
         { key: 'name', label: 'Nama Kelas', sortable: true },
         { key: 'startTime', label: 'Waktu Mulai', sortable: true },
-        { key: 'teachingGroupId', label: 'Kelompok', sortable: true },
+        { key: 'subBranchId', label: 'Kelompok', sortable: true },
         { key: 'teachers', label: 'Guru', sortable: true, render: (row) => row.teachers },
         { key: 'students', label: 'Siswa', sortable: true, render: (row) => row.students },
         { key: 'attendances', label: 'Pertemuan', sortable: true, render: (row) => row.attendances },
@@ -20,7 +20,7 @@ const ClassesView = () => {
     const filterOptions = [
         { key: 'name', label: 'Nama Kelas', options: Array.from(new Set(classes.map(c => c.name))) },
         { key: 'startTime', label: 'Waktu Mulai', options: Array.from(new Set(classes.map(c => c.startTime))) },
-        { key: 'teachingGroupId', label: 'Kelompok', options: Array.from(new Set(classes.map(c => c.teachingGroupId))) },
+        { key: 'subBranchId', label: 'Kelompok', options: Array.from(new Set(classes.map(c => c.subBranchId))) },
     ];
 
     return (
@@ -33,7 +33,7 @@ const ClassesView = () => {
                     data={classes}
                     columns={columns}
                     onRowClick={(cls) => navigate(`/dashboard/classes/${cls._id}`)}
-                    searchableColumns={['name', 'teachingGroupId']}
+                    searchableColumns={['name', 'subBranchId']}
                     initialSort={{ key: 'name', direction: 'ascending' }}
                     isLoading={false}
                     filterOptions={filterOptions}

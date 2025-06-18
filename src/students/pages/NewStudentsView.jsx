@@ -15,24 +15,24 @@ const NewStudentView = () => {
 
     const [isTransitioning, setIsTransitioning] = useState(false);
     const { isLoading, error, sendRequest, setError } = useHttp();
-    const [loadedTeachingGroups, setLoadedTeachingGroups] = useState([]);
+    const [loadedSubBranches, setLoadedSubBranches] = useState([]);
     const [signUpFields, setSignUpFields] = useState()
 
     // const auth = useContext(AuthContext);
     const navigate = useNavigate()
 
     useEffect(() => {
-        const fetchTeachingGroups = async () => {
+        const fetchSubBranches = async () => {
             try {
-                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/levels/teachingGroup`);
-                setLoadedTeachingGroups(responseData.teachingGroups);
+                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/levels/subBranch`);
+                setLoadedSubBranches(responseData.subBranches);
             } catch (err) { }
         };
-        fetchTeachingGroups();
+        fetchSubBranches();
     }, [sendRequest]);
 
     useEffect(() => {
-        if (loadedTeachingGroups) {
+        if (loadedSubBranches) {
             setSignUpFields([       
                 { name: 'name', label: 'Name Lengkap', placeholder: '', type: 'text', required: true },
                 { name: 'email', label: 'Email', placeholder: 'contoh@gmail.com', type: 'email', required: true },
@@ -50,16 +50,16 @@ const NewStudentView = () => {
 
                 },
                 {
-                    name: 'teachingGroupName',
+                    name: 'subBranchName',
                     label: 'Kelompok',
                     type: 'select',
                     required: true,
-                    options: loadedTeachingGroups.map(({ name }) => ({ label: name, value: name }))
+                    options: loadedSubBranches.map(({ name }) => ({ label: name, value: name }))
                 },
 
             ]);
         }
-    }, [loadedTeachingGroups]);
+    }, [loadedSubBranches]);
 
 
     const handleFormSubmit = async (data) => {
@@ -69,7 +69,7 @@ const NewStudentView = () => {
             email: data.email,
             password: data.password,
             role: data.role,
-            teachingGroupName: data.teachingGroupName
+            subBranchName: data.subBranchName
         });
 
         const studentUrl = `${import.meta.env.VITE_BACKEND_URL}/students/`

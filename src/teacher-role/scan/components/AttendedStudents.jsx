@@ -209,7 +209,7 @@ const AttendedStudents = () => {
                     )
                 )}
             </div>
-            {state.studentList.length !== 0 && state.isTeachingGroupYearActivated === true ? (
+            {state.studentList.length !== 0 && state.isSubBranchYearActivated === true ? (
                 <div className="inline-flex items-center">
                     <label className="flex items-center cursor-pointer relative" htmlFor="check-2">
                         <input
@@ -230,8 +230,8 @@ const AttendedStudents = () => {
             ) : (
                 <div className='italic text-gray-500 mt-2'>Daftar hadir kosong</div>
             )}
-            <div className={`flex flex-col ${state.studentList.length !== 0 && state.isTeachingGroupYearActivated === true ? 'mb-4' : ''} `}>
-                {state.isTeachingGroupYearActivated === true && state.studentList.map(student => (
+            <div className={`flex flex-col ${state.studentList.length !== 0 && state.isSubBranchYearActivated === true ? 'mb-4' : ''} `}>
+                {state.isSubBranchYearActivated === true && state.studentList.map(student => (
                     <div key={student.studentId.nis} className={`p-4 pr-0 mx-[-1rem] min-h-20 flex items-center gap-4 border-b ${getBorderColor(student.status)} transition-all duration-500`}>
                         <label className="flex items-center cursor-pointer relative" htmlFor={student.studentId.nis}>
                             <input
@@ -395,7 +395,7 @@ const AttendedStudents = () => {
                     </div>
                 ))}
             </div>
-            {state.isTeachingGroupYearActivated === true && state.studentList.length !== 0 && (
+            {state.isSubBranchYearActivated === true && state.studentList.length !== 0 && (
                 <div className="flex justify-between items-center">
                     <div className='flex gap-2'>
                         <button

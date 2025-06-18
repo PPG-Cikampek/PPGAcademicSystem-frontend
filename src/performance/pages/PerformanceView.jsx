@@ -29,8 +29,8 @@ const PerformanceView = () => {
   const [branchesList, setBranchesList] = useState();
   const [selectedBranch, setSelectedBranch] = useState(null);
 
-  const [teachingGroupsList, setTeachingGroupsList] = useState();
-  const [selectedTeachingGroup, setSelectedTeachingGroup] = useState(null);
+  const [subBranchesList, setSubBranchesList] = useState();
+  const [selectedSubBranch, setSelectedSubBranch] = useState(null);
 
   const [classesList, setClassesList] = useState();
   const [selectedClass, setSelectedClass] = useState(null);
@@ -50,7 +50,7 @@ const PerformanceView = () => {
 
   const fetchAcademicYears = useCallback(async () => {
     try {
-      const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/academicYears/?populate=teachingGroupYears`);
+      const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/academicYears/?populate=subBranchYears`);
       setAcademicYearsList(responseData.academicYears);
     } catch (err) { }
   }, [sendRequest]);
@@ -60,7 +60,7 @@ const PerformanceView = () => {
     const body = JSON.stringify({
       academicYearId: selectedAcademicYear,
       branchId: selectedBranch,
-      teachingGroupId: selectedTeachingGroup,
+      subBranchId: selectedSubBranch,
       classId: selectedClass,
       startDate: startDate ? startDate.toISOString() : null,
       endDate: endDate ? endDate.toISOString() : null,
@@ -79,7 +79,7 @@ const PerformanceView = () => {
       setOverallAttendances(attendanceData.overallStats);
       setViolationData(attendanceData.violationStats);
     } catch (err) { }
-  }, [sendRequest, selectedAcademicYear, selectedBranch, selectedTeachingGroup, selectedClass, startDate, endDate]);
+  }, [sendRequest, selectedAcademicYear, selectedBranch, selectedSubBranch, selectedClass, startDate, endDate]);
 
   useEffect(() => {
     registerLocale("id-ID", idID);
@@ -94,8 +94,8 @@ const PerformanceView = () => {
     setSelectedAcademicYear(academicYearId);
     setBranchesList([]);
     setSelectedBranch(null);
-    setTeachingGroupsList([]);
-    setSelectedTeachingGroup(null);
+    setSubBranchesList([]);
+    setSelectedSubBranch(null);
     setClassesList([]);
     setSelectedClass(null);
 
@@ -117,41 +117,41 @@ const PerformanceView = () => {
     setViolationData(null)
     setAttendanceData(null)
     setSelectedBranch(branchId);
-    setTeachingGroupsList([]);
-    setSelectedTeachingGroup(null);
+    setSubBranchesList([]);
+    setSelectedSubBranch(null);
     setClassesList([]);
     setSelectedClass(null);
 
     if (branchId !== '') {
-      fetchTeachingGroupsList(branchId);
+      fetchSubBranchesList(branchId);
     }
   };
 
-  const fetchTeachingGroupsList = async (branchId) => {
+  const fetchSubBranchesList = async (branchId) => {
     try {
       const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/levels/branches/${branchId}?populate=true`);
-      setTeachingGroupsList(responseData.branch.teachingGroups);
+      setSubBranchesList(responseData.branch.subBranches);
     } catch (err) { }
   };
 
-  const selectTeachingGroupHandler = (teachingGroupId) => {
+  const selectSubBranchHandler = (subBranchId) => {
     setOverallAttendances(null)
     setViolationData(null)
     setAttendanceData(null)
-    setSelectedTeachingGroup(teachingGroupId);
+    setSelectedSubBranch(subBranchId);
     setClassesList([]);
     setSelectedClass(null);
 
-    if (teachingGroupId !== '') {
-      fetchClassesList(teachingGroupId);
+    if (subBranchId !== '') {
+      fetchClassesList(subBranchId);
     }
   };
 
-  const fetchClassesList = async (teachingGroupId) => {
-    const url = `${import.meta.env.VITE_BACKEND_URL}/teachingGroupYears/teaching-group/${teachingGroupId}/academic-year/${selectedAcademicYear}`;
+  const fetchClassesList = async (subBranchId) => {
+    const url = `${import.meta.env.VITE_BACKEND_URL}/subBranchYears/teaching-group/${subBranchId}/academic-year/${selectedAcademicYear}`;
     try {
       const responseData = await sendRequest(url);
-      setClassesList(responseData.teachingGroupYear.classes);
+      setClassesList(responseData.subBranchYear.classes);
     } catch (err) { }
   };
 
@@ -199,7 +199,7 @@ const PerformanceView = () => {
               <div className={`flex flex-col`}>
                 <h2 className="text-xl font-bold">Daerah Cikampek</h2>
                 {/* <p className="text-sm text-gray-600">
-                          Target Semester: {teachingGroupData.semesterTarget} hari
+                          Target Semester: {subBranchData.semesterTarget} hari
                       </p> */}
               </div>
             </div>
@@ -259,15 +259,15 @@ const PerformanceView = () => {
                       ))}
                     </select>
                     <select
-                      value={selectedTeachingGroup ? selectedTeachingGroup : ''}
-                      onChange={(e) => selectTeachingGroupHandler(e.target.value)}
+                      value={selectedSubBranch ? selectedSubBranch : ''}
+                      onChange={(e) => selectSubBranchHandler(e.target.value)}
                       className="border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300"
                       disabled={!selectedBranch}
                     >
                       <option value={''}>Semua</option>
-                      {teachingGroupsList && teachingGroupsList.map((teachingGroup, index) => (
-                        <option key={index} value={teachingGroup._id}>
-                          {teachingGroup.name}
+                      {subBranchesList && subBranchesList.map((subBranch, index) => (
+                        <option key={index} value={subBranch._id}>
+                          {subBranch.name}
                         </option>
                       ))}
                     </select>
@@ -275,7 +275,7 @@ const PerformanceView = () => {
                       value={selectedClass ? selectedClass : ''}
                       onChange={(e) => selectClassHandler(e.target.value)}
                       className="border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300"
-                      disabled={!selectedTeachingGroup}
+                      disabled={!selectedSubBranch}
                     >
                       <option value={''}>Semua</option>
                       {classesList && classesList.map((cls, index) => (
@@ -296,9 +296,9 @@ const PerformanceView = () => {
                     return <p key={index}> {branch.name} - {branch.id} </p>
                   }
                 }) : ''}</div>
-                <div>{selectedTeachingGroup ? teachingGroupsList.map((teachingGroup, index) => {
-                  if (teachingGroup._id === selectedTeachingGroup) {
-                    return <p key={index}> {teachingGroup.name} - {teachingGroup.id} </p>
+                <div>{selectedSubBranch ? subBranchesList.map((subBranch, index) => {
+                  if (subBranch._id === selectedSubBranch) {
+                    return <p key={index}> {subBranch.name} - {subBranch.id} </p>
                   }
                 }) : ''}</div>
                 <div>{selectedClass ? classesList.map((cls, index) => {

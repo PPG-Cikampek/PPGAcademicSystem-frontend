@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 
 import useHttp from '../../shared/hooks/http-hook';
 import DynamicForm from '../../shared/Components/UIElements/DynamicForm';
@@ -7,9 +7,6 @@ import DynamicForm from '../../shared/Components/UIElements/DynamicForm';
 import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 import Modal from '../../shared/Components/UIElements/ModalBottomClose'
-
-import BackButton from '../../shared/Components/UIElements/BackButton';
-
 
 
 const NewClassView = () => {
@@ -23,6 +20,9 @@ const NewClassView = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const { state } = location;
+
+  const teachingGroupId = useParams().teachingGroupId;
+  console.log('Teaching Group ID:', teachingGroupId);
 
   const classFields = [
     {
@@ -42,6 +42,7 @@ const NewClassView = () => {
       ]
     },
     { name: 'startTime', label: 'Waktu Mulai', type: 'time', required: true },
+    { name: 'endTime', label: 'Waktu Selesai', type: 'time', required: true },
   ]
 
 
@@ -51,7 +52,8 @@ const NewClassView = () => {
     const body = JSON.stringify({
       name: data.name,
       startTime: data.startTime,
-      teachingGroupYearId: state
+      endTime: data.endTime,
+      teachingGroupId
     });
 
     let responseData;

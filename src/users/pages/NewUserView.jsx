@@ -16,35 +16,35 @@ const NewUserView = () => {
     const [isAccountForAdmin, setIsAccountForAdmin] = useState(true);
     const [isTransitioning, setIsTransitioning] = useState(false);
     const { isLoading, error, sendRequest, setError } = useHttp();
-    const [loadedTeachingGroups, setLoadedTeachingGroups] = useState([]);
+    const [loadedSubBranches, setLoadedSubBranches] = useState([]);
     const [adminFields, setAdminFields] = useState()
 
     const auth = useContext(AuthContext);
     const navigate = useNavigate()
 
     useEffect(() => {
-        const fetchTeachingGroups = async () => {
+        const fetchSubBranches = async () => {
             try {
-                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/levels/branches/teaching-groupes?populate=branchId`);
-                setLoadedTeachingGroups(responseData.teachingGroups);
-                console.log(responseData.teachingGroups);
+                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/levels/branches/sub-branches?populate=branchId`);
+                setLoadedSubBranches(responseData.subBranches);
+                console.log(responseData.subBranches);
             } catch (err) { }
         };
-        fetchTeachingGroups();
+        fetchSubBranches();
     }, [sendRequest]);
 
     useEffect(() => {
-        if (loadedTeachingGroups) {
+        if (loadedSubBranches) {
             setAdminFields([
                 { name: 'name', label: 'Nama Lengkap', placeholder: 'Faisal Ahmad', type: 'text', required: true },
                 { name: 'email', label: 'Email', placeholder: 'contoh@email.com', type: 'email', required: true },
                 { name: 'password', label: 'Password', placeholder: 'min 8 karakter', type: 'password', required: true },
                 {
-                    name: 'teachingGroupId',
+                    name: 'subBranchId',
                     label: 'Kelompok',
                     type: 'select',
                     required: true,
-                    options: loadedTeachingGroups
+                    options: loadedSubBranches
                         .map(group => ({
                             label: `${group.branchId?.name || 'Unknown Branch'} - ${group.name}`,
                             value: group.id
@@ -57,15 +57,16 @@ const NewUserView = () => {
                     type: 'select',
                     required: true,
                     options: [
-                        { label: 'Admin', value: 'admin' },
-                        { label: 'Admin Kelompok', value: 'teachingGroupAdmin' },
+                        { label: 'Admin Daerah', value: 'admin' },
+                        { label: 'PJP Desa', value: 'branchAdmin' },
+                        { label: 'PJP Kelompok', value: 'subBranchAdmin' },
                         { label: 'Kurikulum', value: 'curriculum' },
                     ]
                 },
 
             ]);
         }
-    }, [loadedTeachingGroups]);
+    }, [loadedSubBranches]);
 
     const handleFormSubmit = async (data) => {
         const url = `${import.meta.env.VITE_BACKEND_URL}/users/createUser`
@@ -76,14 +77,14 @@ const NewUserView = () => {
                 email: data.email,
                 password: data.password,
                 role: data.role,
-                teachingGroupId: data.teachingGroupId
+                subBranchId: data.subBranchId
             }
             : {
                 name: data.name,
                 email: data.email,
                 password: data.password,
                 role: data.position,
-                teachingGroupId: data.teachingGroupId,
+                subBranchId: data.subBranchId,
                 teacherDetails: {
                     nig: data.nig,
                     position: data.position
@@ -131,7 +132,8 @@ const NewUserView = () => {
             options:
                 [
                     { label: 'Admin', value: 'admin' },
-                    { label: 'Admin Kelompok', value: 'teachingGroupAdmin' },
+                    { label: 'PJP Desa', value: 'branchAdmin' },
+                    { label: 'PJP Kelompok', value: 'subBranchAdmin' },
                 ]
 
         };

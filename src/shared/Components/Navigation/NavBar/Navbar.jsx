@@ -3,9 +3,10 @@ import { NavLink, useNavigate } from 'react-router-dom';
 
 import { SidebarContext } from '../../Context/sidebar-context';
 import { AuthContext } from '../../Context/auth-context';
-import { User, Calendar, Settings, ChevronLeft, ChevronRight, LogOut } from 'lucide-react';
+import getUserRoleTitle from '../../../Utilities/getUserRoleTitle';
 import FloatingMenu from '../../UIElements/FloatingMenu';
 import BackButton from '../../UIElements/BackButton';
+import { User, Calendar, Settings, ChevronLeft, ChevronRight, LogOut } from 'lucide-react';
 
 const Navbar = () => {
 
@@ -48,10 +49,10 @@ const Navbar = () => {
 
 
     const navLinks = [
-        ...(auth.currentTeachingGroupYear ? [
-            // { id: 1, name: formatAcademicYear(auth.currentTeachingGroupYear), path: '/settings/academic', icon: <Calendar /> }
+        ...(auth.currentSubBranchYear ? [
+            // { id: 1, name: formatAcademicYear(auth.currentSubBranchYear), path: '/academic', icon: <Calendar /> }
         ] : []),
-        { id: 2, name: auth.userRole, path: '', icon: <Settings /> },
+        { id: 2, name: getUserRoleTitle(auth.userRole), path: '', icon: <Settings /> },
     ];
 
 

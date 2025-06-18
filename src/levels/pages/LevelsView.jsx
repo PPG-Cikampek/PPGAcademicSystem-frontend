@@ -83,17 +83,17 @@ const LevelsView = () => {
         setModalIsOpen(true);
     }
 
-    const deleteTeachingGroupHandler = (e, teachingGroupName, teachingGroupId) => {
+    const deleteSubBranchHandler = (e, subBranchName, subBranchId) => {
         e.stopPropagation()
-        console.log(teachingGroupId)
+        console.log(subBranchId)
         const confirmDelete = async () => {
             setModalIsOpen(false)
-            const url = `${import.meta.env.VITE_BACKEND_URL}/levels/branches/teaching-groupes`;
+            const url = `${import.meta.env.VITE_BACKEND_URL}/levels/branches/sub-branches`;
 
             console.log(url)
 
             const body = JSON.stringify({
-                teachingGroupId
+                subBranchId
             });
 
             let responseData;
@@ -111,7 +111,7 @@ const LevelsView = () => {
         };
         setModal({
             title: `Konfirmasi Penghapusan`,
-            message: `Hapus Desa: ${teachingGroupName}?`,
+            message: `Hapus Desa: ${subBranchName}?`,
             onConfirm: confirmDelete,
         });
         setModalIsOpen(true);
@@ -197,7 +197,7 @@ const LevelsView = () => {
                                         <div className='flex items-center gap-2'>
                                             <h2 className="text-sm font-semibold text-gray-900">Desa {branch.name}</h2>
                                             <div className="text-xs text-gray-500 border border-gray-500 rounded p-1">
-                                                {branch.teachingGroups.length} Kelompok
+                                                {branch.subBranches.length} Kelompok
                                             </div>
                                         </div>
                                         <div className="flex items-center text-xs text-gray-500 mt-1">
@@ -226,7 +226,7 @@ const LevelsView = () => {
 
                                 {expandedBranches[branch._id] && (
                                     <div className="mt-3 ml-12 space-y-2">
-                                        {branch.teachingGroups.map(sub => (
+                                        {branch.subBranches.map(sub => (
                                             <div key={sub._id} className="flex items-center justify-between py-2 px-3 bg-gray-50 rounded text-sm">
                                                 <div>
                                                     <div className="font-medium text-gray-900">Kelompok {sub.name}</div>
@@ -237,7 +237,7 @@ const LevelsView = () => {
                                                 </div>
                                                 <div className="flex">
                                                     <button onClick={() => navigate(`/settings/levels/teaching-group/${sub._id}`)} className='px-2 italic text-gray-500 hover:underline hover:text-blue-500 hover:cursor-pointer'>Edit</button>
-                                                    <button onClick={(e) => deleteTeachingGroupHandler(e, sub.name, sub._id)} className='px-2 italic text-gray-500 hover:underline hover:text-red-500 hover:cursor-pointer'>Hapus</button>
+                                                    <button onClick={(e) => deleteSubBranchHandler(e, sub.name, sub._id)} className='px-2 italic text-gray-500 hover:underline hover:text-red-500 hover:cursor-pointer'>Hapus</button>
                                                 </div>
 
                                             </div>

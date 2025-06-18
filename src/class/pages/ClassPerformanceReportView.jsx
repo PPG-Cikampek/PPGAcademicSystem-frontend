@@ -200,7 +200,7 @@ const ClassPerformanceReportView = ({ studentData, noCard = false }) => {
                     </View>
                     <View style={styles.studentDetailLists}>
                         <Text>Tahun Ajaran</Text>
-                        <Text>: {studentData.teachingGroupYearName}</Text>
+                        <Text>: {studentData.subBranchYearName}</Text>
                     </View>
                     <View style={styles.studentDetailLists}>
                         <Text>Periode</Text>

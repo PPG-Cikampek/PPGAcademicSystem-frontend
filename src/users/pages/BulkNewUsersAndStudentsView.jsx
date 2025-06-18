@@ -11,7 +11,7 @@ import Modal from '../../shared/Components/UIElements/ModalBottomClose'
 import { AuthContext } from '../../shared/Components/Context/auth-context';
 
 const BulkNewUsersAndStudentsView = () => {
-    const [loadedTeachingGroups, setLoadedTeachingGroups] = useState([]);
+    const [loadedSubBranches, setLoadedSubBranches] = useState([]);
     const { isLoading, error, sendRequest, setError } = useHttp();
     const [bulkCreateFields, setBulkCreateFields] = useState()
     const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -21,26 +21,26 @@ const BulkNewUsersAndStudentsView = () => {
     const auth = useContext(AuthContext)
 
     useEffect(() => {
-        const fetchTeachingGroups = async () => {
+        const fetchSubBranches = async () => {
             try {
-                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/levels/branches/teaching-groupes?populate=branchId`);
-                setLoadedTeachingGroups(responseData.teachingGroups);
+                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/levels/branches/sub-branches?populate=branchId`);
+                setLoadedSubBranches(responseData.subBranches);
             } catch (err) { }
         };
-        fetchTeachingGroups();
+        fetchSubBranches();
     }, [sendRequest]);
 
     useEffect(() => {
-        if (loadedTeachingGroups) {
+        if (loadedSubBranches) {
             setBulkCreateFields([
                 { name: 'count', label: 'Jumlah Siswa', placeholder: '0', type: 'number', required: true },
                 { name: 'year', type: 'year', label: 'Tahun', value: new Date().getFullYear(), required: true },
                 {
-                    name: 'teachingGroupId',
+                    name: 'subBranchId',
                     label: 'Kelompok',
                     type: 'select',
                     required: true,
-                    options: loadedTeachingGroups
+                    options: loadedSubBranches
                         .map(group => ({
                             label: `${group.branchId?.name || 'Unknown Branch'} - ${group.name}`,
                             value: group.id
@@ -50,7 +50,7 @@ const BulkNewUsersAndStudentsView = () => {
 
             ]);
         }
-    }, [loadedTeachingGroups]);
+    }, [loadedSubBranches]);
 
     const handleBulkCreate = async (data) => {
         if (!data.count || data.count <= 0) {
@@ -61,10 +61,10 @@ const BulkNewUsersAndStudentsView = () => {
         const url = `${import.meta.env.VITE_BACKEND_URL}/users/bulk-create`;
 
         const body = JSON.stringify({
-            teachingGroupId: data.teachingGroupId,
+            subBranchId: data.subBranchId,
             year: data.year,
             count: data.count,
-            // teachingGroupName: data.teachingGroupName,
+            // subBranchName: data.subBranchName,
             role: 'student',
         });
 
@@ -113,7 +113,7 @@ const BulkNewUsersAndStudentsView = () => {
                 subtitle={'Sistem Akademik Digital'}
                 fields={bulkCreateFields || [
                     { name: 'count', label: 'Jumlah Akun', placeholder: '0', type: 'text', required: true },
-                    { name: 'teachingGroupName', label: 'Kelompok', placeholder: 'Kelompok', type: 'text', required: true },
+                    { name: 'subBranchName', label: 'Kelompok', placeholder: 'Kelompok', type: 'text', required: true },
                     { name: 'role', label: 'Jenis Akun', placeholder: 'Peserta Didik', type: 'text', required: true },
                 ]}
                 onSubmit={handleBulkCreate}

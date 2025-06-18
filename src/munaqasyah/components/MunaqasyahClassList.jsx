@@ -8,13 +8,13 @@ const MunaqasyahClassList = () => {
     const [classes, setClasses] = useState()
     const { isLoading, error, sendRequest, setError } = useHttp()
 
-    const teachingGroupYearId = useParams().teachingGroupYearId;
+    const subBranchYearId = useParams().subBranchYearId;
 
 
     useEffect(() => {
         const fetchClasses = async () => {
             try {
-                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/scores/teachingGroupYear/${teachingGroupYearId}`);
+                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/scores/subBranchYear/${subBranchYearId}`);
                 setClasses(responseData.classes);
                 console.log(responseData)
                 // console.log(JSON.stringify(responseData.classes))
@@ -46,7 +46,7 @@ const MunaqasyahClassList = () => {
                     <div key={cls.classId._id}>
                         <Link
                             to={`/munaqasyah/class/${cls.classId._id}`}
-                            state={{ teachingGroupYearId }}
+                            state={{ subBranchYearId }}
                         >
                             <div className={`card-basic hover:bg-gray-100 active:bg-gray-100 hover:cursor-pointer rounded-md justify-start m-0 transition-all duration-200 my-4`}>
                                 <div className="flex items-center space-x-4">

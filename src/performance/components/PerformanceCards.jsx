@@ -40,7 +40,7 @@ const StatBadge = ({ status, percentage }) => (
 const PerformanceCards = ({ data }) => {
     const [view, setView] = useState('branches');
     const [selectedBranch, setSelectedBranch] = useState(null);
-    const [selectedTeachingGroup, setSelectedTeachingGroup] = useState(null);
+    const [selectedSubBranch, setSelectedSubBranch] = useState(null);
     const [selectedClass, setSelectedClass] = useState(null);
     const [showRelativeToTarget, setShowRelativeToTarget] = useState(false);
 
@@ -68,9 +68,9 @@ const PerformanceCards = ({ data }) => {
             setView('classes');
             setSelectedClass(null);
         } else if (view === 'classes') {
-            setView('teachingGroups');
-            setSelectedTeachingGroup(null);
-        } else if (view === 'teachingGroups') {
+            setView('subBranches');
+            setSelectedSubBranch(null);
+        } else if (view === 'subBranches') {
             setView('branches');
             setSelectedBranch(null);
         } else {
@@ -80,11 +80,11 @@ const PerformanceCards = ({ data }) => {
 
     const renderBranches = () => {
         const branches = {};
-        data.teachingGroupYears.forEach(year => {
-            const branchId = year.teachingGroupId.branchId._id;
+        data.subBranchYears.forEach(year => {
+            const branchId = year.subBranchId.branchId._id;
             if (!branches[branchId]) {
                 branches[branchId] = {
-                    name: year.teachingGroupId.branchId.name,
+                    name: year.subBranchId.branchId.name,
                     attendances: [],
                     uniqueStudents: new Set(),
                     semesterTarget: year.semesterTarget
@@ -100,7 +100,7 @@ const PerformanceCards = ({ data }) => {
 
         if (Object.keys(branches).length === 1) {
             setSelectedBranch(Object.keys(branches)[0]);
-            setView('teachingGroups');
+            setView('subBranches');
         }
 
         return (
@@ -119,7 +119,7 @@ const PerformanceCards = ({ data }) => {
                         className="card-interactive justify-between"
                         onClick={() => {
                             setSelectedBranch(id);
-                            setView('teachingGroups');
+                            setView('subBranches');
                         }}
                     >
                         <div className="flex flex-col gap-1">
@@ -151,16 +151,16 @@ const PerformanceCards = ({ data }) => {
 
 
 
-    const renderTeachingGroups = () => {
-        const teachingGroupYear = data.teachingGroupYears.find(
-            year => year.teachingGroupId.branchId._id === selectedBranch
+    const renderSubBranches = () => {
+        const subBranchYear = data.subBranchYears.find(
+            year => year.subBranchId.branchId._id === selectedBranch
         );
 
-        const teachingGroups = data.teachingGroupYears
-            .filter(year => year.teachingGroupId.branchId._id === selectedBranch) // Fixed key
+        const subBranches = data.subBranchYears
+            .filter(year => year.subBranchId.branchId._id === selectedBranch) // Fixed key
             .map(year => ({
-                id: year.teachingGroupId._id,
-                name: year.teachingGroupId.name,
+                id: year.subBranchId._id,
+                name: year.subBranchId.name,
                 attendances: year.classes.flatMap(cls => cls.attendances),
                 semesterTarget: year.semesterTarget,
                 uniqueStudents: new Set(
@@ -168,7 +168,7 @@ const PerformanceCards = ({ data }) => {
                 ).size // Count unique student IDs
             }));
 
-        const branchName = data.teachingGroupYears.find(year => year.teachingGroupId.branchId._id === selectedBranch)?.teachingGroupId.branchId.name;
+        const branchName = data.subBranchYears.find(year => year.subBranchId.branchId._id === selectedBranch)?.subBranchId.branchId.name;
 
         return (
             <motion.div
@@ -180,38 +180,38 @@ const PerformanceCards = ({ data }) => {
                 <div className="mx-8 flex flex-col">
                     <h2 className="text-xl font-bold">Kelompok {branchName}</h2>
                     {/* <p className="text-sm text-gray-600">
-                        Target Semester: {teachingGroupYear.semesterTarget} hari
+                        Target Semester: {subBranchYear.semesterTarget} hari
                     </p> */}
                 </div>
 
-                {teachingGroups.map(teachingGroup => (
+                {subBranches.map(subBranch => (
                     <motion.div
-                        key={teachingGroup.id}
+                        key={subBranch.id}
                         variants={itemVariants}
                         className="card-interactive justify-between"
                         onClick={() => {
-                            setSelectedTeachingGroup(teachingGroup.id);
+                            setSelectedSubBranch(subBranch.id);
                             setView('classes');
                         }}
                     >
                         <div className="flex flex-col gap-1">
-                            <h3 className="text-lg font-medium">{teachingGroup.name}</h3>
+                            <h3 className="text-lg font-medium">{subBranch.name}</h3>
                             <p className="text-sm text-gray-600">
-                                Jumlah Siswa: {teachingGroup.uniqueStudents} siswa
+                                Jumlah Siswa: {subBranch.uniqueStudents} siswa
                             </p>
                             <p className="text-sm text-gray-600">
-                                Total Pertemuan: {teachingGroup.attendances.length / teachingGroup.uniqueStudents} hari
-                                Total Pertemuan: {attendanceCount(teachingGroup)} hari
+                                Total Pertemuan: {subBranch.attendances.length / subBranch.uniqueStudents} hari
+                                Total Pertemuan: {attendanceCount(subBranch)} hari
                             </p>
                             {/* <p className="text-sm text-gray-600">
-                                Target Semester: {teachingGroup.semesterTarget} hari
+                                Target Semester: {subBranch.semesterTarget} hari
                             </p> */}
                         </div>
                         <div className="flex flex-wrap gap-2 items-center">
                             {/* {calculateStats(
-                                teachingGroup.attendances,
-                                showRelativeToTarget ? teachingGroup.semesterTarget : null,
-                                showRelativeToTarget ? teachingGroup.uniqueStudents : null
+                                subBranch.attendances,
+                                showRelativeToTarget ? subBranch.semesterTarget : null,
+                                showRelativeToTarget ? subBranch.uniqueStudents : null
                             ).map((stat, idx) => (
                                 <StatBadge key={idx} {...stat} />
                             ))} */}
@@ -225,21 +225,21 @@ const PerformanceCards = ({ data }) => {
 
 
     const renderClasses = () => {
-        const teachingGroupYear = data.teachingGroupYears.find(
-            year => year.teachingGroupId._id === selectedTeachingGroup
+        const subBranchYear = data.subBranchYears.find(
+            year => year.subBranchId._id === selectedSubBranch
         );
 
-        if (!teachingGroupYear) return null;
+        if (!subBranchYear) return null;
 
-        const classes = teachingGroupYear.classes.map(cls => ({
+        const classes = subBranchYear.classes.map(cls => ({
             id: cls._id,
             name: cls.name,
             attendances: cls.attendances,
             uniqueStudents: new Set(cls.students.map(studentId => studentId)).size,
-            semesterTarget: teachingGroupYear.semesterTarget,
+            semesterTarget: subBranchYear.semesterTarget,
         }));
 
-        const teachingGroupName = data.teachingGroupYears.find(year => year.teachingGroupId._id === selectedTeachingGroup)?.teachingGroupId.name;
+        const subBranchName = data.subBranchYears.find(year => year.subBranchId._id === selectedSubBranch)?.subBranchId.name;
 
         return (
             <motion.div
@@ -249,9 +249,9 @@ const PerformanceCards = ({ data }) => {
                 className="flex flex-col items-stretch"
             >
                 <div className="mx-8 flex flex-col">
-                    <h2 className="text-xl font-bold">Kelompok {teachingGroupName}</h2>
+                    <h2 className="text-xl font-bold">Kelompok {subBranchName}</h2>
                     {/* <p className="text-sm text-gray-600">
-                        Target Semester: {teachingGroupYear.semesterTarget} hari
+                        Target Semester: {subBranchYear.semesterTarget} hari
                     </p> */}
                 </div>
 
@@ -292,10 +292,10 @@ const PerformanceCards = ({ data }) => {
 
 
     const renderStudents = () => {
-        const teachingGroupYear = data.teachingGroupYears.find(
-            year => year.teachingGroupId._id === selectedTeachingGroup
+        const subBranchYear = data.subBranchYears.find(
+            year => year.subBranchId._id === selectedSubBranch
         );
-        const selectedClassData = teachingGroupYear?.classes.find(cls => cls._id === selectedClass);
+        const selectedClassData = subBranchYear?.classes.find(cls => cls._id === selectedClass);
 
         if (!selectedClassData) return null;
 
@@ -310,7 +310,7 @@ const PerformanceCards = ({ data }) => {
                         a => a.studentId._id === student._id
                     ),
                     uniqueStudents: new Set(selectedClassData.students.map(studentId => studentId)).size,
-                    semesterTarget: teachingGroupYear.semesterTarget,
+                    semesterTarget: subBranchYear.semesterTarget,
                 });
             }
             return acc;
@@ -326,7 +326,7 @@ const PerformanceCards = ({ data }) => {
                 <div className="mx-8 flex flex-col">
                     <h2 className="text-xl font-bold">Kelompok {selectedClassData.name}</h2>
                     {/* <p className="text-sm text-gray-600">
-                        Target Semester: {teachingGroupYear.semesterTarget} hari
+                        Target Semester: {subBranchYear.semesterTarget} hari
                     </p> */}
                 </div>
                 {students.map(student => (
@@ -383,7 +383,7 @@ const PerformanceCards = ({ data }) => {
 
             <AnimatePresence mode="wait">
                 {view === 'branches' && renderBranches()}
-                {view === 'teachingGroups' && renderTeachingGroups()}
+                {view === 'subBranches' && renderSubBranches()}
                 {view === 'classes' && renderClasses()}
                 {view === 'students' && renderStudents()}
             </AnimatePresence>

@@ -9,7 +9,7 @@ const MunaqasyahByClassView = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { isLoading, error, sendRequest } = useHttp();
-    const [teachingGroupYearId, setteachingGroupYearId] = useState(location.state?.teachingGroupYearId || []);
+    const [subBranchYearId, setsubBranchYearId] = useState(location.state?.subBranchYearId || []);
     const [rawScores, setRawScores] = useState([]);
     const classId = useParams().classId;
 
@@ -19,7 +19,7 @@ const MunaqasyahByClassView = () => {
         let intervalId;
         const fetchScores = async () => {
             try {
-                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/scores/teachingGroupYear/${teachingGroupYearId}?classId=${classId}`);
+                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/scores/subBranchYear/${subBranchYearId}?classId=${classId}`);
                 const matchedClass = responseData.classes.find(cls => cls.classId._id === classId);
                 if (matchedClass) {
                     setRawScores(matchedClass.scores);
@@ -139,7 +139,7 @@ const MunaqasyahByClassView = () => {
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     // Use normalized score for PDF
-                                                    downloadReport(score.studentId.name, scores[idx], score.studentNis, score.classId.name, score.teachingGroupYearId.academicYearId.name);
+                                                    downloadReport(score.studentId.name, scores[idx], score.studentNis, score.classId.name, score.subBranchYearId.academicYearId.name);
                                                 }}
                                                 className='btn-primary-outline m-0 text-gray-700'>
                                                 Unduh Raport Orang Tua
@@ -148,7 +148,7 @@ const MunaqasyahByClassView = () => {
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     // Use normalized score for PDF
-                                                    previewReport(score.studentId.name, scores[idx], score.studentNis, score.classId.name, score.teachingGroupYearId.academicYearId.name);
+                                                    previewReport(score.studentId.name, scores[idx], score.studentNis, score.classId.name, score.subBranchYearId.academicYearId.name);
                                                 }}
                                                 className='btn-primary-outline m-0 text-gray-700 hidden md:block'>
                                                 Lihat Raport Orang Tua
@@ -157,7 +157,7 @@ const MunaqasyahByClassView = () => {
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     // Use raw score for PDF
-                                                    downloadReport(score.studentId.name, rawScores[idx], score.studentNis, score.classId.name, score.teachingGroupYearId.academicYearId.name);
+                                                    downloadReport(score.studentId.name, rawScores[idx], score.studentNis, score.classId.name, score.subBranchYearId.academicYearId.name);
                                                 }}
                                                 className='btn-primary-outline m-0 text-gray-700'>
                                                 Unduh Raport Pengurus
@@ -166,7 +166,7 @@ const MunaqasyahByClassView = () => {
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     // Use raw score for PDF
-                                                    previewReport(score.studentId.name, rawScores[idx], score.studentNis, score.classId.name, score.teachingGroupYearId.academicYearId.name);
+                                                    previewReport(score.studentId.name, rawScores[idx], score.studentNis, score.classId.name, score.subBranchYearId.academicYearId.name);
                                                 }}
                                                 className='btn-primary-outline m-0 text-gray-700 hidden md:block'>
                                                 Lihat Raport Pengurus

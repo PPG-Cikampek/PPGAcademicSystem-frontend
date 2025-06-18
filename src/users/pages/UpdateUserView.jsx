@@ -11,7 +11,7 @@ import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 const UpdateUserView = () => {
     const { isLoading, error, sendRequest, setError } = useHttp();
     const [isTransitioning, setIsTransitioning] = useState(false);
-    const [loadedTeachingGroups, setLoadedTeachingGroups] = useState([]);
+    const [loadedSubBranches, setLoadedSubBranches] = useState([]);
     const [loadedUser, setLoadedUser] = useState();
 
     const userId = useParams().userId
@@ -28,13 +28,13 @@ const UpdateUserView = () => {
         }
         fetchUser();
 
-        const fetchTeachingGroups = async () => {
+        const fetchSubBranches = async () => {
             try {
-                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/levels/branches/teaching-groupes/`);
-                setLoadedTeachingGroups(responseData.teachingGroups);
+                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/levels/branches/sub-branches/`);
+                setLoadedSubBranches(responseData.subBranches);
             } catch (err) { }
         };
-        fetchTeachingGroups();
+        fetchSubBranches();
 
     }, [sendRequest])
 
@@ -44,7 +44,7 @@ const UpdateUserView = () => {
         const body = JSON.stringify({
             name: data.name,
             role: data.role,
-            teachingGroupId: data.teachingGroupId,
+            subBranchId: data.subBranchId,
         });
 
         console.log(body)
@@ -85,7 +85,7 @@ const UpdateUserView = () => {
                 {!isLoading && loadedUser && <DynamicForm
                     title={loadedUser.role === 'admin'
                         ? 'Ubah Data Admin'
-                        : loadedUser.role === 'teachingGroupAdmin'
+                        : loadedUser.role === 'subBranchAdmin'
                             ? 'Ubah Data Admin Kelompok'
                             : loadedUser.role === 'teacher'
                                 ? 'Ubah Data Guru'
@@ -93,8 +93,8 @@ const UpdateUserView = () => {
                     subtitle={'Sistem Akademik Digital'}
                     fields={[
                         { name: 'name', label: 'Nama', placeholder: 'Nama Lengkap', type: 'text', required: true, value: loadedUser.name },
-                        ...(loadedUser.role === 'admin' ? [{ name: 'role', label: 'Jenis Akun', placeholder: 'admin', type: 'select', required: true, value: loadedUser.role, options: [{ label: 'Admin', value: 'admin' }, { label: 'Admin Kelompok', value: 'teachingGroupAdmin' }] }] : []),
-                        { name: 'teachingGroupId', label: 'Kelompok', placeholder: 'Kelompok', type: 'select', required: true, value: loadedUser.teachingGroupId.name, options: loadedTeachingGroups.map(({ name }) => ({ label: name, value: name })) },
+                        ...(loadedUser.role === 'admin' ? [{ name: 'role', label: 'Jenis Akun', placeholder: 'admin', type: 'select', required: true, value: loadedUser.role, options: [{ label: 'Admin', value: 'admin' }, { label: 'Admin Kelompok', value: 'subBranchAdmin' }] }] : []),
+                        { name: 'subBranchId', label: 'Kelompok', placeholder: 'Kelompok', type: 'select', required: true, value: loadedUser.subBranchId.name, options: loadedSubBranches.map(({ name }) => ({ label: name, value: name })) },
                     ]}
                     onSubmit={handleFormSubmit}
                     disabled={isLoading}

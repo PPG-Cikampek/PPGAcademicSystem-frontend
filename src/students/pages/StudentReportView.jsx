@@ -280,9 +280,9 @@ const StudentReportView = ({ studentData, attendanceData, noCard = false }) => {
                                 <View style={[styles.flex, styles.flexCol, { gap: 1 }]}>
                                     <Text style={styles.fontBold}>: {(studentData.nis).toUpperCase()}</Text>
                                     <Text style={styles.fontBold}>: {(studentData.name).toUpperCase()}</Text>
-                                    <Text style={styles.fontBold}>: {(studentData.branchName).toUpperCase()} - {(studentData.teachingGroupName).toUpperCase()}</Text>
+                                    <Text style={styles.fontBold}>: {(studentData.branchName).toUpperCase()} - {(studentData.subBranchName).toUpperCase()}</Text>
                                     <Text style={styles.fontBold}>: {(studentData.className).toUpperCase()}</Text>
-                                    <Text style={styles.fontBold}>: {(studentData.teachingGroupYearName).toUpperCase()}</Text>
+                                    <Text style={styles.fontBold}>: {(studentData.subBranchYearName).toUpperCase()}</Text>
                                     <Text style={styles.fontBold}>: {(studentData.month ? studentData.month : 'Semua').toUpperCase()}</Text>
                                 </View>
                             </View>

@@ -90,10 +90,10 @@ const RequestedAccountView = () => {
       render: (item) => item.userId?.name || ' Tidak Diketahui',
     },
     {
-      key: 'teachingGroupName',
+      key: 'subBranchName',
       label: 'Kelompok',
       sortable: true,
-      render: (item) => item.teachingGroupId?.name || ' Tidak Diketahui',
+      render: (item) => item.subBranchId?.name || ' Tidak Diketahui',
     },
     {
       key: 'createdTime',

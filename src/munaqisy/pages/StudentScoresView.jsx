@@ -20,7 +20,7 @@ const StudentScoresView = () => {
 
     const general = useContext(GeneralContext);
     const auth = useContext(AuthContext);
-    const teachingGroupYearId = auth.currentTeachingGroupYearId;
+    const branchYearId = auth.currentBranchYearId
 
     const navigate = useNavigate();
 
@@ -36,17 +36,17 @@ const StudentScoresView = () => {
         const fetchData = async () => {
             setIsLoading(true);
             try {
-                await fetchScoreData(scannedData, teachingGroupYearId, dispatch, auth.userId);
+                await fetchScoreData(scannedData, branchYearId, dispatch, auth.userId);
                 if (isMounted) setDataLoaded(true); // Set to true after fetch
             } finally {
                 if (isMounted) setIsLoading(false);
             }
         };
-        if (teachingGroupYearId && scannedData) {
+        if (branchYearId && scannedData) {
             fetchData();
         }
         return () => { isMounted = false; };
-    }, [teachingGroupYearId, scannedData]);
+    }, [branchYearId, scannedData]);
 
     useEffect(() => {
         // Guard: only check after data is loaded and valid
@@ -100,7 +100,7 @@ const StudentScoresView = () => {
                 label: category.label,
                 score: state.studentScore[category.key]
             },
-            semester: parseInt(state.studentScore.teachingGroupYearId.academicYearId.name.slice(-1)),
+            semester: parseInt(state.studentScore.branchYearId.academicYearId.name.slice(-1)),
             classGrade: state.studentScore.classId.name.split(' ').pop()
         }
         navigate(`/munaqasyah/examination`, {

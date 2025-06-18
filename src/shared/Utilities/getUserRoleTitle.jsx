@@ -1,7 +1,8 @@
 const getUserRoleTitle = (role) => {
     const roleMap = {
         admin: 'Admin Daerah',
-        teachingGroupAdmin: 'Admin Kelompok',
+        branchAdmin: 'PJP Desa',
+        subBranchAdmin: 'PJP Kelompok',
         teacher: 'Guru',
         student: 'Siswa',
         curriculum: 'Tim Kurikulum',

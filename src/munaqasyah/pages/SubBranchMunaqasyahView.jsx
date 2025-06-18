@@ -10,8 +10,8 @@ import { CircleAlert } from 'lucide-react';
 import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 
-const TeachingGroupMunaqasyahView = () => {
-    const [teachingGroupYears, setTeachingGroupYears] = useState()
+const SubBranchMunaqasyahView = () => {
+    const [subBranchYears, setSubBranchYears] = useState()
     const [modal, setModal] = useState({ title: '', message: '', onConfirm: null });
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const { isLoading, error, sendRequest, setError } = useHttp()
@@ -19,33 +19,33 @@ const TeachingGroupMunaqasyahView = () => {
     const auth = useContext(AuthContext)
 
     useEffect(() => {
-        const fetchTeachingGroupYears = async () => {
+        const fetchSubBranchYears = async () => {
             try {
-                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/teachingGroupYears/teachingGroup/${auth.userTeachingGroupId}`);
-                setTeachingGroupYears(responseData.teachingGroupYears);
+                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/subBranchYears/subBranch/${auth.userSubBranchId}`);
+                setSubBranchYears(responseData.subBranchYears);
                 console.log(responseData)
-                // console.log(responseData.teachingGroupYears)
-                // console.log(responseData.teachingGroupYears[0].academicYearId.isMunaqasyahActive)
+                // console.log(responseData.subBranchYears)
+                // console.log(responseData.subBranchYears[0].academicYearId.isMunaqasyahActive)
             } catch (err) {
                 // Error is handled by useHttp  
             }
         };
-        fetchTeachingGroupYears();
+        fetchSubBranchYears();
     }, [sendRequest]);
 
-    const startMunaqasyahHandler = (teachingGroupYearName, teachingGroupYearId) => {
+    const startMunaqasyahHandler = (subBranchYearName, subBranchYearId) => {
         const confirmStart = async () => {
             const body = JSON.stringify({ isMunaqasyahActive: true });
             try {
                 const responseData = await sendRequest(
-                    `${import.meta.env.VITE_BACKEND_URL}/munaqasyahs/start/${teachingGroupYearId}`,
+                    `${import.meta.env.VITE_BACKEND_URL}/munaqasyahs/start/${subBranchYearId}`,
                     'PATCH',
                     body,
                     { 'Content-Type': 'application/json' }
                 );
-                setTeachingGroupYears((prevYears) =>
+                setSubBranchYears((prevYears) =>
                     prevYears.map((year) =>
-                        year._id === teachingGroupYearId
+                        year._id === subBranchYearId
                             ? { ...year, isMunaqasyahActive: true }
                             : year
                     )
@@ -62,7 +62,7 @@ const TeachingGroupMunaqasyahView = () => {
 
         setModal({
             title: `Konfirmasi`,
-            message: `Mulai munaqosah untuk tahun ajaran ${teachingGroupYearName}?`,
+            message: `Mulai munaqosah untuk tahun ajaran ${subBranchYearName}?`,
             onConfirm: confirmStart
         });
         setModalIsOpen(true);
@@ -110,7 +110,7 @@ const TeachingGroupMunaqasyahView = () => {
                     <h1 className="text-2xl font-semibold text-gray-900">Munaqosah</h1>
                 </div>
 
-                {(!teachingGroupYears || isLoading) && (
+                {(!subBranchYears || isLoading) && (
                     <div className="space-y-4">
                         <SkeletonLoader variant="rectangular" width="100%" height={140} count={3} />
                     </div>
@@ -118,8 +118,8 @@ const TeachingGroupMunaqasyahView = () => {
 
                 {error && <ErrorCard error={error} />}
 
-                {teachingGroupYears && !isLoading && (
-                    teachingGroupYears.map(year => {
+                {subBranchYears && !isLoading && (
+                    subBranchYears.map(year => {
                         const content = (
                             <div className={`card-basic hover:bg-gray-100 active:bg-gray-100 hover:cursor-pointer rounded-md justify-start m-0 transition-all duration-200 my-4`} >
                                 <div className="flex items-center space-x-4 ">
@@ -194,7 +194,7 @@ const TeachingGroupMunaqasyahView = () => {
                     })
                 )}
 
-                {teachingGroupYears && teachingGroupYears.length === 0 && (
+                {subBranchYears && subBranchYears.length === 0 && (
                     <div className="bg-white rounded-md shadow-md p-6 border border-gray-200">
                         <p className="text-gray-700 text-center">Belum ada tahun ajaran terdaftar.</p>
                     </div>
@@ -204,4 +204,4 @@ const TeachingGroupMunaqasyahView = () => {
     )
 }
 
-export default TeachingGroupMunaqasyahView
+export default SubBranchMunaqasyahView

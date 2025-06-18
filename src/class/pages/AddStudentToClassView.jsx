@@ -6,7 +6,6 @@ import useHttp from '../../shared/hooks/http-hook';
 
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 import Modal from "../../shared/Components/UIElements/ModalBottomClose";
-import { TriangleAlert } from "lucide-react";
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 
 
@@ -20,38 +19,35 @@ const AddStudentToClassView = () => {
 
     const navigate = useNavigate()
     const auth = useContext(AuthContext)
-    const targetTeachingGroupId = auth.userTeachingGroupId
+    const targetSubBranchId = auth.userSubBranchId
 
     const classId = useParams().classId;
-    const targetActiveAcademicYear = auth.currentTeachingGroupYear
-
-    console.log(targetActiveAcademicYear)
 
     useEffect(() => {
         const loadStudents = async () => {
             try {
-                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/students/teaching-group/${targetTeachingGroupId}`);
+                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/students/sub-branch/${targetSubBranchId}`);
                 setStudents(responseData.students);
-                // console.log(JSON.stringify(responseData.students))
+                console.log(responseData.students)
             } catch (err) {
                 // Error handled by useHttp
             }
         };
-        const loadClassesByTeachingGroupYear = async () => {
+        const loadClassesByTeachingGroupId = async () => {
             try {
                 const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/classes/${classId}`);
                 // setCls(responseData.class);
                 console.log(responseData.class)
                 try {
-                    const classesData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/classes/teachingGroupYear/${responseData.class.teachingGroupYearId}`);
+                    const classesData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/classes/teaching-group/${responseData.class.teachingGroupId}`);
                     setCls(classesData.classes);
-                    console.log(JSON.stringify(classesData.classes))
+                    console.log(classesData.classes)
                 } catch (err) { }
             } catch (err) { }
         }
 
         loadStudents();
-        loadClassesByTeachingGroupYear();
+        loadClassesByTeachingGroupId();
 
     }, [sendRequest, modal]);
 
@@ -65,6 +61,7 @@ const AddStudentToClassView = () => {
                 classId,
                 studentId
             });
+            console.log(body)
             let responseData;
             try {
                 responseData = await sendRequest(url, 'POST', body, {
@@ -74,7 +71,7 @@ const AddStudentToClassView = () => {
                 setModalIsOpen(true)
                 setModal({ title: 'Berhasil!', message: responseData.message, onConfirm: null });
 
-                const updatedData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/students/teaching-group/${targetTeachingGroupId}`);
+                const updatedData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/students/sub-branch/${targetSubBranchId}`);
                 setStudents(updatedData.students);
 
             } catch (err) {
@@ -123,7 +120,7 @@ const AddStudentToClassView = () => {
         <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">
             <div className="max-w-6xl mx-auto">
                 <h1 className="text-2xl font-bold mb-4">Pendaftaran Ulang Peserta Didik</h1>
-                {!isLoading && cls && <h3 className="text-base font-normal mb-4">Daftarkan Peserta Didik ke {cls[0].name}</h3>}
+                {!isLoading && cls && <h3 className="text-base font-normal mb-4">Daftarkan Peserta Didik ke KBM {cls.name}</h3>}
 
                 {error && <ErrorCard error={error} onClear={() => setError(null)} />}
 
@@ -162,25 +159,11 @@ const AddStudentToClassView = () => {
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {students.map((student) => {
                                     const isStudentRegistered = () => {
-                                        // Iterate through each class
-                                        if (!cls) return false;
-                                        for (const kelas of cls) {
-                                            // Check if the student ID is in the students array of this class
-                                            if (kelas.students.includes(student.id)) {
-                                                return true;
-                                            }
-                                        }
-
-                                        // Return false if the ID is not found in any class
-                                        return false;
+                                        if (!student.classIds || !Array.isArray(student.classIds) || !cls || !Array.isArray(cls)) return false;
+                                        return student.classIds.some(c => cls.some(classObj => classObj._id === c._id));
                                     };
 
                                     const registered = isStudentRegistered();
-
-                                    // student.classIds.some(
-                                    //     (classId) => console.log(classId?.teachingGroupYearId?.academicYearId?.name, student.name, activeAcademicYear.name, hasTargetActiveAcademicYear)
-                                    // )
-
                                     return (
                                         <div
                                             key={student._id}
@@ -188,7 +171,7 @@ const AddStudentToClassView = () => {
                                                 ? "bg-gray-100 border-gray-300 text-gray-500 cursor-not-allowed"
                                                 : "bg-white border-gray-200 hover:ring-4 hover:ring-blue-200 hover:border-blue-500 hover:shadow-xl cursor-pointer"
                                                 }`}
-                                            onClick={!registered && student.isProfileComplete === true ? () => registerStudentHandler(student.name, student.id) : undefined}
+                                            onClick={!registered && student.isProfileComplete === true ? () => registerStudentHandler(student.name, student._id) : undefined}
                                         >
                                             <div className="flex justify-between items-center gap-2">
                                                 <div className="flex gap-4 items-center">

@@ -57,8 +57,8 @@ const SelectClassView = () => {
                         <ul className='flex flex-col gap-2 items-stretch w-full'>
                             <h2 className='text-lg my-2'>Absen Untuk Kelas:</h2>
                             {loadedData.classes.map((classItem) => {
-                                const isClassInTeachingGroupYear = classItem?.teachingGroupYearId?.academicYearId?.isActive
-                                if (isClassInTeachingGroupYear) {
+                                const isClassInSubBranchYear = classItem?.teachingGroupId?.branchYearId?.academicYearId?.isActive
+                                if (isClassInSubBranchYear) {
                                     activeClassCount++
                                     return (
                                         <Link

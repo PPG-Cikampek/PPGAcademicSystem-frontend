@@ -12,7 +12,7 @@ function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [navigateBlockMessage, setNavigateBlockMessage] = useState(true);
 
-  const { token, login, logout, userId, userRole, userName, userBranchId, userTeachingGroupId, currentTeachingGroupYear, currentTeachingGroupYearId, userClassIds, setAttributes } = useAuth();
+  const { token, login, logout, userId, userRole, userName, userBranchId, userSubBranchId, currentBranchYear, currentBranchYearId, userClassIds, setAttributes } = useAuth();
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -55,7 +55,7 @@ function App() {
   return (
     <GeneralContext.Provider value={{ navigateBlockMessage, setMessage }}>
       <SidebarContext.Provider value={{ isSidebarOpen, toggle }}>
-        <AuthContext.Provider value={{ isLoggedIn: !!token, userRole, userId, userName, userBranchId, userTeachingGroupId, currentTeachingGroupYear, currentTeachingGroupYearId, userClassIds, token, login, setAttributes, logout }}>
+        <AuthContext.Provider value={{ isLoggedIn: !!token, userRole, userId, userName, userBranchId, userSubBranchId, currentBranchYear, currentBranchYearId, userClassIds, token, login, setAttributes, logout }}>
           <Router future={{
             v7_startTransition: true,
             v7_relativeSplatPath: true

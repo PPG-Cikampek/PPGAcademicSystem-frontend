@@ -10,7 +10,7 @@ import { AuthContext } from '../../shared/Components/Context/auth-context';
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 
 import PieChart from '../components/PieChart';
-import TeachingGroupAdminPerformanceCards from '../components/TeachingGroupAdminPerformanceCards';
+import SubBranchAdminPerformanceCards from '../components/SubBranchAdminPerformanceCards';
 import { academicYearFormatter } from '../../shared/Utilities/academicYearFormatter';
 import { getMonday } from '../../shared/Utilities/getMonday';
 
@@ -43,7 +43,7 @@ const TeacherPerformanceView = () => {
 
     const fetchAcademicYears = useCallback(async () => {
         try {
-            const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/academicYears/?populate=teachingGroupYears`);
+            const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/academicYears/?populate=subBranchYears`);
             setAcademicYearsList(responseData.academicYears);
         } catch (err) { }
     }, [sendRequest]);
@@ -51,7 +51,7 @@ const TeacherPerformanceView = () => {
     const fetchAttendanceData = useCallback(async () => {
         const getOverallStats = (data) => {
             const attendances = [];
-            data.teachingGroupYears.forEach((year) => {
+            data.subBranchYears.forEach((year) => {
                 year.classes.forEach((cls) => {
                     cls.attendances.forEach((att) => {
                         attendances.push(att.status);
@@ -72,7 +72,7 @@ const TeacherPerformanceView = () => {
 
         const getViolationStats = (data) => {
             const violationCounts = {};
-            data.teachingGroupYears.forEach((groupYear) => {
+            data.subBranchYears.forEach((groupYear) => {
                 groupYear.classes.forEach((cls) => {
                     cls.attendances.forEach((attendance) => {
                         Object.entries(attendance.violations).forEach(([violation, occurred]) => {
@@ -91,7 +91,7 @@ const TeacherPerformanceView = () => {
         const body = JSON.stringify({
             academicYearId: selectedAcademicYear,
             branchId: auth.userBranchId,
-            teachingGroupId: auth.userTeachingGroupId,
+            subBranchId: auth.userSubBranchId,
             classId: selectedClass,
             startDate: startDate ? startDate.toISOString() : null,
             endDate: endDate ? endDate.toISOString() : null,
@@ -104,7 +104,7 @@ const TeacherPerformanceView = () => {
             console.log(responseData)
 
             let updatedData = {}
-            updatedData.teachingGroupYears = responseData.teachingGroupYears.map(year => {
+            updatedData.subBranchYears = responseData.subBranchYears.map(year => {
                 // Keep only the classes with IDs in the classIdsToKeep array
                 year.classes = year.classes.filter(cls => auth.userClassIds.includes(cls._id));
                 return year;
@@ -204,11 +204,11 @@ const TeacherPerformanceView = () => {
                     <div className="card-basic rounded-md flex-col gap-4">
 
                         <div className="flex justify-between">
-                            {/* {teachingGroupData && (
+                            {/* {subBranchData && (
                                 <div className={`flex flex-col`}>
-                                    <h2 className="text-xl font-bold">Kelompok {teachingGroupData.teachingGroupName}</h2>
+                                    <h2 className="text-xl font-bold">Kelompok {subBranchData.subBranchName}</h2>
                                     <p className="text-sm text-gray-600">
-                                        Target Semester: {teachingGroupData.semesterTarget} hari
+                                        Target Semester: {subBranchData.semesterTarget} hari
                                     </p>
                                 </div>
                             )} */}
@@ -300,7 +300,7 @@ const TeacherPerformanceView = () => {
 
                 )}
                 {violationData && attendanceData && !isLoading && selectedAcademicYear && (
-                    <TeachingGroupAdminPerformanceCards data={attendanceData} violationData={violationData} initialView={'classes'} month={periode} />
+                    <SubBranchAdminPerformanceCards data={attendanceData} violationData={violationData} initialView={'classes'} month={periode} />
                 )}
             </main>
         </div>

@@ -9,7 +9,7 @@ const initialState = {
     selectAll: false,
     classId: null,
     classStartTime: null,
-    isTeachingGroupYearMunaqasyahStarted: null,
+    isSubBranchYearMunaqasyahStarted: null,
 };
 
 const reducer = (state, action) => {
@@ -19,7 +19,7 @@ const reducer = (state, action) => {
         case 'SET_STUDENT_DATA':
             return { ...state, studentData: action.payload };
         case 'SET_IS_MUNAQASYAH_STARTED':
-            return { ...state, isTeachingGroupYearMunaqasyahStarted: action.payload };
+            return { ...state, isSubBranchYearMunaqasyahStarted: action.payload };
         case 'UPDATE_SCORE_DATA':
             return {
                 ...state,
@@ -57,8 +57,8 @@ const reducer = (state, action) => {
     }
 };
 
-const fetchYearData = async (teachingGroupYearId, dispatch) => {
-    const url = `${import.meta.env.VITE_BACKEND_URL}/teachingGroupYears/${teachingGroupYearId}`;
+const fetchYearData = async (branchYearId, dispatch) => {
+    const url = `${import.meta.env.VITE_BACKEND_URL}/branchYears/${branchYearId}`;
 
     try {
         const response = await fetch(url, {
@@ -72,9 +72,9 @@ const fetchYearData = async (teachingGroupYearId, dispatch) => {
         }
         const data = await response.json();
 
-        console.log(data.teachingGroupYear)
+        console.log(data.branchYear)
 
-        dispatch({ type: 'SET_IS_MUNAQASYAH_STARTED', payload: data.teachingGroupYear.isMunaqasyahActive });
+        dispatch({ type: 'SET_IS_MUNAQASYAH_STARTED', payload: data.branchYear.munaqasyahStatus === 'inProgress' });
 
     } catch (error) {
         console.error('Error fetching attendance data:', error);
@@ -82,8 +82,8 @@ const fetchYearData = async (teachingGroupYearId, dispatch) => {
 
 };
 
-const fetchScoreData = async (studentNis, teachingGroupYearId, dispatch, userId) => {
-    const url = `${import.meta.env.VITE_BACKEND_URL}/scores?teachingGroupYearId=${teachingGroupYearId}&&studentNis=${studentNis}`;
+const fetchScoreData = async (studentNis, branchYearId, dispatch, userId) => {
+    const url = `${import.meta.env.VITE_BACKEND_URL}/scores?branchYearId=${branchYearId}&&studentNis=${studentNis}`;
     const header = {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${JSON.parse(localStorage.getItem('userData')).token}`

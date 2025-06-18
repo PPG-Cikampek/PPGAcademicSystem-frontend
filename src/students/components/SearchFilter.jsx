@@ -23,7 +23,7 @@ const filterOptions = [
         ]
     },
     {
-        id: 'teachingGroup',
+        id: 'subBranch',
         label: 'Semua Kelompok',
         options: [
             { value: '', label: 'Semua Kelompok' },

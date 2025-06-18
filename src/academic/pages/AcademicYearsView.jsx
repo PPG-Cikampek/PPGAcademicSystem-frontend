@@ -21,7 +21,7 @@ const AcademicYearsView = () => {
   useEffect(() => {
     const loadLevels = async () => {
       try {
-        const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/academicYears?populate=teachingGroupYears`);
+        const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/academicYears?populate=subBranchYears`);
         setData(responseData);
       } catch (err) {
         // Error handled by useHttp
@@ -49,7 +49,7 @@ const AcademicYearsView = () => {
 
         setModal({ title: 'Berhasil!', message: responseData.message, onConfirm: null });
 
-        const updatedData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/academicYears?populate=teachingGroupYears`);
+        const updatedData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/academicYears?populate=subBranchYears`);
         setData(updatedData);
       } catch (err) { }
     };
@@ -64,7 +64,7 @@ const AcademicYearsView = () => {
 
   const startMunaqasyahHandler = (academicYearName, academicYearId) => {
     const confirmStart = async () => {
-      const body = JSON.stringify({ isMunaqasyahActive: true })
+      const body = JSON.stringify({ munaqasyahStatus: "running" })
       try {
         const responseData = await sendRequest(
           `${import.meta.env.VITE_BACKEND_URL}/academicYears/start/${academicYearId}/munaqasyah`,
@@ -75,7 +75,7 @@ const AcademicYearsView = () => {
 
         setModal({ title: 'Berhasil!', message: responseData.message, onConfirm: null });
 
-        const updatedData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/academicYears?populate=teachingGroupYears`);
+        const updatedData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/academicYears?populate=subBranchYears`);
         setData(updatedData);
       } catch (err) { }
     };
@@ -100,7 +100,7 @@ const AcademicYearsView = () => {
 
         setModal({ title: 'Berhasil!', message: responseData.message, onConfirm: null });
 
-        const updatedData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/academicYears?populate=teachingGroupYears`);
+        const updatedData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/academicYears?populate=subBranchYears`);
         setData(updatedData);
       } catch (err) {
         setModal({ title: 'Gagal!', message: err.message, onConfirm: null });
@@ -140,7 +140,7 @@ const AcademicYearsView = () => {
 
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-semibold text-gray-900">Daftar Tahun Ajaran</h1>
-          <Link to="/settings/academic/new">
+          <Link to="/academic/new">
             <button className="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors duration-200">
               <PlusIcon className="w-4 h-4 mr-2" />
               Tambah

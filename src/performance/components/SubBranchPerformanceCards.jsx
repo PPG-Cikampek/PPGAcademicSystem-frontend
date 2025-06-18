@@ -15,7 +15,7 @@ const getOverallStats = (data) => {
     const attendances = [];
 
     // Extract all attendance records
-    data.teachingGroupYears.forEach((year) => {
+    data.subBranchYears.forEach((year) => {
         year.classes.forEach((cls) => {
             cls.attendances.forEach((att) => {
                 attendances.push(att.status);
@@ -205,7 +205,7 @@ const StatCard = ({ level, title, subtitle, stats, onViewMore, expanded }) => {
     )
 }
 
-const TeachingGroupAdminPerformanceCards = ({ data, violationData, initialView, month }) => {
+const SubBranchAdminPerformanceCards = ({ data, violationData, initialView, month }) => {
     const [view, setView] = useState(initialView);
     const [selectedClass, setSelectedClass] = useState(null);
     const [showRelativeToTarget, setShowRelativeToTarget] = useState(false);
@@ -242,26 +242,26 @@ const TeachingGroupAdminPerformanceCards = ({ data, violationData, initialView, 
     };
 
     const renderClasses = () => {
-        const teachingGroupYear = data.teachingGroupYears.find(
-            year => year.teachingGroupId._id === auth.userTeachingGroupId
+        const subBranchYear = data.subBranchYears.find(
+            year => year.subBranchId._id === auth.userSubBranchId
         );
 
-        if (!teachingGroupYear) return null;
+        if (!subBranchYear) return null;
 
-        const classes = teachingGroupYear.classes.map(cls => ({
+        const classes = subBranchYear.classes.map(cls => ({
             id: cls._id,
             name: cls.name,
-            branchName: teachingGroupYear.teachingGroupId.branchId.name,
-            teachingGroupName: teachingGroupYear.teachingGroupId.name,
+            branchName: subBranchYear.subBranchId.branchId.name,
+            subBranchName: subBranchYear.subBranchId.name,
             attendances: cls.attendances,
             teachers: cls.teachers,
             uniqueStudents: new Set(cls.students.map(studentId => studentId)).size,
-            semesterTarget: teachingGroupYear.semesterTarget,
+            semesterTarget: subBranchYear.semesterTarget,
         }));
 
-        const teachingGroupName = data.teachingGroupYears.find(year => year.teachingGroupId._id === auth.userTeachingGroupId)?.teachingGroupId.name;
+        const subBranchName = data.subBranchYears.find(year => year.subBranchId._id === auth.userSubBranchId)?.subBranchId.name;
 
-        // console.log(JSON.stringify(teachingGroupYear, null, 2))
+        // console.log(JSON.stringify(subBranchYear, null, 2))
 
         return (
             <motion.div
@@ -315,10 +315,10 @@ const TeachingGroupAdminPerformanceCards = ({ data, violationData, initialView, 
 
 
     const renderStudents = () => {
-        const teachingGroupYear = data.teachingGroupYears.find(
-            year => year.teachingGroupId._id === auth.userTeachingGroupId
+        const subBranchYear = data.subBranchYears.find(
+            year => year.subBranchId._id === auth.userSubBranchId
         );
-        const selectedClassData = teachingGroupYear?.classes.find(cls => cls._id === selectedClass)
+        const selectedClassData = subBranchYear?.classes.find(cls => cls._id === selectedClass)
         // selectedClassData
 
         if (!selectedClassData) return null;
@@ -330,27 +330,27 @@ const TeachingGroupAdminPerformanceCards = ({ data, violationData, initialView, 
             if (!acc.some(s => s.id === student._id)) {
                 acc.push({
                     id: student._id,
-                    teachingGroupYearName: teachingGroupYear.name,
+                    subBranchYearName: subBranchYear.name,
                     month,
                     className: selectedClassData.name,
                     name: student.name,
                     nis: student.nis,
                     image: student.image,
                     thumbnail: student.thumbnail,
-                    branchName: teachingGroupYear.teachingGroupId.branchId.name,
-                    teachingGroupName: teachingGroupYear.teachingGroupId.name,
+                    branchName: subBranchYear.subBranchId.branchId.name,
+                    subBranchName: subBranchYear.subBranchId.name,
                     teachers: selectedClassData.teachers,
                     attendances: selectedClassData.attendances.filter(
                         a => a.studentId._id === student._id
                     ),
                     uniqueStudents: new Set(selectedClassData.students.map(studentId => studentId)).size,
-                    semesterTarget: teachingGroupYear.semesterTarget,
+                    semesterTarget: subBranchYear.semesterTarget,
                 });
             }
             return acc;
         }, []);
 
-        // console.log(JSON.stringify(teachingGroupYear, null, 2))
+        // console.log(JSON.stringify(subBranchYear, null, 2))
         // console.log(JSON.stringify(students, null, 2))
 
         return (
@@ -470,4 +470,4 @@ const TeachingGroupAdminPerformanceCards = ({ data, violationData, initialView, 
     );
 };
 
-export default TeachingGroupAdminPerformanceCards;
+export default SubBranchAdminPerformanceCards;

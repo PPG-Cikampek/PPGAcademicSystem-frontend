@@ -31,7 +31,7 @@ const DashboardView = () => {
     // console.log(auth.userId)
     // console.log(auth.userName)
     // console.log(auth.userRole)
-    // console.log(auth.userTeachingGroupId)
+    // console.log(auth.userSubBranchId)
 
     return (
         <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">

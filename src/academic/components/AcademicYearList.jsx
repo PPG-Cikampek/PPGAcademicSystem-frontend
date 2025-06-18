@@ -8,7 +8,7 @@ const AcademicYearList = ({ years, expandedCards, onToggleCard, onActivateYear, 
         return (
             <div className="bg-white rounded-md shadow-md p-6 border border-gray-200">
                 <p className="text-gray-700 text-center">
-                    Belum ada tahun ajaran. <Link to="/settings/academic/new" className="text-blue-500 hover:underline">Buat baru</Link>
+                    Belum ada tahun ajaran. <Link to="/academic/new" className="text-blue-500 hover:underline">Buat baru</Link>
                 </p>
             </div>
         );

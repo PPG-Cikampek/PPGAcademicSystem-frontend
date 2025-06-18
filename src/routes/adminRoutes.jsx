@@ -24,7 +24,7 @@ const BulkNewUsersAndStudentsView = lazy(() => import("../users/pages/BulkNewUse
 const UpdateStudentView = lazy(() => import("../students/pages/UpdateStudentView"));
 const UpdateTeacherView = lazy(() => import("../teachers/pages/UpdateTeacherView"));
 const StudentReportView = lazy(() => import("../students/pages/StudentReportView"));
-const UpdateTeachingGroupView = lazy(() => import("../levels/pages/UpdateTeachingGroupView"));
+const UpdateSubBranchView = lazy(() => import("../levels/pages/UpdateSubBranchView"));
 const UpdateBranchView = lazy(() => import("../teachers/pages/UpdateBranchView"));
 const UpdateAcademicYearView = lazy(() => import("../academic/pages/UpdateAcademicYearView"));
 const ProfileView = lazy(() => import("../users/pages/ProfileView"));
@@ -58,13 +58,13 @@ export const adminRoutes = [
     { path: '/performances/student/:studentId', element: <StudentReportView /> },
     { path: '/munaqasyah/student/score', element: <PreviewReport /> },
     { path: '/profile/:userId', element: <ProfileView /> },
-    { path: '/settings/academic', element: <AcademicYearsView /> },
-    { path: '/settings/academic/new', element: <NewAcademicYearView /> },
-    { path: '/settings/academic/:academicYearId', element: <UpdateAcademicYearView /> },
+    { path: '/academic', element: <AcademicYearsView /> },
+    { path: '/academic/new', element: <NewAcademicYearView /> },
+    { path: '/academic/:academicYearId', element: <UpdateAcademicYearView /> },
     { path: '/settings/levels', element: <LevelsView /> },
     { path: '/settings/levels/new', element: <NewLevelView /> },
     { path: '/settings/levels/:branchId', element: <UpdateBranchView /> },
-    { path: '/settings/levels/teaching-group/:teachingGroupId', element: <UpdateTeachingGroupView /> },
+    { path: '/settings/levels/teaching-group/:subBranchId', element: <UpdateSubBranchView /> },
     { path: '/settings/users', element: <UsersView /> },
     { path: '/settings/users/new', element: <NewUserView /> },
     { path: '/settings/users/:userId', element: <UpdateUserView /> },

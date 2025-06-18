@@ -43,11 +43,11 @@ const HomeNavigation = ({ children }) => {
                 icon: <Gauge />,
                 label: 'Performa Kehadiran',
             },
-            {
-                link: '/dashboard/academic',
-                icon: <CalendarCog />,
-                label: 'Tahun Ajaran',
-            },
+            // {
+            //     link: '/dashboard/academic',
+            //     icon: <CalendarCog />,
+            //     label: 'Tahun Ajaran',
+            // },
             {
                 link: `/settings/profile/` + auth.userId,
                 icon: <Settings />,
