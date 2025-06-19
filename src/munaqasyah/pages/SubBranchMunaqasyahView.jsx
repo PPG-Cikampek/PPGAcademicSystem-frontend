@@ -139,16 +139,25 @@ const SubBranchMunaqasyahView = () => {
                                         </div>
                                         <div className='text-gray-500'>
                                             {year.branchYear.isActive === true && (
-                                                year.subBranch.munaqasyahStatus === "inProgress" ? (
+                                                year.subBranch.munaqasyahStatus === "inProgress" && (
                                                     <div className='text-green-500'>
                                                         Munaqosah Kelompok berjalan!
                                                     </div>
-                                                ) : (
+                                                )
+                                            )}
+                                            {year.branchYear.isActive === true && (
+                                                year.branchYear.munaqasyahStatus !== "inProgress" ? (
                                                     <div className='inline-flex items-center text-yellow-600 gap-1'>
                                                         <CircleAlert />
                                                         Desa belum memulai munaqosah.
                                                     </div>
-                                                ))}
+                                                ) : (
+                                                    <div className='inline-flex items-center text-blue-500 gap-1'>
+                                                        <CircleAlert />
+                                                        Desa sudah memulai munaqosah.
+                                                    </div>
+                                                )
+                                            )}
                                         </div>
 
                                         <div>
@@ -195,7 +204,11 @@ const SubBranchMunaqasyahView = () => {
 
                         console.log("Branch Year ID:", year.branchYear._id);
 
-                        return year.branchYear.munaqasyahStatus === "inProgress" ? (
+                        return (
+                            year.branchYear.munaqasyahStatus === "inProgress" &&
+                            year.subBranch &&
+                            year.subBranch.munaqasyahStatus === "inProgress"
+                        ) ? (
                             <Link key={year._id} to={`/munaqasyah/${year.branchYear._id}`}>
                                 {content}
                             </Link>

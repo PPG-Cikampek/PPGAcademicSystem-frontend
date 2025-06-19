@@ -78,7 +78,7 @@ const StudentScoresView = () => {
         { key: 'hadithTafsir', label: 'Tafsir Hadits' },
         { key: 'practice', label: 'Praktik Ibadah' },
         { key: 'moralManner', label: 'Akhlak dan Tata Krama' },
-        { key: 'memorizingSurah', label: 'Surat-surat Al-Quran' },
+        { key: 'memorizingSurah', label: 'Hafalan Surat-surat Al-Quran' },
         { key: 'memorizingHadith', label: 'Hafalan Hadits' },
         { key: 'memorizingDua', label: "Hafalan Do'a" },
         { key: 'memorizingBeautifulName', label: 'Hafalan Asmaul Husna' },

@@ -129,25 +129,24 @@ const AddSubBranchToTeachingGroupView = () => {
 
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {subBranches.map((subBranch) => {
-                                    // const hasTargetBranch = subBranch.subBranches.some(
-                                    //     (subBranch) => subBranch.id === targetTeachingGroupId.
-                                    // );
+                                    const hasEnrolled = subBranch.teachingGroups.includes(targetTeachingGroupId);
+
 
                                     return (
                                         <div
                                             key={subBranch._id}
-                                            className={`p-4 border rounded-lg transition-all duration-300 bg-white border-gray-200 hover:ring-4 hover:ring-blue-200 hover:border-blue-500 hover:shadow-xl cursor-pointer`}
-                                            // className={`p-4 border rounded-lg transition-all duration-300 ${hasTargetBranch
-                                            //     ? "bg-gray-100 border-gray-300 text-gray-500 hover:cursor-not-allowed"
-                                            //     : "bg-white border-gray-200 hover:ring-4 hover:ring-blue-200 hover:border-blue-500 hover:shadow-xl cursor-pointer"
-                                            //     }`}
-                                            onClick={() => registerSubBranchHandler(subBranch.name, subBranch.id)}
+                                            // className={`p-4 border rounded-lg transition-all duration-300 bg-white border-gray-200 hover:ring-4 hover:ring-blue-200 hover:border-blue-500 hover:shadow-xl cursor-pointer`}
+                                            className={`p-4 border rounded-lg transition-all duration-300 ${hasEnrolled
+                                                ? "bg-gray-100 border-gray-300 text-gray-500 hover:cursor-not-allowed"
+                                                : "bg-white border-gray-200 hover:ring-4 hover:ring-blue-200 hover:border-blue-500 hover:shadow-xl cursor-pointer"
+                                                }`}
+                                            onClick={!hasEnrolled ? () => registerSubBranchHandler(subBranch.name, subBranch.id) : undefined}
                                         >
                                             <div className="flex justify-between items-center">
-                                                <h2 className="text-lg font-medium">{subBranch.name}</h2>
-                                                {/* {hasTargetBranch && (
+                                                <h2 className="text-lg font-medium">{subBranch?.name}</h2>
+                                                {hasEnrolled && (
                                                     <span className="text-sm font-base text-gray-500">Terdaftar ✓</span>
-                                                )} */}
+                                                )}
                                             </div>
                                         </div>
                                     );

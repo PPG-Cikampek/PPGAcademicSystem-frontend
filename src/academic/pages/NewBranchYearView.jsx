@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 
 import { AuthContext } from "../../shared/Components/Context/auth-context";
 import useHttp from '../../shared/hooks/http-hook';
+import { academicYearFormatter } from '../../shared/Utilities/academicYearFormatter'
 
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 import Modal from "../../shared/Components/UIElements/ModalBottomClose";
@@ -29,17 +30,11 @@ const NewBranchYearsView = () => {
         loadYears();
     }, [sendRequest]);
 
-    const formatAcademicYear = (name) => {
-        const year = name.substring(0, 4);
-        const semester = name.substring(4);
-        return `${year}/${parseInt(year) + 1} ${semester === '1' ? 'Ganjil' : 'Genap'}`;
-    };
-
     const registerYearHandler = (academicYearName, academicYearId) => {
         const confirmRegister = async () => {
             const url = `${import.meta.env.VITE_BACKEND_URL}/branchYears`
             const body = JSON.stringify({
-                name: formatAcademicYear(academicYearName),
+                name: academicYearName,
                 branchId: auth.userBranchId,
                 academicYearId
             });
@@ -63,7 +58,7 @@ const NewBranchYearsView = () => {
         };
         setModal({
             title: `Konfirmasi Pendaftaran`,
-            message: `Daftarkan tahun ajaran ${formatAcademicYear(academicYearName)}?`,
+            message: `Daftarkan tahun ajaran ${academicYearFormatter(academicYearName)}?`,
             onConfirm: confirmRegister,
         });
         setModalIsOpen(true);
@@ -142,7 +137,7 @@ const NewBranchYearsView = () => {
                                             onClick={!hasTargetBranch ? () => registerYearHandler(year.name, year.id) : undefined}
                                         >
                                             <div className="flex justify-between items-center">
-                                                <h2 className="text-lg font-medium">{formatAcademicYear(year.name)}</h2>
+                                                <h2 className="text-lg font-medium">{academicYearFormatter(year.name)}</h2>
                                                 {hasTargetBranch && (
                                                     <span className="text-sm font-base text-gray-500">Terdaftar ✓</span>
                                                 )}

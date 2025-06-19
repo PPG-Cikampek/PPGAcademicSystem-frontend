@@ -148,13 +148,13 @@ const TeachingGroupsView = () => {
         };
         setModal({
             title: `Konfirmasi Penghapusan`,
-            message: `Hapus ${name} dari kelas ini?`,
+            message: `Hapus ${name} KBM ini?`,
             onConfirm: confirmRemove,
         });
         closeModal(); // Ensure modal is closed before opening
         openModal({
             title: `Konfirmasi Penghapusan`,
-            message: `Hapus ${name} dari kelas ini?`,
+            message: `Hapus ${name} KBM ini?`,
             onConfirm: confirmRemove,
         });
     }
@@ -297,7 +297,7 @@ const TeachingGroupsView = () => {
                         <div className="mb-8">
                             <div className="flex flex-col gap-4">
                                 <h1 className="text-2xl font-semibold text-gray-900 mb-2">Detail KBM</h1>
-                                <div className="card-basic justify-between items-center rounded-md m-0 mb-2">
+                                <div className="card-basic flex-col md:flex-row justify-between md:items-center rounded-md m-0 mb-2">
                                     <div className="flex flex-col gap-2">
                                         <h1 className="flex items-center gap-2 text-xl font-medium text-gray-900 mb-2">KBM {teachingGroupData.name}
                                             <span className={`inline-block p-1 rounded-md border-2 ${teachingGroupData.isLocked ? 'border-blue-500 text-blue-500' : 'border-red-500 text-red-500'}`}>{teachingGroupData.isLocked ? <Lock size={16} /> : <LockOpen size={16} />}</span>
@@ -344,7 +344,7 @@ const TeachingGroupsView = () => {
                         </div>
 
                         <div className="mb-8">
-                            <div className="mb-2 flex justify-between items-end">
+                            <div className="mb-2 flex justify-between items-center">
                                 <div className="flex gap-1 items-center">
                                     {/* <GraduationCap className="mr-2 h-5 w-5 text-gray-600" /> */}
                                     <h2 className="text-xl font-medium text-gray-800">Kelompok Terdaftar</h2>
@@ -387,7 +387,7 @@ const TeachingGroupsView = () => {
                         </div>
 
                         <div className="mb-8">
-                            <div className="mb-2 flex justify-between items-end">
+                            <div className="mb-2 flex justify-between items-center">
                                 <div className="flex gap-1 items-center">
                                     {/* <GraduationCap className="mr-2 h-5 w-5 text-gray-600" /> */}
                                     <h2 className="text-xl font-medium text-gray-800">Kelas Terdaftar</h2>
