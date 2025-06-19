@@ -9,6 +9,7 @@ import Modal from '../../shared/Components/UIElements/ModalBottomClose';
 import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
 import { academicYearFormatter } from '../../shared/Utilities/academicYearFormatter';
 import MunaqasyahCard from '../components/MunaqasyahCard';
+import SkeletonLoader from '../../shared/Components/UIElements/SkeletonLoader';
 
 const BranchAdminMunaqasyahView = () => {
     const [modal, setModal] = useState({ title: '', message: '', onConfirm: null });
@@ -22,14 +23,15 @@ const BranchAdminMunaqasyahView = () => {
     useEffect(() => {
         const fetchBranchYears = async () => {
             try {
-                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/BranchYears/branch/${auth.userBranchId}`);
+                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/branchYears/branch/${auth.userBranchId}`);
                 setBranchYears(responseData);
-                console.log(responseData)
             } catch (err) {
                 // Error is handled by useHttp  
             }
         };
         fetchBranchYears();
+        // Expose fetchBranchYears for use elsewhere
+        BranchAdminMunaqasyahView.fetchBranchYears = fetchBranchYears;
     }, [sendRequest]);
 
 
@@ -135,8 +137,8 @@ const BranchAdminMunaqasyahView = () => {
                     footer={<ModalFooter />}
                 >
                     {isLoading && (
-                        <div className="flex justify-center mt-16">
-                            <LoadingCircle size={32} />
+                        <div className="flex flex-col gap-4 mt-8">
+                            <SkeletonLoader variant="rectangular" height={32} width="100%" count={2} />
                         </div>
                     )}
                     {!isLoading && (
@@ -145,8 +147,8 @@ const BranchAdminMunaqasyahView = () => {
                 </Modal>
 
                 {(!branchYears || isLoading) && (
-                    <div className="flex justify-center mt-16">
-                        <LoadingCircle size={32} />
+                    <div className="flex flex-col gap-4 mt-16">
+                        <SkeletonLoader variant="rectangular" height={64} width="100%" count={3} />
                     </div>
                 )}
 
@@ -170,6 +172,7 @@ const BranchAdminMunaqasyahView = () => {
                                                 state: { year }
                                             });
                                         }}
+                                        fetchData={BranchAdminMunaqasyahView.fetchBranchYears}
                                     />
                                 ))}
                             </div>

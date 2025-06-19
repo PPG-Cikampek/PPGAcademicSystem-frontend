@@ -2,7 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import AcademicYearCard from './AcademicYearCard';
 
-const AcademicYearList = ({ years, expandedCards, onToggleCard, onActivateYear, onStartMunaqasyah, onDeleteYear }) => {
+const AcademicYearList = ({ years, expandedCards, onToggleCard, onActivateYear, onMunaqsyahStatusChange, onDeleteYear }) => {
     console.log(years)
     if (years.length === 0) {
         return (
@@ -23,7 +23,7 @@ const AcademicYearList = ({ years, expandedCards, onToggleCard, onActivateYear, 
                     expanded={expandedCards[year._id]}
                     onToggle={() => onToggleCard(year._id)}
                     onActivate={onActivateYear}
-                    onStartMunaqasyah={onStartMunaqasyah}
+                    onMunaqsyahStatusChange={onMunaqsyahStatusChange}
                     onDelete={onDeleteYear}
                 />
             ))}

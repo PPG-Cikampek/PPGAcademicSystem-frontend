@@ -165,7 +165,13 @@ const QuestionView = () => {
                                 <div className="font-semibold text-gray-700">Pertanyaan:</div>
                                 <div className="mt-1 text-gray-600 whitespace-pre-line font-lpmq text-base">{question.question}</div>
                             </div>
-                            {question.type !== 'multipleChoices' && question.answers[0] !== '' && (
+
+                            <div className="mt-2">
+                                <div className="font-semibold text-gray-700">Jawaban yang Benar:</div>
+                                <div className='whitespace-pre-line font-lpmq text-base'>{question.answers}</div>
+                            </div>
+
+                            {/* {question.type !== 'multipleChoices' && question.answers[0] !== '' && (
                                 <div className="mt-2">
                                     <div className="font-semibold text-gray-700">Jawaban yang Benar:</div>
                                     <div className='whitespace-pre-line font-lpmq text-base'>{question.answers[0]}</div>
@@ -180,7 +186,7 @@ const QuestionView = () => {
                                         ))}
                                     </ul>
                                 </div>
-                            )}
+                            )} */}
                             <div className="mt-4">
                                 <div className="font-semibold text-gray-700 mb-2">Nilai:</div>
                                 <div className="flex flex-wrap gap-3">

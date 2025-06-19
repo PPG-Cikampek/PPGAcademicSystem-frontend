@@ -99,10 +99,10 @@ const fetchScoreData = async (studentNis, branchYearId, dispatch, userId) => {
         }
         const data = await response.json();
 
-        if (data.scores[0].isBeingScored === "false") { data.scores[0].isBeingScored = userId; }
+        // if (data.scores[0].isBeingScored === "false") { data.scores[0].isBeingScored = userId; }
 
-        console.log(data.scores[0])
-        console.log(data.scores[0].studentId)
+        // console.log(data.scores[0])
+        // console.log(data.scores[0].studentId)
         console.log(data)
 
         const student = { ...data.scores[0].studentId, className: data.scores[0].classId.name };

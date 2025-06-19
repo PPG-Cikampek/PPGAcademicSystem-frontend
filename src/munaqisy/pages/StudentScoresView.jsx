@@ -29,7 +29,7 @@ const StudentScoresView = () => {
 
     useEffect(() => {
         let isMounted = true;
-        general.setMessage('Pilih "Selesai" untuk kembali!'); // Clear any previous messages
+        // general.setMessage('Pilih "Selesai" untuk kembali!'); // Clear any previous messages
         dispatch({ type: 'SET_SCORE_DATA', payload: [] });
         dispatch({ type: 'SET_STUDENT_DATA', payload: [] });
         setDataLoaded(false); // Reset before fetching
@@ -131,7 +131,7 @@ const StudentScoresView = () => {
                     className="button-primary m-0"
                     onClick={() => {
                         handleFinish()
-                        general.setMessage(true);
+                        // general.setMessage(true);
                     }}
                 >
                     Selesai

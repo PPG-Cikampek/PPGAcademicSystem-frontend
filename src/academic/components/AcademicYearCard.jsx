@@ -3,8 +3,9 @@ import { ChevronDown } from 'lucide-react';
 import DataTable from '../../shared/Components/UIElements/DataTable';
 
 import { academicYearFormatter } from '../../shared/Utilities/academicYearFormatter';
+import getMunaqasyahStatusName from '../../munaqasyah/utilities/getMunaqasyahStatusName';
 
-const AcademicYearCard = ({ year, expanded, onToggle, onActivate, onStartMunaqasyah, onDelete }) => {
+const AcademicYearCard = ({ year, expanded, onToggle, onActivate, onMunaqsyahStatusChange, onDelete }) => {
     const transformedData = Array.isArray(year.branchYears) && year.branchYears.length > 0
         ? year.branchYears.map(group => ({
             name: group.branchId.name,
@@ -24,25 +25,23 @@ const AcademicYearCard = ({ year, expanded, onToggle, onActivate, onStartMunaqas
             key: 'isActive',
             label: 'Status',
             sortable: true,
+            headerAlign: 'center',
+            cellAlign: 'center',
             render: (item) => item.isActive ? 'Aktif' : 'Nonaktif',
-            cellStyle: (item) => `py-1 px-2 text-sm text-center w-min border rounded-md ${item.isActive ? 'text-green-500 bg-green-100' : 'text-red-500 bg-red-100'}`
+            cellStyle: (item) => `py-1 px-2 text-sm text-center w-min border rounded-md ${item.isActive ? 'text-green-500 bg-green-100 border-green-100' : 'text-red-500 bg-red-100 border-red-100'}`
         },
         {
             key: 'munaqasyahStatus',
             label: 'Munaqosah',
             sortable: true,
-            render: (item) => {
-                if (year.munaqasyahStatus === 'notStarted') return <span className="italic text-gray-500">Daerah belum memulai</span>;
-                if (item.munaqasyahStatus === 'notStarted') return 'Belum Dimulai';
-                if (item.munaqasyahStatus === 'running') return 'Sedang Berjalan';
-                if (item.munaqasyahStatus === 'finished') return 'Selesai';
-                return 'Tidak Diketahui';
-            },
+            headerAlign: 'center',
+            cellAlign: 'center',
+            render: (item) => getMunaqasyahStatusName(item.munaqasyahStatus),
             cellStyle: (item) => {
-                if (year.munaqasyahStatus === 'notStarted') return 'py-1 px-2 text-sm text-center w-min italic text-gray-500';
-                if (item.munaqasyahStatus === 'notStarted') return 'py-1 px-2 text-sm text-center w-min text-yellow-600 bg-yellow-100';
-                if (item.munaqasyahStatus === 'running') return 'py-1 px-2 text-sm text-center w-min text-blue-600 bg-blue-100';
-                if (item.munaqasyahStatus === 'finished') return 'py-1 px-2 text-sm text-center w-min text-green-600 bg-green-100';
+                if (year.munaqasyahStatus === 'notStarted') return 'py-1 px-2 rounded-md text-sm text-center w-min italic text-gray-500';
+                if (item.munaqasyahStatus === 'notStarted') return 'py-1 px-2 rounded-md text-sm text-center w-min text-yellow-600 bg-yellow-100';
+                if (item.munaqasyahStatus === 'inProgress') return 'py-1 px-2 rounded-md text-sm text-center w-min text-blue-600 bg-blue-100';
+                if (item.munaqasyahStatus === 'completed') return 'py-1 px-2 rounded-md text-sm text-center w-min text-green-600 bg-green-100';
                 return 'py-1 px-2 text-sm text-center w-min text-gray-500';
             }
         }
@@ -51,11 +50,12 @@ const AcademicYearCard = ({ year, expanded, onToggle, onActivate, onStartMunaqas
     // Helper for year-level status
     const getMunaqasyahStatusLabel = (status) => {
         if (status === 'notStarted') return { label: 'Munaqosah belum dimulai', className: 'text-yellow-600 bg-yellow-100' };
-        if (status === 'running') return { label: 'Munaqosah sedang berjalan', className: 'text-blue-600 bg-blue-100' };
-        if (status === 'finished') return { label: 'Munaqosah selesai', className: 'text-green-600 bg-green-100' };
+        if (status === 'inProgress') return { label: 'Munaqosah sedang berjalan', className: 'text-blue-600 bg-blue-100' };
+        if (status === 'completed') return { label: 'Munaqosah selesai', className: 'text-green-600 bg-green-100' };
         return { label: 'Status tidak diketahui', className: 'text-gray-600 bg-gray-100' };
     };
     const munaqasyahStatusObj = getMunaqasyahStatusLabel(year.munaqasyahStatus);
+    console.log(munaqasyahStatusObj);
 
     return (
         <div className={`bg-white rounded-lg shadow-md overflow-hidden transition-all duration-300 
@@ -86,14 +86,24 @@ const AcademicYearCard = ({ year, expanded, onToggle, onActivate, onStartMunaqas
                         <div className={`inline-block mt-2 px-2 py-1 text-sm rounded ${munaqasyahStatusObj.className}`}>
                             {munaqasyahStatusObj.label}
                         </div>
-                        {year.munaqasyahStatus === 'notStarted' && (
+                        {year.munaqasyahStatus === 'inProgress' && (
                             <button
                                 className='btn-primary-outline mt-2'
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    onStartMunaqasyah(year.name, year._id);
+                                    onMunaqsyahStatusChange('complete', year.name, year._id);
                                 }}>
-                                Mulai Munaqosah
+                                Selesaikan Munaqosah
+                            </button>
+                        )}
+                        {year.munaqasyahStatus !== 'inProgress' && (
+                            <button
+                                className='btn-primary-outline mt-2'
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onMunaqsyahStatusChange('start', year.name, year._id);
+                                }}>
+                                {year.munaqasyahStatus === 'notStarted' ? 'Mulai Munaqosah' : 'Mulai Munaqosah Susulan'}
                             </button>
                         )}
                     </div>

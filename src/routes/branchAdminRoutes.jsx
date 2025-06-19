@@ -23,10 +23,10 @@ const AddStudentToClassView = lazy(() => import("../class/pages/AddStudentToClas
 const AddTeacherToClassView = lazy(() => import("../class/pages/AddTeacherToClassView"));
 const UpdateStudentView = lazy(() => import("../students/pages/UpdateStudentView"));
 const UpdateTeacherView = lazy(() => import("../teachers/pages/UpdateTeacherView"));
-const StudentReportView = lazy(() => import("../students/pages/StudentReportView"));
+// const StudentReportView = lazy(() => import("../students/pages/StudentReportView"));
 const ProfileView = lazy(() => import("../users/pages/ProfileView"));
 const EmailVerifyView = lazy(() => import("../users/pages/EmailVerifyView"));
-const SubBranchPerformanceView = lazy(() => import("../performance/pages/SubBranchPerformanceView"));
+// const SubBranchPerformanceView = lazy(() => import("../performance/pages/SubBranchPerformanceView"));
 const RequestAccountView = lazy(() => import("../users/pages/RequestAccountView"));
 const RequestAccountForm = lazy(() => import("../users/pages/RequestAccountForm"));
 const RequestAccountTicketDetail = lazy(() => import("../users/pages/RequestAccountTicketDetail"));
@@ -49,7 +49,7 @@ export const branchAdminRoutes = [
     { path: '/dashboard/teaching-groups/:teachingGroupId', element: <TeachingGroupsView /> },
     { path: '/dashboard/teaching-groups/:teachingGroupId/add-class/', element: <NewClassView /> },
     { path: '/dashboard/teaching-groups/:teachingGroupId/add-sub-branches/', element: <AddSubBranchToTeachingGroupView /> },
-    { path: '/performances/student/:studentId', element: <StudentReportView /> },
+    // { path: '/performances/student/:studentId', element: <StudentReportView /> },
     { path: '/munaqasyah/student/score', element: <PreviewReport /> },
     { path: '/academic/', element: <BranchYearsView /> },
     { path: '/academic/new', element: <NewBranchYearsView /> },
@@ -59,7 +59,7 @@ export const branchAdminRoutes = [
     { path: '/settings/requestAccount/ticket/:ticketId', element: <RequestAccountTicketDetail /> },
     { path: '/dashboard/classes/:classId/add-students', element: <AddStudentToClassView /> },
     { path: '/dashboard/classes/:classId/add-teachers', element: <AddTeacherToClassView /> },
-    { path: '/performance', element: <SubBranchPerformanceView /> },
+    // { path: '/performance', element: <SubBranchPerformanceView /> },
     { path: '/munaqasyah', element: <BranchAdminMunaqasyahView /> },
     { path: '/munaqasyah/:branchYearId', element: <BranchAdminMunaqasyahDetailView /> },
 ];

@@ -238,7 +238,7 @@ const ClassDetailView = () => {
                             </div>
                             <div className="mt-2 flex items-center text-gray-500">
                                 <Building className="mr-2 h-4 w-4" />
-                                {/* <span>{classData.class.subBranchYearId.subBranchId.name} - {classData.class.subBranchYearId.name}</span> */}
+                                {/* <span>{classData.class.subBranchYearId.subBranchId.name} - {classData.class.subbranchYearId.academicYearId.name}</span> */}
                             </div>
                         </div>
 

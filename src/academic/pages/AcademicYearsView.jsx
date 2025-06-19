@@ -62,12 +62,12 @@ const AcademicYearsView = () => {
     setModalIsOpen(true);
   };
 
-  const startMunaqasyahHandler = (academicYearName, academicYearId) => {
-    const confirmStart = async () => {
-      const body = JSON.stringify({ munaqasyahStatus: "running" })
+  const munaqasyahStatusHandler = (actionType, academicYearName, academicYearId) => {
+    const confirmAction = async (action) => {
+      const body = JSON.stringify({ munaqasyahStatus: action })
       try {
         const responseData = await sendRequest(
-          `${import.meta.env.VITE_BACKEND_URL}/academicYears/start/${academicYearId}/munaqasyah`,
+          `${import.meta.env.VITE_BACKEND_URL}/academicYears/munaqasyah/${academicYearId}`,
           'PATCH',
           body,
           { 'Content-Type': 'application/json' }
@@ -77,16 +77,27 @@ const AcademicYearsView = () => {
 
         const updatedData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/academicYears?populate=subBranchYears`);
         setData(updatedData);
-      } catch (err) { }
+      } catch (err) {
+        setModal({ title: 'Gagal!', message: err.message, onConfirm: null });
+      }
     };
 
-    setModal({
-      title: `Konfirmasi`,
-      message: `Mulai munaqosah untuk tahun ajaran ${academicYearFormatter(academicYearName)}?`,
-      onConfirm: confirmStart
-    });
-    setModalIsOpen(true);
-  };
+    if (actionType === 'start') {
+      setModal({
+        title: `Konfirmasi`,
+        message: `Mulai munaqosah untuk tahun ajaran ${academicYearFormatter(academicYearName)}?`,
+        onConfirm: () => confirmAction('inProgress')
+      });
+      setModalIsOpen(true);
+    } else if (actionType === 'complete') {
+      setModal({
+        title: `Konfirmasi`,
+        message: `Selesaikan munaqosah untuk tahun ajaran ${academicYearFormatter(academicYearName)}?`,
+        onConfirm: () => confirmAction('completed')
+      });
+      setModalIsOpen(true);
+    };
+  }
 
   const deleteAcademicYearHandler = (academicYearName, academicYearId) => {
     const confirmDelete = async () => {
@@ -162,7 +173,7 @@ const AcademicYearsView = () => {
             expandedCards={expandedCards}
             onToggleCard={toggleCard}
             onActivateYear={activateYearHandler}
-            onStartMunaqasyah={startMunaqasyahHandler}
+            onMunaqsyahStatusChange={munaqasyahStatusHandler}
             onDeleteYear={deleteAcademicYearHandler}
           />
         )}

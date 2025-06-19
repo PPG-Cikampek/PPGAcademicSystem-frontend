@@ -4,7 +4,7 @@ const getMunaqasyahStatusName = (status) => {
             inProgress: 'Sedang Berlangsung',
             completed: 'Selesai',
         };
-        return statusMap[status] || 'kosong';
+        return statusMap[status] || 'Tidak Diketahui';
     };
 
 export default getMunaqasyahStatusName;

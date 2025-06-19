@@ -6,34 +6,41 @@ import ErrorCard from '../../shared/Components/UIElements/ErrorCard'
 import { Eye, MapPin, PlusIcon } from 'lucide-react'
 import DataTable from '../../shared/Components/UIElements/DataTable'
 import { AuthContext } from '../../shared/Components/Context/auth-context'
-import MunaqasyahCard from '../components/MunaqasyahCard'
-import { render } from 'react-dom'
 import getMunaqasyahStatusName from '../utilities/getMunaqasyahStatusName'
+import Modal from '../../shared/Components/Modal';
+import ModalFooter from '../../shared/Components/ModalFooter';
+import useModal from '../../shared/hooks/useModal';
 
 const BranchAdminMunaqasyahDetailView = () => {
     const [subBranchData, setSubBranchData] = useState([])
-
     const { sendRequest, isLoading, error, setError } = useHttp()
+    const {
+        isOpen: modalIsOpen,
+        modal,
+        openModal,
+        closeModal,
+        setModal
+    } = useModal({ title: '', message: '', onConfirm: null });
 
     const auth = useContext(AuthContext)
     const teachingGroupId = useParams().teachingGroupId
-
     const navigate = useNavigate()
     const location = useLocation()
-    const state = location.state.year || {}
-    console.log(state)
+    const state = (location.state && location.state.year) ? location.state.year : {}
 
     useEffect(() => {
-        const fetchSubBranchData = async () => {
-            try {
-                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/levels/branches/${auth.userBranchId}/sub-branches/`)
+        fetchSubBranchData();
+    }, [sendRequest, setError]);
 
-                setSubBranchData(responseData.subBranches)
-                console.log(responseData)
-            } catch (err) { }
-        }
-        fetchSubBranchData()
-    }, [sendRequest, setError])
+    // Define fetchSubBranchData so it can be passed as fetchData
+    const fetchSubBranchData = async () => {
+        try {
+            const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/levels/branches/${auth.userBranchId}/sub-branches/`)
+            setSubBranchData(responseData.subBranches)
+
+            BranchAdminMunaqasyahDetailView.fetchSubBranchData = fetchSubBranchData; // Expose for use elsewhere
+        } catch (err) { }
+    }
 
     const getMunaqasyahStatusStyle = (status) => {
         const statusClassMap = {
@@ -48,8 +55,8 @@ const BranchAdminMunaqasyahDetailView = () => {
         { key: 'name', label: 'Nama', sortable: true, headerAlign: 'left', cellAlign: 'left' },
         { key: 'munaqisyCount', label: 'Jumlah Munaqis', sortable: true, headerAlign: 'center', cellAlign: 'center' },
         { key: 'studentCount', label: 'Jumlah Siswa', sortable: true, headerAlign: 'center', cellAlign: 'center' },
-        { key: 'progress', label: 'Penyelesaian', sortable: true, headerAlign: 'center', cellAlign: 'center' },
         { key: 'avgScore', label: 'Nilai Rata-Rata', sortable: true, headerAlign: 'center', cellAlign: 'center' },
+        { key: 'progress', label: 'Penyelesaian', sortable: true, headerAlign: 'center', cellAlign: 'center' },
         {
             key: 'munaqasyahStatus', label: 'Status', sortable: true, headerAlign: 'center', cellAlign: 'center',
             render: (item) => getMunaqasyahStatusName(item.munaqasyahStatus),
@@ -57,19 +64,91 @@ const BranchAdminMunaqasyahDetailView = () => {
         },
         {
             key: 'action', label: 'Aksi', sortable: false, headerAlign: 'center', cellAlign: 'center', render: (item) => (
-                <Link to={`/dashboard/teaching-groups/${teachingGroupId}/sub-branches/${item._id}`}>
+                item.munaqasyahStatus === 'notStarted' ? (
                     <button
                         className="btn-primary-outline disabled:opacity-50"
-                        disabled={true}>
-                        <Eye className="w-4 h-4 " />
+                        disabled={state.munaqasyahStatus !== 'inProgress'}
+                        onClick={() => subBranchMunaqasyahStatusHandler('start', item.name, item._id)}>
+                        Mulai
                     </button>
-                </Link>
+                ) : item.munaqasyahStatus === 'inProgress'
+                    ? (
+                        <>
+                            <button
+                                className="btn-primary-outline disabled:opacity-50 mx-1"
+                                onClick={() => navigate(`/dashboard/teaching-groups/${teachingGroupId}/sub-branches/${item._id}`)}>
+                                Lihat
+                            </button>
+                            <button
+                                className="btn-primary-outline disabled:opacity-50 mx-1"
+                                onClick={() => subBranchMunaqasyahStatusHandler('complete', item.name, item._id)}>
+                                Selesaikan
+                            </button>
+                        </>
+                    ) : (
+                        <>
+                            <button
+                                className="btn-primary-outline disabled:opacity-50 mx-1"
+                                onClick={() => navigate(`/dashboard/teaching-groups/${teachingGroupId}/sub-branches/${item._id}`)}>
+                                Lihat
+                            </button>
+                            <button
+                                className="btn-primary-outline disabled:opacity-50 mx-1"
+                                onClick={() => subBranchMunaqasyahStatusHandler('start', item.name, item._id)}
+                                disabled={state.munaqasyahStatus !== 'inProgress'}
+                            >
+                                Mulai Susulan
+                            </button>
+                        </>
+                    )
             )
         }
     ];
 
+    const subBranchMunaqasyahStatusHandler = (actionName, subBranchName, subBranchId) => {
+        const confirmAction = async (action) => {
+            const url = `${import.meta.env.VITE_BACKEND_URL}/branchYears/munaqasyah/${auth.currentBranchYearId}/sub-branch/`;
+            const body = JSON.stringify({
+                subBranchId,
+                munaqasyahStatus: action
+            });
+            try {
+                const responseData = await sendRequest(url, 'PATCH', body, {
+                    'Content-Type': 'application/json'
+                });
+                openModal({ title: 'Berhasil!', message: responseData.message, onConfirm: null });
+                BranchAdminMunaqasyahDetailView.fetchSubBranchData(); // Refresh sub-branch data
+            } catch (err) {
+                setError(err.message);
+                openModal({ title: 'Gagal!', message: err.message, onConfirm: null });
+            }
+        };
+
+        if (actionName === 'start') {
+            openModal({
+                title: `Konfirmasi`,
+                message: `Mulai Munaosah untuk Kelompok ${subBranchName}?`,
+                onConfirm: () => confirmAction('inProgress')
+            });
+        } else {
+            openModal({
+                title: `Konfirmasi`,
+                message: `Selesaikan Munaosah untuk Kelompok ${subBranchName}?`,
+                onConfirm: () => confirmAction('completed')
+            });
+        }
+    }
+
     return (
         <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8 pb-24">
+            <Modal
+                isOpen={modalIsOpen}
+                title={modal.title}
+                message={modal.message}
+                onClose={closeModal}
+                onConfirm={modal.onConfirm}
+                footer={<ModalFooter isLoading={isLoading} onClose={closeModal} onConfirm={modal.onConfirm} showConfirm={!!modal.onConfirm} />}
+            />
             <div className="max-w-6xl mx-auto">
 
                 {error && <ErrorCard error={error} onClear={() => setError(null)} />}
@@ -91,13 +170,11 @@ const BranchAdminMunaqasyahDetailView = () => {
                     </div>
                 )}
 
-
                 {subBranchData && !isLoading && state && (
                     <>
                         <div className="mb-8">
                             <div className="flex flex-col gap-4">
                                 <h1 className="text-2xl font-semibold text-gray-900 mb-2">Munaqosah Desa</h1>
-                                <MunaqasyahCard year={state} isClickAble={false} />
                             </div>
                         </div>
 
@@ -114,7 +191,7 @@ const BranchAdminMunaqasyahDetailView = () => {
                                 searchableColumns={['name']}
                                 initialSort={{ key: 'name', direction: 'ascending' }}
                                 initialEntriesPerPage={5}
-                                onRowClick={(row) => { `/dashboard/teaching-groups/${teachingGroupId}/sub-branches/${row._id}` }}
+                                onRowClick={null} // No-op, as clickableRows is false
                                 config={{
                                     showSearch: false,
                                     showTopEntries: false,
@@ -123,7 +200,7 @@ const BranchAdminMunaqasyahDetailView = () => {
                                     clickableRows: false,
                                     entriesOptions: [5, 10, 20, 30]
                                 }}
-                                tableId={`teaching-group-sub-branches-table-${teachingGroupId}`} // Unique table ID for this teaching group
+                                tableId={`teaching-group-sub-branches-table-${teachingGroupId}`}
                             />
                         </div>
                     </>

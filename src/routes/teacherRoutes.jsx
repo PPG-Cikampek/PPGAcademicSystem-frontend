@@ -26,10 +26,10 @@ const UpdateStudentView = lazy(() => import("../students/pages/UpdateStudentView
 const UpdateTeacherView = lazy(() => import("../teachers/pages/UpdateTeacherView"));
 const SelectClassView = lazy(() => import("../teacher-role/scan/pages/SelectClassView"));
 const UpdateAttendanceView = lazy(() => import("../teacher-role/history/attendanceHistory/pages/UpdateAttendanceView"));
-const StudentReportView = lazy(() => import("../students/pages/StudentReportView"));
+// const StudentReportView = lazy(() => import("../students/pages/StudentReportView"));
 const ProfileView = lazy(() => import("../users/pages/ProfileView"));
 const NewJournalView = lazy(() => import("../teacher-role/journal/pages/NewJournalView"));
-const TeacherPerformanceView = lazy(() => import("../performance/pages/TeacherPerformanceView"));
+// const TeacherPerformanceView = lazy(() => import("../performance/pages/TeacherPerformanceView"));
 const MaterialProgressView = lazy(() => import("../teacher-role/materialProgress/pages/materialProgressView"));
 const NewMaterialProgresslView = lazy(() => import("../teacher-role/materialProgress/pages/NewMaterialProgressView"));
 
@@ -212,22 +212,22 @@ export const teacherRoutes = [
             </PageHeader>
         )
     },
-    {
-        path: '/performances',
-        element: (
-            <PageHeader>
-                <TeacherPerformanceView />
-            </PageHeader >
-        )
-    },
-    {
-        path: '/performances/student/:studentId',
-        element: (
-            <PageHeader>
-                <StudentReportView />
-            </PageHeader>
-        )
-    },
+    // {
+    //     path: '/performances',
+    //     element: (
+    //         <PageHeader>
+    //             <TeacherPerformanceView />
+    //         </PageHeader >
+    //     )
+    // },
+    // {
+    //     path: '/performances/student/:studentId',
+    //     element: (
+    //         <PageHeader>
+    //             <StudentReportView />
+    //         </PageHeader>
+    //     )
+    // },
     {
         path: '/settings/profile/:userId',
         element: (

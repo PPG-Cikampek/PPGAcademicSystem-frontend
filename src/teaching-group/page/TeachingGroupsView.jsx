@@ -63,6 +63,7 @@ const TeachingGroupsView = () => {
                         </button>
                     </Link>
                     {teachingGroupData.branchYearId.academicYearId.isActive
+                        && teachingGroupData.isLocked === false
                         && (<button
                             onClick={(e) => { e.stopPropagation(); removeSubBranchHandler(item.name, item._id); }}
                             className="p-3 rounded-full hover:bg-gray-200 text-red-500 hover:text-red-700 transition"
@@ -103,6 +104,7 @@ const TeachingGroupsView = () => {
                     </Link>
                     {auth.userRole === 'branchAdmin'
                         && teachingGroupData.branchYearId.academicYearId.isActive
+                        && teachingGroupData.isLocked === false
                         && (<>
                             <button
                                 onClick={(e) => {
@@ -227,6 +229,45 @@ const TeachingGroupsView = () => {
         });
     }
 
+    const lockTeachingGroupHandler = (actionType, teachingGroupId) => {
+        console.log(actionType)
+        const confirmLock = async () => {
+            const url = actionType === 'lock'
+                ? `${import.meta.env.VITE_BACKEND_URL}/teachingGroups/lock`
+                : `${import.meta.env.VITE_BACKEND_URL}/teachingGroups/unlock`;
+            const body = JSON.stringify({ teachingGroupId })
+
+            let responseData;
+            try {
+                responseData = await sendRequest(url, 'PATCH', body, {
+                    'Content-Type': 'application/json'
+                });
+
+                setModal({ title: 'Berhasil!', message: responseData.message, onConfirm: null });
+                if (TeachingGroupsView.fetchTeachingGroupData) {
+                    TeachingGroupsView.fetchTeachingGroupData();
+                }
+
+            } catch (err) {
+                setModal({ title: 'Gagal!', message: err.message, onConfirm: null });
+            }
+        }
+        closeModal()
+        if (actionType === 'lock') {
+            openModal({
+                title: `Kunci KBM: ${teachingGroupData.name}?`,
+                message: `KBM tidak akan bisa di-edit lagi!`,
+                onConfirm: confirmLock,
+            });
+        } else {
+            openModal({
+                title: `Buka Kunci KBM: ${teachingGroupData.name}?`,
+                message: `KBM akan bisa di-edit lagi`,
+                onConfirm: confirmLock,
+            });
+        }
+    }
+
     return (
         <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8 pb-24">
             <div className="max-w-6xl mx-auto">
@@ -258,7 +299,9 @@ const TeachingGroupsView = () => {
                                 <h1 className="text-2xl font-semibold text-gray-900 mb-2">Detail KBM</h1>
                                 <div className="card-basic justify-between items-center rounded-md m-0 mb-2">
                                     <div className="flex flex-col gap-2">
-                                        <h1 className="text-xl font-medium text-gray-900 mb-2">KBM {teachingGroupData.name}</h1>
+                                        <h1 className="flex items-center gap-2 text-xl font-medium text-gray-900 mb-2">KBM {teachingGroupData.name}
+                                            <span className={`inline-block p-1 rounded-md border-2 ${teachingGroupData.isLocked ? 'border-blue-500 text-blue-500' : 'border-red-500 text-red-500'}`}>{teachingGroupData.isLocked ? <Lock size={16} /> : <LockOpen size={16} />}</span>
+                                        </h1>
                                         <div className="flex items-center space-x-2 text-gray-600">
                                             <MapPin className="h-5 w-5" />
                                             <span>Tempat Kegiatan KBM: {teachingGroupData.address}</span>
@@ -274,11 +317,26 @@ const TeachingGroupsView = () => {
                                     </div>
                                     <div>
                                         {console.log(teachingGroupData)}
-                                        {teachingGroupData.branchYearId.academicYearId.isActive && teachingGroupData.isLocked ? (
-                                            <button className='button-danger'>Buka KBM</button>
-                                        ) : teachingGroupData.branchYearId.academicYearId.isActive && (
-                                            <button className='button-primary'>Kunci KBM</button>
-                                        )}
+                                        {teachingGroupData.branchYearId.academicYearId.isActive
+                                            && auth.userRole === 'branchAdmin'
+                                            && teachingGroupData.isLocked
+                                            ? (
+                                                <button
+                                                    className='button-danger'
+                                                    onClick={() => lockTeachingGroupHandler("unlock", teachingGroupId)}
+                                                >
+                                                    Buka KBM
+                                                </button>
+                                            ) : teachingGroupData.branchYearId.academicYearId.isActive
+                                            && auth.userRole === 'branchAdmin'
+                                            && (
+                                                <button
+                                                    className='button-primary'
+                                                    onClick={() => lockTeachingGroupHandler("lock", teachingGroupId)}
+                                                >
+                                                    Kunci KBM
+                                                </button>
+                                            )}
                                     </div>
 
                                 </div>
@@ -293,6 +351,7 @@ const TeachingGroupsView = () => {
                                 </div>
                                 {teachingGroupData.branchYearId.academicYearId.isActive
                                     && auth.userRole === 'branchAdmin'
+                                    && teachingGroupData.isLocked === false
                                     && (
                                         <button
                                             className="button-primary pl-[11px] mt-0"
@@ -335,6 +394,7 @@ const TeachingGroupsView = () => {
                                 </div>
                                 {auth.userRole === 'branchAdmin'
                                     && teachingGroupData.branchYearId.academicYearId.isActive
+                                    && teachingGroupData.isLocked === false
                                     && (
                                         <Link to={`/dashboard/teaching-groups/${teachingGroupId}/add-class/`}>
                                             <button className="button-primary pl-[11px] mt-0">
