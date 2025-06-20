@@ -9,6 +9,7 @@ import Modal from '../../shared/Components/UIElements/ModalBottomClose';
 import { CircleAlert } from 'lucide-react';
 import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
+import { academicYearFormatter } from '../../shared/Utilities/academicYearFormatter';
 
 const SubBranchMunaqasyahView = () => {
     const [subBranchYears, setSubBranchYears] = useState()
@@ -129,7 +130,7 @@ const SubBranchMunaqasyahView = () => {
                                 <div className="flex items-center space-x-4 ">
                                     <div className="flex-1 h-fit"  >
                                         <div className='flex items-center gap-2'>
-                                            <h2 className="text-xl text-gray-900">{year.branchYear.name}</h2>
+                                            <h2 className="text-xl text-gray-900">{academicYearFormatter(year.branchYear.name)}</h2>
                                         </div>
                                         <div className="flex items-center text-gray-500 mt-1">
                                             Jumlah Kelas: {year.classes.length}

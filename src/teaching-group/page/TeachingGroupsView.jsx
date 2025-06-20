@@ -35,7 +35,7 @@ const TeachingGroupsView = () => {
                 const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/teachingGroups/${teachingGroupId}`)
 
                 setTeachingGroupData(responseData.identifiedTeachingGroup)
-                console.log(responseData)
+                console.log(responseData.identifiedTeachingGroup)
             } catch (err) {
                 // setError(err.message || 'Failed to fetch teaching groups.')  
             }
@@ -316,19 +316,23 @@ const TeachingGroupsView = () => {
                                         </div>
                                     </div>
                                     <div>
-                                        {console.log(teachingGroupData)}
-                                        {teachingGroupData.branchYearId.academicYearId.isActive
+                                        {(teachingGroupData.branchYearId.isActive === false
+                                            && teachingGroupData.branchYearId.academicYearId.isActive === true
                                             && auth.userRole === 'branchAdmin'
-                                            && teachingGroupData.isLocked
-                                            ? (
+                                            && teachingGroupData.isLocked === true)
+                                            && (
                                                 <button
                                                     className='button-danger'
                                                     onClick={() => lockTeachingGroupHandler("unlock", teachingGroupId)}
                                                 >
                                                     Buka KBM
                                                 </button>
-                                            ) : teachingGroupData.branchYearId.academicYearId.isActive
-                                            && auth.userRole === 'branchAdmin'
+                                            )}
+
+                                        {(teachingGroupData.branchYearId.isActive === false
+                                            && teachingGroupData.branchYearId.academicYearId.isActive === true
+                                            && teachingGroupData.isLocked === false
+                                            && auth.userRole === 'branchAdmin')
                                             && (
                                                 <button
                                                     className='button-primary'

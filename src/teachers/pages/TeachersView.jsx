@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import useHttp from '../../shared/hooks/http-hook';
 import { AuthContext } from '../../shared/Components/Context/auth-context';
 
@@ -92,7 +92,6 @@ const TeachersView = () => {
                 render: (teacher) => teacher?.userId?.subBranchId?.name
             }
         ] : []),
-        { key: 'name', label: 'Nama', sortable: true },
         ...(auth.userRole === 'branchAdmin' ? [
             {
                 key: 'group',

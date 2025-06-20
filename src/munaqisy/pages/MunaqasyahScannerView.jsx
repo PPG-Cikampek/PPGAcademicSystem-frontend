@@ -20,6 +20,7 @@ const MunaqasyahScannerView = () => {
 
     const auth = useContext(AuthContext)
     const branchYearId = auth.currentBranchYearId
+    const subBranchId = auth.userSubBranchId
     const location = useLocation()
     const errorMessage = location.state?.errorMessage || "";
 
@@ -27,7 +28,7 @@ const MunaqasyahScannerView = () => {
         console.log(branchYearId)
         setIsLoading(true);
 
-        fetchYearData(branchYearId, dispatch);
+        fetchYearData(branchYearId, subBranchId, dispatch);
 
         dispatch({ type: 'SET_SCORE_DATA', payload: [] });
         dispatch({ type: 'SET_STUDENT_DATA', payload: [] });
@@ -37,14 +38,13 @@ const MunaqasyahScannerView = () => {
 
     // useEffect(() => {
     //     console.log(state.studentScore);
-    // }, [state.isSubBranchYearMunaqasyahStarted])
+    // }, [state.isBranchYearMunaqasyahStarted])
 
     return (
         <div className='flex flex-col pb-24'>
-            {state.isSubBranchYearMunaqasyahStarted === true && (
-                <SequentialAnimation variant={2}>
-                    <StatusBar academicYear={auth.branchYear} />
-                </SequentialAnimation>)}
+            <SequentialAnimation variant={2}>
+                <StatusBar academicYear={auth.branchYear} />
+            </SequentialAnimation>
 
             {isLoading && (
                 <div className={`flex justify-center mt-16 `}>
@@ -54,18 +54,24 @@ const MunaqasyahScannerView = () => {
 
             {!isLoading && (
                 <SequentialAnimation variant={2}>
-                    {state.isSubBranchYearMunaqasyahStarted === true ?
+                    {(state.isBranchYearMunaqasyahStarted === true && state.isSubBranchMunaqasyahStarted === true) ?
                         (< div className='card-basic m-4'>
+                            {console.log(state.isBranchYearMunaqasyahStarted)}
+                            {console.log(state.isSubBranchMunaqasyahStarted)}
                             <QRCodeScanner errorMessage={errorMessage} />
-                        </div>) : state.isSubBranchYearMunaqasyahStarted === false ? (
+                        </div>) : state.isBranchYearMunaqasyahStarted === false ? (
                             <InfoCard className={'mx-4 my-12'}>
                                 <p>PJP Desa belum memulai munaqosah!</p>
                             </InfoCard>)
-                            : auth.currentBranchYear === null && (
+                            : state.isSubBranchMunaqasyahStarted === false ? (
                                 <InfoCard className={'mx-4 my-12'}>
-                                    <p>Tidak ada tahun ajaran aktif, hubungi PJP Desa!</p>
-                                </InfoCard>
-                            )}
+                                    <p>PJP Kelompok belum memulai munaqosah!</p>
+                                </InfoCard>)
+                                : auth.currentBranchYear === null && (
+                                    <InfoCard className={'mx-4 my-12'}>
+                                        <p>Tidak ada tahun ajaran aktif, hubungi PJP Desa!</p>
+                                    </InfoCard>
+                                )}
                 </SequentialAnimation>
             )}
         </div >

@@ -7,6 +7,7 @@ import useHttp from '../../shared/hooks/http-hook';
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 import Modal from "../../shared/Components/UIElements/ModalBottomClose";
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
+import SkeletonLoader from "../../shared/Components/UIElements/SkeletonLoader";
 
 
 const AddStudentToClassView = () => {
@@ -14,7 +15,6 @@ const AddStudentToClassView = () => {
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [students, setStudents] = useState()
     const [cls, setCls] = useState()
-    const [activeAcademicYear, setActiveAcademicYear] = useState();
     const { isLoading, error, sendRequest, setError } = useHttp();
 
     const navigate = useNavigate()
@@ -38,11 +38,7 @@ const AddStudentToClassView = () => {
                 const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/classes/${classId}`);
                 // setCls(responseData.class);
                 console.log(responseData.class)
-                try {
-                    const classesData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/classes/teaching-group/${responseData.class.teachingGroupId}`);
-                    setCls(classesData.classes);
-                    console.log(classesData.classes)
-                } catch (err) { }
+                setCls(responseData.class)
             } catch (err) { }
         }
 
@@ -68,8 +64,9 @@ const AddStudentToClassView = () => {
                     'Content-Type': 'application/json'
                 });
 
-                setModalIsOpen(true)
-                setModal({ title: 'Berhasil!', message: responseData.message, onConfirm: null });
+                setModalIsOpen(false)
+                // setModalIsOpen(true)
+                // setModal({ title: 'Berhasil!', message: responseData.message, onConfirm: null });
 
                 const updatedData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/students/sub-branch/${targetSubBranchId}`);
                 setStudents(updatedData.students);
@@ -79,12 +76,15 @@ const AddStudentToClassView = () => {
             }
 
         };
-        setModal({
-            title: `Konfirmasi Pendaftaran`,
-            message: `Daftarkan peserta didik ${studentName}?`,
-            onConfirm: confirmRegister,
-        });
-        setModalIsOpen(true);
+
+        confirmRegister();
+
+        // setModal({
+        //     title: `Konfirmasi Pendaftaran`,
+        //     message: `Daftarkan peserta didik ${studentName}?`,
+        //     onConfirm: confirmRegister,
+        // });
+        // setModalIsOpen(true);
     }
 
     const getInitials = (name) => {
@@ -142,8 +142,21 @@ const AddStudentToClassView = () => {
 
 
                 {(!students || isLoading) && (
-                    <div className="flex justify-center mt-16">
-                        <LoadingCircle size={32} />
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-16">
+                        {[...Array(18)].map((_, idx) => (
+                            <div key={idx} className="p-4 border rounded-lg bg-white border-gray-200">
+                                <div className="flex justify-between items-center gap-2">
+                                    <div className="flex gap-4 items-center">
+                                        <SkeletonLoader variant="circular" width={40} height={40} />
+                                        <div className="flex flex-col gap-1 w-32">
+                                            <SkeletonLoader width="100%" height={32} />
+                                            <SkeletonLoader width="60%" height={24} />
+                                        </div>
+                                    </div>
+                                    <SkeletonLoader width={60} height={16} />
+                                </div>
+                            </div>
+                        ))}
                     </div>
                 )}
 
@@ -159,8 +172,8 @@ const AddStudentToClassView = () => {
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {students.map((student) => {
                                     const isStudentRegistered = () => {
-                                        if (!student.classIds || !Array.isArray(student.classIds) || !cls || !Array.isArray(cls)) return false;
-                                        return student.classIds.some(c => cls.some(classObj => classObj._id === c._id));
+                                        if (!student.classIds || !Array.isArray(student.classIds) || !cls || !cls.teachingGroupId) return false;
+                                        return student.classIds.some(c => c.teachingGroupId && c.teachingGroupId._id === cls.teachingGroupId);
                                     };
 
                                     const registered = isStudentRegistered();

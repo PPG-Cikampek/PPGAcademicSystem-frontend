@@ -2,11 +2,9 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useHttp from '../../shared/hooks/http-hook';
 import { AuthContext } from '../../shared/Components/Context/auth-context';
-import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 import StudentInitial from '../../shared/Components/UIElements/StudentInitial';
 import WarningCard from '../../shared/Components/UIElements/WarningCard';
 import DataTable from '../../shared/Components/UIElements/DataTable';
-import { render } from '@react-pdf/renderer';
 
 const StudentsView = () => {
     const [students, setStudents] = useState([]);

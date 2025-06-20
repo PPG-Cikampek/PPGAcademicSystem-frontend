@@ -1,5 +1,6 @@
 // MunaqasyahScoreContext.jsx
-import React, { createContext, useReducer, useEffect } from 'react';
+import React, { createContext, useReducer } from 'react';
+
 
 const MunaqasyahScoreContext = createContext();
 
@@ -9,7 +10,8 @@ const initialState = {
     selectAll: false,
     classId: null,
     classStartTime: null,
-    isSubBranchYearMunaqasyahStarted: null,
+    isSubBranchMunaqasyahStarted: null,
+    isBranchYearMunaqasyahStarted: null,
 };
 
 const reducer = (state, action) => {
@@ -18,8 +20,10 @@ const reducer = (state, action) => {
             return { ...state, studentScore: action.payload };
         case 'SET_STUDENT_DATA':
             return { ...state, studentData: action.payload };
-        case 'SET_IS_MUNAQASYAH_STARTED':
-            return { ...state, isSubBranchYearMunaqasyahStarted: action.payload };
+        case 'SET_IS_SUB_BRANCH_MUNAQASYAH_STARTED':
+            return { ...state, isSubBranchMunaqasyahStarted: action.payload };
+        case 'SET_IS_BRANCH_YEAR_MUNAQASYAH_STARTED':
+            return { ...state, isBranchYearMunaqasyahStarted: action.payload };
         case 'UPDATE_SCORE_DATA':
             return {
                 ...state,
@@ -57,8 +61,8 @@ const reducer = (state, action) => {
     }
 };
 
-const fetchYearData = async (branchYearId, dispatch) => {
-    const url = `${import.meta.env.VITE_BACKEND_URL}/branchYears/${branchYearId}`;
+const fetchYearData = async (branchYearId, subBranchId, dispatch) => {
+    const url = `${import.meta.env.VITE_BACKEND_URL}/branchYears/${branchYearId}?populate=subBranches`;
 
     try {
         const response = await fetch(url, {
@@ -74,7 +78,10 @@ const fetchYearData = async (branchYearId, dispatch) => {
 
         console.log(data.branchYear)
 
-        dispatch({ type: 'SET_IS_MUNAQASYAH_STARTED', payload: data.branchYear.munaqasyahStatus === 'inProgress' });
+        const isMunaqasyahInProgress = (data, subBranchId) => (data.teachingGroups?.flatMap(g => g.subBranches || []).find(sub => sub._id === subBranchId)?.munaqasyahStatus) === 'inProgress';
+
+        dispatch({ type: 'SET_IS_BRANCH_YEAR_MUNAQASYAH_STARTED', payload: data.branchYear.munaqasyahStatus === 'inProgress' });
+        dispatch({ type: 'SET_IS_SUB_BRANCH_MUNAQASYAH_STARTED', payload: isMunaqasyahInProgress(data.branchYear, subBranchId) });
 
     } catch (error) {
         console.error('Error fetching attendance data:', error);
@@ -98,12 +105,6 @@ const fetchScoreData = async (studentNis, branchYearId, dispatch, userId) => {
             throw new Error('Failed to fetch data');
         }
         const data = await response.json();
-
-        // if (data.scores[0].isBeingScored === "false") { data.scores[0].isBeingScored = userId; }
-
-        // console.log(data.scores[0])
-        // console.log(data.scores[0].studentId)
-        console.log(data)
 
         const student = { ...data.scores[0].studentId, className: data.scores[0].classId.name };
 

@@ -68,11 +68,11 @@ const DashboardNav = ({ children }) => {
                 label: 'Dashboard',
                 end: true,
             },
-            {
-                link: '/dashboard/classes',
-                icon: <Presentation />,
-                label: 'Kelas',
-            },
+            // {
+            //     link: '/dashboard/classes',
+            //     icon: <Presentation />,
+            //     label: 'Kelas',
+            // },
             {
                 link: '/dashboard/teachers',
                 icon: <GraduationCap />,
@@ -83,11 +83,11 @@ const DashboardNav = ({ children }) => {
                 icon: <Users />,
                 label: 'Peserta Didik',
             },
-            {
-                link: '/performance',
-                icon: <Gauge />,
-                label: 'Performa Kehadiran',
-            },
+            // {
+            //     link: '/performance',
+            //     icon: <Gauge />,
+            //     label: 'Performa Kehadiran',
+            // },
             {
                 link: null,
                 icon: <FolderCog />,
@@ -107,11 +107,11 @@ const DashboardNav = ({ children }) => {
                 label: 'Dashboard',
                 end: true,
             },
-            {
-                link: '/dashboard/classes',
-                icon: <Presentation />,
-                label: 'Kelas',
-            },
+            // {
+            //     link: '/dashboard/classes',
+            //     icon: <Presentation />,
+            //     label: 'Kelas',
+            // },
             {
                 link: '/dashboard/teachers',
                 icon: <GraduationCap />,
@@ -122,11 +122,11 @@ const DashboardNav = ({ children }) => {
                 icon: <Users />,
                 label: 'Peserta Didik',
             },
-            {
-                link: '/performance',
-                icon: <Gauge />,
-                label: 'Performa Kehadiran',
-            },
+            // {
+            //     link: '/performance',
+            //     icon: <Gauge />,
+            //     label: 'Performa Kehadiran',
+            // },
             {
                 link: null,
                 icon: <FolderCog />,

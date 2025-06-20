@@ -1,9 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react'
 import useHttp from '../../shared/hooks/http-hook'
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import SkeletonLoader from '../../shared/Components/UIElements/SkeletonLoader'
 import ErrorCard from '../../shared/Components/UIElements/ErrorCard'
-import { Eye, MapPin, PlusIcon } from 'lucide-react'
 import DataTable from '../../shared/Components/UIElements/DataTable'
 import { AuthContext } from '../../shared/Components/Context/auth-context'
 import getMunaqasyahStatusName from '../utilities/getMunaqasyahStatusName'
@@ -76,7 +75,8 @@ const BranchAdminMunaqasyahDetailView = () => {
                         <>
                             <button
                                 className="btn-primary-outline disabled:opacity-50 mx-1"
-                                onClick={() => navigate(`/dashboard/teaching-groups/${teachingGroupId}/sub-branches/${item._id}`)}>
+                            // onClick={() => navigate(`/dashboard/teaching-groups/${teachingGroupId}/sub-branches/${item._id}`)}
+                            >
                                 Lihat
                             </button>
                             <button
@@ -89,7 +89,8 @@ const BranchAdminMunaqasyahDetailView = () => {
                         <>
                             <button
                                 className="btn-primary-outline disabled:opacity-50 mx-1"
-                                onClick={() => navigate(`/dashboard/teaching-groups/${teachingGroupId}/sub-branches/${item._id}`)}>
+                            // onClick={() => navigate(`/dashboard/teaching-groups/${teachingGroupId}/sub-branches/${item._id}`)}
+                            >
                                 Lihat
                             </button>
                             <button
