@@ -147,7 +147,7 @@ const SubBranchMunaqasyahView = () => {
                                                     </div>
                                                 )
                                             )}
-                                            {year.branchYear.isActive === true && (
+                                            {year.branchYear.isActive === true && year.branchYear.academicYearId.munaqasyahStatus === "inProgress" && (
                                                 year.branchYear.munaqasyahStatus !== "inProgress" ? (
                                                     <div className='inline-flex items-center text-yellow-600 gap-1'>
                                                         <CircleAlert />
@@ -159,6 +159,13 @@ const SubBranchMunaqasyahView = () => {
                                                         Desa sudah memulai munaqosah.
                                                     </div>
                                                 )
+                                            )}
+
+                                            {year.branchYear.isActive === true && year.branchYear.academicYearId.munaqasyahStatus !== "inProgress" && (
+                                                <div className='inline-flex items-center text-gray-600 gap-1'>
+                                                    <CircleAlert />
+                                                    Munaqosah Daerah belum dimulai.
+                                                </div>
                                             )}
                                         </div>
 
