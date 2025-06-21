@@ -6,7 +6,7 @@ import { AuthContext } from '../../Context/auth-context';
 import getUserRoleTitle from '../../../Utilities/getUserRoleTitle';
 import FloatingMenu from '../../UIElements/FloatingMenu';
 import BackButton from '../../UIElements/BackButton';
-import { User, Calendar, Settings, ChevronLeft, ChevronRight, LogOut } from 'lucide-react';
+import { User, Settings, ChevronLeft, ChevronRight, LogOut } from 'lucide-react';
 
 const Navbar = () => {
 
@@ -41,21 +41,12 @@ const Navbar = () => {
         );
     };
 
-    const formatAcademicYear = (name) => {
-        const year = name.substring(0, 4);
-        const semester = name.substring(4);
-        return `${year}/${parseInt(year) + 1} ${semester === '1' ? 'Ganjil' : 'Genap'}`;
-    };
-
-
     const navLinks = [
-        ...(auth.currentSubBranchYear ? [
+        ...(auth.currentBranchYear ? [
             // { id: 1, name: formatAcademicYear(auth.currentSubBranchYear), path: '/academic', icon: <Calendar /> }
         ] : []),
         { id: 2, name: getUserRoleTitle(auth.userRole), path: '', icon: <Settings /> },
     ];
-
-
 
     return (
         <nav className="bg-white">

@@ -18,7 +18,10 @@ const MunaqasyahClassList = () => {
     useEffect(() => {
         const fetchClasses = async () => {
             try {
-                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/scores/sub-branch/${subBranchId}`);
+                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/scores/sub-branch/${subBranchId}`, 'GET', null, {
+                    'Authorization': `Bearer ${auth.token}`,
+                    'Content-Type': 'application/json'
+                });
                 setClasses(responseData.classes);
                 console.log(responseData)
                 // console.log(JSON.stringify(responseData.classes))

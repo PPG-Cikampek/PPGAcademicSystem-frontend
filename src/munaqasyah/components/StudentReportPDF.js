@@ -77,7 +77,7 @@ export function generatePDFContent(studentName, studentScores, scoreCategories, 
 
     // Adjust header X to leave space for logo
     const headerX = pageWidth / 2 + logoWidth / 2;
-    doc.setFont("Helvetica", "bold");
+    doc.setFont("Helvetica", "normal");
     doc.setFontSize(12);
     doc.text("LAPORAN PENILAIAN HASIL BELAJAR SISWA", headerX, currentY, {
         align: "center"
@@ -116,6 +116,15 @@ export function generatePDFContent(studentName, studentScores, scoreCategories, 
             isNull ? '-' : IndonesianNumberConverter(score)
         ];
     });
+
+    const totalScore = scoreCategories.reduce((total, category) => {
+        const score = studentScores[category.key]?.score;
+        return score !== null && score !== undefined ? total + score : total;
+    }, 0);
+
+    console.log('Total Score:', totalScore);
+
+    console.log(tableData)
 
     doc.setFontSize(11);
     doc.autoTable({
@@ -164,6 +173,40 @@ export function generatePDFContent(studentName, studentScores, scoreCategories, 
             4: { cellWidth: 23, halign: 'center', valign: 'middle' }
         }
     });
+
+    currentY = doc.lastAutoTable.finalY;
+
+    doc.autoTable({
+        theme: 'grid',
+        head: [], // No headers
+        body: [
+            [{ content: 'Jumlah', colSpan: 2, styles: { halign: 'right', valign: 'middle' } }, totalScore, '', ''],
+            [
+                { content: 'Peringkat', colSpan: 2, styles: { halign: 'right', valign: 'middle' } },
+                { content: `____ dari _____ siswa.`, colSpan: 3, styles: { halign: 'left', valign: 'middle' } }
+
+            ]
+        ],
+        startY: currentY,
+        margin: { left: marginLeft, right: marginRight },
+        tableWidth: pageWidth - marginLeft - marginRight,
+        styles: {
+            lineColor: 0,
+            lineWidth: 0.001,
+            cellPadding: 1.25,
+            fillColor: false // transparent
+        },
+        columnStyles: {
+            0: { cellWidth: 10, halign: 'center', valign: 'middle' },
+            1: { cellWidth: 70 },
+            2: { cellWidth: 17, halign: 'center', valign: 'middle' },
+            3: { cellWidth: 60, halign: 'center', valign: 'middle' },
+            4: { cellWidth: 23, halign: 'center', valign: 'middle' }
+        }
+    });
+
+
+
     currentY = doc.lastAutoTable.finalY + 8;
 
     // Section: Laporan Perkembangan Individu Siswa
@@ -213,7 +256,7 @@ export function generatePDFContent(studentName, studentScores, scoreCategories, 
 
     // Right table: Catatan untuk diperhatikan Orang Tua/Wali
     doc.autoTable({
-        theme: 'grid',        
+        theme: 'grid',
         head: [['Catatan untuk diperhatikan Orang Tua/Wali']],
         // body: [['']],
         startY: currentY,
@@ -274,6 +317,7 @@ export function generatePDFContent(studentName, studentScores, scoreCategories, 
     });
 
     // Footer section
+    doc.setFontSize(11);
     currentY = doc.lastAutoTable.finalY + lineSpacing;
     doc.text(`Diberikan di`, marginLeft, currentY);
     doc.text(`:`, marginLeft + 35, currentY);
@@ -282,7 +326,7 @@ export function generatePDFContent(studentName, studentScores, scoreCategories, 
     doc.text("Pada Tanggal", marginLeft, currentY);
     doc.text(`:`, marginLeft + 35, currentY);
 
-    currentY += lineSpacing * 2;
+    currentY += lineSpacing + 1;
     doc.text("Mengetahui,", marginLeft, currentY);
 
     currentY += lineSpacing + 1;

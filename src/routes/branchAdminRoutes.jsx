@@ -30,7 +30,6 @@ const EmailVerifyView = lazy(() => import("../users/pages/EmailVerifyView"));
 const RequestAccountView = lazy(() => import("../users/pages/RequestAccountView"));
 const RequestAccountForm = lazy(() => import("../users/pages/RequestAccountForm"));
 const RequestAccountTicketDetail = lazy(() => import("../users/pages/RequestAccountTicketDetail"));
-const MunaqasyahClassList = lazy(() => import("../munaqasyah/components/MunaqasyahClassList"));
 
 export const branchAdminRoutes = [
     { path: '/verify-email/:token', element: <EmailVerifyView /> },

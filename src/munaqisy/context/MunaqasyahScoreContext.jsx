@@ -12,10 +12,16 @@ const initialState = {
     classStartTime: null,
     isSubBranchMunaqasyahStarted: null,
     isBranchYearMunaqasyahStarted: null,
+    error: null,
+    isLoading: false,
 };
 
 const reducer = (state, action) => {
     switch (action.type) {
+        case 'SET_ERROR':
+            return { ...state, error: action.payload };
+        case 'SET_IS_LOADING':
+            return { ...state, isLoading: action.payload };
         case 'SET_SCORE_DATA':
             return { ...state, studentScore: action.payload };
         case 'SET_STUDENT_DATA':
@@ -72,7 +78,9 @@ const fetchYearData = async (branchYearId, subBranchId, dispatch) => {
             }
         });
         if (!response.ok) {
-            throw new Error('Failed to fetch data');
+            const errorData = await response.json();
+            await dispatch({ type: 'SET_ERROR', payload: errorData.message || 'Failed to fetch data' });
+            throw new Error(errorData.message || 'Failed to fetch data');
         }
         const data = await response.json();
 
@@ -102,7 +110,9 @@ const fetchScoreData = async (studentNis, branchYearId, dispatch, userId) => {
             headers: header
         });
         if (!response.ok) {
-            throw new Error('Failed to fetch data');
+            const errorData = await response.json();
+            await dispatch({ type: 'SET_ERROR', payload: errorData.message || 'Failed to fetch data' });
+            throw new Error(errorData.message || 'Failed to fetch data');
         }
         const data = await response.json();
 
@@ -110,15 +120,16 @@ const fetchScoreData = async (studentNis, branchYearId, dispatch, userId) => {
 
         await dispatch({ type: 'SET_SCORE_DATA', payload: data.scores[0] });
         await dispatch({ type: 'SET_STUDENT_DATA', payload: student });
+        await dispatch({ type: 'SET_ERROR', payload: null });
 
-        patchScoreData(data.scores[0]);
+        // patchScoreData(data.scores[0]);
 
     } catch (error) {
         console.error('Error fetching attendance data:', error);
     }
 };
 
-const patchScoreData = async (scoreData) => {
+const patchScoreData = async (scoreData, dispatch) => {
     const url = `${import.meta.env.VITE_BACKEND_URL}/scores/${scoreData.id}`;
     const header = {
         'Content-Type': 'application/json',
@@ -134,9 +145,14 @@ const patchScoreData = async (scoreData) => {
             body: JSON.stringify(scoreData)
         });
         if (!response.ok) {
-            throw new Error('Failed to fetch data');
+            const errorData = await response.json();
+            await dispatch({ type: 'SET_ERROR', payload: errorData.message || 'Failed to fetch data' });
+            throw new Error(errorData.message || 'Failed to fetch data');
         }
+
         const result = await response.json();
+
+        await dispatch({ type: 'SET_SCORE_DATA', payload: result.score });
 
         // dispatch({ type: 'SET_STATUS', payload: data.message });
 

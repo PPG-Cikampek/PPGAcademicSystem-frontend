@@ -124,7 +124,8 @@ const SubBranchMunaqasyahView = () => {
                 {error && <ErrorCard error={error} />}
 
                 {subBranchYears && !isLoading && (
-                    subBranchYears.map(year => {
+                    subBranchYears.map((year, idx) => {
+                        const key = year._id || `year-${idx}`;
                         const content = (
                             <div className={`card-basic hover:bg-gray-100 active:bg-gray-100 hover:cursor-pointer rounded-md justify-start m-0 transition-all duration-200 my-4`} >
                                 <div className="flex items-center space-x-4 ">
@@ -210,11 +211,11 @@ const SubBranchMunaqasyahView = () => {
                             year.subBranch &&
                             year.subBranch.munaqasyahStatus === "inProgress"
                         ) ? (
-                            <Link key={year._id} to={`/munaqasyah/${year.branchYear._id}`}>
+                            <Link key={key} to={`/munaqasyah/${year.branchYear._id}`}>
                                 {content}
                             </Link>
                         ) : (
-                            <div key={year._id}>
+                            <div key={key}>
                                 {content}
                             </div>
                         );

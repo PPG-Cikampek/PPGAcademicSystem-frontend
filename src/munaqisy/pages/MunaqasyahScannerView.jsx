@@ -11,7 +11,6 @@ import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 
 import { AuthContext } from '../../shared/Components/Context/auth-context';
 import { MunaqasyahScoreContext } from '../context/MunaqasyahScoreContext';
-import { GeneralContext } from '../../shared/Components/Context/general-context';
 
 const MunaqasyahScannerView = () => {
     const { isLoading, error, sendRequest, setError, setIsLoading } = useHttp();
@@ -54,7 +53,7 @@ const MunaqasyahScannerView = () => {
 
             {!isLoading && (
                 <SequentialAnimation variant={2}>
-                    {(state.isBranchYearMunaqasyahStarted === true && state.isSubBranchMunaqasyahStarted === true) ?
+                    {(state.isBranchYearMunaqasyahStarted === true) ?
                         (< div className='card-basic m-4'>
                             {console.log(state.isBranchYearMunaqasyahStarted)}
                             {console.log(state.isSubBranchMunaqasyahStarted)}
@@ -63,15 +62,11 @@ const MunaqasyahScannerView = () => {
                             <InfoCard className={'mx-4 my-12'}>
                                 <p>PJP Desa belum memulai munaqosah!</p>
                             </InfoCard>)
-                            : state.isSubBranchMunaqasyahStarted === false ? (
+                            : auth.currentBranchYear === null && (
                                 <InfoCard className={'mx-4 my-12'}>
-                                    <p>PJP Kelompok belum memulai munaqosah!</p>
-                                </InfoCard>)
-                                : auth.currentBranchYear === null && (
-                                    <InfoCard className={'mx-4 my-12'}>
-                                        <p>Tidak ada tahun ajaran aktif, hubungi PJP Desa!</p>
-                                    </InfoCard>
-                                )}
+                                    <p>Tidak ada tahun ajaran aktif, hubungi PJP Desa!</p>
+                                </InfoCard>
+                            )}
                 </SequentialAnimation>
             )}
         </div >

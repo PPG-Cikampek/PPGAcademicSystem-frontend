@@ -3,6 +3,7 @@ import PreviewReport from '../munaqasyah/pages/PreviewReport';
 import SubBranchAdminClassesView from '../class/pages/SubBranchAdminClassesView';
 import TeachingGroupsView from '../teaching-group/page/TeachingGroupsView';
 import BranchYearsView from '../academic/pages/BranchYearsView';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const DashboardNav = lazy(() => import("../shared/Components/Navigation/DashboardNav/DashboardNav"));
 const DashboardView = lazy(() => import("../dashboard/pages/DashboardView"));
@@ -26,7 +27,7 @@ const RequestAccountView = lazy(() => import("../users/pages/RequestAccountView"
 const RequestAccountForm = lazy(() => import("../users/pages/RequestAccountForm"));
 const RequestAccountTicketDetail = lazy(() => import("../users/pages/RequestAccountTicketDetail"));
 const SubBranchMunaqasyahView = lazy(() => import("../munaqasyah/pages/SubBranchMunaqasyahView"));
-const MunaqasyahClassList = lazy(() => import("../munaqasyah/components/MunaqasyahClassList"));
+const MunaqasyahClassList = lazy(() => import("../munaqasyah/pages/MunaqasyahClassList"));
 const MunaqasyahByClassView = lazy(() => import("../munaqasyah/pages/MunaqasyahByClassView"));
 
 export const subBranchAdminRoutes = [
@@ -56,7 +57,7 @@ export const subBranchAdminRoutes = [
     // { path: '/performance', element: <SubBranchPerformanceView /> },
     { path: '/munaqasyah', element: <SubBranchMunaqasyahView /> },
     { path: '/munaqasyah/:branchYearId', element: <MunaqasyahClassList /> },
-    { path: '/munaqasyah/class/:classId', element: <MunaqasyahByClassView /> },
+    { path: '/munaqasyah/class/:classId', element: <QueryClientProvider client={new QueryClient()}><MunaqasyahByClassView /></QueryClientProvider> },
 ];
 
 export const SubBranchAdminRouteWrapper = ({ children }) => (

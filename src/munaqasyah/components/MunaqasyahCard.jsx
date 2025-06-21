@@ -92,7 +92,7 @@ const MunaqasyahCard = ({ year, onClick, isClickAble = true, fetchData }) => {
                                 {year.academicYearId.munaqasyahStatus === 'inProgress' ? 'Daerah sudah memulai munaqosah!' : year.academicYearId.munaqasyahStatus === 'completed' ? 'Munaqosah daerah sudah selesai.' : 'Daerah belum memulai'}
                             </div>
                         </div>
-                        {year.academicYearId.isActive && (
+                        {(year.academicYearId.isActive === true && year.academicYearId.munaqasyahStatus === 'inProgress') && (
                             <>
                                 {(year.munaqasyahStatus === 'notStarted' || year.munaqasyahStatus === 'completed') && (
                                     <div className="mt-4">
