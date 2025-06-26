@@ -55,8 +55,6 @@ const MunaqasyahScannerView = () => {
                 <SequentialAnimation variant={2}>
                     {(state.isBranchYearMunaqasyahStarted === true) ?
                         (< div className='card-basic m-4'>
-                            {console.log(state.isBranchYearMunaqasyahStarted)}
-                            {console.log(state.isSubBranchMunaqasyahStarted)}
                             <QRCodeScanner errorMessage={errorMessage} />
                         </div>) : state.isBranchYearMunaqasyahStarted === false ? (
                             <InfoCard className={'mx-4 my-12'}>

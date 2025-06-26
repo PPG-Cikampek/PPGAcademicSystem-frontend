@@ -38,11 +38,11 @@ const HomeNavigation = ({ children }) => {
                 icon: <BookOpenText />,
                 label: 'Munaqosah',
             },
-            {
-                link: '/performances',
-                icon: <Gauge />,
-                label: 'Performa Kehadiran',
-            },
+            // {
+            //     link: '/performances',
+            //     icon: <Gauge />,
+            //     label: 'Performa Kehadiran',
+            // },
             // {
             //     link: '/dashboard/academic',
             //     icon: <CalendarCog />,

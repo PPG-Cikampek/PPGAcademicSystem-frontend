@@ -1,8 +1,8 @@
 export default function IndonesianNumberConverter(inputNum) {
     const convertToTitleCase = (num) => {
         // Validate input
-        if (isNaN(num) || num < 0 || num > 999 || !Number.isInteger(Number(num))) {
-            return { error: 'Please enter a valid integer between 0-999', result: '' };
+        if (isNaN(num) || num < 0 || num > 9999 || !Number.isInteger(Number(num))) {
+            return { error: 'Please enter a valid integer between 0-9999', result: '' };
         }
 
         // Map numbers to Indonesian words
@@ -19,27 +19,38 @@ export default function IndonesianNumberConverter(inputNum) {
 
         let words = '';
         const numStr = num.toString();
+        let n = parseInt(numStr, 10);
+
+        // Handle thousands
+        if (n >= 1000) {
+            const thousands = Math.floor(n / 1000);
+            if (thousands === 1) {
+                words += 'seribu ';
+            } else {
+                words += ones[thousands] + ' ribu ';
+            }
+            n = n % 1000;
+        }
 
         // Handle hundreds
-        if (numStr.length === 3) {
-            if (numStr[0] === '1') {
+        if (n >= 100) {
+            const hundreds = Math.floor(n / 100);
+            if (hundreds === 1) {
                 words += 'seratus ';
             } else {
-                words += ones[numStr[0]] + ' ratus ';
+                words += ones[hundreds] + ' ratus ';
             }
+            n = n % 100;
         }
 
         // Handle tens and ones
-        const lastTwoDigits = parseInt(numStr.slice(-2));
-
-        if (lastTwoDigits < 10) {
-            words += ones[lastTwoDigits];
-        } else if (lastTwoDigits < 20) {
-            words += teens[lastTwoDigits - 10];
+        if (n < 10) {
+            words += ones[n];
+        } else if (n < 20) {
+            words += teens[n - 10];
         } else {
-            const tensDigit = Math.floor(lastTwoDigits / 10);
-            const onesDigit = lastTwoDigits % 10;
-
+            const tensDigit = Math.floor(n / 10);
+            const onesDigit = n % 10;
             words += tens[tensDigit];
             if (onesDigit > 0) {
                 words += ' ' + ones[onesDigit];
@@ -58,5 +69,5 @@ export default function IndonesianNumberConverter(inputNum) {
 
     const { error, result } = convertToTitleCase(inputNum);
 
-    return error || result
+    return error || result;
 }

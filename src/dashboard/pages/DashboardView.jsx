@@ -67,13 +67,15 @@ const DashboardView = () => {
                                 </div>
                             </div>
                         }
-                        <div className='card-interactive rounded-md gap-4 md:gap-8 flex items-center justify-start border-0 border-b-4 border-secondary md:p-8 m-0 w-full h-full'>
-                            <Presentation className="size-8 md:size-10" />
-                            <div className="flex flex-col">
-                                <h1 className="text-lg md:text-3xl font-bold">{dashboardData.Kelas && dashboardData.Kelas}</h1>
-                                <p className="">{"Kelas"}</p>
+                        {dashboardData.kelas &&
+                            <div className='card-interactive rounded-md gap-4 md:gap-8 flex items-center justify-start border-0 border-b-4 border-secondary md:p-8 m-0 w-full h-full'>
+                                <Presentation className="size-8 md:size-10" />
+                                <div className="flex flex-col">
+                                    <h1 className="text-lg md:text-3xl font-bold">{dashboardData.Kelas && dashboardData.Kelas}</h1>
+                                    <p className="">{"Kelas"}</p>
+                                </div>
                             </div>
-                        </div>
+                        }
                         <div className='card-interactive rounded-md gap-4 md:gap-8 flex items-center justify-start border-0 border-b-4 border-secondary md:p-8 m-0 w-full h-full'>
                             <Users className="size-8 md:size-10" />
                             <div className="flex flex-col">
@@ -91,7 +93,7 @@ const DashboardView = () => {
                         <div className='card-interactive rounded-md gap-4 md:gap-8 flex items-center justify-start border-0 border-b-4 border-secondary md:p-8 m-0 w-full h-full'>
                             <Gauge className="size-8 md:size-10" />
                             <div className="flex flex-col">
-                                <h1 className="text-lg md:text-3xl font-bold">{dashboardData.Kehadiran && dashboardData.Kehadiran.toFixed(1)}{dashboardData.Kehadiran ? "%" : "-" }</h1>
+                                <h1 className="text-lg md:text-3xl font-bold">{dashboardData.Kehadiran && dashboardData.Kehadiran.toFixed(1)}{dashboardData.Kehadiran ? "%" : "-"}</h1>
                                 <p className="">{"Kehadiran"}</p>
                             </div>
                         </div>

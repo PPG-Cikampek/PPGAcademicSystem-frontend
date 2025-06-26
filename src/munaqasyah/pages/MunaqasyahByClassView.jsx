@@ -73,6 +73,12 @@ const MunaqasyahByClassView = () => {
         return matchedClass ? matchedClass.scores : [];
     }, [responseData, classId]);
 
+    const branchAvgScores = React.useMemo(() => {
+        if (!responseData) return [];
+        const matchedClass = responseData.classes.find(cls => cls.classId._id === classId);
+        return matchedClass ? matchedClass.averageScores : [];
+    }, [responseData, classId]);
+
     const scoreCategories = useMemo(() => {
         if (rawScores.length > 0 && rawScores[0].classId && !/(5|6)/.test(rawScores[0].classId.name)) {
             return DEFAULT_SCORE_CATEGORIES.filter(cat => !['independence', 'quranTafsir', 'hadithTafsir', 'memorizingHadith'].includes(cat.key));
@@ -80,46 +86,46 @@ const MunaqasyahByClassView = () => {
         return DEFAULT_SCORE_CATEGORIES;
     }, [rawScores]);
 
-    const scores = useMemo(() => {
-        return rawScores.map(score => ({
-            ...score,
-            ...scoreCategories.reduce((acc, category) => {
-                const originalScore = score[category.key]?.score;
-                let normalizedScore = originalScore;
-                if (originalScore === 0) {
-                    normalizedScore = null;
-                } else if (originalScore > 0 && originalScore <= 100) {
-                    normalizedScore = 60 + (originalScore / 100) * 40;
-                    normalizedScore = Math.round(normalizedScore * 10) / 10; // round to 1 decimal
-                }
-                return {
-                    ...acc,
-                    [category.key]: {
-                        ...score[category.key],
-                        score: normalizedScore,
-                    }
-                };
-            }, {})
-        }));
-    }, [rawScores, scoreCategories]);
-
-    // Calculate normalized scores (old)
     // const scores = useMemo(() => {
     //     return rawScores.map(score => ({
     //         ...score,
-    //         ...scoreCategories.reduce((acc, category) => ({
-    //             ...acc,
-    //             [category.key]: {
-    //                 ...score[category.key],
-    //                 score: (score[category.key]?.score < 60 && score[category.key]?.score > 0)
-    //                     ? 60
-    //                     : score[category.key]?.score === 0
-    //                         ? null
-    //                         : score[category.key]?.score,
+    //         ...scoreCategories.reduce((acc, category) => {
+    //             const originalScore = score[category.key]?.score;
+    //             let normalizedScore = originalScore;
+    //             if (originalScore === 0) {
+    //                 normalizedScore = null;
+    //             } else if (originalScore > 0 && originalScore <= 100) {
+    //                 normalizedScore = 60 + (originalScore / 100) * 40;
+    //                 normalizedScore = Math.round(normalizedScore * 10) / 10; // round to 1 decimal
     //             }
-    //         }), {})
+    //             return {
+    //                 ...acc,
+    //                 [category.key]: {
+    //                     ...score[category.key],
+    //                     score: normalizedScore,
+    //                 }
+    //             };
+    //         }, {})
     //     }));
     // }, [rawScores, scoreCategories]);
+
+    // Calculate normalized scores (old)
+    const scores = useMemo(() => {
+        return rawScores.map(score => ({
+            ...score,
+            ...scoreCategories.reduce((acc, category) => ({
+                ...acc,
+                [category.key]: {
+                    ...score[category.key],
+                    score: (score[category.key]?.score < 60 && score[category.key]?.score > 0)
+                        ? 60
+                        : score[category.key]?.score === 0
+                            ? null
+                            : score[category.key]?.score,
+                }
+            }), {})
+        }));
+    }, [rawScores, scoreCategories]);
 
     const expandedCount = useMemo(() =>
         Object.values(expandedCards).filter(Boolean).length,
@@ -143,14 +149,14 @@ const MunaqasyahByClassView = () => {
         return (sum / values.length).toFixed(1);
     };
 
-    const downloadReport = (studentName, studentScores, studentNis, grade, academicYearName) => {
-        const doc = generatePDFContent(studentName, studentScores, scoreCategories, studentNis, grade, academicYearName);
+    const downloadReport = (studentName, studentScores, studentNis, grade, academicYearName, branchAvgScores) => {
+        const doc = generatePDFContent(studentName, studentScores, scoreCategories, studentNis, grade, academicYearName, branchAvgScores);
         const safeYear = academicYearName.replace(/[/\\:*?"<>|]/g, '-');
         doc.save(`Raport_${studentName}_${safeYear}.pdf`);
     };
 
-    const previewReport = (studentName, studentScores, studentNis, grade, academicYearName) => {
-        const doc = generatePDFContent(studentName, studentScores, scoreCategories, studentNis, grade, academicYearName);
+    const previewReport = (studentName, studentScores, studentNis, grade, academicYearName, branchAvgScores) => {
+        const doc = generatePDFContent(studentName, studentScores, scoreCategories, studentNis, grade, academicYearName, branchAvgScores);
         const pdfBlob = doc.output('blob');
         const pdfUrl = URL.createObjectURL(pdfBlob);
         navigate('/munaqasyah/student/score', { state: { pdfUrl, studentName, academicYearName } });
@@ -214,7 +220,7 @@ const MunaqasyahByClassView = () => {
                 </div>
                 <WarningCard
                     className="items-center justify-start"
-                    warning="Nilai rata-rata kelas dan ranking siswa akan muncul setelah satu daerah telah menyelesaikan munaqosah!"
+                    warning="Nilai rata-rata kelas akan muncul setelah satu daerah telah menyelesaikan munaqosah!"
                     onClear={() => setError(null)}
                 />
                 <div className="flex flex-col gap-4">
@@ -249,7 +255,7 @@ const MunaqasyahByClassView = () => {
                                                                 setModal((prev) => ({ ...prev, message: 'Menghitung Nilai..', title: 'Mohon Tunggu' }));
                                                                 setLoadingIdx(idx);
                                                                 setTimeout(() => {
-                                                                    downloadReport(score.studentId.name, rawScores[idx], score.studentNis, score.classId.name, score.branchYearId.academicYearId.name);
+                                                                    downloadReport(score.studentId.name, scores[idx], score.studentNis, score.classId.name, score.branchYearId.academicYearId.name, branchAvgScores);
                                                                     setLoadingIdx(null);
                                                                     openModal({
                                                                         title: 'Berhasil!',
@@ -270,9 +276,12 @@ const MunaqasyahByClassView = () => {
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         // Use normalized score for PDF
-                                                        previewReport(score.studentId.name, scores[idx], score.studentNis, score.classId.name, score.branchYearId.academicYearId.name);
+                                                        previewReport(score.studentId.name, scores[idx], score.studentNis, score.classId.name, score.branchYearId.academicYearId.name, branchAvgScores);
                                                     }}
-                                                    className='btn-primary-outline m-0 text-gray-700 hidden md:block'>
+                                                    className='btn-primary-outline m-0 text-gray-700 hidden md:block'
+                                                    disabled={loadingIdx === idx}
+                                                >
+                                                    {loadingIdx === idx ? <LoadingCircle size={18} /> : null}
                                                     Lihat Raport Orang Tua
                                                 </button>
                                                 <button
@@ -285,7 +294,7 @@ const MunaqasyahByClassView = () => {
                                                                 setModal((prev) => ({ ...prev, message: 'Menghitung Nilai..', title: 'Mohon Tunggu' }));
                                                                 setLoadingIdx(idx);
                                                                 setTimeout(() => {
-                                                                    downloadReport(score.studentId.name, rawScores[idx], score.studentNis, score.classId.name, score.branchYearId.academicYearId.name);
+                                                                    downloadReport(score.studentId.name, rawScores[idx], score.studentNis, score.classId.name, score.branchYearId.academicYearId.name, branchAvgScores);
                                                                     setLoadingIdx(null);
                                                                     openModal({
                                                                         title: 'Berhasil!',
@@ -306,9 +315,12 @@ const MunaqasyahByClassView = () => {
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         // Use raw score for PDF
-                                                        previewReport(score.studentId.name, rawScores[idx], score.studentNis, score.classId.name, score.branchYearId.academicYearId.name);
+                                                        previewReport(score.studentId.name, rawScores[idx], score.studentNis, score.classId.name, score.branchYearId.academicYearId.name, branchAvgScores);
                                                     }}
-                                                    className='btn-primary-outline m-0 text-gray-700 hidden md:block'>
+                                                    className='btn-primary-outline m-0 text-gray-700 hidden md:block'
+                                                    disabled={loadingIdx === idx}
+                                                >
+                                                    {loadingIdx === idx ? <LoadingCircle size={18} /> : null}
                                                     Lihat Raport Pengurus
                                                 </button>
                                             </div>

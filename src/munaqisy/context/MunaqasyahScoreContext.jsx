@@ -10,8 +10,9 @@ const initialState = {
     selectAll: false,
     classId: null,
     classStartTime: null,
-    isSubBranchMunaqasyahStarted: null,
+    isAcademicYearhMunaqasyahStarted: null,
     isBranchYearMunaqasyahStarted: null,
+    isSubBranchMunaqasyahStarted: null,
     error: null,
     isLoading: false,
 };
@@ -26,6 +27,8 @@ const reducer = (state, action) => {
             return { ...state, studentScore: action.payload };
         case 'SET_STUDENT_DATA':
             return { ...state, studentData: action.payload };
+        case 'SET_IS_ACADEMIC_YEAR_MUNAQASYAH_STARTED':
+            return { ...state, isAcademicYearhMunaqasyahStarted: action.payload };
         case 'SET_IS_SUB_BRANCH_MUNAQASYAH_STARTED':
             return { ...state, isSubBranchMunaqasyahStarted: action.payload };
         case 'SET_IS_BRANCH_YEAR_MUNAQASYAH_STARTED':
