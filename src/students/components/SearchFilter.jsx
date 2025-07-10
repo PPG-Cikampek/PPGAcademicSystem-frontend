@@ -61,7 +61,7 @@ function SearchFilter({ search, setSearch, setFilter, showFilters, setShowFilter
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         placeholder="Search students..."
-                        className="w-full p-2 pl-10 border border-primary-subtle shadow-sm rounded-md hover:border-1 hover:border-primary outline-none focus:ring-2 focus:ring-primary transition-all"
+                        className="w-full p-2 pl-10 border border-primary-subtle shadow-xs rounded-md hover:border hover:border-primary outline-hidden focus:ring-2 focus:ring-primary transition-all"
                     />
                     <Search className="absolute left-3 top-2.5 h-5 w-5 text-gray-400" />
                 </div>
@@ -69,7 +69,7 @@ function SearchFilter({ search, setSearch, setFilter, showFilters, setShowFilter
                 {/* Filter Toggle Button */}
                 <button
                     onClick={() => setShowFilters(prev => !prev)}
-                    className="flex items-center p-2 border bg-white shadow-sm border-primary-subtle rounded-md hover:border-1 hover:border-primary focus:ring-2 focus:ring-primary transition-all"
+                    className="flex items-center p-2 border bg-white shadow-xs border-primary-subtle rounded-md hover:border hover:border-primary focus:ring-2 focus:ring-primary transition-all"
                 >
                     <SlidersHorizontal className="h-5 w-5 text-gray-400 mr-2" />
                     <span className='text-gray-800'>Filter</span>
@@ -78,7 +78,7 @@ function SearchFilter({ search, setSearch, setFilter, showFilters, setShowFilter
 
             {/* Filter Options */}
             {showFilters && (
-                <div className="mt-4 p-4 border border-primary-subtle rounded-md  bg-white shadow-sm transition-all duration-500">
+                <div className="mt-4 p-4 border border-primary-subtle rounded-md  bg-white shadow-xs transition-all duration-500">
                     <div className="flex flex-wrap justify-between items-center gap-4">
                         {/* Filter Dropdowns on the Right */}
                         <div className="flex flex-wrap gap-2">
@@ -86,7 +86,7 @@ function SearchFilter({ search, setSearch, setFilter, showFilters, setShowFilter
                                 <div key={filter.id}>
                                     <select
                                         onChange={(e) => setFilter(prev => ({ ...prev, [filter.id]: e.target.value }))}
-                                        className="w-full p-2 border border-primary-subtle rounded-md hover:border-1 hover:border-primary outline-none focus:ring-2 focus:ring-primary transition-all"
+                                        className="w-full p-2 border border-primary-subtle rounded-md hover:border hover:border-primary outline-hidden focus:ring-2 focus:ring-primary transition-all"
                                     >
                                         {filter.options.map((option) => (
                                             <option key={option.value} value={option.value}>
@@ -103,7 +103,7 @@ function SearchFilter({ search, setSearch, setFilter, showFilters, setShowFilter
                             <ArrowDownWideNarrow className="h-5 w-5 text-gray-400 mr-2" />
                             <select
                                 onChange={(e) => setSort(e.target.value)}
-                                className="p-2 border border-primary-subtle rounded-md hover:border-1 hover:border-primary outline-none focus:ring-2 focus:ring-primary transition-all"
+                                className="p-2 border border-primary-subtle rounded-md hover:border hover:border-primary outline-hidden focus:ring-2 focus:ring-primary transition-all"
                             >
                                 <option value="">Sort By</option>
                                 {sortOptions.map((option) => (

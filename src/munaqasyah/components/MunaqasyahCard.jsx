@@ -79,16 +79,16 @@ const MunaqasyahCard = ({ year, onClick, isClickAble = true, fetchData }) => {
                             <div className='flex gap-2 flex-row flex-wrap'>
                                 <h2 className="text-xl font-medium text-gray-800">{academicYearFormatter(year.academicYearId.name)}</h2>
                                 <div className="flex gap-2">
-                                    <div className={`inline-block px-2 py-1 text-sm ${(year.academicYearId.isActive ? 'text-blue-600 bg-blue-100' : 'text-gray-600 bg-gray-100')} rounded`}>
+                                    <div className={`inline-block px-2 py-1 text-sm ${(year.academicYearId.isActive ? 'text-blue-600 bg-blue-100' : 'text-gray-600 bg-gray-100')} rounded-sm`}>
                                         {year.academicYearId.isActive ? 'Semester Berjalan' : 'Semester Lewat'}
                                     </div>
-                                    <div className={`inline-block px-2 py-1 text-sm ${year.munaqasyahStatus === 'inProgress' ? 'text-yellow-600 bg-yellow-100' : year.munaqasyahStatus === 'completed' ? 'text-green-600 bg-green-100' : 'text-gray-600 bg-gray-100'} rounded`}>
+                                    <div className={`inline-block px-2 py-1 text-sm ${year.munaqasyahStatus === 'inProgress' ? 'text-yellow-600 bg-yellow-100' : year.munaqasyahStatus === 'completed' ? 'text-green-600 bg-green-100' : 'text-gray-600 bg-gray-100'} rounded-sm`}>
                                         {getMunaqasyahStatusName(year.munaqasyahStatus)}
                                     </div>
                                 </div>
                             </div>
 
-                            <div className={`inline-block py-1 text-sm ${year.academicYearId.munaqasyahStatus === 'inProgress' ? 'text-blue-500' : year.academicYearId.munaqasyahStatus === 'completed' ? 'text-gray-500' : 'text-gray-600 '} rounded`}>
+                            <div className={`inline-block py-1 text-sm ${year.academicYearId.munaqasyahStatus === 'inProgress' ? 'text-blue-500' : year.academicYearId.munaqasyahStatus === 'completed' ? 'text-gray-500' : 'text-gray-600 '} rounded-sm`}>
                                 {year.academicYearId.munaqasyahStatus === 'inProgress' ? 'Daerah sudah memulai munaqosah!' : year.academicYearId.munaqasyahStatus === 'completed' ? 'Munaqosah daerah sudah selesai.' : 'Daerah belum memulai'}
                             </div>
                         </div>

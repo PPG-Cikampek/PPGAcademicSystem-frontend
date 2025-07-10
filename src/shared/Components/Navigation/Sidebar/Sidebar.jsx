@@ -103,7 +103,7 @@ const Sidebar = ({ linksList, children }) => {
                                     className={({ isActive }) => `
                                         flex items-center px-4 py-3 
                                         hover:bg-gray-100
-                                        focus:outline-none focus:ring-primary-subtle
+                                        focus:outline-hidden focus:ring-primary-subtle
                                         ${isActive && link.link ? 'bg-gray-100 text-primary font-medium' : 'text-gray-800'} 
                                         ${sidebar.isSidebarOpen && !link.subOptions ? 'justify-start' : sidebar.isSidebarOpen && link.subOptions ? 'justify-between' : 'justify-center'}
                                     `}
@@ -137,7 +137,7 @@ const Sidebar = ({ linksList, children }) => {
                                                 <NavLink
                                                     to={subOption.link}
                                                     // onClick={sidebarHandler}
-                                                    className={({ isActive }) => ` flex items-center px-4 py-2 text-sm hover:bg-gray-100 focus:outline-none focus:ring-primary-subtle ${isActive ? 'bg-gray-100 text-primary font-medium' : 'text-gray-800'} `}
+                                                    className={({ isActive }) => ` flex items-center px-4 py-2 text-sm hover:bg-gray-100 focus:outline-hidden focus:ring-primary-subtle ${isActive ? 'bg-gray-100 text-primary font-medium' : 'text-gray-800'} `}
                                                     onClick={() => {
                                                         handleNavigation()
                                                         if (sidebar.isSidebarOpen && !window.matchMedia('(min-width: 768px)').matches) {

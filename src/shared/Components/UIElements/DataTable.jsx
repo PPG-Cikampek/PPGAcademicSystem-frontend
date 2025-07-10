@@ -114,7 +114,7 @@ const DataTable = ({
         <tr className="animate-pulse">
             {columns.map((_, index) => (
                 <td key={index} className="p-2 md:p-4">
-                    <div className="h-4 bg-gray-200 rounded"></div>
+                    <div className="h-4 bg-gray-200 rounded-sm"></div>
                 </td>
             ))}
         </tr>
@@ -124,7 +124,7 @@ const DataTable = ({
         <tr>
             {columns.map((_, index) => (
                 <th key={index} className="min-w-14 p-2 md:p-4">
-                    <div className="h-4 bg-gray-200 rounded animate-pulse w-20"></div>
+                    <div className="h-4 bg-gray-200 rounded-sm animate-pulse w-20"></div>
                 </th>
             ))}
         </tr>
@@ -154,7 +154,7 @@ const DataTable = ({
                         <div key={key}>
                             <label className="text-sm font-medium text-gray-700 mb-1">{label}</label>
                             <select
-                                className="w-full border rounded-full px-2 py-2 text-sm focus:ring-1 focus:ring-primary focus:outline-none"
+                                className="w-full border rounded-full px-2 py-2 text-sm focus:ring-1 focus:ring-primary focus:outline-hidden"
                                 value={filters[key] || ''}
                                 onChange={(e) => setFilters(prev => ({
                                     ...prev,
@@ -179,10 +179,10 @@ const DataTable = ({
                 {isLoading ? (
                     <>
                         <div className="flex items-center gap-2">
-                            <div className="h-8 w-32 bg-gray-200 rounded animate-pulse"></div>
+                            <div className="h-8 w-32 bg-gray-200 rounded-sm animate-pulse"></div>
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="h-8 w-48 bg-gray-200 rounded animate-pulse"></div>
+                            <div className="h-8 w-48 bg-gray-200 rounded-sm animate-pulse"></div>
                         </div>
                     </>
                 ) : (
@@ -191,7 +191,7 @@ const DataTable = ({
                             <div className="flex items-center gap-2">
                                 <span>Tampilkan</span>
                                 <select
-                                    className="border rounded px-2 py-1"
+                                    className="border rounded-sm px-2 py-1"
                                     value={entriesPerPage}
                                     onChange={(e) => setEntriesPerPage(Number(e.target.value))}
                                 >
@@ -208,7 +208,7 @@ const DataTable = ({
                                     <span>Pencarian:</span>
                                     <input
                                         type="text"
-                                        className="px-2 py-1 border rounded-[4px] shadow-sm hover:ring-1 hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
+                                        className="px-2 py-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300"
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
                                     />
@@ -228,7 +228,7 @@ const DataTable = ({
                 )}
             </div>
             {config.showFilter && filterOptions.length > 0 && <FilterCard />}
-            <div className="bg-white shadow-sm rounded-md overflow-auto text-nowrap mb-4">
+            <div className="bg-white shadow-xs rounded-md overflow-auto text-nowrap mb-4">
                 <table className="w-full">
                     <thead className="border-b">
                         {isLoading ? (
@@ -289,10 +289,10 @@ const DataTable = ({
             <div className="flex justify-between items-center">
                 {isLoading ? (
                     <>
-                        <div className="h-4 w-48 bg-gray-200 rounded animate-pulse"></div>
+                        <div className="h-4 w-48 bg-gray-200 rounded-sm animate-pulse"></div>
                         <div className="flex gap-2">
-                            <div className="h-8 w-24 bg-gray-200 rounded animate-pulse"></div>
-                            <div className="h-8 w-24 bg-gray-200 rounded animate-pulse"></div>
+                            <div className="h-8 w-24 bg-gray-200 rounded-sm animate-pulse"></div>
+                            <div className="h-8 w-24 bg-gray-200 rounded-sm animate-pulse"></div>
                         </div>
                     </>
                 ) : (

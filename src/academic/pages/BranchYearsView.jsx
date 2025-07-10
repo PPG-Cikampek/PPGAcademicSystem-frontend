@@ -251,8 +251,8 @@ const BranchYearsView = () => {
                         <div className='flex gap-2 flex-row flex-wrap'>
                           <h2 className="text-xl font-medium text-gray-800">{formatAcademicYear(year.academicYearId.name)}</h2>
                           <div className="flex gap-2">
-                            {year.academicYearId.isActive && (<div className='inline-block px-2 py-1 text-sm text-blue-600 bg-blue-100 rounded'>{year.academicYearId.isActive}Semester Berjalan</div>)}
-                            <div className={`inline-block px-2 py-1 text-sm ${year.isActive ? 'text-green-600 bg-green-100' : (year.academicYearId.isActive ? 'text-red-600 bg-red-100' : 'text-gray-600 bg-gray-100')} rounded`}>
+                            {year.academicYearId.isActive && (<div className='inline-block px-2 py-1 text-sm text-blue-600 bg-blue-100 rounded-sm'>{year.academicYearId.isActive}Semester Berjalan</div>)}
+                            <div className={`inline-block px-2 py-1 text-sm ${year.isActive ? 'text-green-600 bg-green-100' : (year.academicYearId.isActive ? 'text-red-600 bg-red-100' : 'text-gray-600 bg-gray-100')} rounded-sm`}>
                               {year.isActive ? 'Aktif' : (year.academicYearId.isActive ? 'Nonaktif' : 'Semester Lewat')}
                             </div>
                           </div>

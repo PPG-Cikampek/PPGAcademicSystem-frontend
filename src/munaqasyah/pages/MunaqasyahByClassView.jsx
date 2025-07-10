@@ -354,7 +354,7 @@ const MunaqasyahByClassView = () => {
                                     <div className="px-4 py-4 bg-gray-50 border-t border-gray-200">
                                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 md:gap-4">
                                             {scoreCategories.map(category => (
-                                                <div key={category.key} className="flex justify-between items-center p-2 bg-white rounded border">
+                                                <div key={category.key} className="flex justify-between items-center p-2 bg-white rounded-sm border">
                                                     <span className="text-gray-600">{category.label}</span>
                                                     <span className="font-medium text-gray-800">
                                                         {score[category.key]?.score > 0 ? score[category.key]?.score : '-'}

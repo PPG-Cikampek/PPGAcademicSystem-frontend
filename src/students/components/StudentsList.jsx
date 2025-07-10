@@ -3,7 +3,7 @@ import StudentItem from './Studentitem';
 
 function StudentList({ students }) {
     return (
-        <div className="border border-gray-200 rounded-md overflow-hidden shadow-sm">
+        <div className="border border-gray-200 rounded-md overflow-hidden shadow-xs">
             <table className="w-full">
                 <thead className="bg-white border-b border-gray-200">
                     <tr>

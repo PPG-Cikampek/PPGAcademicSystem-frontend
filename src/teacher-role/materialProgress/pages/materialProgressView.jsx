@@ -117,7 +117,7 @@ const MaterialProgressView = () => {
 
                     {/* <h1 className='text-2xl font-medium m-5'>Jurnal Saya</h1> */}
                     {progressData.length >= 1 && progressData.map((progress) => (
-                        <div className="card-basic mx-4 rounded-3xl shadow-sm justify-start">
+                        <div className="card-basic mx-4 rounded-3xl shadow-xs justify-start">
                             <div className="flex justify-between w-full">
                                 <div className="flex flex-col">
                                     <div className="flex flex-col">

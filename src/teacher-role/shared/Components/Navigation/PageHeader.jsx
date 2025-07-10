@@ -14,9 +14,9 @@ const PageHeader = ({ page = 'PPG Cikampek', children }) => {
 
     return (
         <div className='w-full h-auto'>
-            <div className='px-3 py-2 flex bg-white items-center gap-2 shadow-sm'>
+            <div className='px-3 py-2 flex bg-white items-center gap-2 shadow-xs'>
                 <button
-                    className="p-2 rounded-full focus:bg-gray-200 hover:outline-none hover:ring-1 hover:ring-offset-1 hover:ring-gray-400"
+                    className="p-2 rounded-full focus:bg-gray-200 hover:outline-hidden hover:ring-1 hover:ring-offset-1 hover:ring-gray-400"
                     onClick={sidebarHandler}
                 >
                     {sidebar.isSidebarOpen ? <ChevronLeft size={24} /> : <ChevronRight size={24} />}

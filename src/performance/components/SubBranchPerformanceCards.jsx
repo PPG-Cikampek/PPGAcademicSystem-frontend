@@ -143,7 +143,7 @@ const StatCard = ({ level, title, subtitle, stats, onViewMore, expanded }) => {
     const monthlyStats = calculateMonthlyStats(stats.attendances, stats.semesterTarget, stats.uniqueStudents)
 
     return (
-        <div className="bg-white rounded-lg shadow-sm mx-4 md:mx-8  p-6 mb-4 transition-all">
+        <div className="bg-white rounded-lg shadow-xs mx-4 md:mx-8  p-6 mb-4 transition-all">
             <div className="flex justify-between items-start mb-4">
                 <div className="flex-1 h-fit">
                     <h3 className="text-lg font-medium">{level} {title}</h3>
@@ -171,7 +171,7 @@ const StatCard = ({ level, title, subtitle, stats, onViewMore, expanded }) => {
                         e.stopPropagation()
                         onViewMore()
                     }}
-                    className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary/90 transition-colors"
+                    className="px-4 py-2 text-sm bg-primary text-white rounded-sm hover:bg-primary/90 transition-colors"
                 >
                     Lihat Detail
                 </button>
@@ -448,7 +448,7 @@ const SubBranchAdminPerformanceCards = ({ data, violationData, initialView, mont
                     <p>Kalkulasi Berdasarkan: {!showRelativeToTarget ? <strong>Hari berjalan</strong> : <strong>Hari efektif</strong>}</p>
                     {/* <button
                         onClick={() => setShowRelativeToTarget(!showRelativeToTarget)}
-                        className="text-primary px-4 py-2 rounded border border-primary hover:bg-primary hover:text-white transition"
+                        className="text-primary px-4 py-2 rounded-sm border border-primary hover:bg-primary hover:text-white transition"
                     >
                         Ubah
                     </button> */}

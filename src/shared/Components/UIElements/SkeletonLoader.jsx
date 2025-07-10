@@ -12,8 +12,8 @@ const SkeletonLoader = ({
   const getSkeletonClasses = () => {
     const baseClasses = 'bg-gray-200 animate-pulse';
     const variantClasses = {
-      text: 'h-4 rounded',
-      rectangular: 'rounded',
+      text: 'h-4 rounded-sm',
+      rectangular: 'rounded-sm',
       circular: 'rounded-full',
     };
 

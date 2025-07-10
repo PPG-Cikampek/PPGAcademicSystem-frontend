@@ -164,7 +164,7 @@ const CategoryPackageViewReactPDF = () => {
   return (
     <div className="container mx-auto p-4">
       <div className="flex flex-col gap-4">
-        <div className="border rounded p-4" style={{ minHeight: 600 }}>
+        <div className="border rounded-sm p-4" style={{ minHeight: 600 }}>
           {questionsData && (
             <PDFViewer width="100%" height={900}>
               <MunaqasyahPDF questionsData={questionsData} state={state} />

@@ -23,7 +23,7 @@ const Dashboard = ({ data }) => {
                     </p>
                 </div>
             </div>
-            {/* <div className="bg-white rounded-md shadow p-4">
+            {/* <div className="bg-white rounded-md shadow-sm p-4">
                 <h3 className="text-base font-medium mb-3">Placeholder</h3>
                 <div className="space-y-3">
                     {[1, 2, 3].map((item) => (

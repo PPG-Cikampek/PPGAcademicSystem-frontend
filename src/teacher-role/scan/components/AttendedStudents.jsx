@@ -216,7 +216,7 @@ const AttendedStudents = () => {
                             type="checkbox"
                             checked={state.selectAll}
                             onChange={handleSelectAll}
-                            className="peer h-4 w-4 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border border-slate-300 checked:bg-primary checked:border-primary"
+                            className="peer h-4 w-4 cursor-pointer transition-all appearance-none rounded-sm shadow-sm hover:shadow-md border border-slate-300 checked:bg-primary checked:border-primary"
                             id="check-2"
                         />
                         <span className="absolute text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
@@ -232,13 +232,13 @@ const AttendedStudents = () => {
             )}
             <div className={`flex flex-col ${state.studentList.length !== 0 && state.isSubBranchYearActivated === true ? 'mb-4' : ''} `}>
                 {state.isSubBranchYearActivated === true && state.studentList.map(student => (
-                    <div key={student.studentId.nis} className={`p-4 pr-0 mx-[-1rem] min-h-20 flex items-center gap-4 border-b ${getBorderColor(student.status)} transition-all duration-500`}>
+                    <div key={student.studentId.nis} className={`p-4 pr-0 -mx-4 min-h-20 flex items-center gap-4 border-b ${getBorderColor(student.status)} transition-all duration-500`}>
                         <label className="flex items-center cursor-pointer relative" htmlFor={student.studentId.nis}>
                             <input
                                 type="checkbox"
                                 checked={!!student.isSelected}
                                 onChange={() => handleCheckboxChange(student.studentId.nis)}
-                                className="peer h-4 w-4 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border bg-white border-slate-300 checked:bg-primary checked:border-primary"
+                                className="peer h-4 w-4 cursor-pointer transition-all appearance-none rounded-sm shadow-sm hover:shadow-md border bg-white border-slate-300 checked:bg-primary checked:border-primary"
                                 id={student.studentId.nis}
                                 disabled={student.status === "Hadir" || student.status === "Terlambat"}
                             />
@@ -300,7 +300,7 @@ const AttendedStudents = () => {
                                                                 type="text"
                                                                 onChange={(e) => handleNotesChange(student.studentId.nis, e.target.value)}
                                                                 value={student.teachersNotes}
-                                                                className={`w-full p-2 mb-1 border rounded-sm shadow-sm hover:ring-1 hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300`}
+                                                                className={`w-full p-2 mb-1 border rounded-xs shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300`}
                                                             />
                                                         </div>
                                                     </div>
@@ -335,7 +335,7 @@ const AttendedStudents = () => {
                                                                     type="checkbox"
                                                                     checked={!!student.violations.attribute}
                                                                     onChange={() => handleViolationsChange(student.studentId.nis, "Attribute")}
-                                                                    className="peer h-4 w-4 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border border-slate-300 checked:bg-primary checked:border-primary"
+                                                                    className="peer h-4 w-4 cursor-pointer transition-all appearance-none rounded-sm shadow-sm hover:shadow-md border border-slate-300 checked:bg-primary checked:border-primary"
                                                                     id={student.studentId.nis + "attribute"}
                                                                     disabled={student.status === "Sakit" || student.status === "Izin" || student.status === "Tanpa Keterangan"}
                                                                 />
@@ -353,7 +353,7 @@ const AttendedStudents = () => {
                                                                     type="checkbox"
                                                                     checked={!!student.violations.attitude}
                                                                     onChange={() => handleViolationsChange(student.studentId.nis, "Attitude")}
-                                                                    className="peer h-4 w-4 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border border-slate-300 checked:bg-primary checked:border-primary"
+                                                                    className="peer h-4 w-4 cursor-pointer transition-all appearance-none rounded-sm shadow-sm hover:shadow-md border border-slate-300 checked:bg-primary checked:border-primary"
                                                                     id={student.studentId.nis + "attitude"}
                                                                     disabled={student.status === "Sakit" || student.status === "Izin" || student.status === "Tanpa Keterangan"}
                                                                 />
@@ -371,7 +371,7 @@ const AttendedStudents = () => {
                                                                     type="checkbox"
                                                                     checked={!!student.violations.tidiness}
                                                                     onChange={() => handleViolationsChange(student.studentId.nis, "tidiness")}
-                                                                    className="peer h-4 w-4 cursor-pointer transition-all appearance-none rounded shadow hover:shadow-md border border-slate-300 checked:bg-primary checked:border-primary"
+                                                                    className="peer h-4 w-4 cursor-pointer transition-all appearance-none rounded-sm shadow-sm hover:shadow-md border border-slate-300 checked:bg-primary checked:border-primary"
                                                                     id={student.studentId.nis + "tidiness"}
                                                                     disabled={student.status === "Sakit" || student.status === "Izin" || student.status === "Tanpa Keterangan"}
                                                                 />

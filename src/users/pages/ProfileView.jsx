@@ -288,14 +288,14 @@ const ProfileView = () => {
                             {isLoading && (
                                 <div className="animate-pulse flex space-x-4 mb-6">
                                     <div className="flex-1 h-fit space-y-6 py-1">
-                                        <div className="h-5 bg-slate-500 rounded"></div>
+                                        <div className="h-5 bg-slate-500 rounded-sm"></div>
                                         <div className="space-y-3">
                                             <div className="grid grid-cols-3 gap-4">
-                                                <div className="h-3 bg-slate-300 rounded col-span-2"></div>
-                                                <div className="h-3 bg-slate-300 rounded col-span-1"></div>
+                                                <div className="h-3 bg-slate-300 rounded-sm col-span-2"></div>
+                                                <div className="h-3 bg-slate-300 rounded-sm col-span-1"></div>
                                             </div>
-                                            <div className="h-3 bg-slate-300 rounded"></div>
-                                            <div className="h-3 bg-slate-300 rounded"></div>
+                                            <div className="h-3 bg-slate-300 rounded-sm"></div>
+                                            <div className="h-3 bg-slate-300 rounded-sm"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -309,7 +309,7 @@ const ProfileView = () => {
                                                     type="text"
                                                     value={editedName}
                                                     onChange={e => setEditedName(e.target.value)}
-                                                    className="border rounded px-2 py-2 font-medium text-gray-800 focus:ring-2 focus:ring-primary"
+                                                    className="border rounded-sm px-2 py-2 font-medium text-gray-800 focus:ring-2 focus:ring-primary"
                                                     autoFocus
                                                 />
                                                 <button type="submit" className="button-primary my-0 text-sm">Simpan</button>
@@ -337,7 +337,7 @@ const ProfileView = () => {
                                         value={newEmail}
                                         onChange={handleEmailChange}
                                         placeholder="Email Baru"
-                                        className={`grow mr-2 p-2 my-1 border rounded-[4px] shadow-sm hover:ring-1 hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 `}
+                                        className={`grow mr-2 p-2 my-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 `}
                                     />
                                     <button
                                         type="button"
@@ -358,7 +358,7 @@ const ProfileView = () => {
                                         value={oldPassword}
                                         onChange={handleOldPasswordChange}
                                         placeholder="Password Lama"
-                                        className={`p-2 my-1 border rounded-[4px] shadow-sm hover:ring-1 hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 `}
+                                        className={`p-2 my-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 `}
                                     />
                                     <div className="relative">
                                         <input
@@ -366,7 +366,7 @@ const ProfileView = () => {
                                             value={password}
                                             onChange={handlePasswordChange}
                                             placeholder="Password Baru"
-                                            className={`p-2 my-1 border rounded-[4px] shadow-sm hover:ring-1 hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 w-full`}
+                                            className={`p-2 my-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 w-full`}
                                         />
                                         <span
                                             onClick={toggleShowPassword}
@@ -384,7 +384,7 @@ const ProfileView = () => {
                                         value={confirmPassword}
                                         onChange={handleConfirmPasswordChange}
                                         placeholder="Konfirmasi Password Baru"
-                                        className={`p-2 my-1 border rounded-[4px] shadow-sm hover:ring-1 hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 `}
+                                        className={`p-2 my-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 `}
                                     />
                                     {passwordError && <p className="text-red-500">{passwordError}</p>}
                                     <button

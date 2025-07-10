@@ -29,7 +29,7 @@ const FloatingMenu = ({ boxWidth, style, label, buttons, horizontalStyle = true 
     return (
         <div className="relative" ref={menuRef} onClick={(e) => e.stopPropagation()}>
             <button
-                className={style? style : "p-1 hover:bg-gray-100 rounded"}
+                className={style? style : "p-1 hover:bg-gray-100 rounded-sm"}
                 onClick={handleOpen}
             >
                 { label ? label : horizontalStyle ? <MoreHorizontal className="w-5 h-5 text-gray-500" /> : <MoreVertical className="w-5 h-5 text-gray-500" /> }

@@ -29,7 +29,7 @@ const SelectMunaqasyahClassView = () => {
                     {isLoading ? (
                         // Skeleton loaders for loading state
                         [...Array(6)].map((_, index) => (
-                            <div key={index} className="card-interactive justify-start min-h-16 min-w-40 max-w-[10.5rem] md:min-h-40 md:min-w-80 md:max-w-96 rounded-md items-center md:p-8 m-0 gap-4">
+                            <div key={index} className="card-interactive justify-start min-h-16 min-w-40 max-w-42 md:min-h-40 md:min-w-80 md:max-w-96 rounded-md items-center md:p-8 m-0 gap-4">
                                 <div className="mx-4 flex flex-col items-start gap-2 w-full">
                                     <SkeletonLoader variant="text" width="150px" height="24px" className="mb-2" />
                                     <SkeletonLoader variant="text" width="60px" height="16px" />
@@ -38,7 +38,7 @@ const SelectMunaqasyahClassView = () => {
                         ))
                     ) : (
                         classes.map((cls) => (
-                            <Link key={cls.grade} to={`/munaqasyah/question-bank/${cls.grade}`} className='card-interactive justify-start min-h-16 min-w-40 max-w-[10.5rem] md:min-h-40 md:min-w-80 md:max-w-96 rounded-md items-center md:p-8 m-0 gap-4'>
+                            <Link key={cls.grade} to={`/munaqasyah/question-bank/${cls.grade}`} className='card-interactive justify-start min-h-16 min-w-40 max-w-42 md:min-h-40 md:min-w-80 md:max-w-96 rounded-md items-center md:p-8 m-0 gap-4'>
                                 <div className="mx-4 flex flex-col items-start gap-2 ">
                                     <h1 className="text-lg md:text-2xl font-bold">{cls.label.toUpperCase()}</h1>
                                     <p className="">{cls.questionCount} Soal</p>

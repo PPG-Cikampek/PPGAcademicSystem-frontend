@@ -242,7 +242,7 @@ const ClassDetailView = () => {
                             </div>
                         </div>
 
-                        <div className="flex flex-col gap-4 mb-8 rounded-md border border-gray-200 bg-white p-6 shadow-sm">
+                        <div className="flex flex-col gap-4 mb-8 rounded-md border border-gray-200 bg-white p-6 shadow-xs">
                             <div className="flex items-center space-x-2 text-gray-600">
                                 <Clock className="h-5 w-5" />
                                 <span>Kelas Mulai: {classData.class.startTime}</span>
@@ -281,7 +281,7 @@ const ClassDetailView = () => {
                                         </Link>
                                     )}
                             </div>
-                            <div className="rounded-md bg-white shadow-sm overflow-auto text-nowrap">
+                            <div className="rounded-md bg-white shadow-xs overflow-auto text-nowrap">
                                 <table className="w-full">
                                     <thead className="bg-white">
                                         <tr>
@@ -359,7 +359,7 @@ const ClassDetailView = () => {
                                         </Link>
                                     )}
                             </div>
-                            <div className="rounded-md bg-white shadow-sm overflow-auto text-nowrap">
+                            <div className="rounded-md bg-white shadow-xs overflow-auto text-nowrap">
                                 <table className="w-full">
                                     <thead className="bg-white">
                                         <tr>

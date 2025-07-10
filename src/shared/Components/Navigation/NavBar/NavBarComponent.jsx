@@ -36,7 +36,7 @@ const Navbar = ({ links, logo }) => {
                 {/* Mobile Menu Button */}
                 <button
                     onClick={toggleMenu}
-                    className="md:hidden text-gray-600 hover:text-blue-600 focus:outline-none"
+                    className="md:hidden text-gray-600 hover:text-blue-600 focus:outline-hidden"
                 >
                     <svg
                         className="w-6 h-6"

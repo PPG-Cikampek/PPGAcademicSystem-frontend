@@ -18,7 +18,7 @@ const AttendanceList = ({ data }) => {
                         {attendances.map((attendance) => (
                             <div
                                 key={attendance._id}
-                                className="border rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200"
+                                className="border rounded-lg p-4 shadow-xs hover:shadow-md transition-shadow duration-200"
                             >
                                 <p className="text-sm text-gray-500">
                                     <strong>Status:</strong> {attendance.status}
@@ -71,7 +71,7 @@ export default AttendanceList;
 //                 const formattedDate = fullDate.toLocaleDateString('id-ID'); // dd/mm/yyyy format
 
 //                 return (
-//                     <div key={date} className="border border-gray-300 rounded-md shadow-sm">
+//                     <div key={date} className="border border-gray-300 rounded-md shadow-xs">
 //                         <button
 //                             onClick={() => handleToggle(date)}
 //                             className={`w-full p-2 flex justify-between items-center bg-blue-100 active:bg-blue-200 hover:bg-blue-200 rounded-t-md ${expandedDate === date ? '' : 'rounded-b-md'} transition-all duration-300`}

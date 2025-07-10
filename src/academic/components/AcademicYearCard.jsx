@@ -80,10 +80,10 @@ const AcademicYearCard = ({ year, expanded, onToggle, onActivate, onMunaqsyahSta
 
                 {year.isActive ? (
                     <div className="flex flex-col items-start gap-1">
-                        <div className="inline-block mt-2 px-2 py-1 text-sm text-green-600 bg-green-100 rounded">
+                        <div className="inline-block mt-2 px-2 py-1 text-sm text-green-600 bg-green-100 rounded-sm">
                             Tahun Ajaran Aktif
                         </div>
-                        <div className={`inline-block mt-2 px-2 py-1 text-sm rounded ${munaqasyahStatusObj.className}`}>
+                        <div className={`inline-block mt-2 px-2 py-1 text-sm rounded-sm ${munaqasyahStatusObj.className}`}>
                             {munaqasyahStatusObj.label}
                         </div>
                         {year.munaqasyahStatus === 'inProgress' && (

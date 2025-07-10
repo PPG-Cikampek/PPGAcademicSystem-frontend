@@ -46,7 +46,7 @@ const IndividualDoughnut = ({ status, percentage }) => {
         </div>
       </div>
       <div
-        className="px-2 py-1 text-white rounded"
+        className="px-2 py-1 text-white rounded-sm"
         style={{ backgroundColor: getChartColors(status) }}
       >
         {status}

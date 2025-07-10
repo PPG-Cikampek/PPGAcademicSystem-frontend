@@ -183,7 +183,7 @@ const LevelsView = () => {
                 )}
 
                 {data && !isLoading && (
-                    <div className="bg-white rounded-lg shadow divide-y">
+                    <div className="bg-white rounded-lg shadow-sm divide-y">
                         {data.branches.map(branch => (
                             <div key={branch._id} className="p-4 hover:bg-gray-100 hover:cursor-pointer transition-all duration-200" >
                                 <div
@@ -196,7 +196,7 @@ const LevelsView = () => {
                                     <div className="flex-1 h-fit"  >
                                         <div className='flex items-center gap-2'>
                                             <h2 className="text-sm font-semibold text-gray-900">Desa {branch.name}</h2>
-                                            <div className="text-xs text-gray-500 border border-gray-500 rounded p-1">
+                                            <div className="text-xs text-gray-500 border border-gray-500 rounded-sm p-1">
                                                 {branch.subBranches.length} Kelompok
                                             </div>
                                         </div>
@@ -227,7 +227,7 @@ const LevelsView = () => {
                                 {expandedBranches[branch._id] && (
                                     <div className="mt-3 ml-12 space-y-2">
                                         {branch.subBranches.map(sub => (
-                                            <div key={sub._id} className="flex items-center justify-between py-2 px-3 bg-gray-50 rounded text-sm">
+                                            <div key={sub._id} className="flex items-center justify-between py-2 px-3 bg-gray-50 rounded-sm text-sm">
                                                 <div>
                                                     <div className="font-medium text-gray-900">Kelompok {sub.name}</div>
                                                     <div className="flex items-center text-xs text-gray-500 mt-1">

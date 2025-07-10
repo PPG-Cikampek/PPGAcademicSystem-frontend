@@ -186,7 +186,7 @@ const QuestionDetailView = () => {
 
     return (
         <div className="min-h-screen px-4 py-8 md:p-8">
-            <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-sm p-6">
+            <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-xs p-6">
                 <Modal
                     isOpen={modalIsOpen}
                     onClose={() => setModalIsOpen(false)}

@@ -54,9 +54,9 @@ const Navbar = () => {
                 <div className="flex justify-between items-center h-16">
                     {/* Logo */}
                     <div className="flex gap-6 items-center">
-                        <div className="flex flex-shrink-0">
+                        <div className="flex shrink-0">
                             <button
-                                className="p-2 rounded-full focus:bg-gray-200 hover:outline-none hover:ring-1 hover:ring-offset-1 hover:ring-gray-400"
+                                className="p-2 rounded-full focus:bg-gray-200 hover:outline-hidden hover:ring-1 hover:ring-offset-1 hover:ring-gray-400"
                                 onClick={sidebarHandler}
                             >
                                 {sidebar.isSidebarOpen ? <ChevronLeft size={24} /> : <ChevronRight size={24} />}

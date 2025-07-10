@@ -34,7 +34,7 @@ const PreviewReport = () => {
                     <iframe
                         src={pdfUrl}
                         title="PDF Preview"
-                        className="w-full h-[600px] border rounded"
+                        className="w-full h-[600px] border rounded-sm"
                     ></iframe>
                 </div>
                 <div className="flex justify-end mt-4">

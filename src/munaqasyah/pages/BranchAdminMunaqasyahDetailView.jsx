@@ -43,11 +43,11 @@ const BranchAdminMunaqasyahDetailView = () => {
 
     const getMunaqasyahStatusStyle = (status) => {
         const statusClassMap = {
-            notStarted: 'bg-gray-100 text-gray-600 px-2 py-1 rounded',
-            inProgress: 'bg-yellow-400 text-white px-2 py-1 rounded',
-            completed: 'bg-green-500 text-white px-2 py-1 rounded',
+            notStarted: 'bg-gray-100 text-gray-600 px-2 py-1 rounded-sm',
+            inProgress: 'bg-yellow-400 text-white px-2 py-1 rounded-sm',
+            completed: 'bg-green-500 text-white px-2 py-1 rounded-sm',
         };
-        return statusClassMap[status] || 'bg-red-500 text-white px-2 py-1 rounded';
+        return statusClassMap[status] || 'bg-red-500 text-white px-2 py-1 rounded-sm';
     };
 
     const subBranchColumns = [

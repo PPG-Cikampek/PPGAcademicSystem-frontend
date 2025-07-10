@@ -56,7 +56,7 @@ const DynamicForm = ({ logo, title, subtitle, fields = [], onSubmit, button, cus
                                 {...register(field.name, { required: field.required })}
                                 disabled={field.disabled}
                                 rows={field.textAreaRows}
-                                className={`w-full p-2 mb-1 border rounded-[4px] shadow-sm hover:ring-1 hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 ${field.disabled ? 'bg-gray-200' : ''}`}
+                                className={`w-full p-2 mb-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 ${field.disabled ? 'bg-gray-200' : ''}`}
                             />
                         ) : field.type === 'checkbox' ? (
                             <div className="flex items-center space-x-2">
@@ -65,7 +65,7 @@ const DynamicForm = ({ logo, title, subtitle, fields = [], onSubmit, button, cus
                                     defaultChecked={field.value || false}
                                     {...register(field.name)}
                                     disabled={field.disabled}
-                                    className={`rounded-md border-gray-300 shadow-sm focus:ring-2 focus:ring-secondary ${field.disabled ? 'bg-gray-200 cursor-not-allowed' : ''}`}
+                                    className={`rounded-md border-gray-300 shadow-xs focus:ring-2 focus:ring-secondary ${field.disabled ? 'bg-gray-200 cursor-not-allowed' : ''}`}
                                 />
                                 <span>{field.label}</span>
                             </div>
@@ -74,7 +74,7 @@ const DynamicForm = ({ logo, title, subtitle, fields = [], onSubmit, button, cus
                                 defaultValue={field.value || ''}
                                 {...register(field.name, { required: field.required })}
                                 disabled={field.disabled}
-                                className={`w-full p-2 border rounded-md shadow-sm hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 ${field.disabled ? 'bg-gray-200' : ''}`}
+                                className={`w-full p-2 border rounded-md shadow-xs hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 ${field.disabled ? 'bg-gray-200' : ''}`}
                             >
                                 {field.options.map((option, index) => (
                                     <option key={index} value={option.value} disabled={option.disabled}>
@@ -96,7 +96,7 @@ const DynamicForm = ({ logo, title, subtitle, fields = [], onSubmit, button, cus
                                 min="1900"
                                 max={currentYear + 1}
                                 step="1"
-                                className={`w-full p-2 mb-1 border rounded-[4px] shadow-sm hover:ring-1 hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 ${field.disabled ? 'bg-gray-200 cursor-not-allowed' : ''}`}
+                                className={`w-full p-2 mb-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 ${field.disabled ? 'bg-gray-200 cursor-not-allowed' : ''}`}
                             />
                         ) : field.type === 'phone' ? (
                             <div className="relative flex items-center">
@@ -113,7 +113,7 @@ const DynamicForm = ({ logo, title, subtitle, fields = [], onSubmit, button, cus
                                         }
                                     })}
                                     disabled={field.disabled}
-                                    className={`w-full pl-12 p-2 mb-1 border rounded-[4px] shadow-sm hover:ring-1 hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 ${field.disabled ? 'bg-gray-200 cursor-not-allowed' : ''}`}
+                                    className={`w-full pl-12 p-2 mb-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 ${field.disabled ? 'bg-gray-200 cursor-not-allowed' : ''}`}
                                 />
                             </div>
                         ) : field.type === 'radio' ? (
@@ -126,7 +126,7 @@ const DynamicForm = ({ logo, title, subtitle, fields = [], onSubmit, button, cus
                                             defaultChecked={field.value === option.value}
                                             {...register(field.name, { required: field.required })}
                                             disabled={field.disabled || option.disabled}
-                                            className={`border-gray-300 shadow-sm focus:ring-2 focus:ring-primary 
+                                            className={`border-gray-300 shadow-xs focus:ring-2 focus:ring-primary 
                                             ${field.disabled ? 'bg-gray-200 cursor-not-allowed' : ''}`}
                                         />
                                         <label>{option.label}</label>
@@ -147,8 +147,8 @@ const DynamicForm = ({ logo, title, subtitle, fields = [], onSubmit, button, cus
                                     ...(field.max && { max: { value: field.max, message: `Maximum value is ${field.max}` } })
                                 })}
                                 disabled={field.disabled}
-                                className={`w-full p-2 mb-1 border rounded-[4px] shadow-sm hover:ring-1 hover:ring-primary 
-                                focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 
+                                className={`w-full p-2 mb-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary 
+                                focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 
                                 ${field.disabled ? 'bg-gray-200 cursor-not-allowed' : ''}`}
                             />
                         ) : field.type === 'date' ? (
@@ -160,7 +160,7 @@ const DynamicForm = ({ logo, title, subtitle, fields = [], onSubmit, button, cus
                                     <DatePicker
                                         selected={value}
                                         onChange={onChange}
-                                        className="w-full p-2 border rounded-md shadow-sm hover:ring-1 hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
+                                        className="w-full p-2 border rounded-md shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300"
                                         dateFormat="dd/MM/yyyy"
                                         wrapperClassName='w-full'
                                         showYearDropdown
@@ -187,8 +187,8 @@ const DynamicForm = ({ logo, title, subtitle, fields = [], onSubmit, button, cus
                                                             onChange(newValues);
                                                         }}
                                                         placeholder={field.placeholder || ''}
-                                                        className="w-full p-2 border rounded-[4px] shadow-sm hover:ring-1 hover:ring-primary 
-                                                            focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
+                                                        className="w-full p-2 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary 
+                                                            focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300"
                                                     />
                                                 ) : (
                                                     <input
@@ -205,8 +205,8 @@ const DynamicForm = ({ logo, title, subtitle, fields = [], onSubmit, button, cus
                                                         max={field.inputType === 'number' ? field.max : undefined}
                                                         step={field.inputType === 'number' ? (field.step || 1) : undefined}
                                                         placeholder={field.placeholder || ''}
-                                                        className="w-full p-2 border rounded-[4px] shadow-sm hover:ring-1 hover:ring-primary 
-                                                            focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
+                                                        className="w-full p-2 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary 
+                                                            focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300"
                                                     />
                                                 )}
                                                 <button
@@ -240,7 +240,7 @@ const DynamicForm = ({ logo, title, subtitle, fields = [], onSubmit, button, cus
                                     placeholder={field.placeholder || ''}
                                     {...register(field.name, { required: field.required })}
                                     disabled={field.disabled}
-                                    className={`w-full p-2 mb-1 border rounded-[4px] shadow-sm hover:ring-1 hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 ${field.disabled ? 'bg-gray-200 cursor-not-allowed' : ''}`}
+                                    className={`w-full p-2 mb-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 ${field.disabled ? 'bg-gray-200 cursor-not-allowed' : ''}`}
                                 />
                                 {field.type === 'password' && (
                                     <button

@@ -192,7 +192,7 @@ const UsersView = () => {
                             e.stopPropagation();
                             navigate(`/settings/users/${user._id}`);
                         }}
-                        className="p-1 hover:bg-gray-100 rounded"
+                        className="p-1 hover:bg-gray-100 rounded-sm"
                     >
                         <Pencil className="w-4 h-4" />
                     </button>
@@ -201,7 +201,7 @@ const UsersView = () => {
                             e.stopPropagation();
                             handleDeleteUser(user._id);
                         }}
-                        className="p-1 hover:bg-gray-100 rounded text-red-500"
+                        className="p-1 hover:bg-gray-100 rounded-sm text-red-500"
                     >
                         <Trash className="w-4 h-4" />
                     </button>

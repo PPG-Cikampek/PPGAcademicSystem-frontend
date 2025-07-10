@@ -27,7 +27,7 @@ export default function Modal_2({ isOpen, onClose, children }) {
             >
                 <button
                     onClick={onClose}
-                    className="text-gray-500 hover:text-gray-700 focus:outline-none absolute top-2 right-2"
+                    className="text-gray-500 hover:text-gray-700 focus:outline-hidden absolute top-2 right-2"
                 >
                     &times;
                 </button>
