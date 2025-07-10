@@ -192,7 +192,7 @@ export function generatePDFContent(studentName, studentScores, scoreCategories, 
         theme: 'grid',
         head: [], // No headers
         body: [
-            [{ content: 'Jumlah ', colSpan: 2, styles: { halign: 'right', valign: 'middle' } }, totalScore, IndonesianNumberConverter(totalScore), totalBranchAvg],
+            [{ content: 'Jumlah ', colSpan: 2, styles: { halign: 'right', valign: 'middle' } }, totalScore, { content: IndonesianNumberConverter(totalScore), colSpan: 2 }],
             [
                 { content: 'Peringkat ', colSpan: 2, styles: { halign: 'right', valign: 'middle' } },
                 { content: `   ${studentScores.studentRank} dari ${studentScores.studentTotal} siswa ${grade} se-desa.`, colSpan: 3, styles: { halign: 'left', valign: 'middle' } }
