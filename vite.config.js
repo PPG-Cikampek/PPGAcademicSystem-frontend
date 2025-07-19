@@ -1,10 +1,11 @@
-import { defineConfig, defaultClientConditions, defaultServerConditions } from 'vite'
+import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 // import mkcert from 'vite-plugin-mkcert'
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
+    ['babel-plugin-react-compiler', { target: '18' }],
     react(),
     // mkcert()
   ],
