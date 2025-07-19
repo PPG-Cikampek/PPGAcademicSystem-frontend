@@ -116,6 +116,7 @@ const AuthView = () => {
                         onSubmit={handleFormSubmit}
                         disabled={isLoading}
                         labels={false}
+                        className={'min-w-96'}
                         button={
                             <div className="flex flex-col justify-stretch mt-4">
                                 <button
@@ -147,6 +148,7 @@ const AuthView = () => {
                         disabled={isLoading}
                         fields={studentLoginFields}
                         labels={false}
+                        className={'min-w-96'}
                         button={
                             <div className="flex flex-col justify-stretch mt-4">
                                 {studentLoginFields.length !== 0 && (

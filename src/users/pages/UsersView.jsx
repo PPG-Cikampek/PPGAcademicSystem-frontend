@@ -4,7 +4,7 @@ import { AuthContext } from '../../shared/Components/Context/auth-context';
 import useHttp from '../../shared/hooks/http-hook';
 
 import Modal from '../../shared/Components/UIElements/ModalBottomClose';
-import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
+import SkeletonLoader from '../../shared/Components/UIElements/SkeletonLoader';
 import { Search, Users, Pencil, Trash, ChevronDown, Filter, PlusIcon } from 'lucide-react';
 import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
 import DataTable from '../../shared/Components/UIElements/DataTable';
@@ -221,12 +221,9 @@ const UsersView = () => {
                     title={modal.title}
                     footer={<ModalFooter />}
                 >
-                    {isLoading && (
-                        <div className="flex justify-center mt-16">
-                            <LoadingCircle size={32} />
-                        </div>
-                    )}
-                    {!isLoading && (
+                    {isLoading ? (
+                        <SkeletonLoader />
+                    ) : (
                         modal.message
                     )}
                 </Modal>
@@ -253,17 +250,11 @@ const UsersView = () => {
                     </div>
                 </div>
 
-                {isLoading && (
-                    <div className="flex justify-center mt-16">
-                        <LoadingCircle size={32} />
-                    </div>
-                )}
+
 
                 {users && roleOrder.map((role) => {
                     const roleUsers = users.users.filter((user) => user.role === role);
                     if (roleUsers.length === 0) return null;
-                    // console.log(roleUsers);
-
                     return (
                         <div key={role} className="mb-8">
                             <h2 className="text-lg font-bold text-gray-900">{getUserRoleTitle(role)}</h2>
@@ -282,6 +273,7 @@ const UsersView = () => {
                                     entriesOptions: [5, 10, 20, 30]
                                 }}
                                 tableId={`users-table-${role}`}
+                                isLoading={isLoading}
                             />
                             <hr className='my-8' />
                         </div>

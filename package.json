@@ -64,9 +64,7 @@
     "globals": "^15.11.0",
     "postcss": "^8.4.47",
     "tailwindcss": "^4.1.11",
-    "terser": "^5.43.1",
     "vite": "^6.3.5",
-    "vite-plugin-mkcert": "^1.17.6",
-    "vitest": "^2.1.9"
+    "vite-plugin-mkcert": "^1.17.6"
   }
 }
