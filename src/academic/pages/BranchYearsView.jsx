@@ -6,31 +6,30 @@ import useHttp from '../../shared/hooks/http-hook';
 
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 import { Trash, PlusIcon, LockOpen, Lock, } from 'lucide-react';
-import FloatingMenu from '../../shared/Components/UIElements/FloatingMenu';
 import Modal from '../../shared/Components/UIElements/ModalBottomClose';
 import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
 
-const TeachingGroupYearsView = () => {
+const BranchYearsView = () => {
   const [modal, setModal] = useState({ title: '', message: '', onConfirm: null });
   const [modalIsOpen, setModalIsOpen] = useState(false);
   const [expandedId, setExpandedId] = useState(null);
-  const [teachingGroupYears, setTeachingGroupYears] = useState();
+  const [branchYears, setBranchYears] = useState();
   const { isLoading, error, sendRequest, setError } = useHttp();
 
   const auth = useContext(AuthContext)
   const navigate = useNavigate()
 
   useEffect(() => {
-    const fetchTeachingGroupYears = async () => {
+    const fetchBranchYears = async () => {
       try {
-        const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/teachingGroupYears/teachingGroup/${auth.userTeachingGroupId}`);
-        setTeachingGroupYears(responseData);
+        const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/BranchYears/branch/${auth.userBranchId}`);
+        setBranchYears(responseData);
         console.log(responseData)
       } catch (err) {
         // Error is handled by useHttp  
       }
     };
-    fetchTeachingGroupYears();
+    fetchBranchYears();
   }, [sendRequest]);
 
   const formatAcademicYear = (name) => {
@@ -43,54 +42,48 @@ const TeachingGroupYearsView = () => {
     setExpandedId(expandedId === id ? null : id);
   };
 
-  const activateYearHandler = (teachingGroupYearId, teachingGroupYearName, teachingGroupYearSemesterTarget) => (e) => {
+  const activateYearHandler = (branchYearId, branchYearName) => (e) => {
     e.stopPropagation()
-    console.log(teachingGroupYearId)
-    console.log(teachingGroupYearSemesterTarget)
-    if (teachingGroupYearSemesterTarget > 0) {
-      const confirmActivate = async () => {
-        console.log('Updating ... ')
-        const url = `${import.meta.env.VITE_BACKEND_URL}/teachingGroupYears/activate`
+    const confirmActivate = async () => {
+      console.log('Updating ... ')
+      const url = `${import.meta.env.VITE_BACKEND_URL}/branchYears/activate`
 
-        const body = JSON.stringify({
-          teachingGroupYearId: teachingGroupYearId,
-          semesterTarget: 20,
-        });
-
-        console.log(body)
-
-        let responseData
-        try {
-          responseData = await sendRequest(url, 'PATCH', body, {
-            'Content-Type': 'application/json'
-          });
-        } catch (err) {
-          setModal({ title: 'Gagal!', message: err.message, onConfirm: null });
-          setModalIsOpen(true)
-        }
-
-        setModal({ title: 'Berhasil!', message: responseData.message, onConfirm: null });
-
-        const updatedData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/teachingGroupYears/teachingGroup/${auth.userTeachingGroupId}`);
-        setTeachingGroupYears(updatedData);
-      };
-      setModal({
-        title: `Konfirmasi`,
-        message: `Aktifkan tahun ajaran ${formatAcademicYear(teachingGroupYearName)}?`,
-        onConfirm: confirmActivate,
+      const body = JSON.stringify({
+        branchYearId: branchYearId,
       });
-      setModalIsOpen(true);
-    } else {
-      navigate(`/settings/academic/${teachingGroupYearId}`)
+
+      console.log(body)
+
+      let responseData
+      try {
+        responseData = await sendRequest(url, 'PATCH', body, {
+          'Content-Type': 'application/json'
+        });
+      } catch (err) {
+        setModal({ title: 'Gagal!', message: err.message, onConfirm: null });
+        setModalIsOpen(true)
+      }
+
+      setModal({ title: 'Berhasil!', message: responseData.message, onConfirm: null });
+
+      const updatedData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/branchYears/branch/${auth.userBranchId}`);
+      setBranchYears(updatedData);
     }
+
+    setModal({
+      title: `Konfirmasi`,
+      message: `Aktifkan tahun ajaran ${formatAcademicYear(branchYearName)}?`,
+      onConfirm: confirmActivate,
+    });
+    setModalIsOpen(true);
   }
 
-  const deactivateYearHandler = (e, teachingGroupYearName, teachingGroupYearId) => {
+  const deactivateYearHandler = (e, branchYearName, branchYearId) => {
     e.stopPropagation()
     const confirmDelete = async () => {
-      const url = `${import.meta.env.VITE_BACKEND_URL}/teachingGroupYears/deactivate`;
+      const url = `${import.meta.env.VITE_BACKEND_URL}/branchYears/deactivate`;
       const body = JSON.stringify({
-        teachingGroupYearId
+        branchYearId
       });
       let responseData;
       try {
@@ -99,8 +92,8 @@ const TeachingGroupYearsView = () => {
         });
         setModal({ title: 'Berhasil!', message: responseData.message, onConfirm: null });
 
-        const updatedData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/teachingGroupYears/teachingGroup/${auth.userTeachingGroupId}`);
-        setTeachingGroupYears(updatedData);
+        const updatedData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/branchYears/branch/${auth.userBranchId}`);
+        setBranchYears(updatedData);
 
       } catch (err) {
         setModal({ title: 'Gagal!', message: err.message, onConfirm: null });
@@ -109,19 +102,19 @@ const TeachingGroupYearsView = () => {
     };
     setModal({
       title: `Konfirmasi`,
-      message: `Nonaktifkan tahun ajaran ${formatAcademicYear(teachingGroupYearName)}?`,
+      message: `Nonaktifkan tahun ajaran ${formatAcademicYear(branchYearName)}?`,
       onConfirm: confirmDelete,
     });
     setModalIsOpen(true);
   }
 
-  const deleteTeachingGroupYearHandler = (e, teachingGroupYearName, teachingGroupYearId) => {
+  const deleteBranchYearHandler = (e, branchYearName, branchYearId) => {
     e.stopPropagation()
-    console.log(teachingGroupYearId)
+    console.log(branchYearId)
     const confirmDelete = async () => {
-      const url = `${import.meta.env.VITE_BACKEND_URL}/teachingGroupYears/`;
+      const url = `${import.meta.env.VITE_BACKEND_URL}/branchYears/`;
       const body = JSON.stringify({
-        teachingGroupYearId
+        branchYearId
       });
       let responseData;
       try {
@@ -130,8 +123,8 @@ const TeachingGroupYearsView = () => {
         });
         setModal({ title: 'Berhasil!', message: responseData.message, onConfirm: null });
 
-        const updatedData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/teachingGroupYears/teachingGroup/${auth.userTeachingGroupId}`);
-        setTeachingGroupYears(updatedData);
+        const updatedData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/branchYears/branch/${auth.userBranchId}`);
+        setBranchYears(updatedData);
 
       } catch (err) {
         setModal({ title: 'Gagal!', message: err.message, onConfirm: null });
@@ -140,20 +133,19 @@ const TeachingGroupYearsView = () => {
     };
     setModal({
       title: `Konfirmasi Penghapusan`,
-      message: `Hapus tahun ajaran ${formatAcademicYear(teachingGroupYearName)}?`,
+      message: `Hapus tahun ajaran ${formatAcademicYear(branchYearName)}?`,
       onConfirm: confirmDelete,
     });
     setModalIsOpen(true);
   }
 
-  const deleteClassHandler = (e, className, classId) => {
+  const deleteTeachingGroupHandler = (e, className, teachingGroupId) => {
     e.stopPropagation()
-    console.log(classId)
     const confirmDelete = async () => {
-      const url = `${import.meta.env.VITE_BACKEND_URL}/classes/`;
+      const url = `${import.meta.env.VITE_BACKEND_URL}/teachingGroups/`;
       console.log(url)
       const body = JSON.stringify({
-        classId
+        teachingGroupId
       });
       let responseData;
       try {
@@ -162,8 +154,8 @@ const TeachingGroupYearsView = () => {
         });
         setModal({ title: 'Berhasil!', message: responseData.message, onConfirm: null });
 
-        const updatedData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/teachingGroupYears/teachingGroup/${auth.userTeachingGroupId}`);
-        setTeachingGroupYears(updatedData);
+        const updatedData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/branchYears/branch/${auth.userBranchId}`);
+        setBranchYears(updatedData);
 
       } catch (err) {
         setModal({ title: 'Gagal!', message: err.message, onConfirm: null });
@@ -173,7 +165,7 @@ const TeachingGroupYearsView = () => {
     };
     setModal({
       title: `Konfirmasi Penghapusan`,
-      message: `Hapus Kelas: ${className}?`,
+      message: `Hapus KBM: ${className}?`,
       onConfirm: confirmDelete,
     });
     setModalIsOpen(true);
@@ -199,8 +191,8 @@ const TeachingGroupYearsView = () => {
     <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">
       <main className="max-w-6xl mx-auto">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-semibold text-gray-900">Daftar Tahun Ajaran Kelompok</h1>
-          {auth.userRole === 'admin kelompok' && (<Link to="/settings/academic/new">
+          <h1 className="text-2xl font-semibold text-gray-900">Daftar Tahun Ajaran {auth.userRole === 'branchAdmin' ? 'Desa' : ''}</h1>
+          {auth.userRole === 'branchAdmin' && (<Link to="/academic/new">
             {/* <button className="button-primary pl-[11px]">
               <PlusIcon className="w-4 h-4 mr-2" />
               Daftar
@@ -228,7 +220,7 @@ const TeachingGroupYearsView = () => {
           )}
         </Modal>
 
-        {(!teachingGroupYears || isLoading) && (
+        {(!branchYears || isLoading) && (
           <div className="flex justify-center mt-16">
             <LoadingCircle size={32} />
           </div>
@@ -236,16 +228,16 @@ const TeachingGroupYearsView = () => {
 
         {error && <ErrorCard error={error} onClear={() => setError(null)} />}
 
-        {teachingGroupYears && !isLoading && (
+        {branchYears && !isLoading && (
           <>
-            {teachingGroupYears.teachingGroupYears.length === 0 && (
+            {branchYears.branchYears.length === 0 && (
               <div className="bg-white rounded-md shadow-md p-6 border border-gray-200">
                 <p className="text-gray-700 text-center">Belum ada tahun ajaran terdaftar.</p>
               </div>
             )}
-            {teachingGroupYears.teachingGroupYears.length > 0 && (
+            {branchYears.branchYears.length > 0 && (
               <div className="flex flex-col items-stretch gap-4">
-                {teachingGroupYears.teachingGroupYears.map((year) => (
+                {branchYears.branchYears.map((year) => (
                   <div
                     key={year._id}
                     className={`bg-white rounded-md shadow-md overflow-hidden transition-all duration-200
@@ -259,23 +251,23 @@ const TeachingGroupYearsView = () => {
                         <div className='flex gap-2 flex-row flex-wrap'>
                           <h2 className="text-xl font-medium text-gray-800">{formatAcademicYear(year.academicYearId.name)}</h2>
                           <div className="flex gap-2">
-                            {year.academicYearId.isActive && (<div className='inline-block px-2 py-1 text-sm text-blue-600 bg-blue-100 rounded'>{year.academicYearId.isActive}Semester Berjalan</div>)}
-                            <div className={`inline-block px-2 py-1 text-sm ${year.isActive ? 'text-green-600 bg-green-100' : (year.academicYearId.isActive ? 'text-red-600 bg-red-100' : 'text-gray-600 bg-gray-100')} rounded`}>
+                            {year.academicYearId.isActive && (<div className='inline-block px-2 py-1 text-sm text-blue-600 bg-blue-100 rounded-sm'>{year.academicYearId.isActive}Semester Berjalan</div>)}
+                            <div className={`inline-block px-2 py-1 text-sm ${year.isActive ? 'text-green-600 bg-green-100' : (year.academicYearId.isActive ? 'text-red-600 bg-red-100' : 'text-gray-600 bg-gray-100')} rounded-sm`}>
                               {year.isActive ? 'Aktif' : (year.academicYearId.isActive ? 'Nonaktif' : 'Semester Lewat')}
                             </div>
                           </div>
                         </div>
-                        {year.academicYearId.isActive && auth.userRole === 'admin kelompok' && !year.isActive ? (
+                        {year.academicYearId.isActive && auth.userRole === 'branchAdmin' && !year.isActive ? (
                           <div className="flex justify-between md:justify-end items-center w-full">
                             <div className="flex gap-2 my-6 md:my-0">
                               <div
-                                onClick={() => navigate(`/settings/academic/classes/new`, { state: year.id })}
+                                onClick={() => navigate(`/academic/teachingGroups/new`, { state: year.id })}
                                 className='btn-primary-outline m-0 text-gray-700'>
-                                Tambah Kelas
+                                Tambah KBM
                               </div>
                               {(
                                 <div
-                                  onClick={activateYearHandler(year._id, year.name, year.semesterTarget)}
+                                  onClick={activateYearHandler(year._id, year.name)}
                                   className='btn-primary-outline m-0 text-gray-700' >
                                   Aktifkan
                                 </div>
@@ -283,13 +275,13 @@ const TeachingGroupYearsView = () => {
                             </div>
 
                             <button
-                              onClick={(e) => deleteTeachingGroupYearHandler(e, year.academicYearId.name, year._id)}
+                              onClick={(e) => deleteBranchYearHandler(e, year.academicYearId.name, year._id)}
                               className="p-3 rounded-full text-gray-400 hover:bg-gray-200 hover:text-red-500 transition"
                             >
                               <Trash size={20} />
                             </button>
                           </div>
-                        ) : auth.userRole === 'admin kelompok' && year.isActive && (
+                        ) : auth.userRole === 'branchAdmin' && year.isActive && (
                           <div
                             onClick={(e) => deactivateYearHandler(e, year.academicYearId.name, year._id)}
                             className='btn-danger-outline m-0 text-gray-700 mt-4 md:mt-0'>
@@ -303,7 +295,7 @@ const TeachingGroupYearsView = () => {
                         </div>
                       )} */}
                       <div className='mt-2 text-gray-700'>
-                        Jumlah Kelas: {year.classes.length}
+                        Jumlah KBM: {year.teachingGroups.length}
                       </div>
                       {/* <div className='mt-2 text-gray-700'>
                         Target Semester: {year.semesterTarget ? year.semesterTarget : 'Nonaktif'}
@@ -316,38 +308,38 @@ const TeachingGroupYearsView = () => {
                         }`}
                     >
                       <div className="border-t">
-                        {year.classes.length > 0 ? (
+                        {year.teachingGroups.length > 0 ? (
                           <ul className=''>
-                            {year.classes.map((cls) => (
+                            {year.teachingGroups.map((teachingGroup) => (
                               <li
-                                key={cls._id}
+                                key={teachingGroup._id}
                                 className='flex justify-start'
                               >
                                 <Link
-                                  to={`/dashboard/classes/${cls.id}`}
+                                  to={`/dashboard/teaching-groups/${teachingGroup.id}`}
                                   className='grow'
                                 >
                                   <div
                                     className="flex justify-start items-center gap-2 p-4 border-t text-gray-700 border-gray-200 bg-white hover:bg-gray-100 hover:cursor-pointer"
                                   >
                                     <div>
-                                      {cls.name}
+                                      {teachingGroup.name}
                                     </div>
-                                    {year.academicYearId.isActive && <div className={`flex justify-center items-center p-1 border rounded-md border-gray-300 italic size-6 ${cls.isLocked ? 'text-green-400 border-green-400' : 'text-red-400 border-red-400'}`}>{cls.isLocked ? <Lock size={16} /> : <LockOpen size={16} />}</div>}
+                                    {year.academicYearId.isActive && <div className={`flex justify-center items-center p-1 border rounded-md border-gray-300 italic size-6 ${teachingGroup.isLocked ? 'text-green-400 border-green-400' : 'text-red-400 border-red-400'}`}>{teachingGroup.isLocked ? <Lock size={16} /> : <LockOpen size={16} />}</div>}
                                   </div>
                                 </Link>
-                                {auth.userRole === 'admin kelompok' && year.academicYearId.isActive && !year.isActive && (<button onClick={(e) => deleteClassHandler(e, cls.name, cls.id)} className='border-t px-4 italic text-gray-500 hover:underline hover:text-red-500 hover:cursor-pointer'>Hapus Kelas</button>)}
+                                {auth.userRole === 'branchAdmin' && year.academicYearId.isActive && !year.isActive && (<button onClick={(e) => deleteTeachingGroupHandler(e, teachingGroup.name, teachingGroup.id)} className='border-t px-4 italic text-gray-500 hover:underline hover:text-red-500 hover:cursor-pointer'>Hapus KBM</button>)}
                               </li>
                             ))}
                           </ul>
                         ) : (
                           <p className="p-4 text-gray-500 italic">
-                            Tidak ada riwayat kelas.
+                            Tidak ada riwayat KBM.
                             {year.academicYearId.isActive && (
                               <span
-                                onClick={() => navigate(`/settings/academic/classes/new`, { state: year.id })}
+                                onClick={() => navigate(`/academic/teachingGroups/new`, { state: year.id })}
                                 className='text-gray-800 hover:underline hover:cursor-pointer'>
-                                Tambah Kelas
+                                Tambah KBM
                               </span>
                             )}
                           </p>
@@ -365,4 +357,4 @@ const TeachingGroupYearsView = () => {
   );
 };
 
-export default TeachingGroupYearsView;
+export default BranchYearsView;

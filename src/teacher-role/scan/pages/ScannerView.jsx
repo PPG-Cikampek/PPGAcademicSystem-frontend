@@ -77,20 +77,20 @@ const ScannerView = () => {
                             <button
                                 onClick={() => createAttendanceHandler()}
                                 className='btn-mobile-primary rounded-full w-full'
-                                disabled={state.isTeachingGroupYearActivated === false}
+                                disabled={state.isSubBranchYearActivated === false}
                             >
                                 Buat daftar hadir hari ini
                             </button>
-                            {state.isTeachingGroupYearActivated === false ? (<span className='text-danger'>Tahun ajaran belum aktif, hubungi PJP Kelompok!</span>) : ''}
+                            {state.isSubBranchYearActivated === false ? (<span className='text-danger'>PJP Desa belum mengaktifkan tahun ajaran!</span>) : ''}
                         </div>
                     )}
                     {state.studentList.length !== 0 && !isLoading && (
                         <>
-                            {state.isTeachingGroupYearActivated === true &&
+                            {state.isSubBranchYearActivated === true &&
                                 (< div className='card-basic m-4'>
                                     <QRCodeScanner />
                                 </div>)}
-                            {state.isTeachingGroupYearActivated === false
+                            {state.isSubBranchYearActivated === false
                                 ? (<InfoCard className={'mx-4 my-12'}>
                                     <p>Tahun ajaran belum aktif, hubungi PJP Kelompok!</p>
                                 </InfoCard>)

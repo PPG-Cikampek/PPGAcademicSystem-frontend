@@ -1,24 +1,133 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
 
-@font-face {
-  font-family: 'LPMQ';
-  src: url('./assets/fonts/LPMQ-IsepMisbah.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
+@theme {
+  --color-primary: #008ee6;
+  --color-primary-subtle: #e5e7eb;
+  --color-primary-darker: #0278c2;
+  --color-secondary: #facc15;
+  --color-secondary-subtle: #fef08a;
+  --color-danger: #ef4444;
+  --color-danger-subtle: #fca5a5;
+
+  --font-sans: Roboto, sans-serif;
 }
 
-@font-face {
-  font-family: 'urdu';
-  src: url('./assets/fonts/UrdTypeb.ttf') format('truetype');
-  /* font-weight: bold; */
-  /* font-style: normal; */
+/*
+  The default border color has changed to `currentcolor` in Tailwind CSS v4,
+  so we've added these compatibility styles to make sure everything still
+  looks the same as it did with Tailwind CSS v3.
+
+  If we ever want to remove these styles, we need to add an explicit border
+  color utility to any element that depends on these defaults.
+*/
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--color-gray-200, currentcolor);
+  }
 }
 
+@utility font-lpmq {
+  font-family: 'LPMQ', sans-serif;
+}
 
-html {
-  @apply font-sans;
+@utility font-urdu {
+  font-family: 'urdu', sans-serif;
+}
+
+@utility card-interactive {
+  @apply mt-4 p-4 flex justify-center rounded-3xl md:mx-8 bg-white shadow-xs ring-1 ring-gray-200 transition ease-out hover:-translate-y-1 hover:scale-[1.025] hover:cursor-pointer hover:shadow-lg duration-200;
+}
+
+@utility card-basic {
+  @apply mt-4 p-5 flex justify-center rounded-3xl md:mx-8 bg-white shadow-xs ring-1 ring-gray-200;
+}
+
+@utility button-primary {
+  @apply mt-3 p-2 px-4 flex justify-center rounded-md border-2 border-primary shadow-xs transition ease-out hover:scale-[1.025] bg-primary text-white hover:cursor-pointer hover:shadow-lg active:bg-primary-darker focus:outline-hidden focus:ring-2 focus:ring-primary-subtle duration-150;
+}
+
+@utility button-primary-subtle-outline {
+  @apply mt-3 p-2 px-4 flex justify-center rounded-md border-2 border-primary-subtle shadow-xs transition ease-out text-black hover:bg-gray-100 hover:cursor-pointer active:bg-primary active:text-white focus:outline-hidden focus:ring-2 focus:ring-primary-subtle duration-150;
+}
+
+@utility button-secondary {
+  @apply mt-3 p-2 px-4 flex justify-center rounded-md border border-secondary bg-white shadow-xs transition ease-out hover:scale-105 hover:bg-secondary hover:text-white hover:cursor-pointer hover:shadow-lg focus:outline-hidden focus:ring-2 focus:ring-secondary-subtle duration-150;
+}
+
+@utility button-danger {
+  @apply mt-3 p-2 px-4 flex justify-center rounded-md border-2 border-danger text-black bg-white shadow-xs transition ease-out hover:scale-[1.025] hover:bg-danger hover:text-white hover:cursor-pointer hover:shadow-lg focus:outline-hidden focus:ring-2 focus:ring-danger-subtle disabled:opacity-60 duration-150;
+}
+
+@utility btn-danger-outline {
+  @apply p-2 px-4 ring-2 ring-danger-subtle hover:bg-danger hover:ring-danger hover:text-white rounded-[5px] disabled:opacity-60 disabled:hover:cursor-not-allowed transition-all duration-150;
+}
+
+@utility btn-primary-outline {
+  @apply p-2 px-4 ring-2 ring-primary-subtle hover:bg-primary hover:ring-primary hover:text-white rounded-[5px] disabled:opacity-60 disabled:hover:cursor-not-allowed transition-all duration-150;
+}
+
+@utility btn-neutral-outline {
+  @apply p-2 px-4 ring-2 ring-primary-subtle hover:bg-gray-500 hover:ring-gray-500 hover:text-white rounded-[5px] disabled:opacity-60 disabled:hover:cursor-not-allowed transition-all duration-150;
+}
+
+@utility btn-secondary-outline-sharp {
+  @apply p-2 px-4 hover:ring-1 hover:ring-primary-subtle focus:bg-primary-subtle focus:ring-primary-subtle rounded-[2px] transition-all duration-150;
+}
+
+@utility badge-primary {
+  @apply p-2 rounded-[4px] bg-primary text-white font-normal;
+}
+
+@utility badge-primary-outline {
+  @apply p-2 rounded-md border border-primary-subtle;
+}
+
+@utility btn-mobile-secondary-outline {
+  @apply p-2 px-4 rounded-md border border-secondary active:bg-secondary disabled:border-primary-subtle disabled:opacity-60 transition-all duration-200;
+}
+
+@utility btn-mobile-danger-outline {
+  @apply p-2 px-4 rounded-md border border-danger active:bg-danger disabled:border-primary-subtle disabled:opacity-60 transition-all duration-200;
+}
+
+@utility btn-mobile-primary {
+  @apply p-2 px-4 rounded-md border border-primary bg-primary scale-100 active:scale-[1.01] active:ring-2 focus:ring-2 text-white disabled:opacity-55 ease-out transition-all duration-200;
+}
+
+@utility btn-mobile-primary-round {
+  @apply p-2 px-4 rounded-full border border-primary bg-primary scale-100 active:scale-[1.01] active:ring-2 focus:ring-2 text-white disabled:opacity-60 ease-out transition-all duration-200;
+}
+
+@utility btn-mobile-primary-round-gray {
+  @apply flex items-center gap-2 px-4 py-2 border border-gray-300 hover:bg-gray-200 rounded-full text-sm font-medium transition-colors;
+}
+
+@utility stat-card {
+  @apply bg-white rounded-lg shadow-xs p-6 mb-4 transition-all hover:shadow-md;
+}
+
+@layer utilities {
+  @font-face {
+    font-family: 'LPMQ';
+    src: url('./assets/fonts/LPMQ-IsepMisbah.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  @font-face {
+    font-family: 'urdu';
+    src: url('./assets/fonts/UrdTypeb.ttf') format('truetype');
+    /* font-weight: bold; */
+    /* font-style: normal; */
+  }
+
+  html {
+    @apply font-sans;
+  }
 }
 
 
@@ -32,88 +141,8 @@ html {
     border-radius: 5px;
   }
 
-  .font-lpmq {
-    font-family: 'LPMQ', sans-serif;
-  }
-
-  .font-urdu {
-    font-family: 'urdu', sans-serif;
-  }
-
   table {
     @apply border border-gray-200
-  }
-
-  .card-interactive {
-    @apply mt-4 p-4 flex justify-center rounded-3xl md:mx-8 bg-white shadow-sm ring-1 ring-gray-200 transition ease-out hover:-translate-y-1 hover:scale-[1.025] hover:cursor-pointer hover:shadow-lg duration-200
-  }
-
-  .card-basic {
-    @apply mt-4 p-5 flex justify-center rounded-3xl md:mx-8 bg-white shadow-sm ring-1 ring-gray-200
-  }
-
-  .button-primary {
-    @apply mt-3 p-2 px-4 flex justify-center rounded-md border-2 border-primary shadow-sm transition ease-out hover:scale-[1.025] bg-primary text-white hover:cursor-pointer hover:shadow-lg active:bg-primary-darker focus:outline-none focus:ring-2 focus:ring-primary-subtle duration-150
-  }
-
-  .button-primary-subtle-outline {
-    @apply mt-3 p-2 px-4 flex justify-center rounded-md border-2 border-primary-subtle shadow-sm transition ease-out text-black hover:bg-gray-100 hover:cursor-pointer active:bg-primary active:text-white focus:outline-none focus:ring-2 focus:ring-primary-subtle duration-150
-  }
-
-  .button-secondary {
-    @apply mt-3 p-2 px-4 flex justify-center rounded-md border border-secondary bg-white shadow-sm transition ease-out hover:scale-105 hover:bg-secondary hover:text-white hover:cursor-pointer hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-secondary-subtle duration-150
-  }
-
-  .button-danger {
-    @apply mt-3 p-2 px-4 flex justify-center rounded-md border-2 border-danger text-black bg-white shadow-sm transition ease-out hover:scale-[1.025] hover:bg-danger hover:text-white hover:cursor-pointer hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-danger-subtle disabled:opacity-60 duration-150
-  }
-
-  .btn-danger-outline {
-    @apply p-2 px-4 ring-2 ring-danger-subtle hover:bg-danger hover:ring-danger hover:text-white rounded-[5px] disabled:opacity-60 disabled:hover:cursor-not-allowed transition-all duration-150
-  }
-
-  .btn-primary-outline {
-    @apply p-2 px-4 ring-2 ring-primary-subtle hover:bg-primary hover:ring-primary hover:text-white rounded-[5px] disabled:opacity-60 disabled:hover:cursor-not-allowed transition-all duration-150
-  }
-
-  .btn-neutral-outline {
-    @apply p-2 px-4 ring-2 ring-primary-subtle hover:bg-gray-500 hover:ring-gray-500 hover:text-white rounded-[5px] disabled:opacity-60 disabled:hover:cursor-not-allowed transition-all duration-150
-  }
-
-  .btn-secondary-outline-sharp {
-    @apply p-2 px-4 hover:ring-1 hover:ring-primary-subtle focus:bg-primary-subtle focus:ring-primary-subtle rounded-[2px] transition-all duration-150
-  }
-
-  .badge-primary {
-    @apply p-2 rounded-[4px] bg-primary text-white font-normal
-  }
-
-  .badge-primary-outline {
-    @apply p-2 rounded-md border border-primary-subtle
-  }
-
-  .btn-mobile-secondary-outline {
-    @apply p-2 px-4 rounded-md border border-secondary active:bg-secondary disabled:border-primary-subtle disabled:opacity-60 transition-all duration-200
-  }
-
-  .btn-mobile-danger-outline {
-    @apply p-2 px-4 rounded-md border border-danger active:bg-danger disabled:border-primary-subtle disabled:opacity-60 transition-all duration-200
-  }
-
-  .btn-mobile-primary {
-    @apply p-2 px-4 rounded-md border border-primary bg-primary scale-100 active:scale-[1.01] active:ring-2 focus:ring-2 text-white disabled:opacity-55 ease-out transition-all duration-200
-  }
-
-  .btn-mobile-primary-round {
-    @apply p-2 px-4 rounded-full border border-primary bg-primary scale-100 active:scale-[1.01] active:ring-2 focus:ring-2 text-white disabled:opacity-60 ease-out transition-all duration-200
-  }
-
-  .btn-mobile-primary-round-gray {
-    @apply flex items-center gap-2 px-4 py-2 border border-gray-300 hover:bg-gray-200 rounded-full text-sm font-medium transition-colors
-  }
-
-  .stat-card {
-    @apply bg-white rounded-lg shadow-sm p-6 mb-4 transition-all hover:shadow-md;
   }
 }
 

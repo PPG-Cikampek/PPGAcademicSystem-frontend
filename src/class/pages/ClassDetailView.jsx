@@ -8,7 +8,6 @@ import SkeletonLoader from '../../shared/Components/UIElements/SkeletonLoader';
 
 import { LineChart, Trash, LockOpen, Lock, Clock, Users, GraduationCap, Building, PlusIcon, KeyRound } from 'lucide-react'
 import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
-import { attendanceCount } from '../../shared/Utilities/attendanceCount';
 
 
 const ClassDetailView = () => {
@@ -176,13 +175,13 @@ const ClassDetailView = () => {
 
                 {(!classData || isLoading) && !modalIsOpen && (
                     <div className="flex flex-col gap-6 mt-16 px-4">
-                        <SkeletonLoader 
+                        <SkeletonLoader
                             variant="text"
                             width="200px"
                             height="32px"
                             className="mb-4"
                         />
-                        <SkeletonLoader 
+                        <SkeletonLoader
                             variant="rectangular"
                             height="100px"
                             className="rounded-lg"
@@ -198,43 +197,52 @@ const ClassDetailView = () => {
                         <div className="mb-8">
                             <div className="flex items-center gap-4">
                                 <h1 className="text-2xl font-semibold text-gray-900">{classData.class.name}</h1>
-                                {(!classData.class.isLocked && auth.userRole === 'admin kelompok') && classData.class.teachingGroupYearId.academicYearId.isActive === true && (
-                                    <button
-                                        onClick={() => lockClassHandler(classData.class.name, classData.class._id)}
-                                        disabled={classData.class.isLocked}
-                                        className={`btn-primary-outline font-medium flex flex-row items-start gap-2 ${classData.class.isLocked ? 'text-blue-500 disabled:opacity-100' : ''}`}
-                                    >
-                                        <LockOpen size={16} />
-                                        Kunci Kelas
-                                    </button>
-                                )}
-                                {classData.class.isLocked && classData.class.teachingGroupYearId.academicYearId.isActive === true && (
-                                    <button
-                                        className={`btn-primary-outline font-medium flex flex-row items-start gap-2 text-blue-500 disabled:opacity-100`}
-                                        disabled
-                                    >
-                                        <Lock size={16} />
-                                        Kelas Dikunci
-                                    </button>
-                                )}
+                                {!classData.class.isLocked
+                                    && classData.class.teachingGroupId.branchYearId.academicYearId.isActive === true
+                                    && auth.userRole === 'branchAdmin'
+                                    && (
+                                        <button
+                                            onClick={() => lockClassHandler(classData.class.name, classData.class._id)}
+                                            disabled={classData.class.isLocked}
+                                            className={`btn-primary-outline font-medium flex flex-row items-start gap-2 ${classData.class.isLocked ? 'text-blue-500 disabled:opacity-100' : ''}`}
+                                        >
+                                            <LockOpen size={16} />
+                                            Kunci Kelas
+                                        </button>
+                                    )}
+                                {classData.class.isLocked
+                                    && classData.class.teachingGroupId.branchYearId.academicYearId.isActive === true
+                                    && (
+                                        <button
+                                            className={`btn-primary-outline font-medium flex flex-row items-start gap-2 text-blue-500 disabled:opacity-100`}
+                                            disabled
+                                        >
+                                            <Lock size={16} />
+                                            Kelas Dikunci
+                                        </button>
+                                    )}
 
-                                {classData.class.isLocked && classData.class.teachingGroupYearId.isActive === false && auth.userRole === 'admin kelompok' && classData.class.teachingGroupYearId.academicYearId.isActive === true && (
-                                    <button
-                                        onClick={() => unlockClassHandler(classData.class.name, classData.class._id)}
-                                        className={`btn-danger-outline flex flex-row items-start gap-2 text-gray-600`}
-                                    >
-                                        <KeyRound size={16} />
-                                        Buka Kunci
-                                    </button>
-                                )}
+                                {classData.class.isLocked
+                                    && classData.class.teachingGroupId.branchYearId.isActive === false
+                                    && auth.userRole === 'branchAdmin'
+                                    && classData.class.teachingGroupId.branchYearId.academicYearId.isActive === true
+                                    && (
+                                        <button
+                                            onClick={() => unlockClassHandler(classData.class.name, classData.class._id)}
+                                            className={`btn-danger-outline flex flex-row items-start gap-2 text-gray-600`}
+                                        >
+                                            <KeyRound size={16} />
+                                            Buka Kunci
+                                        </button>
+                                    )}
                             </div>
                             <div className="mt-2 flex items-center text-gray-500">
                                 <Building className="mr-2 h-4 w-4" />
-                                <span>{classData.class.teachingGroupYearId.teachingGroupId.name} - {classData.class.teachingGroupYearId.name}</span>
+                                {/* <span>{classData.class.subBranchYearId.subBranchId.name} - {classData.class.subbranchYearId.academicYearId.name}</span> */}
                             </div>
                         </div>
 
-                        <div className="flex flex-col gap-4 mb-8 rounded-md border border-gray-200 bg-white p-6 shadow-sm">
+                        <div className="flex flex-col gap-4 mb-8 rounded-md border border-gray-200 bg-white p-6 shadow-xs">
                             <div className="flex items-center space-x-2 text-gray-600">
                                 <Clock className="h-5 w-5" />
                                 <span>Kelas Mulai: {classData.class.startTime}</span>
@@ -249,8 +257,8 @@ const ClassDetailView = () => {
                             </div>
                             <div className="flex items-center space-x-2 text-gray-600">
                                 <LineChart className="h-5 w-5" />
-                                {/* <span>{attendanceCount(classData.class)} / {classData.class.teachingGroupYearId.semesterTarget} Pertemuan Terlaksana</span> */}
-                                <span>{attendanceCount(classData.class)} Pertemuan Terlaksana</span>
+                                {/* <span>{attendanceCount(classData.class)} / {classData.class.subBranchYearId.semesterTarget} Pertemuan Terlaksana</span> */}
+                                {/* <span>{attendanceCount(classData.class)} Pertemuan Terlaksana</span> */}
                             </div>
                         </div>
 
@@ -261,16 +269,19 @@ const ClassDetailView = () => {
                                     <GraduationCap className="mr-2 h-5 w-5 text-gray-600" />
                                     <h2 className="text-xl font-medium text-gray-800">Guru</h2>
                                 </div>
-                                {auth.userRole === 'admin kelompok' && classData.class.isLocked === false && classData.class.teachingGroupYearId.academicYearId.isActive === true && (
-                                    <Link to={`/dashboard/classes/${classId}/add-teachers/`}>
-                                        <button className="button-primary pl-[11px] mt-0">
-                                            <PlusIcon className="w-4 h-4 mr-2" />
-                                            Tambah Guru
-                                        </button>
-                                    </Link>
-                                )}
+                                {auth.userRole === 'subBranchAdmin'
+                                    && classData.class.isLocked === false
+                                    && classData.class.teachingGroupId.branchYearId.academicYearId.isActive === true
+                                    && (
+                                        <Link to={`/dashboard/classes/${classId}/add-teachers/`}>
+                                            <button className="button-primary pl-[11px] mt-0">
+                                                <PlusIcon className="w-4 h-4 mr-2" />
+                                                Tambah Guru
+                                            </button>
+                                        </Link>
+                                    )}
                             </div>
-                            <div className="rounded-md bg-white shadow-sm overflow-auto text-nowrap">
+                            <div className="rounded-md bg-white shadow-xs overflow-auto text-nowrap">
                                 <table className="w-full">
                                     <thead className="bg-white">
                                         <tr>
@@ -279,7 +290,7 @@ const ClassDetailView = () => {
                                             <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">NIG</th>
                                             <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Posisi</th>
                                             <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Nomor WA</th>
-                                            {auth.userRole !== 'teacher' && classData.class.isLocked === false && classData.class.teachingGroupYearId.academicYearId.isActive === true && (<th className="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Atur</th>)}
+                                            {auth.userRole !== 'teacher' && classData.class.isLocked === false && classData.class.teachingGroupId.branchYearId.academicYearId.isActive === true && (<th className="p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Atur</th>)}
 
                                         </tr>
                                     </thead>
@@ -289,8 +300,8 @@ const ClassDetailView = () => {
                                                 <td className="p-4 ">
                                                     {teacher.image ? (
                                                         <img
-                                                        src={teacher.thumbnail ? teacher.thumbnail : `${import.meta.env.VITE_BACKEND_URL}/${teacher.image}`}
-                                                        alt={teacher.name}
+                                                            src={teacher.thumbnail ? teacher.thumbnail : `${import.meta.env.VITE_BACKEND_URL}/${teacher.image}`}
+                                                            alt={teacher.name}
                                                             className="w-10 h-10 rounded-full min-w-10 border border-gray-200 bg-white"
                                                         />
                                                     ) : (
@@ -305,15 +316,19 @@ const ClassDetailView = () => {
                                                 <td className="px-6 py-4 text-sm text-gray-600">{teacher.nig}</td>
                                                 <td className="px-6 py-4 text-sm text-gray-600">{teacher.position}</td>
                                                 <td className="px-6 py-4 text-sm text-gray-600">{teacher.phone}</td>
-                                                {auth.userRole !== 'teacher' && classData.class.isLocked === false && classData.class.teachingGroupYearId.academicYearId.isActive === true && (
-                                                    <td className="flex gap-4 py-4">
-                                                        <button
-                                                            onClick={(e) => { e.stopPropagation(); removeHandler('teacher', teacher.name, teacher._id); }}
-                                                            className="p-3 rounded-full hover:bg-gray-200 text-red-500 hover:text-red-700 transition"
-                                                        >
-                                                            <Trash size={20} />
-                                                        </button>
-                                                    </td>)}
+                                                {auth.userRole !== 'teacher'
+                                                    && classData.class.isLocked === false
+                                                    && classData.class.teachingGroupId.branchYearId.academicYearId.isActive === true
+                                                    && teacher.userId?.subBranchId?._id === auth.userSubBranchId
+                                                    && (
+                                                        <td className="flex gap-4 py-4">
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); removeHandler('teacher', teacher.name, teacher._id); }}
+                                                                className="p-3 rounded-full hover:bg-gray-200 text-red-500 hover:text-red-700 transition"
+                                                            >
+                                                                <Trash size={20} />
+                                                            </button>
+                                                        </td>)}
                                             </tr>
                                         ))}
                                         {classData.class.teachers.length === 0 && (
@@ -332,23 +347,27 @@ const ClassDetailView = () => {
                                     <Users className="mr-2 h-5 w-5 text-gray-600" />
                                     <h2 className="text-xl font-medium text-gray-800">Siswa</h2>
                                 </div>
-                                {auth.userRole === 'admin kelompok' && classData.class.isLocked === false && (
-                                    <Link to={`/dashboard/classes/${classId}/add-students/`}>
-                                        <button className="button-primary pl-[11px] mt-0">
-                                            <PlusIcon className="w-4 h-4 mr-2" />
-                                            Tambah Siswa
-                                        </button>
-                                    </Link>
-                                )}
+                                {auth.userRole === 'subBranchAdmin'
+                                    && classData.class.isLocked === false
+                                    && classData.class.teachingGroupId.branchYearId.academicYearId.isActive === true
+                                    && (
+                                        <Link to={`/dashboard/classes/${classId}/add-students/`}>
+                                            <button className="button-primary pl-[11px] mt-0">
+                                                <PlusIcon className="w-4 h-4 mr-2" />
+                                                Tambah Siswa
+                                            </button>
+                                        </Link>
+                                    )}
                             </div>
-                            <div className="rounded-md bg-white shadow-sm overflow-auto text-nowrap">
+                            <div className="rounded-md bg-white shadow-xs overflow-auto text-nowrap">
                                 <table className="w-full">
                                     <thead className="bg-white">
                                         <tr>
                                             <th className="pl-6 py-3 text-left text-sm font-medium text-gray-500"></th>
                                             <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">NIS</th>
                                             <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Nama</th>
-                                            {auth.userRole !== 'teacher' && classData.class.isLocked === false && classData.class.teachingGroupYearId.academicYearId.isActive === true && (<th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Atur</th>)}
+                                            <th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Kelompok</th>
+                                            {auth.userRole !== 'teacher' && classData.class.isLocked === false && classData.class.teachingGroupId.branchYearId.academicYearId.isActive === true && (<th className="px-6 py-3 text-left text-sm font-medium text-gray-500">Atur</th>)}
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y divide-gray-200">
@@ -357,8 +376,8 @@ const ClassDetailView = () => {
                                                 <td className="p-4">
                                                     {student.image ? (
                                                         <img
-                                                        src={student.thumbnail ? student.thumbnail : `${import.meta.env.VITE_BACKEND_URL}/${student.image}`}
-                                                        alt={student.name}
+                                                            src={student.thumbnail ? student.thumbnail : `${import.meta.env.VITE_BACKEND_URL}/${student.image}`}
+                                                            alt={student.name}
                                                             className="w-10 h-10 rounded-full min-w-10 border border-gray-200 bg-white"
                                                         />
                                                     ) : (
@@ -371,15 +390,20 @@ const ClassDetailView = () => {
                                                 </td>
                                                 <td className="px-6 py-4 text-sm text-gray-900">{student.nis}</td>
                                                 <td className="px-6 py-4 text-sm text-gray-900">{student.name}</td>
-                                                {auth.userRole === 'admin kelompok' &&  classData.class.isLocked === false && classData.class.teachingGroupYearId.academicYearId.isActive === true && (
-                                                    <td className="flex gap-4 py-4">
-                                                        <button
-                                                            onClick={(e) => { e.stopPropagation(); removeHandler('student', student.name, student._id); }}
-                                                            className="p-3 rounded-full  hover:bg-gray-200 text-red-500 hover:text-red-700 transition"
-                                                        >
-                                                            <Trash size={20} />
-                                                        </button>
-                                                    </td>)}
+                                                <td className="px-6 py-4 text-sm text-gray-600">{student.userId?.subBranchId?.name || ''}</td>
+                                                {auth.userRole === 'subBranchAdmin'
+                                                    && classData.class.isLocked === false
+                                                    && classData.class.teachingGroupId.branchYearId.academicYearId.isActive === true
+                                                    && student.userId?.subBranchId?._id === auth.userSubBranchId
+                                                    && (
+                                                        <td className="flex gap-4 py-4">
+                                                            <button
+                                                                onClick={(e) => { e.stopPropagation(); removeHandler('student', student.name, student._id); }}
+                                                                className="p-3 rounded-full  hover:bg-gray-200 text-red-500 hover:text-red-700 transition"
+                                                            >
+                                                                <Trash size={20} />
+                                                            </button>
+                                                        </td>)}
                                             </tr>
                                         ))}
                                         {classData.class.students.length === 0 && (

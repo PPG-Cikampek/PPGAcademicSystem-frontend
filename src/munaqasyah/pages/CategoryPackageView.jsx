@@ -167,13 +167,13 @@ const CategoryPackageView = () => {
         <div className="flex gap-4">
           <button
             onClick={generatePDF}
-            className="bg-blue-500 text-white px-4 py-2 rounded"
+            className="bg-blue-500 text-white px-4 py-2 rounded-sm"
           >
             Preview PDF
           </button>
         </div>
 
-        <div className="border rounded p-4">
+        <div className="border rounded-sm p-4">
           {pdfUrl && (
             <iframe
               src={pdfUrl}

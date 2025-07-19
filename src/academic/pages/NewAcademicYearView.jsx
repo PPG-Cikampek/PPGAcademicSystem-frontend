@@ -58,7 +58,7 @@ const NewAcademicYearView = () => {
                         <button
                             onClick={() => {
                                 setModalIsOpen(false)
-                                navigate('/settings/academic/')
+                                navigate('/academic/')
                             }}
                             className='btn-danger-outline'
                         >

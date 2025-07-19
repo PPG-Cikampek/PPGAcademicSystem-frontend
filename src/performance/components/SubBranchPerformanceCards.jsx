@@ -15,7 +15,7 @@ const getOverallStats = (data) => {
     const attendances = [];
 
     // Extract all attendance records
-    data.teachingGroupYears.forEach((year) => {
+    data.subBranchYears.forEach((year) => {
         year.classes.forEach((cls) => {
             cls.attendances.forEach((att) => {
                 attendances.push(att.status);
@@ -143,7 +143,7 @@ const StatCard = ({ level, title, subtitle, stats, onViewMore, expanded }) => {
     const monthlyStats = calculateMonthlyStats(stats.attendances, stats.semesterTarget, stats.uniqueStudents)
 
     return (
-        <div className="bg-white rounded-lg shadow-sm mx-4 md:mx-8  p-6 mb-4 transition-all">
+        <div className="bg-white rounded-lg shadow-xs mx-4 md:mx-8  p-6 mb-4 transition-all">
             <div className="flex justify-between items-start mb-4">
                 <div className="flex-1 h-fit">
                     <h3 className="text-lg font-medium">{level} {title}</h3>
@@ -171,7 +171,7 @@ const StatCard = ({ level, title, subtitle, stats, onViewMore, expanded }) => {
                         e.stopPropagation()
                         onViewMore()
                     }}
-                    className="px-4 py-2 text-sm bg-primary text-white rounded hover:bg-primary/90 transition-colors"
+                    className="px-4 py-2 text-sm bg-primary text-white rounded-sm hover:bg-primary/90 transition-colors"
                 >
                     Lihat Detail
                 </button>
@@ -205,7 +205,7 @@ const StatCard = ({ level, title, subtitle, stats, onViewMore, expanded }) => {
     )
 }
 
-const TeachingGroupAdminPerformanceCards = ({ data, violationData, initialView, month }) => {
+const SubBranchAdminPerformanceCards = ({ data, violationData, initialView, month }) => {
     const [view, setView] = useState(initialView);
     const [selectedClass, setSelectedClass] = useState(null);
     const [showRelativeToTarget, setShowRelativeToTarget] = useState(false);
@@ -242,26 +242,26 @@ const TeachingGroupAdminPerformanceCards = ({ data, violationData, initialView, 
     };
 
     const renderClasses = () => {
-        const teachingGroupYear = data.teachingGroupYears.find(
-            year => year.teachingGroupId._id === auth.userTeachingGroupId
+        const subBranchYear = data.subBranchYears.find(
+            year => year.subBranchId._id === auth.userSubBranchId
         );
 
-        if (!teachingGroupYear) return null;
+        if (!subBranchYear) return null;
 
-        const classes = teachingGroupYear.classes.map(cls => ({
+        const classes = subBranchYear.classes.map(cls => ({
             id: cls._id,
             name: cls.name,
-            branchName: teachingGroupYear.teachingGroupId.branchId.name,
-            teachingGroupName: teachingGroupYear.teachingGroupId.name,
+            branchName: subBranchYear.subBranchId.branchId.name,
+            subBranchName: subBranchYear.subBranchId.name,
             attendances: cls.attendances,
             teachers: cls.teachers,
             uniqueStudents: new Set(cls.students.map(studentId => studentId)).size,
-            semesterTarget: teachingGroupYear.semesterTarget,
+            semesterTarget: subBranchYear.semesterTarget,
         }));
 
-        const teachingGroupName = data.teachingGroupYears.find(year => year.teachingGroupId._id === auth.userTeachingGroupId)?.teachingGroupId.name;
+        const subBranchName = data.subBranchYears.find(year => year.subBranchId._id === auth.userSubBranchId)?.subBranchId.name;
 
-        // console.log(JSON.stringify(teachingGroupYear, null, 2))
+        // console.log(JSON.stringify(subBranchYear, null, 2))
 
         return (
             <motion.div
@@ -315,10 +315,10 @@ const TeachingGroupAdminPerformanceCards = ({ data, violationData, initialView, 
 
 
     const renderStudents = () => {
-        const teachingGroupYear = data.teachingGroupYears.find(
-            year => year.teachingGroupId._id === auth.userTeachingGroupId
+        const subBranchYear = data.subBranchYears.find(
+            year => year.subBranchId._id === auth.userSubBranchId
         );
-        const selectedClassData = teachingGroupYear?.classes.find(cls => cls._id === selectedClass)
+        const selectedClassData = subBranchYear?.classes.find(cls => cls._id === selectedClass)
         // selectedClassData
 
         if (!selectedClassData) return null;
@@ -330,27 +330,27 @@ const TeachingGroupAdminPerformanceCards = ({ data, violationData, initialView, 
             if (!acc.some(s => s.id === student._id)) {
                 acc.push({
                     id: student._id,
-                    teachingGroupYearName: teachingGroupYear.name,
+                    subBranchYearName: subBranchYear.name,
                     month,
                     className: selectedClassData.name,
                     name: student.name,
                     nis: student.nis,
                     image: student.image,
                     thumbnail: student.thumbnail,
-                    branchName: teachingGroupYear.teachingGroupId.branchId.name,
-                    teachingGroupName: teachingGroupYear.teachingGroupId.name,
+                    branchName: subBranchYear.subBranchId.branchId.name,
+                    subBranchName: subBranchYear.subBranchId.name,
                     teachers: selectedClassData.teachers,
                     attendances: selectedClassData.attendances.filter(
                         a => a.studentId._id === student._id
                     ),
                     uniqueStudents: new Set(selectedClassData.students.map(studentId => studentId)).size,
-                    semesterTarget: teachingGroupYear.semesterTarget,
+                    semesterTarget: subBranchYear.semesterTarget,
                 });
             }
             return acc;
         }, []);
 
-        // console.log(JSON.stringify(teachingGroupYear, null, 2))
+        // console.log(JSON.stringify(subBranchYear, null, 2))
         // console.log(JSON.stringify(students, null, 2))
 
         return (
@@ -448,7 +448,7 @@ const TeachingGroupAdminPerformanceCards = ({ data, violationData, initialView, 
                     <p>Kalkulasi Berdasarkan: {!showRelativeToTarget ? <strong>Hari berjalan</strong> : <strong>Hari efektif</strong>}</p>
                     {/* <button
                         onClick={() => setShowRelativeToTarget(!showRelativeToTarget)}
-                        className="text-primary px-4 py-2 rounded border border-primary hover:bg-primary hover:text-white transition"
+                        className="text-primary px-4 py-2 rounded-sm border border-primary hover:bg-primary hover:text-white transition"
                     >
                         Ubah
                     </button> */}
@@ -470,4 +470,4 @@ const TeachingGroupAdminPerformanceCards = ({ data, violationData, initialView, 
     );
 };
 
-export default TeachingGroupAdminPerformanceCards;
+export default SubBranchAdminPerformanceCards;

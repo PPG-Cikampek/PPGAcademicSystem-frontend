@@ -6,12 +6,13 @@ import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 import { AuthContext } from '../../shared/Components/Context/auth-context';
 
-import { Icon } from '@iconify-icon/react/dist/iconify.js';
 import FileUpload from '../../shared/Components/FormElements/FileUpload';
 import DynamicForm from '../../shared/Components/UIElements/DynamicForm';
 import Modal from '../../shared/Components/UIElements/ModalBottomClose';
 import WarningCard from '../../shared/Components/UIElements/WarningCard';
 import generateBase64Thumbnail from '../../shared/Utilities/generateBase64Thumbnail';
+import { Pencil } from 'lucide-react';
+import { Icon } from '@iconify-icon/react/dist/iconify.js';
 
 const ProfileView = () => {
     const [modal, setModal] = useState({ title: '', message: '', onConfirm: null });
@@ -25,6 +26,8 @@ const ProfileView = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [passwordError, setPasswordError] = useState('');
     const [emailError, setEmailError] = useState('');
+    const [isEditingName, setIsEditingName] = useState(false);
+    const [editedName, setEditedName] = useState('');
 
     const { isLoading, error, sendRequest, setError } = useHttp();
 
@@ -176,6 +179,30 @@ const ProfileView = () => {
         setModalIsOpen(true);
     };
 
+
+    const handleSaveName = async (e) => {
+        e.preventDefault();
+        if (!editedName.trim()) return;
+        try {
+            const response = await sendRequest(
+                `${import.meta.env.VITE_BACKEND_URL}/users/${auth.userId}`,
+                'PATCH',
+                JSON.stringify({ name: editedName }),
+                {
+                    'Content-Type': 'application/json',
+                    Authorization: 'Bearer ' + auth.token
+                }
+            );
+            setUserData(prev => ({ ...prev, name: editedName }));
+            setIsEditingName(false);
+            setModal({ title: 'Berhasil!', message: response.message || 'Nama berhasil diubah.', onConfirm: null });
+            setModalIsOpen(true);
+        } catch (err) {
+            setModal({ title: 'Gagal!', message: err.message, onConfirm: null });
+            setModalIsOpen(true);
+        }
+    };
+
     const ModalFooter = () => (
         <div className="flex gap-2 items-center">
             <button
@@ -261,24 +288,45 @@ const ProfileView = () => {
                             {isLoading && (
                                 <div className="animate-pulse flex space-x-4 mb-6">
                                     <div className="flex-1 h-fit space-y-6 py-1">
-                                        <div className="h-5 bg-slate-500 rounded"></div>
+                                        <div className="h-5 bg-slate-500 rounded-sm"></div>
                                         <div className="space-y-3">
                                             <div className="grid grid-cols-3 gap-4">
-                                                <div className="h-3 bg-slate-300 rounded col-span-2"></div>
-                                                <div className="h-3 bg-slate-300 rounded col-span-1"></div>
+                                                <div className="h-3 bg-slate-300 rounded-sm col-span-2"></div>
+                                                <div className="h-3 bg-slate-300 rounded-sm col-span-1"></div>
                                             </div>
-                                            <div className="h-3 bg-slate-300 rounded"></div>
-                                            <div className="h-3 bg-slate-300 rounded"></div>
+                                            <div className="h-3 bg-slate-300 rounded-sm"></div>
+                                            <div className="h-3 bg-slate-300 rounded-sm"></div>
                                         </div>
                                     </div>
                                 </div>
                             )}
                             {!isLoading && userData && (
                                 <div className="mb-4">
-                                    <h2 className="text-xl font-medium text-gray-800">{userData.name}</h2>
+                                    <div className={`flex items-center ${isEditingName ? 'justify-between' : ''} gap-2 my-2`}>
+                                        {isEditingName ? (
+                                            <form onSubmit={handleSaveName} className="flex items-center gap-2">
+                                                <input
+                                                    type="text"
+                                                    value={editedName}
+                                                    onChange={e => setEditedName(e.target.value)}
+                                                    className="border rounded-sm px-2 py-2 font-medium text-gray-800 focus:ring-2 focus:ring-primary"
+                                                    autoFocus
+                                                />
+                                                <button type="submit" className="button-primary my-0 text-sm">Simpan</button>
+                                                <button type="button" onClick={() => setIsEditingName(false)} className="ml-1 text-gray-500 hover:text-red-500">Batal</button>
+                                            </form>
+                                        ) : (
+                                            <>
+                                                <h2 className="text-xl font-medium text-gray-800">{userData.name}</h2>
+                                                <button onClick={() => { setIsEditingName(true); setEditedName(userData.name); }} className="p-2 self-start place-self-start rounded-full hover:bg-gray-200" title="Edit Nama">
+                                                    <Pencil size={18} />
+                                                </button>
+                                            </>
+                                        )}
+                                    </div>
                                     <div className='text-gray-600 flex flex-wrap items-center mb-2 md:mb-0 md:gap-2'>{userData.email} {userData.isEmailVerified ? <Icon icon="tdesign:verified" width="18" height="18" style={{ "color": "#06ff00" }} /> : <div onClick={handleEmailVerification} className='p-1 border rounded-md border-red-500 text-gray-500 active:text-primary hover:cursor-pointer italic flex items-center'>Belum verifikasi <Icon icon="ci:triangle-warning" width="16" height="16" style={{ "color": "#ff0000" }} /></div>}</div>
-                                    <p className='text-gray-600'>Desa {userData?.teachingGroupId?.branchId?.name}</p>
-                                    <p className='text-gray-600'>Kelompok {userData?.teachingGroupId?.name || ''}</p>
+                                    <p className='text-gray-600'>Desa {userData?.subBranchId?.branchId?.name}</p>
+                                    <p className='text-gray-600'>Kelompok {userData?.subBranchId?.name || ''}</p>
                                 </div>
                             )}
                             <div className="my-4">
@@ -289,7 +337,7 @@ const ProfileView = () => {
                                         value={newEmail}
                                         onChange={handleEmailChange}
                                         placeholder="Email Baru"
-                                        className={`grow mr-2 p-2 my-1 border rounded-[4px] shadow-sm hover:ring-1 hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 `}
+                                        className={`grow mr-2 p-2 my-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 `}
                                     />
                                     <button
                                         type="button"
@@ -310,7 +358,7 @@ const ProfileView = () => {
                                         value={oldPassword}
                                         onChange={handleOldPasswordChange}
                                         placeholder="Password Lama"
-                                        className={`p-2 my-1 border rounded-[4px] shadow-sm hover:ring-1 hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 `}
+                                        className={`p-2 my-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 `}
                                     />
                                     <div className="relative">
                                         <input
@@ -318,7 +366,7 @@ const ProfileView = () => {
                                             value={password}
                                             onChange={handlePasswordChange}
                                             placeholder="Password Baru"
-                                            className={`p-2 my-1 border rounded-[4px] shadow-sm hover:ring-1 hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 w-full`}
+                                            className={`p-2 my-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 w-full`}
                                         />
                                         <span
                                             onClick={toggleShowPassword}
@@ -336,7 +384,7 @@ const ProfileView = () => {
                                         value={confirmPassword}
                                         onChange={handleConfirmPasswordChange}
                                         placeholder="Konfirmasi Password Baru"
-                                        className={`p-2 my-1 border rounded-[4px] shadow-sm hover:ring-1 hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 `}
+                                        className={`p-2 my-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 `}
                                     />
                                     {passwordError && <p className="text-red-500">{passwordError}</p>}
                                     <button

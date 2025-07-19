@@ -1,7 +1,7 @@
 const getTeacherPositionName = (position) => {
     const positionMap = {
         branchTeacher: 'MT Desa',
-        teachingGroupTeacher: 'MT Kelompok',
+        subBranchTeacher: 'MT Kelompok',
         localTeacher: 'MS',
         assistant: 'Asisten',
         munaqisy: 'Munaqis'

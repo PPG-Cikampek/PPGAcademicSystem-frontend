@@ -15,7 +15,7 @@ const ClassCards = ({ data }) => {
         });
     };
 
-    console.log(JSON.stringify(data))
+    // console.log(JSON.stringify(data))
 
     let activeClassCount = 0;
 
@@ -24,9 +24,9 @@ const ClassCards = ({ data }) => {
             <div className="max-w-7xl mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-16">
                     {data.classes.map((classItem) => {
-                        const isClassInTeachingGroupYear = classItem?.teachingGroupYearId?.academicYearId?.isActive;
+                        const isClassInSubBranchYear = classItem?.teachingGroupId?.branchYearId?.academicYearId?.isActive;
                         console.log(classItem)
-                        if (isClassInTeachingGroupYear) {
+                        if (isClassInSubBranchYear) {
                             activeClassCount++;
                             return (
                                 <div
@@ -75,8 +75,8 @@ const ClassCards = ({ data }) => {
                                         <div className="flex items-center text-gray-600">
                                             <ChartLine className="w-4 h-4 mr-2" />
                                             <span className="text-sm">
-                                                {/* {`${attendanceCount(classItem)} / ${classItem.teachingGroupYearId.semesterTarget} Pertemuan Terlaksana`} */}
-                                                {`${attendanceCount(classItem)} Pertemuan Terlaksana`}
+                                                {/* {`${attendanceCount(classItem)} / ${classItem.subBranchYearId.semesterTarget} Pertemuan Terlaksana`} */}
+                                                {/* {`${attendanceCount(classItem)} Pertemuan Terlaksana`} */}
                                             </span>
                                         </div>
                                     </div>

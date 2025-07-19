@@ -21,7 +21,7 @@ const AcademicYearsView = () => {
   useEffect(() => {
     const loadLevels = async () => {
       try {
-        const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/academicYears?populate=teachingGroupYears`);
+        const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/academicYears?populate=subBranchYears`);
         setData(responseData);
       } catch (err) {
         // Error handled by useHttp
@@ -49,7 +49,7 @@ const AcademicYearsView = () => {
 
         setModal({ title: 'Berhasil!', message: responseData.message, onConfirm: null });
 
-        const updatedData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/academicYears?populate=teachingGroupYears`);
+        const updatedData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/academicYears?populate=subBranchYears`);
         setData(updatedData);
       } catch (err) { }
     };
@@ -62,12 +62,12 @@ const AcademicYearsView = () => {
     setModalIsOpen(true);
   };
 
-  const startMunaqasyahHandler = (academicYearName, academicYearId) => {
-    const confirmStart = async () => {
-      const body = JSON.stringify({ isMunaqasyahActive: true })
+  const munaqasyahStatusHandler = (actionType, academicYearName, academicYearId) => {
+    const confirmAction = async (action) => {
+      const body = JSON.stringify({ munaqasyahStatus: action })
       try {
         const responseData = await sendRequest(
-          `${import.meta.env.VITE_BACKEND_URL}/academicYears/start/${academicYearId}/munaqasyah`,
+          `${import.meta.env.VITE_BACKEND_URL}/academicYears/munaqasyah/${academicYearId}`,
           'PATCH',
           body,
           { 'Content-Type': 'application/json' }
@@ -75,18 +75,29 @@ const AcademicYearsView = () => {
 
         setModal({ title: 'Berhasil!', message: responseData.message, onConfirm: null });
 
-        const updatedData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/academicYears?populate=teachingGroupYears`);
+        const updatedData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/academicYears?populate=subBranchYears`);
         setData(updatedData);
-      } catch (err) { }
+      } catch (err) {
+        setModal({ title: 'Gagal!', message: err.message, onConfirm: null });
+      }
     };
 
-    setModal({
-      title: `Konfirmasi`,
-      message: `Mulai munaqosah untuk tahun ajaran ${academicYearFormatter(academicYearName)}?`,
-      onConfirm: confirmStart
-    });
-    setModalIsOpen(true);
-  };
+    if (actionType === 'start') {
+      setModal({
+        title: `Konfirmasi`,
+        message: `Mulai munaqosah untuk tahun ajaran ${academicYearFormatter(academicYearName)}?`,
+        onConfirm: () => confirmAction('inProgress')
+      });
+      setModalIsOpen(true);
+    } else if (actionType === 'complete') {
+      setModal({
+        title: `Konfirmasi`,
+        message: `Selesaikan munaqosah untuk tahun ajaran ${academicYearFormatter(academicYearName)}?`,
+        onConfirm: () => confirmAction('completed')
+      });
+      setModalIsOpen(true);
+    };
+  }
 
   const deleteAcademicYearHandler = (academicYearName, academicYearId) => {
     const confirmDelete = async () => {
@@ -100,7 +111,7 @@ const AcademicYearsView = () => {
 
         setModal({ title: 'Berhasil!', message: responseData.message, onConfirm: null });
 
-        const updatedData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/academicYears?populate=teachingGroupYears`);
+        const updatedData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/academicYears?populate=subBranchYears`);
         setData(updatedData);
       } catch (err) {
         setModal({ title: 'Gagal!', message: err.message, onConfirm: null });
@@ -140,7 +151,7 @@ const AcademicYearsView = () => {
 
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-semibold text-gray-900">Daftar Tahun Ajaran</h1>
-          <Link to="/settings/academic/new">
+          <Link to="/academic/new">
             <button className="inline-flex items-center px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-md transition-colors duration-200">
               <PlusIcon className="w-4 h-4 mr-2" />
               Tambah
@@ -162,7 +173,7 @@ const AcademicYearsView = () => {
             expandedCards={expandedCards}
             onToggleCard={toggleCard}
             onActivateYear={activateYearHandler}
-            onStartMunaqasyah={startMunaqasyahHandler}
+            onMunaqsyahStatusChange={munaqasyahStatusHandler}
             onDeleteYear={deleteAcademicYearHandler}
           />
         )}

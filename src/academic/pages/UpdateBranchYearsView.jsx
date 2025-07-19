@@ -9,21 +9,21 @@ import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 import Modal from '../../shared/Components/UIElements/ModalBottomClose';
 
 
-const UpdateTeachingGroupYearsView = () => {
+const UpdateBranchYearsView = () => {
     const [modal, setModal] = useState({ title: '', message: '', onConfirm: null });
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const { isLoading, error, sendRequest, setError } = useHttp();
     const [isTransitioning, setIsTransitioning] = useState(false);
-    const [loadedTeachingGroupYear, setLoadedTeachingGroupYear] = useState();
+    const [loadedSubBranchYear, setLoadedSubBranchYear] = useState();
 
-    const teachingGroupYearId = useParams().teachingGroupYearId
+    const subBranchYearId = useParams().subBranchYearId
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchAttendance = async () => {
             try {
-                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/teachingGroupYears/${teachingGroupYearId}`)
-                setLoadedTeachingGroupYear(responseData.teachingGroupYear)
+                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/subBranchYears/${subBranchYearId}`)
+                setLoadedSubBranchYear(responseData.subBranchYear)
             } catch (err) { }
         }
         fetchAttendance();
@@ -31,10 +31,10 @@ const UpdateTeachingGroupYearsView = () => {
 
     const handleFormSubmit = async (data) => {
         console.log('Updating ... ')
-        const url = `${import.meta.env.VITE_BACKEND_URL}/teachingGroupYears/activate`
+        const url = `${import.meta.env.VITE_BACKEND_URL}/subBranchYears/activate`
 
         const body = JSON.stringify({
-            teachingGroupYearId: loadedTeachingGroupYear._id,
+            subBranchYearId: loadedSubBranchYear._id,
             semesterTarget: data.semesterTarget,
         });
 
@@ -102,10 +102,10 @@ const UpdateTeachingGroupYearsView = () => {
 
                 <DynamicForm
                     title={`Aktifkan Tahun Ajaran`}
-                    subtitle={loadedTeachingGroupYear?.name}
+                    subtitle={loadedSubBranchYear?.name}
                     fields={[
-                        { name: 'name', label: 'Nama Tahun Ajaran', type: 'text', required: false, disabled: true, value: loadedTeachingGroupYear?.name || '' },
-                        { name: 'semesterTarget', label: 'Target Pertemuan Selama 1 Semester', type: 'number', required: true, value: loadedTeachingGroupYear?.semesterTarget || '' },
+                        { name: 'name', label: 'Nama Tahun Ajaran', type: 'text', required: false, disabled: true, value: loadedSubBranchYear?.name || '' },
+                        { name: 'semesterTarget', label: 'Target Pertemuan Selama 1 Semester', type: 'number', required: true, value: loadedSubBranchYear?.semesterTarget || '' },
                     ]}
                     onSubmit={handleFormSubmit}
                     disabled={isLoading}
@@ -128,4 +128,4 @@ const UpdateTeachingGroupYearsView = () => {
     );
 };
 
-export default UpdateTeachingGroupYearsView;
+export default UpdateBranchYearsView;

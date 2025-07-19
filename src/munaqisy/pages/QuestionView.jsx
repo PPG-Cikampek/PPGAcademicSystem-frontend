@@ -6,6 +6,7 @@ import { MunaqasyahScoreContext } from '../context/MunaqasyahScoreContext';
 import Modal from '../../shared/Components/UIElements/ModalBottomClose';
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 import getMunaqasyahQuestionTypeName from '../../munaqasyah/utilities/getMunaqasyahQuestionTypeName';
+import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
 
 const QuestionView = () => {
     const [examQuestions, setExamQuestions] = useState()
@@ -25,7 +26,6 @@ const QuestionView = () => {
     // console.log(data);
 
     useEffect(() => {
-        // console.log(state.studentScore)
 
         const url = `${import.meta.env.VITE_BACKEND_URL}/munaqasyahs/examination/questions?semester=${data.semester}&classGrade=${data.classGrade}&category=${data.categoryData.key}`
 
@@ -68,7 +68,7 @@ const QuestionView = () => {
 
     const handleFinish = async () => {
         if (!totalScore && totalScore !== 0) {
-            setError('Please provide scores for all questions');
+            dispatch({ type: 'SET_ERROR', payload: 'Berikan nilai untuk semua pertanyaan!' });
             setModal({
                 title: 'Gagal!',
                 message: 'Berikan nilai untuk semua pertanyaan!',
@@ -79,7 +79,6 @@ const QuestionView = () => {
         }
 
         try {
-            // Add your API call here to save the final score
             console.log('Saving total score:', totalScore);
             console.log('Current state:', state.studentScore);
         } catch (err) {
@@ -87,17 +86,19 @@ const QuestionView = () => {
         }
 
         setModal({
-            title: 'Konfirmasi!',
+            title: 'Konfirmasi',
             message: 'Simpan Nilai?',
-            onConfirm: () => {
-                setIsLoading(true)
-                patchScoreData(state.studentScore)
-                setIsLoading(false)
-                setModal({
-                    title: 'Berhasil!',
-                    message: 'Berhasil menyimpan nilai!',
-                    onConfirm: null
-                });
+            onConfirm: async () => {
+                setIsLoading(true);
+                await patchScoreData(state.studentScore, dispatch);
+                setIsLoading(false);
+                if (!state.error) {
+                    setModal({
+                        title: 'Berhasil!',
+                        message: 'Berhasil menyimpan nilai!',
+                        onConfirm: null
+                    });
+                }
             },
         });
 
@@ -109,7 +110,8 @@ const QuestionView = () => {
             <button
                 onClick={() => {
                     setModalIsOpen(false);
-                    !error && navigate(-1);
+                    !state.error && navigate(-1);
+                    state.error && navigate(-2);
                 }}
                 className={`${modal.onConfirm ? 'btn-danger-outline' : 'button-primary mt-0 '}`}
             >
@@ -125,10 +127,13 @@ const QuestionView = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 ">
+            {!isLoading && state.error && (
+                <ErrorCard error={state.error} />
+            )}
             <Modal
                 isOpen={modalIsOpen}
                 onClose={() => setModalIsOpen(false)}
-                title={modal.title}
+                title={state.error ? 'Gagal!' : modal.title}
                 footer={<ModalFooter />}
             >
                 {isLoading && (
@@ -137,7 +142,7 @@ const QuestionView = () => {
                     </div>
                 )}
                 {!isLoading && (
-                    modal.message
+                    state.error ? state.error : modal.message
                 )}
             </Modal>
 
@@ -165,7 +170,13 @@ const QuestionView = () => {
                                 <div className="font-semibold text-gray-700">Pertanyaan:</div>
                                 <div className="mt-1 text-gray-600 whitespace-pre-line font-lpmq text-base">{question.question}</div>
                             </div>
-                            {question.type !== 'multipleChoices' && question.answers[0] !== '' && (
+
+                            <div className="mt-2">
+                                <div className="font-semibold text-gray-700">Jawaban yang Benar:</div>
+                                <div className='whitespace-pre-line font-lpmq text-base'>{question.answers}</div>
+                            </div>
+
+                            {/* {question.type !== 'multipleChoices' && question.answers[0] !== '' && (
                                 <div className="mt-2">
                                     <div className="font-semibold text-gray-700">Jawaban yang Benar:</div>
                                     <div className='whitespace-pre-line font-lpmq text-base'>{question.answers[0]}</div>
@@ -180,7 +191,7 @@ const QuestionView = () => {
                                         ))}
                                     </ul>
                                 </div>
-                            )}
+                            )} */}
                             <div className="mt-4">
                                 <div className="font-semibold text-gray-700 mb-2">Nilai:</div>
                                 <div className="flex flex-wrap gap-3">

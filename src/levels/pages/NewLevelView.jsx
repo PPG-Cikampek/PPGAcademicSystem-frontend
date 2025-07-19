@@ -22,7 +22,7 @@ const NewLevelView = () => {
     const [isTransitioning, setIsTransitioning] = useState(false);
     const { isLoading, error, sendRequest, setError } = useHttp();
     const [loadedBranch, setLoadedBranch] = useState([]);
-    const [teachingGroupFields, setTeachingGroupFields] = useState();
+    const [subBranchFields, setSubBranchFields] = useState();
 
 
     const auth = useContext(AuthContext);
@@ -45,7 +45,7 @@ const NewLevelView = () => {
 
     useEffect(() => {
         if (loadedBranch) {
-            setTeachingGroupFields([
+            setSubBranchFields([
                 { name: 'name', label: 'Nama Kelompok', placeholder: 'Nama Kelompok', type: 'text', required: true },
                 { name: 'address', label: 'Alamat Kelompok', placeholder: 'Alamat Lengkap', type: 'text', required: true },
                 {
@@ -64,7 +64,7 @@ const NewLevelView = () => {
     const handleFormSubmit = async (data) => {
         const url = isBranch
             ? `${import.meta.env.VITE_BACKEND_URL}/levels/branches`
-            : `${import.meta.env.VITE_BACKEND_URL}/levels/branches/teaching-groupes`
+            : `${import.meta.env.VITE_BACKEND_URL}/levels/branches/sub-branches`
 
         const body = JSON.stringify(isBranch
             ? { name: data.name, address: data.address }
@@ -126,7 +126,7 @@ const NewLevelView = () => {
                 <DynamicForm
                     title={isBranch ? 'Tambah Desa' : 'Tambah Kelompok'}
                     subtitle={'Sistem Akademik Digital'}
-                    fields={isBranch ? branchFields : teachingGroupFields}
+                    fields={isBranch ? branchFields : subBranchFields}
                     onSubmit={handleFormSubmit}
                     disabled={isLoading}
                     reset={false}

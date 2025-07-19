@@ -1,9 +1,10 @@
-import { teacherRoutes, TeacherRouteWrapper } from './teacherRoutes.jsx';
 import { adminRoutes, AdminRouteWrapper } from './adminRoutes.jsx';
+import { curriculumRoutes, CurriculumRouteWrapper } from './curriculumRoutes.jsx';
+import { branchAdminRoutes, BranchAdminRouteWrapper } from './branchAdminRoutes.jsx';
+import { subBranchAdminRoutes, SubBranchAdminRouteWrapper } from './subBranchAdminRoutes.jsx';
+import { teacherRoutes, TeacherRouteWrapper } from './teacherRoutes.jsx';
 import { munaqisyRoutes, MunaqisyRouteWrapper } from './munaqisyRoutes.jsx';
 import { studentRoutes, StudentRouteWrapper } from './studentRoutes.jsx';
-import { teachingGroupAdminRoutes, TeachingGroupAdminRouteWrapper } from './teachingGroupAdminRoutes.jsx';
-import { curriculumRoutes, CurriculumRouteWrapper } from './curriculumRoutes.jsx';
 
 import AuthView from '../users/pages/AuthView.jsx';
 import PasswordResetView from '../users/pages/PasswordResetView.jsx';
@@ -16,6 +17,11 @@ const getRouteConfig = (userRole) => {
                 routes: teacherRoutes,
                 Wrapper: TeacherRouteWrapper
             };
+        case 'branchAdmin':
+            return {
+                routes: branchAdminRoutes,
+                Wrapper: BranchAdminRouteWrapper
+            };
         case 'munaqisy':
             return {
                 routes: munaqisyRoutes,
@@ -26,10 +32,10 @@ const getRouteConfig = (userRole) => {
                 routes: studentRoutes,
                 Wrapper: StudentRouteWrapper
             };
-        case 'admin kelompok':
+        case 'subBranchAdmin':
             return {
-                routes: teachingGroupAdminRoutes,
-                Wrapper: TeachingGroupAdminRouteWrapper
+                routes: subBranchAdminRoutes,
+                Wrapper: SubBranchAdminRouteWrapper
             };
         case 'admin':
             return {

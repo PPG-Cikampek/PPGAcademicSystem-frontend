@@ -18,7 +18,7 @@ const JournalView = lazy(() => import("../teacher-role/journal/pages/JournalView
 const PageHeader = lazy(() => import("../teacher-role/shared/Components/Navigation/PageHeader"));
 const AttendanceHistoryView = lazy(() => import("../teacher-role/history/attendanceHistory/pages/AttendanceHistoryView"));
 const AttendanceHistoryViewByClass = lazy(() => import("../teacher-role/history/attendanceHistory/pages/AttendanceHistoryViewByClass"));
-const TeachingGroupYearsView = lazy(() => import("../academic/pages/TeachingGroupYearsView"));
+const BranchYearsView = lazy(() => import("../academic/pages/BranchYearsView"));
 const NewClassView = lazy(() => import("../class/pages/NewClassView"));
 const ClassDetailView = lazy(() => import("../class/pages/ClassDetailView"));
 const AddStudentToClassView = lazy(() => import("../class/pages/AddStudentToClassView"));
@@ -26,10 +26,10 @@ const UpdateStudentView = lazy(() => import("../students/pages/UpdateStudentView
 const UpdateTeacherView = lazy(() => import("../teachers/pages/UpdateTeacherView"));
 const SelectClassView = lazy(() => import("../teacher-role/scan/pages/SelectClassView"));
 const UpdateAttendanceView = lazy(() => import("../teacher-role/history/attendanceHistory/pages/UpdateAttendanceView"));
-const StudentReportView = lazy(() => import("../students/pages/StudentReportView"));
+// const StudentReportView = lazy(() => import("../students/pages/StudentReportView"));
 const ProfileView = lazy(() => import("../users/pages/ProfileView"));
 const NewJournalView = lazy(() => import("../teacher-role/journal/pages/NewJournalView"));
-const TeacherPerformanceView = lazy(() => import("../performance/pages/TeacherPerformanceView"));
+// const TeacherPerformanceView = lazy(() => import("../performance/pages/TeacherPerformanceView"));
 const MaterialProgressView = lazy(() => import("../teacher-role/materialProgress/pages/materialProgressView"));
 const NewMaterialProgresslView = lazy(() => import("../teacher-role/materialProgress/pages/NewMaterialProgressView"));
 
@@ -164,7 +164,7 @@ export const teacherRoutes = [
         path: '/dashboard/academic',
         element: (
             <PageHeader>
-                <TeachingGroupYearsView />
+                <BranchYearsView />
             </PageHeader>
         )
     },
@@ -205,29 +205,29 @@ export const teacherRoutes = [
         )
     },
     {
-        path: '/settings/academic/classes/new',
+        path: '/academic/classes/new',
         element: (
             <PageHeader>
                 <NewClassView />
             </PageHeader>
         )
     },
-    {
-        path: '/performances',
-        element: (
-            <PageHeader>
-                <TeacherPerformanceView />
-            </PageHeader >
-        )
-    },
-    {
-        path: '/performances/student/:studentId',
-        element: (
-            <PageHeader>
-                <StudentReportView />
-            </PageHeader>
-        )
-    },
+    // {
+    //     path: '/performances',
+    //     element: (
+    //         <PageHeader>
+    //             <TeacherPerformanceView />
+    //         </PageHeader >
+    //     )
+    // },
+    // {
+    //     path: '/performances/student/:studentId',
+    //     element: (
+    //         <PageHeader>
+    //             <StudentReportView />
+    //         </PageHeader>
+    //     )
+    // },
     {
         path: '/settings/profile/:userId',
         element: (

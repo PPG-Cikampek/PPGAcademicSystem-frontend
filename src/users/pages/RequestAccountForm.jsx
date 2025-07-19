@@ -84,7 +84,7 @@ const RequestAccountForm = () => {
     const handleSubmit = async () => {
 
         const updatedData = {
-            teachingGroupId: auth.userTeachingGroupId,
+            subBranchId: auth.userSubBranchId,
             accountList: dataList.map(account => ({
                 ...account,
                 accountRole: accountType === 'student' ? 'student' : 'teacher',
@@ -163,7 +163,7 @@ const RequestAccountForm = () => {
                                         value={formData[field.name] || ''}
                                         onChange={handleInputChange}
                                         required={field.required}
-                                        className="w-full p-2 border rounded-md shadow-sm hover:ring-secondary-subtle focus:outline-none focus:ring-2 focus:ring-secondary transition-all duration-300"
+                                        className="w-full p-2 border rounded-md shadow-xs hover:ring-secondary-subtle focus:outline-hidden focus:ring-2 focus:ring-secondary transition-all duration-300"
                                     >
                                         <option value="" disabled>{field.placeholder}</option>
                                         {field.options.map((option) => (
@@ -174,7 +174,7 @@ const RequestAccountForm = () => {
                                     <DatePicker
                                         selected={formData[field.name] || null}
                                         onChange={(birthDate) => handleDateChange(birthDate, field.name)}
-                                        className="w-full p-2 border rounded-md shadow-sm hover:ring-1 hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
+                                        className="w-full p-2 border rounded-md shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300"
                                         dateFormat="dd/MM/yyyy"
                                         wrapperClassName='w-full'
                                         showYearDropdown
@@ -190,7 +190,7 @@ const RequestAccountForm = () => {
                                         value={formData[field.name] || ''}
                                         onChange={handleInputChange}
                                         required={field.required}
-                                        className="w-full p-2 border rounded-[4px] shadow-sm hover:ring-1 hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
+                                        className="w-full p-2 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300"
                                     />
                                 )}
                             </div>

@@ -3,9 +3,10 @@ import { NavLink, useNavigate } from 'react-router-dom';
 
 import { SidebarContext } from '../../Context/sidebar-context';
 import { AuthContext } from '../../Context/auth-context';
-import { User, Calendar, Settings, ChevronLeft, ChevronRight, LogOut } from 'lucide-react';
+import getUserRoleTitle from '../../../Utilities/getUserRoleTitle';
 import FloatingMenu from '../../UIElements/FloatingMenu';
 import BackButton from '../../UIElements/BackButton';
+import { User, Settings, ChevronLeft, ChevronRight, LogOut } from 'lucide-react';
 
 const Navbar = () => {
 
@@ -40,21 +41,12 @@ const Navbar = () => {
         );
     };
 
-    const formatAcademicYear = (name) => {
-        const year = name.substring(0, 4);
-        const semester = name.substring(4);
-        return `${year}/${parseInt(year) + 1} ${semester === '1' ? 'Ganjil' : 'Genap'}`;
-    };
-
-
     const navLinks = [
-        ...(auth.currentTeachingGroupYear ? [
-            // { id: 1, name: formatAcademicYear(auth.currentTeachingGroupYear), path: '/settings/academic', icon: <Calendar /> }
+        ...(auth.currentBranchYear ? [
+            // { id: 1, name: formatAcademicYear(auth.currentSubBranchYear), path: '/academic', icon: <Calendar /> }
         ] : []),
-        { id: 2, name: auth.userRole, path: '', icon: <Settings /> },
+        { id: 2, name: getUserRoleTitle(auth.userRole), path: '', icon: <Settings /> },
     ];
-
-
 
     return (
         <nav className="bg-white">
@@ -62,9 +54,9 @@ const Navbar = () => {
                 <div className="flex justify-between items-center h-16">
                     {/* Logo */}
                     <div className="flex gap-6 items-center">
-                        <div className="flex flex-shrink-0">
+                        <div className="flex shrink-0">
                             <button
-                                className="p-2 rounded-full focus:bg-gray-200 hover:outline-none hover:ring-1 hover:ring-offset-1 hover:ring-gray-400"
+                                className="p-2 rounded-full focus:bg-gray-200 hover:outline-hidden hover:ring-1 hover:ring-offset-1 hover:ring-gray-400"
                                 onClick={sidebarHandler}
                             >
                                 {sidebar.isSidebarOpen ? <ChevronLeft size={24} /> : <ChevronRight size={24} />}

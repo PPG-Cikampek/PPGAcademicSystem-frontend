@@ -20,7 +20,7 @@ const StudentScoresView = () => {
 
     const general = useContext(GeneralContext);
     const auth = useContext(AuthContext);
-    const teachingGroupYearId = auth.currentTeachingGroupYearId;
+    const branchYearId = auth.currentBranchYearId
 
     const navigate = useNavigate();
 
@@ -29,24 +29,24 @@ const StudentScoresView = () => {
 
     useEffect(() => {
         let isMounted = true;
-        general.setMessage('Pilih "Selesai" untuk kembali!'); // Clear any previous messages
+        // general.setMessage('Pilih "Selesai" untuk kembali!'); // Clear any previous messages
         dispatch({ type: 'SET_SCORE_DATA', payload: [] });
         dispatch({ type: 'SET_STUDENT_DATA', payload: [] });
         setDataLoaded(false); // Reset before fetching
         const fetchData = async () => {
             setIsLoading(true);
             try {
-                await fetchScoreData(scannedData, teachingGroupYearId, dispatch, auth.userId);
+                await fetchScoreData(scannedData, branchYearId, dispatch, auth.userId);
                 if (isMounted) setDataLoaded(true); // Set to true after fetch
             } finally {
                 if (isMounted) setIsLoading(false);
             }
         };
-        if (teachingGroupYearId && scannedData) {
+        if (branchYearId && scannedData) {
             fetchData();
         }
         return () => { isMounted = false; };
-    }, [teachingGroupYearId, scannedData]);
+    }, [branchYearId, scannedData]);
 
     useEffect(() => {
         // Guard: only check after data is loaded and valid
@@ -78,7 +78,7 @@ const StudentScoresView = () => {
         { key: 'hadithTafsir', label: 'Tafsir Hadits' },
         { key: 'practice', label: 'Praktik Ibadah' },
         { key: 'moralManner', label: 'Akhlak dan Tata Krama' },
-        { key: 'memorizingSurah', label: 'Surat-surat Al-Quran' },
+        { key: 'memorizingSurah', label: 'Hafalan Surat-surat Al-Quran' },
         { key: 'memorizingHadith', label: 'Hafalan Hadits' },
         { key: 'memorizingDua', label: "Hafalan Do'a" },
         { key: 'memorizingBeautifulName', label: 'Hafalan Asmaul Husna' },
@@ -100,7 +100,7 @@ const StudentScoresView = () => {
                 label: category.label,
                 score: state.studentScore[category.key]
             },
-            semester: parseInt(state.studentScore.teachingGroupYearId.academicYearId.name.slice(-1)),
+            semester: parseInt(state.studentScore.branchYearId.academicYearId.name.slice(-1)),
             classGrade: state.studentScore.classId.name.split(' ').pop()
         }
         navigate(`/munaqasyah/examination`, {
@@ -131,7 +131,7 @@ const StudentScoresView = () => {
                     className="button-primary m-0"
                     onClick={() => {
                         handleFinish()
-                        general.setMessage(true);
+                        // general.setMessage(true);
                     }}
                 >
                     Selesai

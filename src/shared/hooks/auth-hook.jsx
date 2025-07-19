@@ -9,24 +9,20 @@ export const useAuth = () => {
     const [userRole, setUserRole] = useState(null);
     const [userName, setUserName] = useState(null);
     const [userBranchId, setUserBranchId] = useState(null);
-    const [userTeachingGroupId, setUserTeachingGroupId] = useState(null);
-    const [currentTeachingGroupYear, setCurrentTeachingGroupYear] = useState(null);
-    const [currentTeachingGroupYearId, setCurrentTeachingGroupYearId] = useState(null);
+    const [userSubBranchId, setUserSubBranchId] = useState(null);
+    const [currentBranchYear, setCurrentBranchYear] = useState(null);
+    const [currentBranchYearId, setCurrentBranchYearId] = useState(null);
     const [userClassIds, setUserClassIds] = useState([]);
 
-    const login = useCallback((uId, role, name, branchId, teachingGroupId, currentTeachingGroupYear, currentTeachingGroupYearId, userClassIds, token, expirationDate) => {
-        if (role === 'teachingGroupAdmin') {
-            setUserRole('admin kelompok')
-        } else {
-            setUserRole(role)
-        }
+    const login = useCallback((uId, role, name, branchId, subBranchId, currentBranchYear, currentBranchYearId, userClassIds, token, expirationDate) => {
+        setUserRole(role)
         setToken(token);
         setUserId(uId);
         setUserName(name)
         setUserBranchId(branchId)
-        setUserTeachingGroupId(teachingGroupId)
-        setCurrentTeachingGroupYear(currentTeachingGroupYear)
-        setCurrentTeachingGroupYearId(currentTeachingGroupYearId)
+        setUserSubBranchId(subBranchId)
+        setCurrentBranchYear(currentBranchYear)
+        setCurrentBranchYearId(currentBranchYearId)
         setUserClassIds(userClassIds)
 
         const tokenExpirationDate = expirationDate || new Date(new Date().getTime() + 1000 * 60 * 60 * 2)
@@ -38,9 +34,9 @@ export const useAuth = () => {
                 name: name,
                 role: role,
                 branchId: branchId,
-                teachingGroupId: teachingGroupId,
-                currentTeachingGroupYear: currentTeachingGroupYear,
-                currentTeachingGroupYearId: currentTeachingGroupYearId,
+                subBranchId: subBranchId,
+                currentBranchYear: currentBranchYear,
+                currentBranchYearId: currentBranchYearId,
                 userClassIds: userClassIds,
                 token: token,
                 expiration: tokenExpirationDate.toISOString()
@@ -54,9 +50,9 @@ export const useAuth = () => {
         setUserRole(null)
         setUserName(null)
         setUserBranchId(null)
-        setUserTeachingGroupId(null)
-        setCurrentTeachingGroupYear(null)
-        setCurrentTeachingGroupYearId(null)
+        setUserSubBranchId(null)
+        setCurrentBranchYear(null)
+        setCurrentBranchYearId(null)
         setUserClassIds(null)
 
         setTokenExpirationDate(null)
@@ -80,9 +76,9 @@ export const useAuth = () => {
                 storedData.role,
                 storedData.name,
                 storedData.branchId,
-                storedData.teachingGroupId,
-                storedData.currentTeachingGroupYear,
-                storedData.currentTeachingGroupYearId,
+                storedData.subBranchId,
+                storedData.currentBranchYear,
+                storedData.currentBranchYearId,
                 storedData.userClassIds,
                 storedData.token,
                 new Date(storedData.expiration)
@@ -90,11 +86,11 @@ export const useAuth = () => {
         }
     }, [login]);
 
-    const setAttributes = useCallback((branchId, teachingGroupId, userClassIds) => {
+    const setAttributes = useCallback((branchId, subBranchId, userClassIds) => {
         setUserBranchId(branchId)
-        setUserTeachingGroupId(teachingGroupId)
+        setUserSubBranchId(subBranchId)
         setUserClassIds(userClassIds)
     }, []);
 
-    return { token, login, logout, userId, userRole, userName, userBranchId, userTeachingGroupId, currentTeachingGroupYear, currentTeachingGroupYearId, userClassIds, setAttributes }
+    return { token, login, logout, userId, userRole, userName, userBranchId, userSubBranchId, currentBranchYear, currentBranchYearId, userClassIds, setAttributes }
 }

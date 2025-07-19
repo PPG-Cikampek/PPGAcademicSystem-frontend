@@ -22,7 +22,6 @@ const DataTable = ({
     tableId
 }) => {
     const storageKey = tableId ? `datatable-state-${tableId}` : null;
-
     const loadPersistedState = () => {
         if (!storageKey) return {};
         try {
@@ -115,7 +114,7 @@ const DataTable = ({
         <tr className="animate-pulse">
             {columns.map((_, index) => (
                 <td key={index} className="p-2 md:p-4">
-                    <div className="h-4 bg-gray-200 rounded"></div>
+                    <div className="h-4 bg-gray-200 rounded-sm"></div>
                 </td>
             ))}
         </tr>
@@ -125,7 +124,7 @@ const DataTable = ({
         <tr>
             {columns.map((_, index) => (
                 <th key={index} className="min-w-14 p-2 md:p-4">
-                    <div className="h-4 bg-gray-200 rounded animate-pulse w-20"></div>
+                    <div className="h-4 bg-gray-200 rounded-sm animate-pulse w-20"></div>
                 </th>
             ))}
         </tr>
@@ -155,7 +154,7 @@ const DataTable = ({
                         <div key={key}>
                             <label className="text-sm font-medium text-gray-700 mb-1">{label}</label>
                             <select
-                                className="w-full border rounded-full px-2 py-2 text-sm focus:ring-1 focus:ring-primary focus:outline-none"
+                                className="w-full border rounded-full px-2 py-2 text-sm focus:ring-1 focus:ring-primary focus:outline-hidden"
                                 value={filters[key] || ''}
                                 onChange={(e) => setFilters(prev => ({
                                     ...prev,
@@ -180,10 +179,10 @@ const DataTable = ({
                 {isLoading ? (
                     <>
                         <div className="flex items-center gap-2">
-                            <div className="h-8 w-32 bg-gray-200 rounded animate-pulse"></div>
+                            <div className="h-8 w-32 bg-gray-200 rounded-sm animate-pulse"></div>
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="h-8 w-48 bg-gray-200 rounded animate-pulse"></div>
+                            <div className="h-8 w-48 bg-gray-200 rounded-sm animate-pulse"></div>
                         </div>
                     </>
                 ) : (
@@ -192,7 +191,7 @@ const DataTable = ({
                             <div className="flex items-center gap-2">
                                 <span>Tampilkan</span>
                                 <select
-                                    className="border rounded px-2 py-1"
+                                    className="border rounded-sm px-2 py-1"
                                     value={entriesPerPage}
                                     onChange={(e) => setEntriesPerPage(Number(e.target.value))}
                                 >
@@ -209,7 +208,7 @@ const DataTable = ({
                                     <span>Pencarian:</span>
                                     <input
                                         type="text"
-                                        className="px-2 py-1 border rounded-[4px] shadow-sm hover:ring-1 hover:ring-primary focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300"
+                                        className="px-2 py-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300"
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
                                     />
@@ -229,18 +228,18 @@ const DataTable = ({
                 )}
             </div>
             {config.showFilter && filterOptions.length > 0 && <FilterCard />}
-            <div className="bg-white shadow-sm rounded-md overflow-auto text-nowrap mb-4">
+            <div className="bg-white shadow-xs rounded-md overflow-auto text-nowrap mb-4">
                 <table className="w-full">
                     <thead className="border-b">
                         {isLoading ? (
                             <SkeletonHeader />
                         ) : (
                             <tr>
-                                {columns.map(({ key, label, sortable }) => (
+                                {columns.map(({ key, label, sortable, headerAlign }) => (
                                     <th
                                         key={key}
                                         onClick={() => sortable && sortData(key)}
-                                        className={`min-w-14 p-2 md:p-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider ${sortable ? 'cursor-pointer hover:bg-gray-50' : ''
+                                        className={`min-w-14 p-2 md:p-4 text-xs font-medium text-gray-500 uppercase tracking-wider ${sortable ? 'cursor-pointer hover:bg-gray-50' : ''} ${headerAlign === 'center' ? 'text-center' : headerAlign === 'right' ? 'text-right' : 'text-left'
                                             }`}
                                     >
                                         {label}
@@ -263,10 +262,11 @@ const DataTable = ({
                                     <tr
                                         key={index}
                                         onClick={() => onRowClick && onRowClick(item)}
-                                        className={`${config.clickableRows && 'hover:bg-gray-50 hover:cursor-pointer'}  transition`}
+                                        className={`${config.clickableRows === true ? 'hover:bg-gray-50 hover:cursor-pointer' : ''}  transition`}
                                     >
-                                        {columns.map(({ key, render, cellStyle }) => (
-                                            <td key={key} className={`${key === 'actions' ? 'p-2' : 'p-2 md:p-4'}`}>
+                                        {columns.map(({ key, render, cellStyle, cellAlign }) => (
+                                            <td key={key} className={`${key === 'actions' ? 'p-1' : 'p-1 md:p-2'} ${cellAlign === 'center' ? 'text-center' : cellAlign === 'right' ? 'text-right' : 'text-left'
+                                                }`}>
                                                 <span className={cellStyle?.(item)}>
                                                     {render ? render(item) : item[key]}
                                                 </span>
@@ -289,10 +289,10 @@ const DataTable = ({
             <div className="flex justify-between items-center">
                 {isLoading ? (
                     <>
-                        <div className="h-4 w-48 bg-gray-200 rounded animate-pulse"></div>
+                        <div className="h-4 w-48 bg-gray-200 rounded-sm animate-pulse"></div>
                         <div className="flex gap-2">
-                            <div className="h-8 w-24 bg-gray-200 rounded animate-pulse"></div>
-                            <div className="h-8 w-24 bg-gray-200 rounded animate-pulse"></div>
+                            <div className="h-8 w-24 bg-gray-200 rounded-sm animate-pulse"></div>
+                            <div className="h-8 w-24 bg-gray-200 rounded-sm animate-pulse"></div>
                         </div>
                     </>
                 ) : (

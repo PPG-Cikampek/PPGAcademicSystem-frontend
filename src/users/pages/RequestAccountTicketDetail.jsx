@@ -34,7 +34,7 @@ const RequestAccountTicketDetail = () => {
                     {data && console.log(data)}
                     {!isLoading && data && (
                         <>
-                            <div className="w-full bg-white shadow-sm rounded-md overflow-auto text-nowrap mt-4">
+                            <div className="w-full bg-white shadow-xs rounded-md overflow-auto text-nowrap mt-4">
                                 <table className="w-full">
                                     <thead>
                                         <tr>

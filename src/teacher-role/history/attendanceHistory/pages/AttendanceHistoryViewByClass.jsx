@@ -159,7 +159,7 @@ const AttendanceHistoryViewByClass = () => {
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: -20 }}
-                            className="border shadow-sm rounded-full"
+                            className="border shadow-xs rounded-full"
                         >
                             <motion.button
                                 onClick={() => toggleExpand(date)}

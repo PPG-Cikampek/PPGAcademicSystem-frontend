@@ -6,16 +6,16 @@ import useHttp from '../../shared/hooks/http-hook'
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle'
 import DataTable from '../../shared/Components/UIElements/DataTable'
 
-const TeachingGroupAdminClassesView = () => {
+const SubBranchAdminClassesView = () => {
     const [classes, setClasses] = useState()
     const { isLoading, error, sendRequest } = useHttp()
 
     const navigate = useNavigate();
     const auth = useContext(AuthContext);
-    console.log(auth.userTeachingGroupId)
+    console.log(auth.userSubBranchId)
 
     useEffect(() => {
-        const url = `${import.meta.env.VITE_BACKEND_URL}/classes/teaching-group/${auth.userTeachingGroupId}`;
+        const url = `${import.meta.env.VITE_BACKEND_URL}/classes/teaching-group/${auth.userSubBranchId}`;
 
         const fetchClasses = async () => {
             console.log(url)
@@ -74,4 +74,4 @@ const TeachingGroupAdminClassesView = () => {
     );
 }
 
-export default TeachingGroupAdminClassesView
+export default SubBranchAdminClassesView

@@ -10,19 +10,19 @@ import idID from "date-fns/locale/id";
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 
 import PieChart from '../components/PieChart';
-import TeachingGroupAdminPerformanceCards from '../components/TeachingGroupAdminPerformanceCards';
+import SubBranchAdminPerformanceCards from '../components/SubBranchAdminPerformanceCards';
 
 import { useReactToPrint } from 'react-to-print';
 import { academicYearFormatter } from '../../shared/Utilities/academicYearFormatter';
 import { getMonday } from '../../shared/Utilities/getMonday';
 
-const TeachingGroupPerformanceView = () => {
+const SubBranchPerformanceView = () => {
 
   const { isLoading, error, sendRequest, setError, setIsLoading } = useHttp();
 
   const [academicYearsList, setAcademicYearsList] = useState();
   const [selectedAcademicYear, setSelectedAcademicYear] = useState(null);
-  const [teachingGroupData, setTeachingGroupData] = useState();
+  const [subBranchData, setSubBranchData] = useState();
 
   const [classesList, setClassesList] = useState();
   const [selectedClass, setSelectedClass] = useState(null);
@@ -42,7 +42,7 @@ const TeachingGroupPerformanceView = () => {
 
   const printFn = useReactToPrint({
     contentRef: contentRef,
-    documentTitle: `Laporan_Performa_Kelompok_${teachingGroupData && teachingGroupData.teachingGroupName}`,
+    documentTitle: `Laporan_Performa_Kelompok_${subBranchData && subBranchData.subBranchName}`,
   });
 
   const handlePrint = () => {
@@ -73,31 +73,31 @@ const TeachingGroupPerformanceView = () => {
 
   const fetchAcademicYears = useCallback(async () => {
     try {
-      const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/academicYears/?populate=teachingGroupYears`);
+      const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/academicYears/?populate=subBranchYears`);
       setAcademicYearsList(responseData.academicYears);
     } catch (err) { }
   }, [sendRequest]);
 
   const fetchAttendanceData = useCallback(async () => {
-    const getTeachingGroupData = (data) => {
-      if (!data || !data[0] || !data[0].teachingGroupId || !data[0].teachingGroupId.branchId) {
+    const getSubBranchData = (data) => {
+      if (!data || !data[0] || !data[0].subBranchId || !data[0].subBranchId.branchId) {
         return null;
       }
 
-      const teachingGroupData = {
-        branchName: data[0].teachingGroupId.branchId.name,
-        teachingGroupName: data[0].teachingGroupId.name,
+      const subBranchData = {
+        branchName: data[0].subBranchId.branchId.name,
+        subBranchName: data[0].subBranchId.name,
         semesterTarget: data[0].semesterTarget,
       };
 
-      return teachingGroupData;
+      return subBranchData;
     };
 
     const url = `${import.meta.env.VITE_BACKEND_URL}/attendances/reports/`;
     const body = JSON.stringify({
       academicYearId: selectedAcademicYear,
       branchId: auth.userBranchId,
-      teachingGroupId: auth.userTeachingGroupId,
+      subBranchId: auth.userSubBranchId,
       classId: selectedClass,
       startDate: startDate ? startDate.toISOString() : null,
       endDate: endDate ? endDate.toISOString() : null,
@@ -110,7 +110,7 @@ const TeachingGroupPerformanceView = () => {
 
       const { overallStats, violationStats, ...cardsData } = attendanceData
 
-      setTeachingGroupData(getTeachingGroupData(attendanceData.teachingGroupYears))
+      setSubBranchData(getSubBranchData(attendanceData.subBranchYears))
       setOverallAttendances(null)
       setViolationData(null)
       setAttendanceData(null)
@@ -142,10 +142,10 @@ const TeachingGroupPerformanceView = () => {
   };
 
   const fetchClassesList = async (academicYear) => {
-    const url = `${import.meta.env.VITE_BACKEND_URL}/teachingGroupYears/teaching-group/${auth.userTeachingGroupId}/academic-year/${academicYear || selectedAcademicYear}`;
+    const url = `${import.meta.env.VITE_BACKEND_URL}/subBranchYears/teaching-group/${auth.userSubBranchId}/academic-year/${academicYear || selectedAcademicYear}`;
     try {
       const responseData = await sendRequest(url);
-      setClassesList(responseData.teachingGroupYear.classes);
+      setClassesList(responseData.subBranchYear.classes);
     } catch (err) { }
   };
 
@@ -193,11 +193,11 @@ const TeachingGroupPerformanceView = () => {
           {academicYearsList && (
             <div className="card-basic rounded-md flex-col gap-4">
               <div className="flex justify-between">
-                {teachingGroupData && (
+                {subBranchData && (
                   <div className={`flex flex-col`}>
-                    <h2 className="text-xl font-bold">Kelompok {teachingGroupData.teachingGroupName}</h2>
-                    {/* {teachingGroupData.semesterTarget && (<p className="text-sm text-gray-600">
-                      Target Semester: {teachingGroupData.semesterTarget} hari
+                    <h2 className="text-xl font-bold">Kelompok {subBranchData.subBranchName}</h2>
+                    {/* {subBranchData.semesterTarget && (<p className="text-sm text-gray-600">
+                      Target Semester: {subBranchData.semesterTarget} hari
                     </p>)} */}
                   </div>
                 )}
@@ -291,7 +291,7 @@ const TeachingGroupPerformanceView = () => {
             </div>
           )}
           {violationData && attendanceData && !isLoading && selectedAcademicYear && (
-            <TeachingGroupAdminPerformanceCards data={attendanceData} violationData={violationData} initialView={'classes'} month={periode} />
+            <SubBranchAdminPerformanceCards data={attendanceData} violationData={violationData} initialView={'classes'} month={periode} />
           )}
         </main>
       </div>
@@ -299,4 +299,4 @@ const TeachingGroupPerformanceView = () => {
   );
 };
 
-export default TeachingGroupPerformanceView;
+export default SubBranchPerformanceView;

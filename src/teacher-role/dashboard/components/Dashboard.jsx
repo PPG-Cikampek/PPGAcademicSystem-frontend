@@ -15,15 +15,15 @@ const Dashboard = ({ data }) => {
                 <div className="card-basic py-4 rounded-md flex-col my-0 active:ring-1 ">
                     <h3 className="text-gray-500 text-sm">Total Pertemuan</h3>
                     <p className="text-xl font-bold">
-                        {data.attendances && data.teachingGroupYearId?.semesterTarget ?
-                            // `${(data.attendances.length / data.teachingGroupYearId.semesterTarget / data.students.length * 100).toFixed(2)}%`
+                        {data.attendances && data.subBranchYearId?.semesterTarget ?
+                            // `${(data.attendances.length / data.subBranchYearId.semesterTarget / data.students.length * 100).toFixed(2)}%`
                             `${attendanceCount(data)}`
                             : 'No Data'
                         }
                     </p>
                 </div>
             </div>
-            {/* <div className="bg-white rounded-md shadow p-4">
+            {/* <div className="bg-white rounded-md shadow-sm p-4">
                 <h3 className="text-base font-medium mb-3">Placeholder</h3>
                 <div className="space-y-3">
                     {[1, 2, 3].map((item) => (

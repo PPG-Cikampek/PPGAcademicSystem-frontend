@@ -8,7 +8,7 @@ const initialState = {
     selectAll: false,
     classId: null,
     classStartTime: null,
-    isTeachingGroupYearActivated: null,
+    isBranchYearActivated: null,
 };
 
 const reducer = (state, action) => {
@@ -20,7 +20,7 @@ const reducer = (state, action) => {
         case 'SET_CLASS_START_TIME':
             return { ...state, classStartTime: action.payload };
         case 'SET_IS_ACTIVE_YEAR_ACTIVATED':
-            return { ...state, isTeachingGroupYearActivated: action.payload };
+            return { ...state, isSubBranchYearActivated: action.payload };
         case 'SET_STATUS':
             return {
                 ...state,
@@ -152,7 +152,7 @@ const fetchAttendanceData = async (classId, attendanceDate, dispatch) => {
         console.error('Error fetching attendance data:', error);
     }
 
-    const classUrl = `${import.meta.env.VITE_BACKEND_URL}/classes/${classId}?populate=teachingGroupYear`;
+    const classUrl = `${import.meta.env.VITE_BACKEND_URL}/classes/${classId}?populate=branchYear`;
 
     try {
         const response = await fetch(classUrl, {
@@ -166,10 +166,10 @@ const fetchAttendanceData = async (classId, attendanceDate, dispatch) => {
         }
         const data = await response.json();
 
-        // console.log(data)
+        console.log(data)
 
         dispatch({ type: 'SET_CLASS_START_TIME', payload: data.class.startTime });
-        dispatch({ type: 'SET_IS_ACTIVE_YEAR_ACTIVATED', payload: data.class.teachingGroupYearId.isActive });
+        dispatch({ type: 'SET_IS_ACTIVE_YEAR_ACTIVATED', payload: data.class.teachingGroupId.branchYearId.isActive });
 
     } catch (error) {
         console.error('Error fetching attendance data:', error);

@@ -113,7 +113,7 @@ const JournalView = () => {
                     {/* <h1 className='text-2xl font-medium m-5'>Jurnal Saya</h1> */}
                     <ul>
                         {journalData.length >= 1 && journalData.map((journal) => (
-                            <li key={journal._id} className="card-basic mx-4 rounded-3xl shadow-sm justify-start">
+                            <li key={journal._id} className="card-basic mx-4 rounded-3xl shadow-xs justify-start">
                                 <div className="flex justify-between w-full">
                                     <div className="flex flex-col  w-full">
                                         <div className="flex justify-between">

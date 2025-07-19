@@ -83,7 +83,7 @@ const Carousel = ({
     return (
         <div className="relative w-full max-w-6xl mx-auto overflow-hidden rounded-md shadow-lg">
             {/* Main carousel container */}
-            <div className="relative h-96 md:h-[32rem]">
+            <div className="relative h-96 md:h-128">
                 <div
                     className="absolute w-full h-full flex transition-transform duration-500 ease-in-out cursor-pointer"
                     style={{
@@ -102,7 +102,7 @@ const Carousel = ({
                                 className="object-cover w-full h-full"
                             />
                             {/* Content overlay */}
-                            <div className="absolute bottom-0 w-full bg-gradient-to-t from-black/85 to-transparent p-6">
+                            <div className="absolute bottom-0 w-full bg-linear-to-t from-black/85 to-transparent p-6">
                                 <h3 className="text-2xl font-semibold text-white mb-2">
                                     {item.title}
                                 </h3>

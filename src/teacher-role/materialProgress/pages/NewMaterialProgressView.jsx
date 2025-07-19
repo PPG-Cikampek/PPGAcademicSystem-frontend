@@ -60,8 +60,8 @@ const NewMaterialProgresslView = () => {
                     label: 'Kelas',
                     type: 'select',
                     required: true,
-                    // options: classData.map(({ cls }) => ({ label: cls?.teachingGroupYearId?.academicYearId?.isActive === true ? cls.name : '', value: cls?.teachingGroupYearId?.academicYearId?.isActive === true ? cls._id : '' })).filter(option => option.label && option.value)
-                    options: classData.map((cls) => ({ label: cls?.teachingGroupYearId?.academicYearId?.isActive === true ? cls.name : '', value: cls?.teachingGroupYearId?.academicYearId?.isActive === true ? cls._id : '' }))
+                    // options: classData.map(({ cls }) => ({ label: cls?.subBranchYearId?.academicYearId?.isActive === true ? cls.name : '', value: cls?.subBranchYearId?.academicYearId?.isActive === true ? cls._id : '' })).filter(option => option.label && option.value)
+                    options: classData.map((cls) => ({ label: cls?.subBranchYearId?.academicYearId?.isActive === true ? cls.name : '', value: cls?.subBranchYearId?.academicYearId?.isActive === true ? cls._id : '' }))
                 },
                 {
                     name: 'category',

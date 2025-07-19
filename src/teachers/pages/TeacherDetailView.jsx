@@ -33,7 +33,7 @@ const TeacherDetailView = () => {
         switch (position) {
             case 'branchTeacher':
                 return 'MT Desa';
-            case 'teachingGroupTeacher':
+            case 'subBranchTeacher':
                 return 'MT Kelompok';
             case 'localTeacher':
                 return 'MS';
@@ -72,8 +72,8 @@ const TeacherDetailView = () => {
                     name: responseData.teacher.name,
                     nig: responseData.teacher.nig,
                     image: responseData.teacher.image,
-                    branch: responseData.teacher.userId.teachingGroupId.branchId.name,
-                    teachingGroup: responseData.teacher.userId.teachingGroupId.name,
+                    branch: responseData.teacher.userId.subBranchId.branchId.name,
+                    subBranch: responseData.teacher.userId.subBranchId.name,
                 });
             } catch (err) {
             }
@@ -107,7 +107,7 @@ const TeacherDetailView = () => {
                             <p className="mt-2 text-gray-600">{teacherInfo.nig}</p>
                             <div className="mt-4 flex flex-col md:flex-row gap-2 text-center">
                                 <NavLink to="" className="badge-primary">{teacherInfo.branch}</NavLink>
-                                <NavLink to="" className="badge-primary">{teacherInfo.teachingGroup}</NavLink>
+                                <NavLink to="" className="badge-primary">{teacherInfo.subBranch}</NavLink>
                                 {/* <NavLink to="" className="badge-primary">{teacherInfo.class}</NavLink> */}
                             </div>
                         </div>

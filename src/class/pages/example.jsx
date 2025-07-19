@@ -9,8 +9,8 @@
             "id": "branchId0001",
             "name": "Teluk Jambe Timur",
             "address": "Jl. Raya Cikampek No.123",
-            "teachingGroups": {
-                "id": "teachingGroupId0001",
+            "subBranches": {
+                "id": "subBranchId0001",
                 "name": "Mekar Raya",
                 "address": "Galuh Mas RT00/00 Cikampek Timur Raya",
                 "classes": {
@@ -71,7 +71,7 @@
             "classId0002"
         ],
         "branchId": "",
-        "teachingGroupId": "",
+        "subBranchId": "",
     }
 }
 // Student Attendance Report

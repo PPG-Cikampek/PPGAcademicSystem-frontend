@@ -52,8 +52,8 @@ const StudentDetailView = () => {
                     name: responseData.student.name,
                     nis: responseData.student.nis,
                     image: responseData.student.image,
-                    branch: responseData.student.userId.teachingGroupId.branchId.name,
-                    teachingGroup: responseData.student.userId.teachingGroupId.name,
+                    branch: responseData.student.userId.subBranchId.branchId.name,
+                    subBranch: responseData.student.userId.subBranchId.name,
                 });
 
                 setStudentData({
@@ -76,7 +76,7 @@ const StudentDetailView = () => {
         const canvas = document.querySelector('canvas');
         const url = canvas.toDataURL('image/png');
         const link = document.createElement('a');
-        const fileName = studentInfo.name.replace(/\s+/g, '') + '_' + studentInfo.teachingGroup.replace(/\s+/g, '');
+        const fileName = studentInfo.name.replace(/\s+/g, '') + '_' + studentInfo.subBranch.replace(/\s+/g, '');
         link.href = url;
         link.download = `${fileName}_QRCode.png`;
         link.click();
@@ -155,7 +155,7 @@ const StudentDetailView = () => {
                             <p className='mt-2 text-gray-600'>{studentInfo.nis}</p>
                             <div className='mt-4 flex flex-col md:flex-row gap-2 text-center'>
                                 <span className="badge-primary">{studentInfo.branch}</span>
-                                <span className="badge-primary">{studentInfo.teachingGroup}</span>
+                                <span className="badge-primary">{studentInfo.subBranch}</span>
                             </div>
                         </div>
 

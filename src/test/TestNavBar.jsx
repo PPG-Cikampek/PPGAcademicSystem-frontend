@@ -6,7 +6,7 @@ const TestNavBar = ({ variant = 'glass', brandName = 'Brand', items = [] }) => {
     const [activeItem, setActiveItem] = useState(0);
 
     const variants = {
-        default: "bg-white border-b shadow-sm",
+        default: "bg-white border-b shadow-xs",
         material: "bg-white shadow-md rounded-lg my-2 mx-4",
         minimal: "bg-transparent",
         colored: "bg-blue-600",

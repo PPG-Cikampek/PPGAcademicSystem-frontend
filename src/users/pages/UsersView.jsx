@@ -4,7 +4,7 @@ import { AuthContext } from '../../shared/Components/Context/auth-context';
 import useHttp from '../../shared/hooks/http-hook';
 
 import Modal from '../../shared/Components/UIElements/ModalBottomClose';
-import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
+import SkeletonLoader from '../../shared/Components/UIElements/SkeletonLoader';
 import { Search, Users, Pencil, Trash, ChevronDown, Filter, PlusIcon } from 'lucide-react';
 import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
 import DataTable from '../../shared/Components/UIElements/DataTable';
@@ -17,13 +17,14 @@ const UsersView = () => {
     const [selectedUserIds, setSelectedUserIds] = useState([]);
     const [groupVisibility, setGroupVisibility] = useState({
         admin: true,
-        teachingGroupAdmin: true,
+        BranchAdmin: true,
+        subBranchAdmin: true,
         teacher: true,
         student: true,
         curriculum: true,
     });
 
-    const roleOrder = ['admin', 'teachingGroupAdmin', 'teacher', 'student', 'curriculum', 'munaqisy'];
+    const roleOrder = ['admin', 'branchAdmin', 'subBranchAdmin', 'teacher', 'student', 'curriculum', 'munaqisy'];
 
     const { isLoading, error, sendRequest, setError } = useHttp();
     const navigate = useNavigate();
@@ -48,11 +49,12 @@ const UsersView = () => {
     const getRoleColor = (role) => {
         const roles = {
             admin: 'bg-red-100 text-red-700',
-            teachingGroupAdmin: 'bg-orange-100 text-orange-700',
+            branchAdmin: 'bg-orange-100 text-orange-700',
+            subBranchAdmin: 'bg-yellow-100 text-yellow-700',
             teacher: 'bg-violet-100 text-violet-700',
             student: 'bg-blue-100 text-blue-700',
             curriculum: 'bg-green-100 text-green-700',
-            munaqisy: 'bg-orange-100 text-orange-700',
+            munaqisy: 'bg-pink-100 text-pink-700',
         };
         return roles[role] || 'bg-gray-100 text-gray-700';
     };
@@ -172,13 +174,13 @@ const UsersView = () => {
             key: 'branch',
             label: 'Desa',
             sortable: true,
-            render: (user) => user.teachingGroupId?.branchId?.name
+            render: (user) => user.subBranchId?.branchId?.name
         },
         {
             key: 'group',
             label: 'Kelompok',
             sortable: true,
-            render: (user) => user.teachingGroupId?.name
+            render: (user) => user.subBranchId?.name
         },
         {
             key: 'actions',
@@ -190,7 +192,7 @@ const UsersView = () => {
                             e.stopPropagation();
                             navigate(`/settings/users/${user._id}`);
                         }}
-                        className="p-1 hover:bg-gray-100 rounded"
+                        className="p-1 hover:bg-gray-100 rounded-sm"
                     >
                         <Pencil className="w-4 h-4" />
                     </button>
@@ -199,7 +201,7 @@ const UsersView = () => {
                             e.stopPropagation();
                             handleDeleteUser(user._id);
                         }}
-                        className="p-1 hover:bg-gray-100 rounded text-red-500"
+                        className="p-1 hover:bg-gray-100 rounded-sm text-red-500"
                     >
                         <Trash className="w-4 h-4" />
                     </button>
@@ -219,12 +221,9 @@ const UsersView = () => {
                     title={modal.title}
                     footer={<ModalFooter />}
                 >
-                    {isLoading && (
-                        <div className="flex justify-center mt-16">
-                            <LoadingCircle size={32} />
-                        </div>
-                    )}
-                    {!isLoading && (
+                    {isLoading ? (
+                        <SkeletonLoader />
+                    ) : (
                         modal.message
                     )}
                 </Modal>
@@ -251,17 +250,11 @@ const UsersView = () => {
                     </div>
                 </div>
 
-                {isLoading && (
-                    <div className="flex justify-center mt-16">
-                        <LoadingCircle size={32} />
-                    </div>
-                )}
+
 
                 {users && roleOrder.map((role) => {
                     const roleUsers = users.users.filter((user) => user.role === role);
                     if (roleUsers.length === 0) return null;
-                    // console.log(roleUsers);
-
                     return (
                         <div key={role} className="mb-8">
                             <h2 className="text-lg font-bold text-gray-900">{getUserRoleTitle(role)}</h2>
@@ -280,6 +273,7 @@ const UsersView = () => {
                                     entriesOptions: [5, 10, 20, 30]
                                 }}
                                 tableId={`users-table-${role}`}
+                                isLoading={isLoading}
                             />
                             <hr className='my-8' />
                         </div>

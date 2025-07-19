@@ -13,7 +13,7 @@ const ClassesViewByAcademicYear = () => {
 
     const navigate = useNavigate();
     const auth = useContext(AuthContext);
-    console.log(auth.userTeachingGroupId)
+    console.log(auth.userSubBranchId)
 
     useEffect(() => {
         const url = `${import.meta.env.VITE_BACKEND_URL}/classes`

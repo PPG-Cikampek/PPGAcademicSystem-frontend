@@ -1,20 +1,27 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import useHttp from '../../shared/hooks/http-hook'
 import SkeletonLoader from '../../shared/Components/UIElements/SkeletonLoader'
 import ErrorCard from '../../shared/Components/UIElements/ErrorCard'
+import { AuthContext } from '../../shared/Components/Context/auth-context'
 
 const MunaqasyahClassList = () => {
     const [classes, setClasses] = useState()
     const { isLoading, error, sendRequest, setError } = useHttp()
 
-    const teachingGroupYearId = useParams().teachingGroupYearId;
+    const branchYearId = useParams().branchYearId;
+    const auth = useContext(AuthContext)
+    const subBranchId = auth.userSubBranchId
 
+    console.log("Branch Year ID:", branchYearId);
 
     useEffect(() => {
         const fetchClasses = async () => {
             try {
-                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/scores/teachingGroupYear/${teachingGroupYearId}`);
+                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/scores/sub-branch/${subBranchId}`, 'GET', null, {
+                    'Authorization': `Bearer ${auth.token}`,
+                    'Content-Type': 'application/json'
+                });
                 setClasses(responseData.classes);
                 console.log(responseData)
                 // console.log(JSON.stringify(responseData.classes))
@@ -46,7 +53,7 @@ const MunaqasyahClassList = () => {
                     <div key={cls.classId._id}>
                         <Link
                             to={`/munaqasyah/class/${cls.classId._id}`}
-                            state={{ teachingGroupYearId }}
+                            state={{ branchYearId }}
                         >
                             <div className={`card-basic hover:bg-gray-100 active:bg-gray-100 hover:cursor-pointer rounded-md justify-start m-0 transition-all duration-200 my-4`}>
                                 <div className="flex items-center space-x-4">

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import useHttp from '../../shared/hooks/http-hook';
 import { AuthContext } from '../../shared/Components/Context/auth-context';
 
@@ -19,15 +19,15 @@ const TeachersView = () => {
     useEffect(() => {
         const url = auth.userRole === 'admin'
             ? `${import.meta.env.VITE_BACKEND_URL}/teachers`
-            : `${import.meta.env.VITE_BACKEND_URL}/teachers/teaching-group/${auth.userTeachingGroupId}`;
-
-        console.log(url)
+            : auth.userRole === 'branchAdmin'
+                ? `${import.meta.env.VITE_BACKEND_URL}/teachers/branch/${auth.userBranchId}`
+                : `${import.meta.env.VITE_BACKEND_URL}/teachers/sub-branch/${auth.userSubBranchId}`;
         const fetchTeachers = async () => {
             try {
                 const responseData = await sendRequest(url);
                 setTeachers(responseData.teachers);
                 console.log(responseData.teachers)
-                console.log(auth.userTeachingGroupId)
+                console.log(auth.userSubBranchId)
 
             } catch (err) {
                 // Error is handled by useHttp
@@ -83,13 +83,21 @@ const TeachersView = () => {
                 key: 'branch',
                 label: 'Desa',
                 sortable: true,
-                render: (teacher) => teacher?.userId?.teachingGroupId?.branchId?.name
+                render: (teacher) => teacher?.userId?.subBranchId?.branchId?.name
             },
             {
                 key: 'group',
                 label: 'Kelompok',
                 sortable: true,
-                render: (teacher) => teacher?.userId?.teachingGroupId?.name
+                render: (teacher) => teacher?.userId?.subBranchId?.name
+            }
+        ] : []),
+        ...(auth.userRole === 'branchAdmin' ? [
+            {
+                key: 'group',
+                label: 'Kelompok',
+                sortable: true,
+                render: (teacher) => teacher?.userId?.subBranchId?.name
             }
         ] : []),
         {
@@ -113,24 +121,32 @@ const TeachersView = () => {
         }
     ];
 
-    if (auth.userRole === 'admin' && teachers?.length > 0) {
-        const branches = [...new Set(teachers.map(t => t?.userId?.teachingGroupId?.branchId?.name).filter(Boolean))];
-        const groups = [...new Set(teachers.map(t => t?.userId?.teachingGroupId?.name).filter(Boolean))];
+    if (teachers?.length > 0) {
+        const branches = [...new Set(teachers.map(s => s?.userId?.subBranchId?.branchId?.name).filter(Boolean))];
+        const subBranches = [...new Set(teachers.map(s => s?.userId?.subBranchId?.name).filter(Boolean))];
 
-        filterOptions.push(
-            {
-                key: 'branch',
-                label: 'Desa',
-                options: branches
-            },
-            {
-                key: 'group',
-                label: 'Kelompok',
-                options: groups
-            }
-        );
-
-        console.log(filterOptions)
+        if (auth.userRole === 'admin') {
+            filterOptions.push(
+                {
+                    key: 'branch',
+                    label: 'Desa',
+                    options: branches
+                },
+                {
+                    key: 'group',
+                    label: 'Kelompok',
+                    options: subBranches
+                }
+            );
+        } else if (auth.userRole === 'branchAdmin') {
+            filterOptions.push(
+                {
+                    key: 'group',
+                    label: 'Kelompok',
+                    options: subBranches
+                }
+            );
+        }
     }
 
     return (

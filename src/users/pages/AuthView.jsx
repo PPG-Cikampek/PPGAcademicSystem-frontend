@@ -36,21 +36,21 @@ const AuthView = () => {
         const body = JSON.stringify({ email: data.email, password: data.password, nis });
 
         let responseData;
-        let teachingGroupYearData
+        let branchYearData
         try {
             responseData = await sendRequest(url, 'POST', body, {
                 'Content-Type': 'application/json'
             });
 
-            console.log(responseData.user.teachingGroupId.id)
-
             try {
-                teachingGroupYearData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/teachingGroupYears/teachingGroup/${responseData.user.teachingGroupId.id}`)
+                branchYearData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/branchYears/branch/${responseData.user.subBranchId.branchId.id}`)
+                console.log(responseData.user.subBranchId.branchId.id)
+                console.log(branchYearData)
             } catch (err) { }
 
-            let activeAcademicYear
-            if (teachingGroupYearData) {
-                activeAcademicYear = teachingGroupYearData.teachingGroupYears.find(year => year.academicYearId.isActive);
+            let activeBranchYear
+            if (branchYearData && branchYearData.branchYears) {
+                activeBranchYear = branchYearData.branchYears.find(year => year.academicYearId.isActive);
             }
 
             let teacherData
@@ -66,7 +66,7 @@ const AuthView = () => {
 
             console.log('logging IN')
             console.log(responseData)
-            console.log(teachingGroupYearData)
+            console.log(branchYearData)
 
             const classIds = teacherData?.teacher?.classIds.map(item => item._id) || []
 
@@ -74,10 +74,10 @@ const AuthView = () => {
                 responseData.user.id,
                 responseData.user.role,
                 responseData.user.name,
-                responseData.user.teachingGroupId.branchId.id,
-                responseData.user.teachingGroupId.id,
-                activeAcademicYear?.academicYearId?.name || null,
-                activeAcademicYear?._id || null,
+                responseData.user?.subBranchId?.branchId?.id || null,
+                responseData.user?.subBranchId?.id || null,
+                activeBranchYear?.academicYearId?.name || null,
+                activeBranchYear?._id || null,
                 classIds,
                 responseData.token
             );
@@ -116,6 +116,7 @@ const AuthView = () => {
                         onSubmit={handleFormSubmit}
                         disabled={isLoading}
                         labels={false}
+                        className={'min-w-96'}
                         button={
                             <div className="flex flex-col justify-stretch mt-4">
                                 <button
@@ -147,6 +148,7 @@ const AuthView = () => {
                         disabled={isLoading}
                         fields={studentLoginFields}
                         labels={false}
+                        className={'min-w-96'}
                         button={
                             <div className="flex flex-col justify-stretch mt-4">
                                 {studentLoginFields.length !== 0 && (

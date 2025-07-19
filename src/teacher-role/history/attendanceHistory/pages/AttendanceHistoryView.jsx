@@ -52,6 +52,8 @@ const AttendanceHistoryView = () => {
                     <LoadingCircle size={32} />
                 </div>
             )}
+            {error && console.log(error)}
+
             {error && (
                 <InfoCard className={'mx-4 mt-12'}>
                     <p>Belum terdaftar di kelas manapun!</p>

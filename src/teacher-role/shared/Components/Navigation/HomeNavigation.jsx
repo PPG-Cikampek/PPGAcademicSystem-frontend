@@ -38,16 +38,16 @@ const HomeNavigation = ({ children }) => {
                 icon: <BookOpenText />,
                 label: 'Munaqosah',
             },
-            {
-                link: '/performances',
-                icon: <Gauge />,
-                label: 'Performa Kehadiran',
-            },
-            {
-                link: '/dashboard/academic',
-                icon: <CalendarCog />,
-                label: 'Tahun Ajaran',
-            },
+            // {
+            //     link: '/performances',
+            //     icon: <Gauge />,
+            //     label: 'Performa Kehadiran',
+            // },
+            // {
+            //     link: '/dashboard/academic',
+            //     icon: <CalendarCog />,
+            //     label: 'Tahun Ajaran',
+            // },
             {
                 link: `/settings/profile/` + auth.userId,
                 icon: <Settings />,

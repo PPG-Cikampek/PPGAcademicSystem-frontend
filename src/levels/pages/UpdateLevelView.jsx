@@ -16,24 +16,24 @@ const UpdateLevelView = () => {
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [loadedLevel, setLoadedLevel] = useState();
 
-    const teachingGroupId = useParams().teachingGroupId
+    const subBranchId = useParams().subBranchId
     const navigate = useNavigate()
 
 
     useEffect(() => {
-        const fetchTeachingGroup = async () => {
+        const fetchSubBranch = async () => {
             try {
-                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/levels/branches/teaching-groupes/${teachingGroupId}`)
-                setLoadedLevel(responseData.teachingGroup)
+                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/levels/branches/sub-branches/${subBranchId}`)
+                setLoadedLevel(responseData.subBranch)
                 console.log(responseData)
-                console.log(responseData.teachingGroup)
+                console.log(responseData.subBranch)
             } catch (err) { }
         }
-        fetchTeachingGroup();
+        fetchSubBranch();
     }, [sendRequest])
 
     const handleFormSubmit = async (data) => {
-        const url = `${import.meta.env.VITE_BACKEND_URL}/levels/branches/teaching-groupes/${teachingGroupId}`
+        const url = `${import.meta.env.VITE_BACKEND_URL}/levels/branches/sub-branches/${subBranchId}`
 
         const body = JSON.stringify({ name: data.name, address: data.address });
 
