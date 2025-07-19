@@ -43,7 +43,7 @@
 }
 
 @utility card-basic {
-  @apply mt-4 p-5 flex justify-center rounded-3xl md:mx-8 bg-white shadow-xs ring-1 ring-gray-200;
+  @apply mt-4 p-5 flex justify-center rounded-3xl bg-white shadow-xs ring-1 ring-gray-200;
 }
 
 @utility button-primary {
