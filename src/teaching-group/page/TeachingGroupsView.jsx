@@ -62,8 +62,8 @@ const TeachingGroupsView = () => {
                             <Eye size={20} />
                         </button>
                     </Link>
-                    {teachingGroupData.branchYearId.academicYearId.isActive
-                        && teachingGroupData.isLocked === false
+                    {teachingGroupData?.branchYearId?.academicYearId.isActive
+                        && teachingGroupData?.isLocked === false
                         && (<button
                             onClick={(e) => { e.stopPropagation(); removeSubBranchHandler(item.name, item._id); }}
                             className="p-3 rounded-full hover:bg-gray-200 text-red-500 hover:text-red-700 transition"
@@ -103,8 +103,8 @@ const TeachingGroupsView = () => {
                         </button>
                     </Link>
                     {auth.userRole === 'branchAdmin'
-                        && teachingGroupData.branchYearId.academicYearId.isActive
-                        && teachingGroupData.isLocked === false
+                        && teachingGroupData?.branchYearId?.academicYearId.isActive
+                        && teachingGroupData?.isLocked === false
                         && (<>
                             <button
                                 onClick={(e) => {
@@ -255,13 +255,13 @@ const TeachingGroupsView = () => {
         closeModal()
         if (actionType === 'lock') {
             openModal({
-                title: `Kunci KBM: ${teachingGroupData.name}?`,
+                title: `Kunci KBM: ${teachingGroupData?.name}?`,
                 message: `KBM tidak akan bisa di-edit lagi!`,
                 onConfirm: confirmLock,
             });
         } else {
             openModal({
-                title: `Buka Kunci KBM: ${teachingGroupData.name}?`,
+                title: `Buka Kunci KBM: ${teachingGroupData?.name}?`,
                 message: `KBM akan bisa di-edit lagi`,
                 onConfirm: confirmLock,
             });
@@ -299,12 +299,12 @@ const TeachingGroupsView = () => {
                                 <h1 className="text-2xl font-semibold text-gray-900 mb-2">Detail KBM</h1>
                                 <div className="card-basic flex-col md:flex-row justify-between md:items-center rounded-md m-0 mb-2">
                                     <div className="flex flex-col gap-2">
-                                        <h1 className="flex items-center gap-2 text-xl font-medium text-gray-900 mb-2">KBM {teachingGroupData.name}
-                                            <span className={`inline-block p-1 rounded-md border-2 ${teachingGroupData.isLocked ? 'border-blue-500 text-blue-500' : 'border-red-500 text-red-500'}`}>{teachingGroupData.isLocked ? <Lock size={16} /> : <LockOpen size={16} />}</span>
+                                        <h1 className="flex items-center gap-2 text-xl font-medium text-gray-900 mb-2">KBM {teachingGroupData?.name}
+                                            <span className={`inline-block p-1 rounded-md border-2 ${teachingGroupData?.isLocked ? 'border-blue-500 text-blue-500' : 'border-red-500 text-red-500'}`}>{teachingGroupData?.isLocked ? <Lock size={16} /> : <LockOpen size={16} />}</span>
                                         </h1>
                                         <div className="flex items-center space-x-2 text-gray-600">
                                             <MapPin className="h-5 w-5" />
-                                            <span>Tempat Kegiatan KBM: {teachingGroupData.address}</span>
+                                            <span>Tempat Kegiatan KBM: {teachingGroupData?.address}</span>
                                         </div>
                                         <div className="flex items-center space-x-2 text-gray-600">
                                             <Layers2 className="h-5 w-5" />
@@ -316,10 +316,10 @@ const TeachingGroupsView = () => {
                                         </div>
                                     </div>
                                     <div>
-                                        {(teachingGroupData.branchYearId.isActive === false
-                                            && teachingGroupData.branchYearId.academicYearId.isActive === true
+                                        {(teachingGroupData?.branchYearId?.isActive === false
+                                            && teachingGroupData?.branchYearId?.academicYearId.isActive === true
                                             && auth.userRole === 'branchAdmin'
-                                            && teachingGroupData.isLocked === true)
+                                            && teachingGroupData?.isLocked === true)
                                             && (
                                                 <button
                                                     className='button-danger'
@@ -329,9 +329,9 @@ const TeachingGroupsView = () => {
                                                 </button>
                                             )}
 
-                                        {(teachingGroupData.branchYearId.isActive === false
-                                            && teachingGroupData.branchYearId.academicYearId.isActive === true
-                                            && teachingGroupData.isLocked === false
+                                        {(teachingGroupData?.branchYearId?.isActive === false
+                                            && teachingGroupData?.branchYearId?.academicYearId.isActive === true
+                                            && teachingGroupData?.isLocked === false
                                             && auth.userRole === 'branchAdmin')
                                             && (
                                                 <button
@@ -353,9 +353,9 @@ const TeachingGroupsView = () => {
                                     {/* <GraduationCap className="mr-2 h-5 w-5 text-gray-600" /> */}
                                     <h2 className="text-xl font-medium text-gray-800">Kelompok Terdaftar</h2>
                                 </div>
-                                {teachingGroupData.branchYearId.academicYearId.isActive
+                                {teachingGroupData?.branchYearId?.academicYearId.isActive
                                     && auth.userRole === 'branchAdmin'
-                                    && teachingGroupData.isLocked === false
+                                    && teachingGroupData?.isLocked === false
                                     && (
                                         <button
                                             className="button-primary pl-[11px] mt-0"
@@ -372,7 +372,7 @@ const TeachingGroupsView = () => {
                                     )}
                             </div>
                             <DataTable
-                                data={teachingGroupData.subBranches || []}
+                                data={teachingGroupData?.subBranches || []}
                                 columns={subBranchColumns}
                                 searchableColumns={['name']}
                                 initialSort={{ key: 'name', direction: 'ascending' }}
@@ -397,8 +397,8 @@ const TeachingGroupsView = () => {
                                     <h2 className="text-xl font-medium text-gray-800">Kelas Terdaftar</h2>
                                 </div>
                                 {auth.userRole === 'branchAdmin'
-                                    && teachingGroupData.branchYearId.academicYearId.isActive
-                                    && teachingGroupData.isLocked === false
+                                    && teachingGroupData?.branchYearId?.academicYearId.isActive
+                                    && teachingGroupData?.isLocked === false
                                     && (
                                         <Link to={`/dashboard/teaching-groups/${teachingGroupId}/add-class/`}>
                                             <button className="button-primary pl-[11px] mt-0">
@@ -409,7 +409,7 @@ const TeachingGroupsView = () => {
                                     )}
                             </div>
                             <DataTable
-                                data={teachingGroupData.classes || []}
+                                data={teachingGroupData?.classes || []}
                                 columns={classColumns}
                                 searchableColumns={['name']}
                                 initialSort={{ key: 'name', direction: 'ascending' }}
