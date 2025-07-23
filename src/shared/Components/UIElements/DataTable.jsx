@@ -63,8 +63,8 @@ const DataTable = ({
         Object.entries(filters).forEach(([key, value]) => {
             if (value) {
                 filtered = filtered.filter(item => {
-                    const column = columns.find(col => col.key === key);
-                    const itemValue = column.render ? column.render(item) : item[key];
+                    // Always use the raw item value for filtering, not the rendered value
+                    const itemValue = item[key];
                     return itemValue === value;
                 });
             }
@@ -162,9 +162,14 @@ const DataTable = ({
                                 }))}
                             >
                                 <option value="">Semua</option>
-                                {options.map(option => (
-                                    <option key={option} value={option}>{option}</option>
-                                ))}
+                                {options.map(option => {
+                                    // Handle both string arrays and object arrays
+                                    const value = typeof option === 'string' ? option : option.value;
+                                    const label = typeof option === 'string' ? option : option.label;
+                                    return (
+                                        <option key={value} value={value}>{label}</option>
+                                    );
+                                })}
                             </select>
                         </div>
                     ))}
@@ -208,7 +213,7 @@ const DataTable = ({
                                     <span>Pencarian:</span>
                                     <input
                                         type="text"
-                                        className="px-2 py-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300"
+                                        className="bg-white px-2 py-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300"
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
                                     />
