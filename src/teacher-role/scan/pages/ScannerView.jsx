@@ -40,7 +40,12 @@ const ScannerView = () => {
         setIsLoading(true);
         if (state.studentList.length === 0) {
             const url = `${import.meta.env.VITE_BACKEND_URL}/attendances/create-new-attendances`;
-            const body = JSON.stringify({ classId });
+            const body = JSON.stringify({
+                classId,
+                subBranchId: auth.userSubBranchId,
+                branchId: auth.userBranchId,
+                branchYearId: auth.currentBranchYearId,
+            });
             try {
                 await sendRequest(url, 'POST', body, {
                     'Content-Type': 'application/json',
@@ -59,7 +64,7 @@ const ScannerView = () => {
     // console.log(state)
 
     return (
-        <div className='flex flex-col pb-24'>
+        <div className='flex flex-col pb-40'>
             <SequentialAnimation variant={2}>
                 <StatusBar />
             </SequentialAnimation>

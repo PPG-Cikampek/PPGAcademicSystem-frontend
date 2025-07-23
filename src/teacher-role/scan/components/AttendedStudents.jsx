@@ -1,4 +1,4 @@
-import React, { useContext, useRef, useState, useEffect } from 'react';
+import { useContext, useRef, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import useHttp from '../../../shared/hooks/http-hook';
@@ -183,31 +183,10 @@ const AttendedStudents = () => {
     };
 
     return (
-        <div className="card-basic mx-4 flex-col box-border">
+        <div className="card-basic mx-4 mb-8 flex-col box-border">
             {unsavedChanges > 0 && <BlockNavigation />}
             <div className="flex items-center gap-3">
                 <h1 className='text-lg font-medium'>Daftar Hadir</h1>
-                {state.studentList.length !== 0 && (
-                    isLoading ? (
-                        <div className='flex items-center gap-2 animate-pulse'>
-                            <LoaderCircle size={24} className='animate-spin' />
-                            <span className='text-xs text-gray-600'>Menyimpan...</span>
-                        </div>
-                    ) : (
-                        error ? (
-                            <Icon icon="mdi:cloud-alert-outline" width="24" height="24" />
-                        ) : (
-                            <div className={`flex items-center gap-1 duration-300 ${unsavedChanges > 0 ? 'text-red-500 animate-bounce' : 'text-blue-500 animate-pulse'}`}>
-                                <Icon icon={unsavedChanges > 0 ? "lucide:circle-alert" : "ci:cloud-check"} width="24" height="24" />
-                                <span className={`text-xs`}>
-                                    {unsavedChanges > 0
-                                        ? `Perubahan belum disimpan`
-                                        : 'Perubahan tersimpan'}
-                                </span>
-                            </div>
-                        )
-                    )
-                )}
             </div>
             {state.studentList.length !== 0 && state.isSubBranchYearActivated === true ? (
                 <div className="inline-flex items-center">
@@ -250,8 +229,8 @@ const AttendedStudents = () => {
                             <div className="flex gap-2 items-center mb-2">
                                 {student.studentId.image ? (
                                     <img
-                                    src={student.studentId.thumbnail ? student.studentId.thumbnail : `${import.meta.env.VITE_BACKEND_URL}/${student.studentId.image}`}
-                                    alt="Profile"
+                                        src={student.studentId.thumbnail ? student.studentId.thumbnail : `${import.meta.env.VITE_BACKEND_URL}/${student.studentId.image}`}
+                                        alt="Profile"
                                         className="rounded-full size-10 shrink-0 border border-gray-200 bg-white"
                                     />
                                 ) : (
@@ -266,8 +245,8 @@ const AttendedStudents = () => {
                                 <select
                                     value={student.status || ''}
                                     onChange={(e) => handleStatusChange(student.studentId.nis, e.target.value)}
-                                    className="border p-1 rounded-full active:ring-2 active:ring-blue-300 h-min"
-                                    // disabled={student.status === "Hadir" || student.status === "Terlambat"}
+                                    className="border p-1 bg-white rounded-full active:ring-2 active:ring-blue-300 h-min"
+                                // disabled={student.status === "Hadir" || student.status === "Terlambat"}
                                 >
                                     <option value={null}>Tanpa Keterangan</option>
                                     <option value="Hadir">Hadir</option>
@@ -293,7 +272,7 @@ const AttendedStudents = () => {
                                                 transition={{ duration: 0.3, ease: "backInOut" }}
                                             // className="overflow-hidden bg-white"
                                             >
-                                                <div className={`mt-2 mr-4 rounded-md bg-white ring-1 ring-black ring-opacity-5`}>
+                                                <div className={`mt-2 mr-4 rounded-md bg-white  ring-opacity-5`}>
                                                     <div className="flex flex-col py-2">
                                                         <div className="px-2 inline-flex items-center">
                                                             <input
@@ -327,7 +306,7 @@ const AttendedStudents = () => {
                                                 transition={{ duration: 0.3, ease: "backInOut" }}
                                             // className="overflow-hidden bg-white"
                                             >
-                                                <div className={`mt-2 mr-4 rounded-md bg-white ring-1 ring-black ring-opacity-5`}>
+                                                <div className={`mt-2 mr-4 rounded-md bg-white  ring-opacity-5`}>
                                                     <div className="flex flex-col py-2">
                                                         <div className="px-2 inline-flex items-center">
                                                             <label className="flex items-center cursor-pointer p-2 relative" htmlFor={student.studentId.nis + "attribute"}>
@@ -394,32 +373,57 @@ const AttendedStudents = () => {
                         </div>
                     </div>
                 ))}
+                
             </div>
+            {/* Fixed action buttons at bottom */}
             {state.isSubBranchYearActivated === true && state.studentList.length !== 0 && (
-                <div className="flex justify-between items-center">
-                    <div className='flex gap-2'>
+                <div className="fixed bottom-16 left-0 right-0 bg-white border-t border-gray-300 p-4 z-10 transition-all">
+                    {state.studentList.length !== 0 && (
+                        <div className="mb-2 mx-2">
+                            {isLoading ? (
+                                <div className='flex items-center gap-2 animate-pulse'>
+                                    <LoaderCircle size={24} className='animate-spin' />
+                                    <span className='text-xs text-gray-600'>Menyimpan...</span>
+                                </div>
+                            ) : error ? (
+                                <Icon icon="mdi:cloud-alert-outline" width="24" height="24" />
+                            ) : (
+                                <div className={`flex items-center gap-1 duration-300 ${unsavedChanges > 0 ? 'text-red-500 animate-bounce' : 'text-blue-500 animate-pulse'}`}>
+                                    <Icon icon={unsavedChanges > 0 ? "lucide:circle-alert" : "ci:cloud-check"} width="24" height="24" />
+                                    <span className={`text-xs`}>
+                                        {unsavedChanges > 0
+                                            ? `Perubahan belum disimpan`
+                                            : 'Perubahan tersimpan'}
+                                    </span>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                    <div className="flex justify-between items-center">
+                        <div className='flex gap-2'>
+                            <button
+                                onClick={() => applyBulkStatus('Sakit')}
+                                className="btn-mobile-secondary-outline rounded-full"
+                                disabled={state.studentList.filter(student => student.isSelected === true).length === 0}
+                            >
+                                Sakit
+                            </button>
+                            <button
+                                onClick={() => applyBulkStatus('Izin')}
+                                className="btn-mobile-danger-outline rounded-full"
+                                disabled={state.studentList.filter(student => student.isSelected === true).length === 0}
+                            >
+                                Izin
+                            </button>
+                        </div>
                         <button
-                            onClick={() => applyBulkStatus('Sakit')}
-                            className="btn-mobile-secondary-outline rounded-full"
-                            disabled={state.studentList.filter(student => student.isSelected === true).length === 0}
+                            onClick={handleSave}
+                            className="btn-mobile-primary-round"
+                            disabled={isLoading || unsavedChanges === 0}
                         >
-                            Sakit
-                        </button>
-                        <button
-                            onClick={() => applyBulkStatus('Izin')}
-                            className="btn-mobile-danger-outline rounded-full"
-                            disabled={state.studentList.filter(student => student.isSelected === true).length === 0}
-                        >
-                            Izin
+                            {isLoading ? (<LoadingCircle>Menyimpan...</LoadingCircle>) : 'Simpan'}
                         </button>
                     </div>
-                    <button
-                        onClick={handleSave}
-                        className="btn-mobile-primary-round"
-                        disabled={isLoading || unsavedChanges === 0}
-                    >
-                        {isLoading ? (<LoadingCircle>Menyimpan...</LoadingCircle>) : 'Simpan'}
-                    </button>
                 </div>
             )}
         </div>
