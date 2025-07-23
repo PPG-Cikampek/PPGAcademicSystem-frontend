@@ -1,4 +1,4 @@
-import React, { lazy } from 'react';
+import { lazy } from 'react';
 import PreviewReport from '../munaqasyah/pages/PreviewReport';
 import ClassesViewByAcademicYear from '../class/pages/ClassesViewByAcademicYear';
 

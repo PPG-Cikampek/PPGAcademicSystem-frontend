@@ -11,7 +11,7 @@ import DynamicForm from '../../shared/Components/UIElements/DynamicForm';
 import Modal from '../../shared/Components/UIElements/ModalBottomClose';
 import WarningCard from '../../shared/Components/UIElements/WarningCard';
 import generateBase64Thumbnail from '../../shared/Utilities/generateBase64Thumbnail';
-import { Pencil } from 'lucide-react';
+import { Pencil, X, Check } from 'lucide-react';
 import { Icon } from '@iconify-icon/react/dist/iconify.js';
 
 const ProfileView = () => {
@@ -309,11 +309,11 @@ const ProfileView = () => {
                                                     type="text"
                                                     value={editedName}
                                                     onChange={e => setEditedName(e.target.value)}
-                                                    className="border rounded-sm px-2 py-2 font-medium text-gray-800 focus:ring-2 focus:ring-primary"
+                                                    className="border rounded-sm m-0 px-2 py-2 font-medium text-gray-800 focus:ring-2 focus:ring-primary"
                                                     autoFocus
                                                 />
-                                                <button type="submit" className="button-primary my-0 text-sm">Simpan</button>
-                                                <button type="button" onClick={() => setIsEditingName(false)} className="ml-1 text-gray-500 hover:text-red-500">Batal</button>
+                                                <button type="submit" className="icon-button-primary    "><Check size={16} /></button>
+                                                <button type="button" onClick={() => setIsEditingName(false)} className="icon-button-danger"><X size={16}/></button>
                                             </form>
                                         ) : (
                                             <>
@@ -341,7 +341,7 @@ const ProfileView = () => {
                                     />
                                     <button
                                         type="button"
-                                        className={`button-primary m-0 py-2 inline-block ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                        className={`button-primary mt-0 py-2 inline-block ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
                                         disabled={isLoading}
                                         onClick={handleEmailUpdate}
                                     >

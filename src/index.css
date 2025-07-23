@@ -21,6 +21,7 @@
   color utility to any element that depends on these defaults.
 */
 @layer base {
+
   *,
   ::after,
   ::before,
@@ -40,6 +41,14 @@
 
 @utility card-interactive {
   @apply mt-4 p-4 flex justify-center rounded-3xl md:mx-8 bg-white shadow-xs ring-1 ring-gray-200 transition ease-out hover:-translate-y-1 hover:scale-[1.025] hover:cursor-pointer hover:shadow-lg duration-200;
+}
+
+@utility icon-button-primary {
+  @apply p-3 rounded-full max-md:border max-md:border-blue-500 hover:cursor-pointer hover:bg-gray-200 hover:text-blue-700 text-blue-500 active:cursor-pointer active:bg-blue-500 active:text-white transition
+}
+
+@utility icon-button-danger {
+  @apply p-3 rounded-full max-md:border max-md:border-red-500 hover:cursor-pointer hover:bg-gray-200 hover:text-red-700 text-red-500 active:cursor-pointer active:bg-red-500 active:text-white transition
 }
 
 @utility card-basic {
@@ -87,11 +96,11 @@
 }
 
 @utility btn-mobile-secondary-outline {
-  @apply p-2 px-4 rounded-md border border-secondary hover:cursor-pointer active:bg-secondary disabled:border-primary-subtle disabled:opacity-60 transition-all duration-200;
+  @apply p-2 px-4 rounded-md border border-secondary hover:cursor-pointer active:text-white active:bg-secondary disabled:border-primary-subtle disabled:opacity-60 transition-all duration-200;
 }
 
 @utility btn-mobile-danger-outline {
-  @apply p-2 px-4 rounded-md border border-danger hover:cursor-pointer active:bg-danger disabled:border-primary-subtle disabled:opacity-60 transition-all duration-200;
+  @apply p-2 px-4 rounded-md border border-danger hover:cursor-pointer active:text-white active:bg-danger disabled:border-primary-subtle disabled:opacity-60 transition-all duration-200;
 }
 
 @utility btn-mobile-primary {
