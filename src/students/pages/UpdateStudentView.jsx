@@ -61,7 +61,7 @@ const UpdateStudentView = () => {
                 { name: 'dateOfBirth', label: 'Tanggal Lahir', placeholder: 'Desa', type: 'date', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedDate || '' },
                 { name: 'gender', label: 'Jenis Kelamin', type: 'select', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.gender || '', options: [{ label: 'Laki-Laki', value: 'male' }, { label: 'Perempuan', value: 'female' }] },
                 { name: 'parentName', label: 'Nama Orang Tua/Wali', type: 'text', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.parentName || '' },
-                { name: 'parentPhone', label: 'Nomor WA Orang Tua/Wali', type: 'phone', placeholder: '8123456789', type: 'phone', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.parentPhone || '' },
+                { name: 'parentPhone', label: 'Nomor WA Orang Tua/Wali', type: 'phone', placeholder: '8123456789', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.parentPhone || '' },
                 { name: 'address', label: 'Alamat', type: 'textarea', required: auth.userRole !== 'admin' ? true : false, disabled: isLoading, value: loadedStudent?.address || '' },
             ])
         }

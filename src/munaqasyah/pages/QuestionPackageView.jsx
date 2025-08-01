@@ -8,7 +8,7 @@ import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle'
 
 import { Download, RefreshCw, Trash } from 'lucide-react'
 
-import { academicYearFormatter } from '../../shared/utilities/academicYearFormatter'
+import { academicYearFormatter } from '../../shared/Utilities/academicYearFormatter'
 
 const QuestionPackageView = () => {
     const [packages, setPackages] = useState([])
