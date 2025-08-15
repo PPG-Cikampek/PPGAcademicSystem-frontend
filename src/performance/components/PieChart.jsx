@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, memo } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import html2canvas from 'html2canvas';
 
@@ -111,7 +111,7 @@ const MultiDoughnutChart = ({ attendanceData }) => (
   </div>
 );
 
-const PieChart = ({ attendanceData, chartType, toImage = false }) => {
+const PieChart = memo(({ attendanceData, chartType, toImage = false }) => {
   const [transformedData, setTransformedData] = useState([]);
   console.log(attendanceData)
 
@@ -178,6 +178,22 @@ const PieChart = ({ attendanceData, chartType, toImage = false }) => {
       )}
     </div>
   )
-};
+}, (prevProps, nextProps) => {
+  // Custom comparison function for React.memo
+  // Only re-render if attendanceData actually changes
+  if (!prevProps.attendanceData && !nextProps.attendanceData) return true;
+  if (!prevProps.attendanceData || !nextProps.attendanceData) return false;
+  
+  // Deep comparison of attendanceData array
+  if (prevProps.attendanceData.length !== nextProps.attendanceData.length) return false;
+  
+  return prevProps.attendanceData.every((item, index) => {
+    const nextItem = nextProps.attendanceData[index];
+    return item.status === nextItem.status && 
+           item.count === nextItem.count && 
+           item.percentage === nextItem.percentage;
+  }) && prevProps.chartType === nextProps.chartType && 
+       prevProps.toImage === nextProps.toImage;
+});
 
 export default PieChart;

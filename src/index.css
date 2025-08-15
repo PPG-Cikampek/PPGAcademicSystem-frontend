@@ -112,7 +112,7 @@
 }
 
 @utility btn-mobile-primary-round-gray {
-  @apply flex items-center gap-2 px-4 py-2 border border-gray-300 hover:bg-gray-200 hover:cursor-pointer rounded-full text-sm font-medium transition-colors;
+  @apply flex items-center gap-2 px-4 py-2 border border-gray-300 hover:bg-gray-200 disabled:text-gray-500 disabled:hover:bg-white disabled:cursor-not-allowed  hover:cursor-pointer rounded-full text-sm font-medium transition-colors;
 }
 
 @utility stat-card {
