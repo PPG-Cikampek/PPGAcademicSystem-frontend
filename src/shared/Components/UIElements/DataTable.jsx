@@ -63,8 +63,8 @@ const DataTable = ({
         Object.entries(filters).forEach(([key, value]) => {
             if (value) {
                 filtered = filtered.filter(item => {
-                    // Always use the raw item value for filtering, not the rendered value
-                    const itemValue = item[key];
+                    const column = columns.find(col => col.key === key);
+                    const itemValue = column.render ? column.render(item) : item[key];
                     return itemValue === value;
                 });
             }
