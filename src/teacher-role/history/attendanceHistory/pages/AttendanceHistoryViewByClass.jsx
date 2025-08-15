@@ -113,7 +113,7 @@ const AttendanceHistoryViewByClass = () => {
     );
 
     return (
-        <div className="p-4 space-y-4">
+        <div className="p-4 space-y-4 mb-24">
             {isLoading && !loadedData && (
                 <div className="flex justify-center mt-16">
                     <LoadingCircle size={32} />
