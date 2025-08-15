@@ -234,7 +234,7 @@ const DataTable = ({
             </div>
             {config.showFilter && filterOptions.length > 0 && <FilterCard />}
             <div className="bg-white shadow-xs rounded-md overflow-auto text-nowrap mb-4">
-                <table className="w-full">
+                <table className="w-full rounded-md">
                     <thead className="border-b">
                         {isLoading ? (
                             <SkeletonHeader />

@@ -15,6 +15,8 @@ const AcademicYearCard = ({ year, expanded, onToggle, onActivate, onMunaqsyahSta
         }))
         : [];
 
+    console.log(JSON.stringify(transformedData, null, 2));
+
     const columns = [
         {
             key: 'name',

@@ -172,7 +172,7 @@ const styles = {
     }
 };
 
-const StudentReportView = ({ studentData, attendanceData, noCard = false }) => {
+const StudentReportView = ({ studentData = null, attendanceData = null, noCard = false }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [reportData, setReportData] = useState();
     const [reportChart, setReportChart] = useState();

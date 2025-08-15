@@ -2,6 +2,7 @@ import React, { lazy } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { StudentAttendanceProvider } from '../teacher-role/scan/context/StudentAttendanceContext';
 import { MunaqasyahScoreProvider } from '../munaqisy/context/MunaqasyahScoreContext';
+import StudentReportView from '../students/pages/StudentReportView';
 
 
 const MunaqasyahScannerView = lazy(() => import('../munaqisy/pages/MunaqasyahScannerView'));
@@ -92,7 +93,7 @@ export const teacherRoutes = [
         path: '/materialProgress',
         element: (
             <PageHeader>
-                <MaterialProgressView/>
+                <MaterialProgressView />
             </PageHeader>
         )
     },
@@ -108,7 +109,7 @@ export const teacherRoutes = [
         path: '/journal',
         element: (
             <PageHeader>
-                <JournalView/>
+                <JournalView />
             </PageHeader>
         )
     },
@@ -187,13 +188,13 @@ export const teacherRoutes = [
     {
         path: '/munaqasyah/scanner',
         element: (
-                <MunaqasyahScannerView />
+            <MunaqasyahScannerView />
         )
     },
     {
         path: '/munaqasyah/student',
         element: (
-                <StudentScoresView />
+            <StudentScoresView />
         )
     },
     {
@@ -220,14 +221,14 @@ export const teacherRoutes = [
             </PageHeader >
         )
     },
-    // {
-    //     path: '/performances/student/:studentId',
-    //     element: (
-    //         <PageHeader>
-    //             <StudentReportView />
-    //         </PageHeader>
-    //     )
-    // },
+    {
+        path: '/performances/student/:studentId',
+        element: (
+            <PageHeader>
+                <StudentReportView />
+            </PageHeader>
+        )
+    },
     {
         path: '/settings/profile/:userId',
         element: (

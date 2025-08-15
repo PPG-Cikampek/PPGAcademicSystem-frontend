@@ -12,50 +12,138 @@ import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 import PieChart from '../components/PieChart';
 import { academicYearFormatter } from '../../shared/Utilities/academicYearFormatter';
 import { getMonday } from '../../shared/Utilities/getMonday';
-import StudentPerformanceCard from '../components/StudentPerformanceCard';
+import DataTable from '../../shared/Components/UIElements/DataTable';
+import StudentInitial from '../../shared/Components/UIElements/StudentInitial';
+import StudentReportView from '../../students/pages/StudentReportView';
 
 const TeacherPerformanceView = () => {
+    const navigate = useNavigate();
 
 
 
-    const students = [{
-        id: 1,
-        name: 'John Doe',
-        nis: '123456',
-        image: 'path/to/image.jpg',
-        thumbnail: 'path/to/thumbnail.jpg',
-        attendances: [
-            { status: 'Hadir', percentage: 80 },
-            { status: 'Terlambat', percentage: 10 },
-            { status: 'Izin', percentage: 5 },
-            { status: 'Sakit', percentage: 5 },
-        ],
-        violationData: [
-            { attribute: 'Perlengkapan Belajar', count: 2 },
-            { attribute: 'Sikap', count: 1 },
-            { attribute: 'Kerapihan', count: 0 },
-        ]
-    }, {
-        id: 2,
-        name: 'Jane Smith',
-        nis: '654321',
-        image: 'path/to/image.jpg',
-        thumbnail: 'path/to/thumbnail.jpg',
-        attendances: [
-            { status: 'Hadir', percentage: 80 },
-            { status: 'Terlambat', percentage: 10 },
-            { status: 'Izin', percentage: 5 },
-            { status: 'Sakit', percentage: 5 },
-        ],
-        violationData: [
-            { attribute: 'Perlengkapan Belajar', count: 2 },
-            { attribute: 'Sikap', count: 1 },
-            { attribute: 'Kerapihan', count: 0 },
-        ]
-    }]
+    const studentData = [
+        {
+            id: 1,
+            name: 'John Doe',
+            nis: '123456',
+            image: 'path/to/image.jpg',
+            thumbnail: 'path/to/thumbnail.jpg',
+            attendances: {
+                'Hadir': 80,
+                'Terlambat': 10,
+                'Izin': 5,
+                'Sakit': 5
+            },
+            violationData: {
+                'Perlengkapan Belajar': 2,
+                'Sikap': 1,
+                'Kerapihan': 0
+            }
+        },
+        {
+            id: 2,
+            name: 'Jane Smith',
+            nis: '654321',
+            image: 'path/to/image.jpg',
+            thumbnail: 'path/to/thumbnail.jpg',
+            attendances: {
+                'Hadir': 80,
+                'Terlambat': 10,
+                'Izin': 5,
+                'Sakit': 5
+            },
+            violationData: {
+                'Perlengkapan Belajar': 2,
+                'Sikap': 1,
+                'Kerapihan': 0
+            }
+        }]
 
 
-
+    const studentColumns = [
+        {
+            key: 'image',
+            label: '',
+            sortable: false,
+            render: (student) => (
+                student.image ? (
+                    <img
+                        src={student.thumbnail ? student.thumbnail : `${import.meta.env.VITE_BACKEND_URL}/${student.image}`}
+                        alt={student.name}
+                        className="size-10 rounded-full m-auto shrink-0 border border-gray-200 bg-white"
+                    />
+                ) : (
+                    <StudentInitial
+                        studentName={student.name}
+                        clsName={`size-10 shrink-0 rounded-full bg-blue-200 text-blue-500 flex items-center justify-center font-medium m-auto`}
+                    />
+                )
+            )
+        },
+        {
+            key: 'name',
+            label: 'Nama',
+            sortable: true,
+        },
+        {
+            key: 'nis',
+            label: 'NIS',
+            sortable: true,
+        },
+        {
+            key: 'present',
+            label: 'Hadir',
+            sortable: true,
+            render: (student) => (
+                <div className="text-center">
+                    {student.attendances.Hadir}%
+                </div>
+            )
+        },
+        {
+            key: 'late',
+            label: 'Terlambat',
+            sortable: true,
+            render: (student) => (
+                <div className="text-center">
+                    {student.attendances.Terlambat}%
+                </div>
+            )
+        },
+        {
+            key: 'permission',
+            label: 'Izin',
+            sortable: true,
+            render: (student) => (
+                <div className="text-center">
+                    {student.attendances.Izin}%
+                </div>
+            )
+        },
+        {
+            key: 'sick',
+            label: 'Sakit',
+            sortable: true,
+            render: (student) => (
+                <div className="text-center">
+                    {student.attendances.Sakit}%
+                </div>
+            )
+        },
+        {
+            key: 'action',
+            label: 'Aksi',
+            render: (student) => (
+                <button 
+                className="btn-mobile-primary-round my-0"
+                onClick={() => navigate(`/performances/student/${student.id}`)}
+                >
+                    Lihat Laporan
+                    {/* <StudentReportView studentData={student} attendanceData={student.attendances} noCard={true} /> */}
+                </button>
+            )
+        }
+    ]
 
 
 
@@ -87,7 +175,9 @@ const TeacherPerformanceView = () => {
         attendanceData: null,
         overallAttendances: null,
         violationData: null,
-        appliedFilters: null // Keep track of which filters were used for the current data
+        appliedFilters: null, // Keep track of which filters were used for the current data
+        classData: null,
+        studentsData: null
     });
 
     // Dropdown options lists
@@ -389,10 +479,22 @@ const TeacherPerformanceView = () => {
                     </div>
 
                 )}
-                {displayState.violationData && displayState.attendanceData && !isLoading && filterState.selectedAcademicYear && (
-                    students.map(student => (
-                        <StudentPerformanceCard key={student.id} data={student}/>
-                    ))
+                {displayState.violationData && !isLoading && filterState.selectedAcademicYear && (
+                    <DataTable
+                        data={studentData}
+                        columns={studentColumns}
+                        searchableColumns={['name']}
+                        initialSort={{ key: 'name', direction: 'ascending' }}
+                        initialEntriesPerPage={50}
+                        config={{
+                            showFilter: false,
+                            showSearch: false,
+                            showTopEntries: false,
+                            showBottomEntries: false,
+                            showPagination: false,
+                            entriesOptions: [10, 20, 30]
+                        }}
+                    />
                 )}
             </main>
         </div>
