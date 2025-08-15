@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 import { useQuery } from '@tanstack/react-query';
@@ -53,9 +53,12 @@ const HomeScreenView = () => {
         staleTime: 1000 * 60 * 5,
     });
 
+    useEffect(() => {
+        console.log(`${auth.userClassIds}`);
+    }, [data]);
+
+
     let activeClassCount = 0;
-    // console.log(JSON.stringify(data))
-    // console.log(data)
 
     return (
         <div className="flex flex-col pb-12">
@@ -105,9 +108,8 @@ const HomeScreenView = () => {
                             <div className="mb-2">
                                 {data.classIds.map((item, index) => {
                                     const isClassInActiveAcademicYear = item?.teachingGroupId?.branchYearId?.academicYearId?.isActive
-                                    // console.log(item)
+                                    console.log(item)
                                     if (isClassInActiveAcademicYear) {
-                                        // console.log(item)
                                         activeClassCount++;
                                         return <Dashboard key={index} data={item} />
                                     }

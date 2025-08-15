@@ -1,6 +1,8 @@
 import React, { useEffect, useState, useRef, memo } from 'react';
 import { Doughnut } from 'react-chartjs-2';
 import html2canvas from 'html2canvas';
+import { Chart, ArcElement, Tooltip, Legend } from 'chart.js'
+Chart.register(ArcElement, Tooltip, Legend);
 
 const getChartColors = (status) => {
   const colors = {
@@ -85,7 +87,7 @@ const CombinedDoughnutChart = ({ attendanceData, toImage }) => {
     maintainAspectRatio: true,
     plugins: {
       // tooltip: { enabled: true },
-      legend: { display: true },
+      legend: { display: true, position: 'bottom' },
     },
     cutout: '50%',
   };
@@ -183,17 +185,17 @@ const PieChart = memo(({ attendanceData, chartType, toImage = false }) => {
   // Only re-render if attendanceData actually changes
   if (!prevProps.attendanceData && !nextProps.attendanceData) return true;
   if (!prevProps.attendanceData || !nextProps.attendanceData) return false;
-  
+
   // Deep comparison of attendanceData array
   if (prevProps.attendanceData.length !== nextProps.attendanceData.length) return false;
-  
+
   return prevProps.attendanceData.every((item, index) => {
     const nextItem = nextProps.attendanceData[index];
-    return item.status === nextItem.status && 
-           item.count === nextItem.count && 
-           item.percentage === nextItem.percentage;
-  }) && prevProps.chartType === nextProps.chartType && 
-       prevProps.toImage === nextProps.toImage;
+    return item.status === nextItem.status &&
+      item.count === nextItem.count &&
+      item.percentage === nextItem.percentage;
+  }) && prevProps.chartType === nextProps.chartType &&
+    prevProps.toImage === nextProps.toImage;
 });
 
 export default PieChart;

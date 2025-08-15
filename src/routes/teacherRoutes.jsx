@@ -29,7 +29,7 @@ const UpdateAttendanceView = lazy(() => import("../teacher-role/history/attendan
 // const StudentReportView = lazy(() => import("../students/pages/StudentReportView"));
 const ProfileView = lazy(() => import("../users/pages/ProfileView"));
 const NewJournalView = lazy(() => import("../teacher-role/journal/pages/NewJournalView"));
-// const TeacherPerformanceView = lazy(() => import("../performance/pages/TeacherPerformanceView"));
+const TeacherPerformanceView = lazy(() => import("../performance/pages/TeacherPerformanceView"));
 const MaterialProgressView = lazy(() => import("../teacher-role/materialProgress/pages/materialProgressView"));
 const NewMaterialProgresslView = lazy(() => import("../teacher-role/materialProgress/pages/NewMaterialProgressView"));
 
@@ -212,14 +212,14 @@ export const teacherRoutes = [
             </PageHeader>
         )
     },
-    // {
-    //     path: '/performances',
-    //     element: (
-    //         <PageHeader>
-    //             <TeacherPerformanceView />
-    //         </PageHeader >
-    //     )
-    // },
+    {
+        path: '/performances',
+        element: (
+            <PageHeader>
+                <TeacherPerformanceView />
+            </PageHeader >
+        )
+    },
     // {
     //     path: '/performances/student/:studentId',
     //     element: (

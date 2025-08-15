@@ -93,7 +93,7 @@ const SubBranchPerformanceView = () => {
       return subBranchData;
     };
 
-    const url = `${import.meta.env.VITE_BACKEND_URL}/attendances/reports/`;
+    const url = `${import.meta.env.VITE_BACKEND_URL}/attendances/overview/`;
     const body = JSON.stringify({
       academicYearId: selectedAcademicYear,
       branchId: auth.userBranchId,

@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useCallback } from 'react';
+import React, { useContext, useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DatePicker, { registerLocale } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -10,30 +10,90 @@ import { AuthContext } from '../../shared/Components/Context/auth-context';
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 
 import PieChart from '../components/PieChart';
-import SubBranchAdminPerformanceCards from '../components/SubBranchAdminPerformanceCards';
 import { academicYearFormatter } from '../../shared/Utilities/academicYearFormatter';
 import { getMonday } from '../../shared/Utilities/getMonday';
+import StudentPerformanceCard from '../components/StudentPerformanceCard';
 
 const TeacherPerformanceView = () => {
 
+
+
+    const students = [{
+        id: 1,
+        name: 'John Doe',
+        nis: '123456',
+        image: 'path/to/image.jpg',
+        thumbnail: 'path/to/thumbnail.jpg',
+        attendances: [
+            { status: 'Hadir', percentage: 80 },
+            { status: 'Terlambat', percentage: 10 },
+            { status: 'Izin', percentage: 5 },
+            { status: 'Sakit', percentage: 5 },
+        ],
+        violationData: [
+            { attribute: 'Perlengkapan Belajar', count: 2 },
+            { attribute: 'Sikap', count: 1 },
+            { attribute: 'Kerapihan', count: 0 },
+        ]
+    }, {
+        id: 2,
+        name: 'Jane Smith',
+        nis: '654321',
+        image: 'path/to/image.jpg',
+        thumbnail: 'path/to/thumbnail.jpg',
+        attendances: [
+            { status: 'Hadir', percentage: 80 },
+            { status: 'Terlambat', percentage: 10 },
+            { status: 'Izin', percentage: 5 },
+            { status: 'Sakit', percentage: 5 },
+        ],
+        violationData: [
+            { attribute: 'Perlengkapan Belajar', count: 2 },
+            { attribute: 'Sikap', count: 1 },
+            { attribute: 'Kerapihan', count: 0 },
+        ]
+    }]
+
+
+
+
+
+
+
     const { isLoading, error, sendRequest, setError } = useHttp();
 
+    const initialFilterState = {
+        selectedAcademicYear: '',
+        startDate: null,
+        endDate: null,
+        periode: null,
+        selectedClass: ''
+    };
+
+    // Academic years list (static data)
     const [academicYearsList, setAcademicYearsList] = useState();
-    const [selectedAcademicYear, setSelectedAcademicYear] = useState(null);
 
+    // Filter state - for user selections (doesn't trigger data fetches)
+    const [filterState, setFilterState] = useState({
+        selectedAcademicYear: null,
+        startDate: null,
+        endDate: null,
+        periode: null,
+        selectedClass: null
+    });
+
+    // Display state - for currently shown data (only updates when filters are applied)
+    const [displayState, setDisplayState] = useState({
+        attendanceData: null,
+        overallAttendances: null,
+        violationData: null,
+        appliedFilters: null // Keep track of which filters were used for the current data
+    });
+
+    // Dropdown options lists
     const [classesList, setClassesList] = useState();
-    const [selectedClass, setSelectedClass] = useState(null);
-
-    const [attendanceData, setAttendanceData] = useState();
-    const [overallAttendances, setOverallAttendances] = useState();
-    const [violationData, setViolationData] = useState();
-
-    const [startDate, setStartDate] = useState(null);
-    const [endDate, setEndDate] = useState(null);
-    const [periode, setPeriode] = useState(null);
 
     const auth = useContext(AuthContext);
-    const navigate = useNavigate();
 
     const violationTranslations = {
         attribute: "Perlengkapan Belajar",
@@ -49,52 +109,15 @@ const TeacherPerformanceView = () => {
     }, [sendRequest]);
 
     const fetchAttendanceData = useCallback(async () => {
-        const getOverallStats = (data) => {
-            const attendances = [];
-            data.subBranchYears.forEach((year) => {
-                year.classes.forEach((cls) => {
-                    cls.attendances.forEach((att) => {
-                        attendances.push(att.status);
-                    });
-                });
-            });
-            const statusCounts = attendances.reduce((acc, status) => {
-                acc[status] = (acc[status] || 0) + 1;
-                return acc;
-            }, {});
-            const total = attendances.length;
-            return Object.keys(statusCounts).map((status) => ({
-                status,
-                count: statusCounts[status],
-                percentage: Math.round((statusCounts[status] / total) * 100 * 100) / 100,
-            })).sort((a, b) => a.status.localeCompare(b.status));
-        };
-
-        const getViolationStats = (data) => {
-            const violationCounts = {};
-            data.subBranchYears.forEach((groupYear) => {
-                groupYear.classes.forEach((cls) => {
-                    cls.attendances.forEach((attendance) => {
-                        Object.entries(attendance.violations).forEach(([violation, occurred]) => {
-                            if (occurred) {
-                                violationCounts[violation] = (violationCounts[violation] || 0) + 1;
-                            }
-                        });
-                    });
-                });
-            });
-
-            return Object.entries(violationCounts).map(([violation, count]) => ({ violation, count }));
-        };
-
-        const url = `${import.meta.env.VITE_BACKEND_URL}/attendances/reports/`;
+        const url = `${import.meta.env.VITE_BACKEND_URL}/attendances/overview/`;
         const body = JSON.stringify({
-            academicYearId: selectedAcademicYear,
+            academicYearId: filterState.selectedAcademicYear,
             branchId: auth.userBranchId,
             subBranchId: auth.userSubBranchId,
-            classId: selectedClass,
-            startDate: startDate ? startDate.toISOString() : null,
-            endDate: endDate ? endDate.toISOString() : null,
+            classId: filterState.selectedClass,
+            teacherClassIds: auth.userClassIds, // Use all classes the user has access to
+            startDate: filterState.startDate ? filterState.startDate.toISOString() : null,
+            endDate: filterState.endDate ? filterState.endDate.toISOString() : null,
         });
 
         try {
@@ -103,45 +126,45 @@ const TeacherPerformanceView = () => {
             });
             console.log(responseData)
 
-            let updatedData = {}
-            updatedData.subBranchYears = responseData.subBranchYears.map(year => {
-                // Keep only the classes with IDs in the classIdsToKeep array
-                year.classes = year.classes.filter(cls => auth.userClassIds.includes(cls._id));
-                return year;
-            });
-
             const { overallStats, violationStats, ...cardsData } = responseData
 
-            setOverallAttendances(null)
-            setViolationData(null)
-            setAttendanceData(cardsData);
-            setOverallAttendances(responseData.overallStats);
-            setViolationData(responseData.violationStats);
+            // Update display state with new data and record applied filters
+            setDisplayState({
+                attendanceData: cardsData,
+                overallAttendances: responseData.overallStats,
+                violationData: responseData.violationStats,
+                appliedFilters: { ...filterState } // Snapshot of current filters
+            });
         } catch (err) { }
-    }, [sendRequest, selectedAcademicYear, selectedClass, startDate, endDate]);
+    }, [sendRequest, filterState]);
 
     useEffect(() => {
         registerLocale("id-ID", idID);
         fetchAcademicYears();
-        fetchAttendanceData();
-    }, [fetchAcademicYears, fetchAttendanceData]);
+    }, [fetchAcademicYears]);
 
-    const selectAcademicYearHandler = (academicYearId) => {
-        setOverallAttendances(null)
-        setViolationData(null)
-        setAttendanceData(null)
-        setSelectedAcademicYear(academicYearId);
+    const selectAcademicYearHandler = useCallback((academicYearId) => {
+        setFilterState(prev => ({
+            ...prev,
+            selectedAcademicYear: academicYearId,
+            selectedClass: null
+        }));
+
+        setDisplayState(prev => ({
+            ...prev,
+            attendanceData: null,
+            overallAttendances: null,
+            violationData: null
+        }));
+
         setClassesList([]);
-        setSelectedClass(null);
-        setStartDate(null);
-        setEndDate(null);
 
         if (academicYearId !== '') {
             fetchClassesList();
         }
-    };
+    }, []);
 
-    const fetchClassesList = async () => {
+    const fetchClassesList = useCallback(async () => {
         const url = `${import.meta.env.VITE_BACKEND_URL}/classes/get-by-ids`
         const body = JSON.stringify({ classIds: auth.userClassIds })
         console.log(body)
@@ -153,21 +176,26 @@ const TeacherPerformanceView = () => {
             setClassesList(responseData.classes)
             console.log(responseData.classes)
         } catch (err) { }
-    };
+    }, [sendRequest, auth.userClassIds]);
 
-    const selectClassHandler = (classId) => {
-        setOverallAttendances(null)
-        setViolationData(null)
-        setAttendanceData(null)
-        setSelectedClass(classId);
-    };
+    const selectClassHandler = useCallback((classId) => {
+        setFilterState(prev => ({
+            ...prev,
+            selectedClass: classId
+        }));
 
-    const selectDateRangeHandler = (dates) => {
-        setOverallAttendances(null)
-        setViolationData(null)
-        setAttendanceData(null)
+        setDisplayState(prev => ({
+            ...prev,
+            attendanceData: null,
+            overallAttendances: null,
+            violationData: null
+        }));
+    }, []);
+
+    const selectDateRangeHandler = useCallback((dates) => {
         let startingWeek = null;
         let endOfWeek = null;
+        let periode = null;
 
         if (dates) {
             startingWeek = getMonday(dates);
@@ -177,7 +205,7 @@ const TeacherPerformanceView = () => {
             console.log(startingWeek)
             console.log(endOfWeek)
 
-            setPeriode(startingWeek.toLocaleDateString('id-ID', {
+            periode = startingWeek.toLocaleDateString('id-ID', {
                 day: '2-digit',
                 timeZone: 'Asia/Jakarta'
             }) + " - " +
@@ -186,52 +214,91 @@ const TeacherPerformanceView = () => {
                     month: 'long',
                     year: 'numeric',
                     timeZone: 'Asia/Jakarta'
-                }))
+                });
         }
-        setStartDate(startingWeek)
-        setEndDate(endOfWeek);
-    };
+
+        setFilterState(prev => ({
+            ...prev,
+            startDate: startingWeek,
+            endDate: endOfWeek,
+            periode: periode
+        }));
+
+        setDisplayState(prev => ({
+            ...prev,
+            attendanceData: null,
+            overallAttendances: null,
+            violationData: null
+        }));
+    }, []);
+
+    const handleApplyFilter = useCallback(() => {
+        if (!filterState.selectedAcademicYear) {
+            alert('Silakan pilih tahun ajaran terlebih dahulu');
+            return;
+        }
+
+        // Clear previous data while loading
+        setDisplayState(prev => ({
+            ...prev,
+            attendanceData: null,
+            overallAttendances: null,
+            violationData: null
+        }));
+
+        fetchAttendanceData();
+    }, [filterState.selectedAcademicYear, fetchAttendanceData]);
+
+    const handleResetFilter = useCallback(() => {
+        // Reset filter selections to initial values
+        setFilterState({ ...initialFilterState });
+
+        // Clear displayed data
+        setDisplayState({
+            attendanceData: null,
+            overallAttendances: null,
+            violationData: null,
+            appliedFilters: null
+        });
+
+        // Clear dependent lists
+        setClassesList([]);
+    }, []);
+
+    // Memoized values to prevent unnecessary re-renders
+    const memoizedOverallAttendances = useMemo(() => {
+        return displayState.overallAttendances;
+    }, [displayState.overallAttendances]);
+
+    const memoizedViolationData = useMemo(() => {
+        return displayState.violationData;
+    }, [displayState.violationData]);
 
     return (
         <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">
-            <main className="max-w-6xl mx-auto">
-                {(!academicYearsList || isLoading) && (
-                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex justify-center items-center w-full h-dvh">
-                        <LoadingCircle size={32} />
-                    </div>
-                )}
+            <main className="max-w-6xl mx-auto mb-24">
+
                 {academicYearsList && (
                     <div className="card-basic rounded-md flex-col gap-4">
-
-                        <div className="flex justify-between">
-                            {/* {subBranchData && (
-                                <div className={`flex flex-col`}>
-                                    <h2 className="text-xl font-bold">Kelompok {subBranchData.subBranchName}</h2>
-                                    <p className="text-sm text-gray-600">
-                                        Target Semester: {subBranchData.semesterTarget} hari
-                                    </p>
-                                </div>
-                            )} */}
-                        </div>
 
                         <div className="flex flex-col md:flex-row justify-between gap-4">
 
                             <div className="flex flex-col gap-5">
 
                                 <div className="flex flex-row gap-4 items-center">
-                                    <div className='flex flex-col gap-[18px]'>
+                                    <div className='flex flex-col gap-[18px] items-start'>
                                         <div>Tahun Ajaran</div>
                                         <div>Periode</div>
                                         <div>Kelas</div>
                                     </div>
                                     <div className='flex flex-col gap-2'>
                                         <select
-                                            value={selectedAcademicYear ? selectedAcademicYear : ''}
+                                            value={filterState.selectedAcademicYear ? filterState.selectedAcademicYear : ''}
                                             onChange={(e) => selectAcademicYearHandler(e.target.value)}
                                             className="border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300"
                                             disabled={false}
                                         >
-                                            {!selectedAcademicYear && <option value={''}>Pilih</option>}
+                                            {!filterState.selectedAcademicYear && <option value={''}>Pilih</option>}
                                             {academicYearsList && academicYearsList.map((academicYear, index) => (
                                                 <option key={index} value={academicYear._id}>
                                                     {academicYearFormatter(academicYear.name)}
@@ -241,21 +308,21 @@ const TeacherPerformanceView = () => {
                                         <DatePicker
                                             dateFormat="dd/MM/yyyy"
                                             maxDate={new Date(getMonday(new Date()).setDate(getMonday(new Date()).getDate() + 6))}
-                                            selected={startDate}
+                                            selected={filterState.startDate}
                                             onChange={selectDateRangeHandler}
-                                            startDate={startDate}
-                                            endDate={endDate}
+                                            startDate={filterState.startDate}
+                                            endDate={filterState.endDate}
                                             locale={'id-ID'}
                                             showWeekPicker
                                             isClearable
                                             withPortal={window.innerWidth <= 768}
-                                            className={`${selectedAcademicYear && 'pr-8'} border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300`}
-                                            disabled={!selectedAcademicYear}
-                                            placeholderText={`${selectedAcademicYear ? 'Semua' : 'Pilih Tahun Ajaran'}`}
+                                            className={`${filterState.selectedAcademicYear && 'pr-8'} border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300`}
+                                            disabled={!filterState.selectedAcademicYear}
+                                            placeholderText={`${filterState.selectedAcademicYear ? 'Semua' : 'Pilih Tahun Ajaran'}`}
                                             onFocus={(e) => e.target.readOnly = true}
                                         />
                                         <select
-                                            value={selectedClass ? selectedClass : ''}
+                                            value={filterState.selectedClass ? filterState.selectedClass : ''}
                                             onChange={(e) => selectClassHandler(e.target.value)}
                                             className="border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300"
                                         >
@@ -270,10 +337,28 @@ const TeacherPerformanceView = () => {
 
                                 </div>
 
+                                <div className="flex justify-center mt-4 gap-2">
+                                    <button
+                                        onClick={handleApplyFilter}
+                                        disabled={!filterState.selectedAcademicYear || isLoading}
+                                        className="btn-mobile-primary-round-gray"
+                                    >
+                                        {isLoading ? 'Memuat...' : 'Tampilkan'}
+                                    </button>
+
+                                    <button
+                                        onClick={handleResetFilter}
+                                        disabled={isLoading}
+                                        className="btn-danger-outline rounded-full"
+                                    >
+                                        Reset Filter
+                                    </button>
+                                </div>
+
                                 <div className="self-start flex flex-row gap-2">
                                     {/* Left Column: Violation Names */}
                                     <div className="flex flex-col gap-1">
-                                        {violationData && !isLoading && selectedAcademicYear && violationData.map(({ violation }, index) => (
+                                        {memoizedViolationData && !isLoading && filterState.selectedAcademicYear && memoizedViolationData.map(({ violation }, index) => (
                                             <div key={index} className="">
                                                 {violationTranslations[violation] || violation}
                                             </div>
@@ -282,7 +367,7 @@ const TeacherPerformanceView = () => {
 
                                     {/* Right Column: Case Counts */}
                                     <div className="flex flex-col gap-1 ">
-                                        {violationData && !isLoading && selectedAcademicYear && violationData.map(({ count }, index) => (
+                                        {memoizedViolationData && !isLoading && filterState.selectedAcademicYear && memoizedViolationData.map(({ count }, index) => (
                                             <div key={index} className="font-bold">
                                                 : {count} Temuan
                                             </div>
@@ -290,17 +375,24 @@ const TeacherPerformanceView = () => {
                                     </div>
                                 </div>
                             </div>
-                            {overallAttendances && !isLoading && selectedAcademicYear && (
+                            {(!academicYearsList || isLoading) && (
+                                <div className="place-self-center justify-self-center self-center mx-auto">
+                                    <LoadingCircle size={32} />
+                                </div>
+                            )}
+                            {memoizedOverallAttendances && !isLoading && filterState.selectedAcademicYear && (
                                 <div className=''>
-                                    <PieChart attendanceData={overallAttendances} />
+                                    <PieChart attendanceData={memoizedOverallAttendances} />
                                 </div>
                             )}
                         </div>
                     </div>
 
                 )}
-                {violationData && attendanceData && !isLoading && selectedAcademicYear && (
-                    <SubBranchAdminPerformanceCards data={attendanceData} violationData={violationData} initialView={'classes'} month={periode} />
+                {displayState.violationData && displayState.attendanceData && !isLoading && filterState.selectedAcademicYear && (
+                    students.map(student => (
+                        <StudentPerformanceCard key={student.id} data={student}/>
+                    ))
                 )}
             </main>
         </div>

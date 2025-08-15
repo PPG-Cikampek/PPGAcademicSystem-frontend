@@ -10,7 +10,6 @@ import { AuthContext } from '../../shared/Components/Context/auth-context';
 
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 
-import ExperimentalCards from '../components/ExperementalCards';
 import PieChart from '../components/PieChart';
 import { academicYearFormatter } from '../../shared/Utilities/academicYearFormatter';
 import { getMonday } from '../../shared/Utilities/getMonday';
@@ -73,7 +72,7 @@ const PerformanceView = () => {
     }, [sendRequest]);
 
     const fetchAttendanceData = useCallback(async () => {
-        const url = `${import.meta.env.VITE_BACKEND_URL}/attendances/reports/`;
+        const url = `${import.meta.env.VITE_BACKEND_URL}/attendances/overview/`;
         const body = JSON.stringify({
             academicYearId: filterState.selectedAcademicYear,
             branchId: filterState.selectedBranch,
