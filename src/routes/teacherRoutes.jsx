@@ -222,7 +222,7 @@ export const teacherRoutes = [
         )
     },
     {
-        path: '/performances/student/:studentId',
+        path: '/performances/student',
         element: (
             <PageHeader>
                 <StudentReportView />

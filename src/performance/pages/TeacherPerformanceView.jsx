@@ -66,7 +66,7 @@ const TeacherPerformanceView = () => {
             label: '',
             sortable: false,
             render: (student) => (
-                student.image ? (
+                student.thumbnail ? (
                     <img
                         src={student.thumbnail ? student.thumbnail : `${import.meta.env.VITE_BACKEND_URL}/${student.image}`}
                         alt={student.name}
@@ -94,8 +94,9 @@ const TeacherPerformanceView = () => {
             key: 'present',
             label: 'Hadir',
             sortable: true,
+            cellAlign: 'center',
             render: (student) => (
-                <div className="text-center">
+                <div className="badge-green w-12 place-self-center">
                     {student.attendances.Hadir}%
                 </div>
             )
@@ -104,18 +105,21 @@ const TeacherPerformanceView = () => {
             key: 'late',
             label: 'Terlambat',
             sortable: true,
+            cellAlign: 'center',
             render: (student) => (
-                <div className="text-center">
+                <div className="badge-primary w-12 place-self-center">
                     {student.attendances.Terlambat}%
                 </div>
             )
+
         },
         {
             key: 'permission',
             label: 'Izin',
             sortable: true,
+            cellAlign: 'center',
             render: (student) => (
-                <div className="text-center">
+                <div className="badge-yellow w-12 place-self-center">
                     {student.attendances.Izin}%
                 </div>
             )
@@ -124,9 +128,21 @@ const TeacherPerformanceView = () => {
             key: 'sick',
             label: 'Sakit',
             sortable: true,
+            cellAlign: 'center',
             render: (student) => (
-                <div className="text-center">
+                <div className="badge-violet w-12 place-self-center">
                     {student.attendances.Sakit}%
+                </div>
+            )
+        },
+        {
+            key: 'absent',
+            label: 'Alpha',
+            sortable: true,
+            cellAlign: 'center',
+            render: (student) => (
+                <div className="badge-red w-12 place-self-center">
+                    {student.attendances["Tanpa Keterangan"]}%
                 </div>
             )
         },
@@ -134,13 +150,19 @@ const TeacherPerformanceView = () => {
             key: 'action',
             label: 'Aksi',
             render: (student) => (
-                <button 
-                className="btn-mobile-primary-round my-0"
-                onClick={() => navigate(`/performances/student/${student.id}`)}
-                >
-                    Lihat Laporan
-                    {/* <StudentReportView studentData={student} attendanceData={student.attendances} noCard={true} /> */}
-                </button>
+                <div>
+                    {filterState.selectedAcademicYear && (student.id || student._id) ? (
+                        <StudentReportView
+                            academicYearId={filterState.selectedAcademicYear}
+                            studentId={student.id || student._id}
+                            startDate={filterState.startDate}
+                            endDate={filterState.endDate}
+                            noCard={true}
+                        />
+                    ) : (
+                        <span className="text-gray-400 text-sm">Pilih tahun ajaran</span>
+                    )}
+                </div>
             )
         }
     ]
@@ -154,7 +176,7 @@ const TeacherPerformanceView = () => {
         selectedAcademicYear: '',
         startDate: null,
         endDate: null,
-        periode: null,
+        period: null,
         selectedClass: ''
     };
 
@@ -166,7 +188,7 @@ const TeacherPerformanceView = () => {
         selectedAcademicYear: null,
         startDate: null,
         endDate: null,
-        periode: null,
+        period: null,
         selectedClass: null
     });
 
@@ -223,7 +245,8 @@ const TeacherPerformanceView = () => {
                 attendanceData: cardsData,
                 overallAttendances: responseData.overallStats,
                 violationData: responseData.violationStats,
-                appliedFilters: { ...filterState } // Snapshot of current filters
+                appliedFilters: { ...filterState }, // Snapshot of current filters
+                studentsData: responseData.studentsData
             });
         } catch (err) { }
     }, [sendRequest, filterState]);
@@ -285,7 +308,7 @@ const TeacherPerformanceView = () => {
     const selectDateRangeHandler = useCallback((dates) => {
         let startingWeek = null;
         let endOfWeek = null;
-        let periode = null;
+        let period = null;
 
         if (dates) {
             startingWeek = getMonday(dates);
@@ -295,7 +318,7 @@ const TeacherPerformanceView = () => {
             console.log(startingWeek)
             console.log(endOfWeek)
 
-            periode = startingWeek.toLocaleDateString('id-ID', {
+            period = startingWeek.toLocaleDateString('id-ID', {
                 day: '2-digit',
                 timeZone: 'Asia/Jakarta'
             }) + " - " +
@@ -307,11 +330,13 @@ const TeacherPerformanceView = () => {
                 });
         }
 
+        console.log(period)
+
         setFilterState(prev => ({
             ...prev,
             startDate: startingWeek,
             endDate: endOfWeek,
-            periode: periode
+            period: period
         }));
 
         setDisplayState(prev => ({
@@ -402,19 +427,21 @@ const TeacherPerformanceView = () => {
                                             onChange={selectDateRangeHandler}
                                             startDate={filterState.startDate}
                                             endDate={filterState.endDate}
+                                            value={filterState.period}
                                             locale={'id-ID'}
                                             showWeekPicker
                                             isClearable
                                             withPortal={window.innerWidth <= 768}
-                                            className={`${filterState.selectedAcademicYear && 'pr-8'} border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300`}
+                                            className={`${filterState.selectedAcademicYear && 'pr-8'} border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300 ${filterState.selectedAcademicYear ? '' : 'opacity-50 cursor-not-allowed'}`}
                                             disabled={!filterState.selectedAcademicYear}
-                                            placeholderText={`${filterState.selectedAcademicYear ? 'Semua' : 'Pilih Tahun Ajaran'}`}
+                                            placeholderText={`${filterState.selectedAcademicYear ? 'Pilih Periode' : 'Pilih Tahun Ajaran'}`}
                                             onFocus={(e) => e.target.readOnly = true}
                                         />
                                         <select
                                             value={filterState.selectedClass ? filterState.selectedClass : ''}
                                             onChange={(e) => selectClassHandler(e.target.value)}
-                                            className="border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300"
+                                            className={`border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300 ${filterState.selectedAcademicYear ? '' : 'opacity-50 cursor-not-allowed'}`}
+                                            disabled={!filterState.selectedAcademicYear}
                                         >
                                             <option value={''}>Semua</option>
                                             {classesList && classesList.map((cls, index) => (
@@ -430,7 +457,7 @@ const TeacherPerformanceView = () => {
                                 <div className="flex justify-center mt-4 gap-2">
                                     <button
                                         onClick={handleApplyFilter}
-                                        disabled={!filterState.selectedAcademicYear || isLoading}
+                                        disabled={!filterState.selectedAcademicYear || !filterState.period || isLoading}
                                         className="btn-mobile-primary-round-gray"
                                     >
                                         {isLoading ? 'Memuat...' : 'Tampilkan'}
@@ -481,7 +508,7 @@ const TeacherPerformanceView = () => {
                 )}
                 {displayState.violationData && !isLoading && filterState.selectedAcademicYear && (
                     <DataTable
-                        data={studentData}
+                        data={displayState.studentsData}
                         columns={studentColumns}
                         searchableColumns={['name']}
                         initialSort={{ key: 'name', direction: 'ascending' }}

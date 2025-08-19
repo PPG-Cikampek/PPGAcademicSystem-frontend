@@ -88,7 +88,27 @@
 }
 
 @utility badge-primary {
-  @apply p-2 rounded-[4px] bg-primary text-white font-normal;
+  @apply p-1 rounded-full bg-blue-200 text-primary font-normal;
+}
+
+@utility badge-green {
+  @apply p-1 rounded-full bg-green-200 text-green-600 font-normal;
+}
+
+@utility badge-yellow {
+  @apply p-1 rounded-full bg-yellow-200 text-yellow-600 font-normal;
+}
+
+@utility badge-orange {
+  @apply p-1 rounded-full bg-orange-200 text-orange-600 font-normal;
+}
+
+@utility badge-red {
+  @apply p-1 rounded-full bg-red-200 text-red-600 font-normal;
+}
+
+@utility badge-violet {
+  @apply p-1 rounded-full bg-violet-200 text-violet-600 font-normal;
 }
 
 @utility badge-primary-outline {

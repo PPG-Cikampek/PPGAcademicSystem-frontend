@@ -6,55 +6,8 @@ import { saveAs } from 'file-saver';
 import logo from '../../assets/logos/ppgcikampek.png';
 import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
 
-import { ArrowDownToLine } from 'lucide-react';
-import PerformanceReportChart from '../../performance/components/PerformanceReportChart';
-
-const violationTranslations = {
-    attribute: "Perlengkapan Belajar",
-    attitude: "Sikap",
-    tidiness: "Kerapihan",
-};
-
-const formatDate = (date) => {
-    if (!(date instanceof Date)) {
-        date = new Date(date);
-    }
-    return date.toLocaleDateString('id-ID', {
-        weekday: 'long',
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric',
-        timeZone: 'Asia/Jakarta'
-    });
-};
-
-const getViolationStats = (data) => {
-    const violationCounts = data.attendances.reduce((acc, attendance) => {
-        Object.entries(attendance.violations).forEach(([key, value]) => {
-            if (value) {
-                const existing = acc.find(item => item.violation === key);
-                if (existing) {
-                    existing.count += 1;
-                } else {
-                    acc.push({ violation: key, count: 1 });
-                }
-            }
-        });
-        return acc;
-    }, []);
-
-    return violationCounts;
-};
-
-const getTeachersNotes = (data) => {
-    const teachersNotes = data.attendances
-        .filter(attendance => attendance.teachersNotes) // Remove empty notes
-        .map(attendance => ({
-            noteContent: attendance.teachersNotes,
-            noteDate: attendance.forDate
-        }));
-    return teachersNotes;
-}
+import { FileDown } from 'lucide-react';
+import useHttp from '../../shared/hooks/http-hook';
 
 const styles = {
     page: {
@@ -172,64 +125,130 @@ const styles = {
     }
 };
 
-const StudentReportView = ({ studentData = null, attendanceData = null, noCard = false }) => {
-    const [isLoading, setIsLoading] = useState(false);
+const violationTranslations = {
+    attribute: "Perlengkapan Belajar",
+    attitude: "Sikap",
+    tidiness: "Kerapihan",
+};
+
+const formatDate = (date) => {
+    if (!(date instanceof Date)) {
+        date = new Date(date);
+    }
+    return date.toLocaleDateString('id-ID', {
+        weekday: 'long',
+        day: '2-digit',
+        month: 'long',
+        year: 'numeric',
+        timeZone: 'Asia/Jakarta'
+    });
+};
+
+const DUMMY_BACKEND_DATA = {
+    reportData: {
+        companyInfo: {
+            name: 'Acme Corporation',
+            address: '123 Business Lane, Corporate City, ST 12345',
+            contact: 'Phone: (555) 123-4567 | Email: info@acmecorp.com',
+        },
+        content: {
+            date: new Date().toLocaleDateString(),
+            subject: 'LAPORAN MONITORING SISWA',
+            body: 'KEGIATAN BELAJAR MENGAJAR',
+            subBody: 'Lembar Performa Siswa',
+        },
+    },
+    attendanceData: [
+        { status: 'Hadir', count: 18, percentage: '90' },
+        { status: 'Izin', count: 1, percentage: '5' },
+        { status: 'Tanpa Keterangan', count: 1, percentage: '5' },
+    ],
+    violationData: [
+        { violation: "attribute", count: 2 },
+        { violation: "attitude", count: 1 },
+        { violation: "tidiness", count: 3 },
+    ],
+    teachersNotes: [
+        {
+            noteContent: "Siswa sangat aktif dalam pembelajaran.",
+            noteDate: "2025-08-01",
+        },
+        {
+            noteContent: "Mohon diperhatikan perlengkapan belajar siswa.",
+            noteDate: "2025-08-05",
+        },
+    ],
+    studentData: {
+        nis: '123456',
+        name: 'John Doe',
+        branchName: 'Cikampek',
+        subBranchName: 'Jomin Barat',
+        period: 'startDate - endDate',
+    },
+    classData: {
+        name: '7A',
+        academicYearName: '2025/2026',
+        teachers: [{
+            _id: 't1',
+            name: 'Budi Santoso',
+            nig: 'NIG001'
+        }]
+    }
+};
+
+const StudentReportView = ({ academicYearId, studentId, startDate, endDate, noCard = true }) => {
     const [reportData, setReportData] = useState();
+    const [violationData, setViolationData] = useState();
+    const [teachersNotes, setTeachersNotes] = useState();
+    const [studentData, setStudentData] = useState();
+    const [classData, setClassData] = useState();
+    const [attendanceData, setAttendanceData] = useState();
     const [reportChart, setReportChart] = useState();
     const [showPreview, setShowPreview] = useState(false);
-    const [teachersNotes, setTeachersNotes] = useState(false);
-    const [violationData, setViolationData] = useState(false);
-
-    useEffect(() => {
-        setIsLoading(true)
-        const transformAttendance = (data) => {
-            const totalAttendances = data.attendances.length;
-
-            const statusCounts = data.attendances.reduce((acc, attendance) => {
-                acc[attendance.status] = (acc[attendance.status] || 0) + 1;
-                return acc;
-            }, {});
-
-            return Object.keys(statusCounts).map((status) => ({
-                status,
-                count: statusCounts[status],
-                percentage: ((statusCounts[status] / totalAttendances) * 100).toFixed(0),
-            }));
-        };
-
-        const transformedAttendance = transformAttendance(studentData);
-
-        const documentData = {
-            companyInfo: {
-                name: 'Acme Corporation',
-                address: '123 Business Lane, Corporate City, ST 12345',
-                contact: 'Phone: (555) 123-4567 | Email: info@acmecorp.com',
-            },
-            content: {
-                date: new Date().toLocaleDateString(),
-                subject: 'LAPORAN MONITORING SISWA',
-                body: 'KEGIATAN BELAJAR MENGAJAR',
-                subBody: 'Lembar Performa Siswa',
-            },
-            data: transformedAttendance,
-        };
-
-        console.log(getViolationStats(studentData))
-        console.log(getTeachersNotes(studentData))
 
 
-        setReportData(documentData);
-        setIsLoading(false)
-        setTeachersNotes(getTeachersNotes(studentData))
-        setViolationData(getViolationStats(studentData))
-        setReportChart(<PerformanceReportChart attendanceData={attendanceData} />)
+    const { isLoading, error, sendRequest, setError, setIsLoading } = useHttp()
 
-    }, [studentData, setReportChart]);
+    const fetchData = async () => {
+        // Validate required props before making API call
+        if (!academicYearId || !studentId) {
+            console.warn('StudentReportView: Missing required props (academicYearId or studentId)');
+            return;
+        }
 
-    const getLocalizedMonthName = (monthNumber, locale = 'id-ID') => {
-        return new Date(2000, monthNumber - 1, 1)
-            .toLocaleString(locale, { month: 'long' });
-    };
+        const url = `${import.meta.env.VITE_BACKEND_URL}/attendances/reports/`;
+
+        console.log(url)
+
+        const body = JSON.stringify({
+            academicYearId,
+            studentId,
+            startDate,
+            endDate
+        });
+
+        let responseData;
+        try {
+            responseData = await sendRequest(url, 'POST', body, {
+                'Content-Type': 'application/json'
+            });
+
+            console.log(responseData)
+
+            setReportData(responseData.reportData);
+            setViolationData(responseData.violationData);
+            setTeachersNotes(responseData.teachersNotes);
+            setStudentData(responseData.studentData);
+            setClassData(responseData.classData);
+            setAttendanceData(responseData.attendanceData);
+
+            return responseData;
+
+        } catch (err) {
+            // Error is already handled by useHttp
+            throw err;
+        }
+    }
 
     const PdfDocument = () => (
         <Document>
@@ -253,22 +272,19 @@ const StudentReportView = ({ studentData = null, attendanceData = null, noCard =
                             {'\n'}
                         </Text>
                     </Text>
-
                 </View>
-
 
                 <View style={[styles.flex, styles.flexCol, { justifyContent: 'space-between' }]}>
                     <View>
                         <View style={styles.subHeader}>
                             {/* Title */}
-                            <Text>{reportData.content.subject}</Text>
-                            <Text>{reportData.content.body}</Text>
-                            <Text>{reportData.content.subBody}</Text>
+                            <Text>{reportData?.content.subject}</Text>
+                            <Text>{reportData?.content.body}</Text>
+                            <Text>{reportData?.content.subBody}</Text>
                         </View>
 
                         <View style={styles.bodyTop}>
                             <View style={[styles.flex, styles.flexRow, { gap: 30, marginBottom: 30 }]}>
-
                                 <View style={[styles.flex, styles.flexCol, { gap: 1 }]}>
                                     <Text>NIS</Text>
                                     <Text>Nama</Text>
@@ -278,12 +294,12 @@ const StudentReportView = ({ studentData = null, attendanceData = null, noCard =
                                     <Text>Periode</Text>
                                 </View>
                                 <View style={[styles.flex, styles.flexCol, { gap: 1 }]}>
-                                    <Text style={styles.fontBold}>: {(studentData.nis).toUpperCase()}</Text>
-                                    <Text style={styles.fontBold}>: {(studentData.name).toUpperCase()}</Text>
-                                    <Text style={styles.fontBold}>: {(studentData.branchName).toUpperCase()} - {(studentData.subBranchName).toUpperCase()}</Text>
-                                    <Text style={styles.fontBold}>: {(studentData.className).toUpperCase()}</Text>
-                                    <Text style={styles.fontBold}>: {(studentData.subBranchYearName).toUpperCase()}</Text>
-                                    <Text style={styles.fontBold}>: {(studentData.month ? studentData.month : 'Semua').toUpperCase()}</Text>
+                                    <Text style={styles.fontBold}>: {(studentData?.nis || '').toUpperCase()}</Text>
+                                    <Text style={styles.fontBold}>: {(studentData?.name || '').toUpperCase()}</Text>
+                                    <Text style={styles.fontBold}>: {(studentData?.branchName || '').toUpperCase()} - {(studentData?.subBranchName || '').toUpperCase()}</Text>
+                                    <Text style={styles.fontBold}>: {(classData?.name || '').toUpperCase()}</Text>
+                                    <Text style={styles.fontBold}>: {(classData?.academicYearName || '').toUpperCase()}</Text>
+                                    <Text style={styles.fontBold}>: {(studentData?.period ? studentData.period : 'Semua').toUpperCase()}</Text>
                                 </View>
                             </View>
                         </View>
@@ -299,7 +315,7 @@ const StudentReportView = ({ studentData = null, attendanceData = null, noCard =
                                 </View>
 
                                 {/* Table Rows */}
-                                {reportData.data.map((row, index) => (
+                                {attendanceData?.map((row, index) => (
                                     <View key={index} style={[styles.tableRow, { paddingLeft: 5 }]}>
                                         <Text style={styles.tableCell}>{row.status}</Text>
                                         <Text style={[styles.tableCell, styles.tableCellNumber]}>{row.count} Hari</Text>
@@ -309,7 +325,6 @@ const StudentReportView = ({ studentData = null, attendanceData = null, noCard =
                             </View>
 
                             <View style={[styles.table, { width: '40%' }]}>
-
                                 {/* Table Header */}
                                 <View style={[styles.tableRow, styles.tableHeader, { paddingLeft: 5 }]}>
                                     <Text style={styles.tableCell}>ITEM</Text>
@@ -317,7 +332,7 @@ const StudentReportView = ({ studentData = null, attendanceData = null, noCard =
                                 </View>
 
                                 {/* Table Rows */}
-                                {violationData.map((row, index) => (
+                                {violationData?.map((row, index) => (
                                     <View key={index} style={[styles.tableRow, { paddingLeft: 5 }]}>
                                         <Text style={styles.tableCell}>{violationTranslations[row.violation] || row.violation}</Text>
                                         <Text style={[styles.tableCell, styles.tableCellNumber]}>{row.count} Kali</Text>
@@ -331,20 +346,15 @@ const StudentReportView = ({ studentData = null, attendanceData = null, noCard =
                             <Text style={{ fontFamily: 'Times-Bold', textDecoration: 'underline', fontStyle: 'italic', marginBottom: 5 }}>
                                 CATATAN KOMUNIKASI KEPADA ORANG TUA:
                             </Text>
-                            {teachersNotes.map((row, index) => (
+                            {teachersNotes?.map((row, index) => (
                                 <View key={index} style={[styles.tableRow, { paddingLeft: 5 }]}>
                                     <Text style={styles.tableCell}>{index + 1}. {row.noteContent} {`(${formatDate(row.noteDate)})`}</Text>
                                 </View>
                             ))}
                         </View>
-
                     </View>
 
-                    {/* 
-                    <ReactPDFChart>
-                        <PieChart attendanceData={attendanceData} chartType={'mobile'} toImage={false} />
-                    </ReactPDFChart> */}
-
+                    {/* Chart (optional, not shown in PDF) */}
                     {/* <View>
                         <ReactPDFChart>
                             {reportChart && reportChart}
@@ -354,63 +364,69 @@ const StudentReportView = ({ studentData = null, attendanceData = null, noCard =
                     <View style={{ marginTop: 50, flexDirection: 'col', justifyContent: 'space-between', alignItems: 'center', alignSelf: 'flex-end' }}>
                         <Text style={{ marginVertical: 3 }}>Cikampek, {new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })}</Text>
                         <Text>Hormat Kami,</Text>
-                        <View style={styles.signature} key={studentData.teachers[0]._id}>
-                            <Text style={styles.signatureName}>{studentData.teachers[0].name}</Text>
-                            <Text>NIG: {studentData.teachers[0].nig}</Text>
+                        <View style={styles.signature} key={classData?.teachers?.[0]?._id}>
+                            <Text style={styles.signatureName}>{classData?.teachers?.[0]?.name}</Text>
+                            <Text>NIG: {classData?.teachers?.[0]?.nig}</Text>
                         </View>
                     </View>
                 </View>
-
-
             </Page>
         </Document>
     );
 
     const generatePDF = async () => {
-        const blob = await pdf(<PdfDocument />).toBlob();
-        const date = new Date().toLocaleDateString();
-        console.log(date)
-        saveAs(blob, `Laporan_Kehadiran_${studentData.name}_${date}.pdf`);
+        try {
+            await fetchData();
+            const blob = await pdf(<PdfDocument />).toBlob();
+            const date = new Date().toLocaleDateString();
+            saveAs(blob, `Laporan_Kehadiran_${studentData?.name || 'Siswa'}_${date}.pdf`);
+        } catch (err) {
+            console.error('Error generating PDF:', err);
+        }
     };
 
-    const togglePreview = () => {
+    const handlePreviewClick = async () => {
+        if (!reportData) {
+            await fetchData();
+        }
         setShowPreview(!showPreview);
     };
 
     return (
         <div className={`${noCard === false && "container mx-auto p-6 max-w-6xl"}`}>
             <div className={`${noCard === false && "bg-white shadow-md rounded-lg p-6"}`}>
-                {isLoading && (
-                    <LoadingCircle size={32} />
-                )}
+
                 {!isLoading && (
                     <div className="space-y-4">
                         <div className="md:flex flex-row justify-start gap-2 hidden">
                             <button
-                                onClick={togglePreview}
+                                onClick={handlePreviewClick}
                                 className="btn-primary-outline"
+                                disabled={isLoading}
                             >
                                 {showPreview ? 'Tutup PDF' : 'Lihat PDF'}
                             </button>
                             <button
                                 onClick={generatePDF}
                                 className="button-primary m-0"
+                                disabled={isLoading}
                             >
-                                Download PDF
+                                {isLoading ? 'Memuat...' : 'Download PDF'}
                             </button>
                         </div>
                         <div className="md:hidden">
                             <button
                                 onClick={generatePDF}
-                                className="btn-primary-outline flex items-center m-0 p-2"
+                                className="btn-mobile-primary-round text-xs flex items-center m-0 mr-2 p-2 pr-3"
+                                disabled={isLoading}
                             >
-                                <ArrowDownToLine size={24} />
-                                <span className='ml-2'>Unduh Laporan</span>
+                                <FileDown size={18} />
+                                <span className='ml-1'>{isLoading ? <LoadingCircle /> : 'Unduh Laporan'}</span>
                             </button>
                         </div>
 
                         {/* PDF Preview */}
-                        {showPreview && (
+                        {showPreview && reportData && (
                             <div className={`${noCard === false && "mt-6 border-2 border-gray-200 rounded-lg overflow-hidden"}`}>
                                 <PDFViewer width="100%" height="600">
                                     <PdfDocument />
