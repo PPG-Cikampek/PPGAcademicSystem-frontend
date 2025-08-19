@@ -424,10 +424,10 @@ const TeacherPerformanceView = () => {
                                         <select
                                             value={filterState.selectedClass ? filterState.selectedClass : ''}
                                             onChange={(e) => selectClassHandler(e.target.value)}
-                                            className={`border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300 ${filterState.selectedAcademicYear ? '' : 'opacity-50 cursor-not-allowed'}`}
+                                            className={`border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300 ${filterState.selectedAcademicYear ? '' : 'text-gray-500 opacity-50 cursor-not-allowed'}`}
                                             disabled={!filterState.selectedAcademicYear}
                                         >
-                                            <option value={''}>Semua</option>
+                                            <option value={''}>{!filterState.selectedAcademicYear ? 'Pilih Tahun Ajaran' : 'Semua'}</option>
                                             {classesList && classesList.map((cls, index) => (
                                                 <option key={index} value={cls._id}>
                                                     {cls.name}
@@ -444,7 +444,7 @@ const TeacherPerformanceView = () => {
                                         disabled={!filterState.selectedAcademicYear || !filterState.period || isLoading}
                                         className="btn-mobile-primary-round-gray"
                                     >
-                                        {isLoading ? <LoadingCircle size={16} /> : 'Tampilkan'}
+                                        {isLoading ? <LoadingCircle size={16} /> : !filterState.selectedAcademicYear ? 'Pilih Tahun Ajaran' : !filterState.period ? 'Pilih Periode' : 'Tampilkan'}
                                     </button>
 
                                     <button
