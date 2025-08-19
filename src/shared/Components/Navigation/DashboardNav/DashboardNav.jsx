@@ -122,11 +122,11 @@ const DashboardNav = ({ children }) => {
                 icon: <Users />,
                 label: 'Peserta Didik',
             },
-            // {
-            //     link: '/performance',
-            //     icon: <Gauge />,
-            //     label: 'Performa Kehadiran',
-            // },
+            {
+                link: '/performance',
+                icon: <Gauge />,
+                label: 'Performa Kehadiran',
+            },
             {
                 link: null,
                 icon: <FolderCog />,

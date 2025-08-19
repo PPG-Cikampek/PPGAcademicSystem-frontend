@@ -22,7 +22,7 @@ const UpdateTeacherView = lazy(() => import("../teachers/pages/UpdateTeacherView
 const StudentReportView = lazy(() => import("../students/pages/StudentReportView"));
 const ProfileView = lazy(() => import("../users/pages/ProfileView"));
 const EmailVerifyView = lazy(() => import("../users/pages/EmailVerifyView"));
-// const SubBranchPerformanceView = lazy(() => import("../performance/pages/SubBranchPerformanceView"));
+const SubBranchPerformanceView = lazy(() => import("../performance/pages/SubBranchPerformanceView"));
 const RequestAccountView = lazy(() => import("../users/pages/RequestAccountView"));
 const RequestAccountForm = lazy(() => import("../users/pages/RequestAccountForm"));
 const RequestAccountTicketDetail = lazy(() => import("../users/pages/RequestAccountTicketDetail"));
@@ -54,7 +54,7 @@ export const subBranchAdminRoutes = [
     { path: '/dashboard/teaching-groups/:teachingGroupId', element: <TeachingGroupsView /> },
     { path: '/dashboard/classes/:classId/add-students', element: <AddStudentToClassView /> },
     { path: '/dashboard/classes/:classId/add-teachers', element: <AddTeacherToClassView /> },
-    // { path: '/performance', element: <SubBranchPerformanceView /> },
+    { path: '/performance', element: <SubBranchPerformanceView /> },
     { path: '/munaqasyah', element: <SubBranchMunaqasyahView /> },
     { path: '/munaqasyah/:branchYearId', element: <MunaqasyahClassList /> },
     { path: '/munaqasyah/class/:classId', element: <QueryClientProvider client={new QueryClient()}><MunaqasyahByClassView /></QueryClientProvider> },

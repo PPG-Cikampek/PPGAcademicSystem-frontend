@@ -7,8 +7,8 @@ Chart.register(ArcElement, Tooltip, Legend);
 const getChartColors = (status) => {
   const colors = {
     Hadir: '#10B981',
-    Terlambat: '#F59E0B',
-    Izin: '#3B82F6',
+    Terlambat: '#3B82F6',
+    Izin: '#F59E0B',
     Sakit: '#8B5CF6',
     'Tanpa Keterangan': '#EF4444',
     'Tidak Hadir': '#F59E0B',
@@ -115,7 +115,6 @@ const MultiDoughnutChart = ({ attendanceData }) => (
 
 const PieChart = memo(({ attendanceData, chartType, toImage = false }) => {
   const [transformedData, setTransformedData] = useState([]);
-  console.log(attendanceData)
 
   const transformData = () => {
     const hadir = attendanceData

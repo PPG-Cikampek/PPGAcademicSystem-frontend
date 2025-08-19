@@ -55,11 +55,26 @@ const DataTable = ({
     }, [searchTerm, entriesPerPage, currentPage, sortConfig, filters, storageKey]);
 
     const filteredData = useMemo(() => {
+        // Debug logs to investigate "Cannot read properties of undefined (reading 'filter')"
+        // console.log('DataTable debug:', {
+        //     dataType: typeof data,
+        //     isArray: Array.isArray(data),
+        //     dataLength: Array.isArray(data) ? data.length : undefined,
+        //     searchableColumns,
+        //     searchTerm
+        // });
+
+        if (!Array.isArray(data)) {
+            console.error('Data is not an array, skipping filter step', { data });
+            return [];
+        }
+
         let filtered = data.filter(item =>
             searchableColumns.some(column =>
-                item[column]?.toString().toLowerCase().includes(searchTerm.toLowerCase())
+            (item?.[column]?.toString() ?? '').toLowerCase().includes((searchTerm ?? '').toLowerCase())
             )
         );
+        
         Object.entries(filters).forEach(([key, value]) => {
             if (value) {
                 filtered = filtered.filter(item => {
