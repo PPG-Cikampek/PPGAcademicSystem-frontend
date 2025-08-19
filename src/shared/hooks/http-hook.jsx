@@ -1,10 +1,12 @@
 // hooks/useHttp.js
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useContext } from 'react';
+import { AuthContext } from '../Components/Context/auth-context';
 
 const useHttp = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const activeHttpRequests = useRef([]);
+    const auth = useContext(AuthContext);
 
     const sendRequest = useCallback(async (url, method = 'GET', body = null, headers = {}) => {
         setIsLoading(true);
@@ -13,11 +15,17 @@ const useHttp = () => {
         const httpAbortCtrl = new AbortController();
         activeHttpRequests.current.push(httpAbortCtrl);
 
+        // Automatically add Authorization header if token exists and not already present
+        const mergedHeaders = { ...headers };
+        if (auth.token && !mergedHeaders.Authorization && !mergedHeaders.authorization) {
+            mergedHeaders.Authorization = `Bearer ${auth.token}`;
+        }
+
         try {
             const response = await fetch(url, {
                 method,
                 body,
-                headers,
+                headers: mergedHeaders,
                 signal: httpAbortCtrl.signal // Attach the abort signal to the request
             });
 
@@ -42,7 +50,7 @@ const useHttp = () => {
             setError(err.message || 'Gagal menghubungi server!');
             throw err;
         }
-    }, []);
+    }, [auth.token]);
 
     useEffect(() => {
         return () => {
