@@ -270,7 +270,7 @@ const DataTable = ({
                                         className={`${config.clickableRows === true ? 'hover:bg-gray-50 hover:cursor-pointer' : ''}  transition`}
                                     >
                                         {columns.map(({ key, render, cellStyle, cellAlign }) => (
-                                            <td key={key} className={`${key === 'actions' ? 'p-1' : 'p-1 md:p-2'} ${cellAlign === 'center' ? 'text-center' : cellAlign === 'right' ? 'text-right' : 'text-left'
+                                            <td key={key} className={`${key === 'actions' ? 'p-1' : 'p-2 md:p-4'} ${cellAlign === 'center' ? 'text-center' : cellAlign === 'right' ? 'text-right' : 'text-left'
                                                 }`}>
                                                 <span className={cellStyle?.(item)}>
                                                     {render ? render(item) : item[key]}

@@ -336,12 +336,12 @@ const StudentReportView = ({ academicYearId, studentId, startDate, endDate, noCa
         }
     };
 
-    const handlePreviewClick = async () => {
-        if (!reportState.reportData) {
-            await fetchData();
-        }
-        setShowPreview(prev => !prev);
-    };
+    // const handlePreviewClick = async () => {
+    //     if (!reportState.reportData) {
+    //         await fetchData();
+    //     }
+    //     setShowPreview(prev => !prev);
+    // };
 
     return (
         <div className={`${noCard === false && "container mx-auto p-6 max-w-6xl"}`}>
@@ -350,13 +350,13 @@ const StudentReportView = ({ academicYearId, studentId, startDate, endDate, noCa
 
                 <div className="space-y-4">
                     <div className="md:flex flex-row justify-start gap-2 hidden">
-                        <button
+                        {/* <button
                             onClick={handlePreviewClick}
                             className="btn-primary-outline"
                             disabled={isLoading}
                         >
                             {showPreview ? 'Tutup PDF' : 'Lihat PDF'}
-                        </button>
+                        </button> */}
                         <button
                             onClick={generatePDF}
                             className="button-primary m-0"

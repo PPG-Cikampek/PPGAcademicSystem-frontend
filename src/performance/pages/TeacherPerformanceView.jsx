@@ -294,6 +294,7 @@ const TeacherPerformanceView = () => {
             label: 'Hadir',
             sortable: true,
             cellAlign: 'center',
+            headerAlign: 'center',
             render: (student) => (
                 <div className="badge-green w-12 place-self-center">
                     {student.attendances.Hadir}%
@@ -305,6 +306,7 @@ const TeacherPerformanceView = () => {
             label: 'Terlambat',
             sortable: true,
             cellAlign: 'center',
+            headerAlign: 'center',
             render: (student) => (
                 <div className="badge-primary w-12 place-self-center">
                     {student.attendances.Terlambat}%
@@ -317,6 +319,7 @@ const TeacherPerformanceView = () => {
             label: 'Izin',
             sortable: true,
             cellAlign: 'center',
+            headerAlign: 'center',
             render: (student) => (
                 <div className="badge-yellow w-12 place-self-center">
                     {student.attendances.Izin}%
@@ -328,6 +331,7 @@ const TeacherPerformanceView = () => {
             label: 'Sakit',
             sortable: true,
             cellAlign: 'center',
+            headerAlign: 'center',
             render: (student) => (
                 <div className="badge-violet w-12 place-self-center">
                     {student.attendances.Sakit}%
@@ -339,6 +343,7 @@ const TeacherPerformanceView = () => {
             label: 'Alpha',
             sortable: true,
             cellAlign: 'center',
+            headerAlign: 'center',
             render: (student) => (
                 <div className="badge-red w-12 place-self-center">
                     {student.attendances["Tanpa Keterangan"]}%
@@ -346,8 +351,9 @@ const TeacherPerformanceView = () => {
             )
         },
         {
-            key: 'action',
+            key: 'actions',
             label: 'Aksi',
+            headerAlign: 'center',
             render: (student) => (
                 <div className='place-self-center'>
                     {filterState.selectedAcademicYear && (student.id || student._id) ? (
@@ -438,7 +444,7 @@ const TeacherPerformanceView = () => {
                                         disabled={!filterState.selectedAcademicYear || !filterState.period || isLoading}
                                         className="btn-mobile-primary-round-gray"
                                     >
-                                        {isLoading ? 'Memuat...' : 'Tampilkan'}
+                                        {isLoading ? <LoadingCircle size={16} /> : 'Tampilkan'}
                                     </button>
 
                                     <button
@@ -470,7 +476,7 @@ const TeacherPerformanceView = () => {
                                     </div>
                                 </div>
                             </div>
-                            {(!academicYearsList || isLoading) && (
+                            {(!academicYearsList || isLoading) && displayState.attendanceData !== null && (
                                 <div className="place-self-center justify-self-center self-center mx-auto">
                                     <LoadingCircle size={32} />
                                 </div>
