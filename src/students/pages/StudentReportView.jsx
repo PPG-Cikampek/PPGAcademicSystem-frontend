@@ -144,68 +144,18 @@ const formatDate = (date) => {
     });
 };
 
-const DUMMY_BACKEND_DATA = {
-    reportData: {
-        companyInfo: {
-            name: 'Acme Corporation',
-            address: '123 Business Lane, Corporate City, ST 12345',
-            contact: 'Phone: (555) 123-4567 | Email: info@acmecorp.com',
-        },
-        content: {
-            date: new Date().toLocaleDateString(),
-            subject: 'LAPORAN MONITORING SISWA',
-            body: 'KEGIATAN BELAJAR MENGAJAR',
-            subBody: 'Lembar Performa Siswa',
-        },
-    },
-    attendanceData: [
-        { status: 'Hadir', count: 18, percentage: '90' },
-        { status: 'Izin', count: 1, percentage: '5' },
-        { status: 'Tanpa Keterangan', count: 1, percentage: '5' },
-    ],
-    violationData: [
-        { violation: "attribute", count: 2 },
-        { violation: "attitude", count: 1 },
-        { violation: "tidiness", count: 3 },
-    ],
-    teachersNotes: [
-        {
-            noteContent: "Siswa sangat aktif dalam pembelajaran.",
-            noteDate: "2025-08-01",
-        },
-        {
-            noteContent: "Mohon diperhatikan perlengkapan belajar siswa.",
-            noteDate: "2025-08-05",
-        },
-    ],
-    studentData: {
-        nis: '123456',
-        name: 'John Doe',
-        branchName: 'Cikampek',
-        subBranchName: 'Jomin Barat',
-        period: 'startDate - endDate',
-    },
-    classData: {
-        name: '7A',
-        academicYearName: '2025/2026',
-        teachers: [{
-            _id: 't1',
-            name: 'Budi Santoso',
-            nig: 'NIG001'
-        }]
-    }
-};
-
 const StudentReportView = ({ academicYearId, studentId, startDate, endDate, noCard = true }) => {
-    const [reportData, setReportData] = useState();
-    const [violationData, setViolationData] = useState();
-    const [teachersNotes, setTeachersNotes] = useState();
-    const [studentData, setStudentData] = useState();
-    const [classData, setClassData] = useState();
-    const [attendanceData, setAttendanceData] = useState();
-    const [reportChart, setReportChart] = useState();
+    // Combine related report state into a single object to batch updates and reduce re-renders
+    const [reportState, setReportState] = useState({
+        reportData: null,
+        violationData: null,
+        teachersNotes: null,
+        studentData: null,
+        classData: null,
+        attendanceData: null,
+        reportChart: null
+    });
     const [showPreview, setShowPreview] = useState(false);
-
 
     const { isLoading, error, sendRequest, setError, setIsLoading } = useHttp()
 
@@ -227,20 +177,23 @@ const StudentReportView = ({ academicYearId, studentId, startDate, endDate, noCa
             endDate
         });
 
-        let responseData;
         try {
-            responseData = await sendRequest(url, 'POST', body, {
+            const responseData = await sendRequest(url, 'POST', body, {
                 'Content-Type': 'application/json'
             });
 
             console.log(responseData)
 
-            setReportData(responseData.reportData);
-            setViolationData(responseData.violationData);
-            setTeachersNotes(responseData.teachersNotes);
-            setStudentData(responseData.studentData);
-            setClassData(responseData.classData);
-            setAttendanceData(responseData.attendanceData);
+            // Batch all related report updates into a single state update
+            setReportState({
+                reportData: responseData.reportData,
+                violationData: responseData.violationData,
+                teachersNotes: responseData.teachersNotes,
+                studentData: responseData.studentData,
+                classData: responseData.classData,
+                attendanceData: responseData.attendanceData,
+                reportChart: responseData.reportChart
+            });
 
             return responseData;
 
@@ -249,192 +202,189 @@ const StudentReportView = ({ academicYearId, studentId, startDate, endDate, noCa
             throw err;
         }
     }
+    const PdfDocument = ({ data }) => {
+        // prefer explicit data (passed in for generatePDF) otherwise fall back to reportState
+        const rd = data || reportState;
 
-    const PdfDocument = () => (
-        <Document>
-            <Page size="A4" style={[styles.page]}>
-                {/* Header with Company Info */}
-                <View style={styles.header}>
-                    <Text>
-                        <Image src={logo} style={styles.logo} />
-                    </Text>
-                    <Text style={styles.subTitle}>
-                        {`${('Penggerak Pembina Generus').toUpperCase()}`}
-                        {'\n'}
-                        <Text style={styles.titleHuge}>
-                            {`PPG`}
-                            {'\n'}
+        return (
+            <Document>
+                <Page size="A4" style={[styles.page]}>
+                    {/* Header with Company Info */}
+                    <View style={styles.header}>
+                        <Text>
+                            <Image src={logo} style={styles.logo} />
                         </Text>
-                        {`${('Daerah Cikampek').toUpperCase()}`}
-                        {'\n'}
-                        <Text style={styles.companyInfo}>
-                            {`Gg. Palem, Desa Jomin Barat, Kecamatan Kotabaru, Kabupaten Karawang`}
+                        <Text style={styles.subTitle}>
+                            {`${('Penggerak Pembina Generus').toUpperCase()}`}
                             {'\n'}
-                        </Text>
-                    </Text>
-                </View>
-
-                <View style={[styles.flex, styles.flexCol, { justifyContent: 'space-between' }]}>
-                    <View>
-                        <View style={styles.subHeader}>
-                            {/* Title */}
-                            <Text>{reportData?.content.subject}</Text>
-                            <Text>{reportData?.content.body}</Text>
-                            <Text>{reportData?.content.subBody}</Text>
-                        </View>
-
-                        <View style={styles.bodyTop}>
-                            <View style={[styles.flex, styles.flexRow, { gap: 30, marginBottom: 30 }]}>
-                                <View style={[styles.flex, styles.flexCol, { gap: 1 }]}>
-                                    <Text>NIS</Text>
-                                    <Text>Nama</Text>
-                                    <Text>Kelompok</Text>
-                                    <Text>Kelas</Text>
-                                    <Text>Tahun Ajaran</Text>
-                                    <Text>Periode</Text>
-                                </View>
-                                <View style={[styles.flex, styles.flexCol, { gap: 1 }]}>
-                                    <Text style={styles.fontBold}>: {(studentData?.nis || '').toUpperCase()}</Text>
-                                    <Text style={styles.fontBold}>: {(studentData?.name || '').toUpperCase()}</Text>
-                                    <Text style={styles.fontBold}>: {(studentData?.branchName || '').toUpperCase()} - {(studentData?.subBranchName || '').toUpperCase()}</Text>
-                                    <Text style={styles.fontBold}>: {(classData?.name || '').toUpperCase()}</Text>
-                                    <Text style={styles.fontBold}>: {(classData?.academicYearName || '').toUpperCase()}</Text>
-                                    <Text style={styles.fontBold}>: {(studentData?.period ? studentData.period : 'Semua').toUpperCase()}</Text>
-                                </View>
-                            </View>
-                        </View>
-
-                        <View style={styles.body}>
-                            {/* Performance Table */}
-                            <View style={[styles.table, { width: '60%' }]}>
-                                {/* Table Header */}
-                                <View style={[styles.tableRow, styles.tableHeader, { paddingLeft: 5 }]}>
-                                    <Text style={styles.tableCell}>ITEM</Text>
-                                    <Text style={[styles.tableCell, styles.tableCellNumber]}>REPETISI</Text>
-                                    <Text style={[styles.tableCell, styles.tableCellNumber]}>PERSENTASE</Text>
-                                </View>
-
-                                {/* Table Rows */}
-                                {attendanceData?.map((row, index) => (
-                                    <View key={index} style={[styles.tableRow, { paddingLeft: 5 }]}>
-                                        <Text style={styles.tableCell}>{row.status}</Text>
-                                        <Text style={[styles.tableCell, styles.tableCellNumber]}>{row.count} Hari</Text>
-                                        <Text style={[styles.tableCell, styles.tableCellNumber]}>{row.percentage}%</Text>
-                                    </View>
-                                ))}
-                            </View>
-
-                            <View style={[styles.table, { width: '40%' }]}>
-                                {/* Table Header */}
-                                <View style={[styles.tableRow, styles.tableHeader, { paddingLeft: 5 }]}>
-                                    <Text style={styles.tableCell}>ITEM</Text>
-                                    <Text style={[styles.tableCell, styles.tableCellNumber]}>REPETISI</Text>
-                                </View>
-
-                                {/* Table Rows */}
-                                {violationData?.map((row, index) => (
-                                    <View key={index} style={[styles.tableRow, { paddingLeft: 5 }]}>
-                                        <Text style={styles.tableCell}>{violationTranslations[row.violation] || row.violation}</Text>
-                                        <Text style={[styles.tableCell, styles.tableCellNumber]}>{row.count} Kali</Text>
-                                    </View>
-                                ))}
-                            </View>
-                        </View>
-
-                        <View style={{ marginTop: 10, marginBottom: 30, display: 'flex', flexDirection: 'col', justifyContent: 'start', alignItems: 'start' }}>
-                            {/* full-width box with 2px border solid black */}
-                            <Text style={{ fontFamily: 'Times-Bold', textDecoration: 'underline', fontStyle: 'italic', marginBottom: 5 }}>
-                                CATATAN KOMUNIKASI KEPADA ORANG TUA:
+                            <Text style={styles.titleHuge}>
+                                {`PPG`}
+                                {'\n'}
                             </Text>
-                            {teachersNotes?.map((row, index) => (
-                                <View key={index} style={[styles.tableRow, { paddingLeft: 5 }]}>
-                                    <Text style={styles.tableCell}>{index + 1}. {row.noteContent} {`(${formatDate(row.noteDate)})`}</Text>
+                            {`${('Daerah Cikampek').toUpperCase()}`}
+                            {'\n'}
+                            <Text style={styles.companyInfo}>
+                                {`Gg. Palem, Desa Jomin Barat, Kecamatan Kotabaru, Kabupaten Karawang`}
+                                {'\n'}
+                            </Text>
+                        </Text>
+                    </View>
+
+                    <View style={[styles.flex, styles.flexCol, { justifyContent: 'space-between' }]}>
+                        <View>
+                            <View style={styles.subHeader}>
+                                {/* Title */}
+                                <Text>{rd.reportData?.content.subject}</Text>
+                                <Text>{rd.reportData?.content.body}</Text>
+                                <Text>{rd.reportData?.content.subBody}</Text>
+                            </View>
+
+                            <View style={styles.bodyTop}>
+                                <View style={[styles.flex, styles.flexRow, { gap: 30, marginBottom: 30 }]}>
+                                    <View style={[styles.flex, styles.flexCol, { gap: 1 }]}>
+                                        <Text>NIS</Text>
+                                        <Text>Nama</Text>
+                                        <Text>Kelompok</Text>
+                                        <Text>Kelas</Text>
+                                        <Text>Tahun Ajaran</Text>
+                                        <Text>Periode</Text>
+                                    </View>
+                                    <View style={[styles.flex, styles.flexCol, { gap: 1 }]}>
+                                        <Text style={styles.fontBold}>: {(rd.studentData?.nis || '').toUpperCase()}</Text>
+                                        <Text style={styles.fontBold}>: {(rd.studentData?.name || '').toUpperCase()}</Text>
+                                        <Text style={styles.fontBold}>: {(rd.studentData?.branchName || '').toUpperCase()} - {(rd.studentData?.subBranchName || '').toUpperCase()}</Text>
+                                        <Text style={styles.fontBold}>: {(rd.classData?.name || '').toUpperCase()}</Text>
+                                        <Text style={styles.fontBold}>: {(rd.classData?.academicYearName || '').toUpperCase()}</Text>
+                                        <Text style={styles.fontBold}>: {(rd.studentData?.period ? rd.studentData.period : 'Semua').toUpperCase()}</Text>
+                                    </View>
                                 </View>
-                            ))}
+                            </View>
+
+                            <View style={styles.body}>
+                                {/* Performance Table */}
+                                <View style={[styles.table, { width: '60%' }]}>
+                                    {/* Table Header */}
+                                    <View style={[styles.tableRow, styles.tableHeader, { paddingLeft: 5 }]}>
+                                        <Text style={styles.tableCell}>ITEM</Text>
+                                        <Text style={[styles.tableCell, styles.tableCellNumber]}>REPETISI</Text>
+                                        <Text style={[styles.tableCell, styles.tableCellNumber]}>PERSENTASE</Text>
+                                    </View>
+
+                                    {/* Table Rows */}
+                                    {rd.attendanceData?.map((row, index) => (
+                                        <View key={index} style={[styles.tableRow, { paddingLeft: 5 }]}>
+                                            <Text style={styles.tableCell}>{row.status}</Text>
+                                            <Text style={[styles.tableCell, styles.tableCellNumber]}>{row.count} Hari</Text>
+                                            <Text style={[styles.tableCell, styles.tableCellNumber]}>{row.percentage}%</Text>
+                                        </View>
+                                    ))}
+                                </View>
+
+                                <View style={[styles.table, { width: '40%' }]}>
+                                    {/* Table Header */}
+                                    <View style={[styles.tableRow, styles.tableHeader, { paddingLeft: 5 }]}>
+                                        <Text style={styles.tableCell}>ITEM</Text>
+                                        <Text style={[styles.tableCell, styles.tableCellNumber]}>REPETISI</Text>
+                                    </View>
+
+                                    {/* Table Rows */}
+                                    {rd.violationData?.map((row, index) => (
+                                        <View key={index} style={[styles.tableRow, { paddingLeft: 5 }]}>
+                                            <Text style={styles.tableCell}>{violationTranslations[row.violation] || row.violation}</Text>
+                                            <Text style={[styles.tableCell, styles.tableCellNumber]}>{row.count} Kali</Text>
+                                        </View>
+                                    ))}
+                                </View>
+                            </View>
+
+                            <View style={{ marginTop: 10, marginBottom: 30, display: 'flex', flexDirection: 'col', justifyContent: 'start', alignItems: 'start' }}>
+                                {/* full-width box with 2px border solid black */}
+                                <Text style={{ fontFamily: 'Times-Bold', textDecoration: 'underline', fontStyle: 'italic', marginBottom: 5 }}>
+                                    CATATAN KOMUNIKASI KEPADA ORANG TUA:
+                                </Text>
+                                {rd.teachersNotes?.map((row, index) => (
+                                    <View key={index} style={[styles.tableRow, { paddingLeft: 5 }]}>
+                                        <Text style={styles.tableCell}>{index + 1}. {row.noteContent} {`(${formatDate(row.noteDate)})`}</Text>
+                                    </View>
+                                ))}
+                            </View>
+                        </View>
+
+                        <View style={{ marginTop: 50, flexDirection: 'col', justifyContent: 'space-between', alignItems: 'center', alignSelf: 'flex-end' }}>
+                            <Text style={{ marginVertical: 3 }}>Cikampek, {new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })}</Text>
+                            <Text>Hormat Kami,</Text>
+                            <View style={styles.signature} key={rd.classData?.teachers?.[0]?._id}>
+                                <Text style={styles.signatureName}>{rd.classData?.teachers?.[0]?.name}</Text>
+                                <Text>NIG: {rd.classData?.teachers?.[0]?.nig}</Text>
+                            </View>
                         </View>
                     </View>
-
-                    {/* Chart (optional, not shown in PDF) */}
-                    {/* <View>
-                        <ReactPDFChart>
-                            {reportChart && reportChart}
-                        </ReactPDFChart>
-                    </View> */}
-
-                    <View style={{ marginTop: 50, flexDirection: 'col', justifyContent: 'space-between', alignItems: 'center', alignSelf: 'flex-end' }}>
-                        <Text style={{ marginVertical: 3 }}>Cikampek, {new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })}</Text>
-                        <Text>Hormat Kami,</Text>
-                        <View style={styles.signature} key={classData?.teachers?.[0]?._id}>
-                            <Text style={styles.signatureName}>{classData?.teachers?.[0]?.name}</Text>
-                            <Text>NIG: {classData?.teachers?.[0]?.nig}</Text>
-                        </View>
-                    </View>
-                </View>
-            </Page>
-        </Document>
-    );
+                </Page>
+            </Document>
+        );
+    };
 
     const generatePDF = async () => {
         try {
-            await fetchData();
-            const blob = await pdf(<PdfDocument />).toBlob();
+            // Use the returned response from fetchData to avoid waiting for state propagation
+            const responseData = await fetchData();
+            const blob = await pdf(<PdfDocument data={responseData} />).toBlob();
             const date = new Date().toLocaleDateString();
-            saveAs(blob, `Laporan_Kehadiran_${studentData?.name || 'Siswa'}_${date}.pdf`);
+            saveAs(blob, `Laporan_Kehadiran_${responseData?.studentData?.name || 'Siswa'}_${date}.pdf`);
         } catch (err) {
             console.error('Error generating PDF:', err);
         }
     };
 
     const handlePreviewClick = async () => {
-        if (!reportData) {
+        if (!reportState.reportData) {
             await fetchData();
         }
-        setShowPreview(!showPreview);
+        setShowPreview(prev => !prev);
     };
 
     return (
         <div className={`${noCard === false && "container mx-auto p-6 max-w-6xl"}`}>
             <div className={`${noCard === false && "bg-white shadow-md rounded-lg p-6"}`}>
 
-                {!isLoading && (
-                    <div className="space-y-4">
-                        <div className="md:flex flex-row justify-start gap-2 hidden">
-                            <button
-                                onClick={handlePreviewClick}
-                                className="btn-primary-outline"
-                                disabled={isLoading}
-                            >
-                                {showPreview ? 'Tutup PDF' : 'Lihat PDF'}
-                            </button>
-                            <button
-                                onClick={generatePDF}
-                                className="button-primary m-0"
-                                disabled={isLoading}
-                            >
-                                {isLoading ? 'Memuat...' : 'Download PDF'}
-                            </button>
-                        </div>
-                        <div className="md:hidden">
-                            <button
-                                onClick={generatePDF}
-                                className="btn-mobile-primary-round text-xs flex items-center m-0 mr-2 p-2 pr-3"
-                                disabled={isLoading}
-                            >
-                                <FileDown size={18} />
-                                <span className='ml-1'>{isLoading ? <LoadingCircle /> : 'Unduh Laporan'}</span>
-                            </button>
-                        </div>
 
-                        {/* PDF Preview */}
-                        {showPreview && reportData && (
-                            <div className={`${noCard === false && "mt-6 border-2 border-gray-200 rounded-lg overflow-hidden"}`}>
-                                <PDFViewer width="100%" height="600">
-                                    <PdfDocument />
-                                </PDFViewer>
-                            </div>
-                        )}
+                <div className="space-y-4">
+                    <div className="md:flex flex-row justify-start gap-2 hidden">
+                        <button
+                            onClick={handlePreviewClick}
+                            className="btn-primary-outline"
+                            disabled={isLoading}
+                        >
+                            {showPreview ? 'Tutup PDF' : 'Lihat PDF'}
+                        </button>
+                        <button
+                            onClick={generatePDF}
+                            className="button-primary m-0"
+                            disabled={isLoading}
+                        >
+                            {isLoading ? 'Memuat...' : 'Download PDF'}
+                        </button>
                     </div>
-                )}
+                    <div className="md:hidden">
+                        <button
+                            onClick={generatePDF}
+                            className="btn-mobile-primary-round text-xs flex items-center m-0 mr-2 p-2 pr-3"
+                            disabled={isLoading}
+                        >
+                            {!isLoading && <FileDown size={18} />}
+                            <span className='ml-1'>{isLoading ? <LoadingCircle /> : 'Unduh Laporan'}</span>
+                        </button>
+                    </div>
+
+                    {/* PDF Preview */}
+                    {showPreview && reportState.reportData && (
+                        <div className={`${noCard === false && "mt-6 border-2 border-gray-200 rounded-lg overflow-hidden"}`}>
+                            <PDFViewer width="100%" height="600">
+                                <PdfDocument />
+                            </PDFViewer>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

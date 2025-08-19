@@ -19,48 +19,247 @@ import StudentReportView from '../../students/pages/StudentReportView';
 const TeacherPerformanceView = () => {
     const navigate = useNavigate();
 
+    const { isLoading, error, sendRequest, setError } = useHttp();
+
+    const initialFilterState = {
+        selectedAcademicYear: '',
+        startDate: null,
+        endDate: null,
+        period: null,
+        selectedClass: ''
+    };
+
+    // Academic years list (static data)
+    const [academicYearsList, setAcademicYearsList] = useState();
+
+    // Filter state - for user selections (doesn't trigger data fetches)
+    const [filterState, setFilterState] = useState({
+        selectedAcademicYear: null,
+        startDate: null,
+        endDate: null,
+        period: null,
+        selectedClass: null
+    });
+
+    // Display state - for currently shown data (only updates when filters are applied)
+    const [displayState, setDisplayState] = useState({
+        attendanceData: null,
+        overallAttendances: null,
+        violationData: null,
+        appliedFilters: null, // Keep track of which filters were used for the current data
+        classData: null,
+        studentsData: null
+    });
+
+    // Dropdown options lists
+    const [classesList, setClassesList] = useState();
+
+    const auth = useContext(AuthContext);
+
+    const violationTranslations = {
+        attribute: "Perlengkapan Belajar",
+        attitude: "Sikap",
+        tidiness: "Kerapihan",
+    };
+
+    const fetchAcademicYears = useCallback(async () => {
+        try {
+            const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/academicYears/?populate=subBranchYears`);
+            setAcademicYearsList(responseData.academicYears);
+        } catch (err) { }
+    }, [sendRequest]);
+
+    const fetchAttendanceData = useCallback(async () => {
+        const url = `${import.meta.env.VITE_BACKEND_URL}/attendances/overview/`;
+        const body = JSON.stringify({
+            academicYearId: filterState.selectedAcademicYear,
+            branchId: auth.userBranchId,
+            subBranchId: auth.userSubBranchId,
+            classId: filterState.selectedClass,
+            teacherClassIds: auth.userClassIds, // Use all classes the user has access to
+            startDate: filterState.startDate ? filterState.startDate.toISOString() : null,
+            endDate: filterState.endDate ? filterState.endDate.toISOString() : null,
+        });
+
+        try {
+            const responseData = await sendRequest(url, 'POST', body, {
+                'Content-Type': 'application/json',
+            });
+            console.log(responseData)
+
+            const { overallStats, violationStats, ...cardsData } = responseData
+
+            // Update display state with new data and record applied filters
+            setDisplayState({
+                attendanceData: cardsData,
+                overallAttendances: responseData.overallStats,
+                violationData: responseData.violationStats,
+                appliedFilters: { ...filterState }, // Snapshot of current filters
+                studentsData: responseData.studentsData
+            });
+        } catch (err) { }
+    }, [sendRequest, filterState]);
+
+    // compute maxDate only once per render to avoid repeated getMonday calls
+    const maxDate = useMemo(() => {
+        const m = getMonday(new Date());
+        const end = new Date(m);
+        end.setDate(m.getDate() + 6);
+        return end;
+    }, []);
+
+    useEffect(() => {
+        registerLocale("id-ID", idID);
+        fetchAcademicYears();
+    }, [fetchAcademicYears]);
+
+    const fetchClassesList = useCallback(async () => {
+        const url = `${import.meta.env.VITE_BACKEND_URL}/classes/get-by-ids`
+        const body = JSON.stringify({ classIds: auth.userClassIds })
+        console.log(body)
+
+        try {
+            const responseData = await sendRequest(url, 'POST', body, {
+                'Content-Type': 'application/json'
+            })
+            setClassesList(responseData.classes)
+            console.log(responseData.classes)
+        } catch (err) { }
+    }, [sendRequest, auth.userClassIds]);
 
 
-    const studentData = [
-        {
-            id: 1,
-            name: 'John Doe',
-            nis: '123456',
-            image: 'path/to/image.jpg',
-            thumbnail: 'path/to/thumbnail.jpg',
-            attendances: {
-                'Hadir': 80,
-                'Terlambat': 10,
-                'Izin': 5,
-                'Sakit': 5
-            },
-            violationData: {
-                'Perlengkapan Belajar': 2,
-                'Sikap': 1,
-                'Kerapihan': 0
-            }
-        },
-        {
-            id: 2,
-            name: 'Jane Smith',
-            nis: '654321',
-            image: 'path/to/image.jpg',
-            thumbnail: 'path/to/thumbnail.jpg',
-            attendances: {
-                'Hadir': 80,
-                'Terlambat': 10,
-                'Izin': 5,
-                'Sakit': 5
-            },
-            violationData: {
-                'Perlengkapan Belajar': 2,
-                'Sikap': 1,
-                'Kerapihan': 0
-            }
-        }]
+    const selectAcademicYearHandler = useCallback((academicYearId) => {
+        setFilterState(prev => ({
+            ...prev,
+            selectedAcademicYear: academicYearId,
+            selectedClass: null
+        }));
+
+        // Batch clear display state to a single update
+        setDisplayState({
+            attendanceData: null,
+            overallAttendances: null,
+            violationData: null,
+            appliedFilters: null,
+            classData: null,
+            studentsData: null
+        });
+
+        setClassesList([]);
+
+        if (academicYearId !== '') {
+            fetchClassesList();
+        }
+    }, [fetchClassesList]);
 
 
-    const studentColumns = [
+    const selectClassHandler = useCallback((classId) => {
+        setFilterState(prev => ({
+            ...prev,
+            selectedClass: classId
+        }));
+
+        // Batch clear
+        setDisplayState({
+            attendanceData: null,
+            overallAttendances: null,
+            violationData: null,
+            appliedFilters: null,
+            classData: null,
+            studentsData: null
+        });
+    }, []);
+
+    const selectDateRangeHandler = useCallback((dates) => {
+        let startingWeek = null;
+        let endOfWeek = null;
+        let period = null;
+
+        if (dates) {
+            startingWeek = getMonday(dates);
+            endOfWeek = new Date(startingWeek);
+            endOfWeek.setDate(startingWeek.getDate() + 6);
+
+            console.log(startingWeek)
+            console.log(endOfWeek)
+
+            period = startingWeek.toLocaleDateString('id-ID', {
+                day: '2-digit',
+                timeZone: 'Asia/Jakarta'
+            }) + " - " +
+                endOfWeek.toLocaleDateString('id-ID', {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric',
+                    timeZone: 'Asia/Jakarta'
+                });
+        }
+
+        console.log(period)
+
+        setFilterState(prev => ({
+            ...prev,
+            startDate: startingWeek,
+            endDate: endOfWeek,
+            period: period
+        }));
+
+        setDisplayState({
+            attendanceData: null,
+            overallAttendances: null,
+            violationData: null,
+            appliedFilters: null,
+            classData: null,
+            studentsData: null
+        });
+    }, []);
+
+    const handleApplyFilter = useCallback(() => {
+        if (!filterState.selectedAcademicYear) {
+            alert('Silakan pilih tahun ajaran terlebih dahulu');
+            return;
+        }
+
+        // Clear previous data while loading
+        setDisplayState(prev => ({
+            ...prev,
+            attendanceData: null,
+            overallAttendances: null,
+            violationData: null
+        }));
+
+        fetchAttendanceData();
+    }, [filterState.selectedAcademicYear, fetchAttendanceData]);
+
+    const handleResetFilter = useCallback(() => {
+        // Reset filter selections to initial values
+        setFilterState({ ...initialFilterState });
+
+        // Clear displayed data in one shot
+        setDisplayState({
+            attendanceData: null,
+            overallAttendances: null,
+            violationData: null,
+            appliedFilters: null,
+            classData: null,
+            studentsData: null
+        });
+
+        // Clear dependent lists
+        setClassesList([]);
+    }, []);
+
+    // Memoized values to prevent unnecessary re-renders
+    const memoizedOverallAttendances = useMemo(() => {
+        return displayState.overallAttendances;
+    }, [displayState.overallAttendances]);
+
+    const memoizedViolationData = useMemo(() => {
+        return displayState.violationData;
+    }, [displayState.violationData]);
+
+    // Memoize columns to keep stable reference unless relevant filterState changes
+    const studentColumns = useMemo(() => [
         {
             key: 'image',
             label: '',
@@ -150,7 +349,7 @@ const TeacherPerformanceView = () => {
             key: 'action',
             label: 'Aksi',
             render: (student) => (
-                <div>
+                <div className='place-self-center'>
                     {filterState.selectedAcademicYear && (student.id || student._id) ? (
                         <StudentReportView
                             academicYearId={filterState.selectedAcademicYear}
@@ -165,229 +364,8 @@ const TeacherPerformanceView = () => {
                 </div>
             )
         }
-    ]
+    ], [filterState.selectedAcademicYear, filterState.startDate, filterState.endDate]);
 
-
-
-
-    const { isLoading, error, sendRequest, setError } = useHttp();
-
-    const initialFilterState = {
-        selectedAcademicYear: '',
-        startDate: null,
-        endDate: null,
-        period: null,
-        selectedClass: ''
-    };
-
-    // Academic years list (static data)
-    const [academicYearsList, setAcademicYearsList] = useState();
-
-    // Filter state - for user selections (doesn't trigger data fetches)
-    const [filterState, setFilterState] = useState({
-        selectedAcademicYear: null,
-        startDate: null,
-        endDate: null,
-        period: null,
-        selectedClass: null
-    });
-
-    // Display state - for currently shown data (only updates when filters are applied)
-    const [displayState, setDisplayState] = useState({
-        attendanceData: null,
-        overallAttendances: null,
-        violationData: null,
-        appliedFilters: null, // Keep track of which filters were used for the current data
-        classData: null,
-        studentsData: null
-    });
-
-    // Dropdown options lists
-    const [classesList, setClassesList] = useState();
-
-    const auth = useContext(AuthContext);
-
-    const violationTranslations = {
-        attribute: "Perlengkapan Belajar",
-        attitude: "Sikap",
-        tidiness: "Kerapihan",
-    };
-
-    const fetchAcademicYears = useCallback(async () => {
-        try {
-            const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/academicYears/?populate=subBranchYears`);
-            setAcademicYearsList(responseData.academicYears);
-        } catch (err) { }
-    }, [sendRequest]);
-
-    const fetchAttendanceData = useCallback(async () => {
-        const url = `${import.meta.env.VITE_BACKEND_URL}/attendances/overview/`;
-        const body = JSON.stringify({
-            academicYearId: filterState.selectedAcademicYear,
-            branchId: auth.userBranchId,
-            subBranchId: auth.userSubBranchId,
-            classId: filterState.selectedClass,
-            teacherClassIds: auth.userClassIds, // Use all classes the user has access to
-            startDate: filterState.startDate ? filterState.startDate.toISOString() : null,
-            endDate: filterState.endDate ? filterState.endDate.toISOString() : null,
-        });
-
-        try {
-            const responseData = await sendRequest(url, 'POST', body, {
-                'Content-Type': 'application/json',
-            });
-            console.log(responseData)
-
-            const { overallStats, violationStats, ...cardsData } = responseData
-
-            // Update display state with new data and record applied filters
-            setDisplayState({
-                attendanceData: cardsData,
-                overallAttendances: responseData.overallStats,
-                violationData: responseData.violationStats,
-                appliedFilters: { ...filterState }, // Snapshot of current filters
-                studentsData: responseData.studentsData
-            });
-        } catch (err) { }
-    }, [sendRequest, filterState]);
-
-    useEffect(() => {
-        registerLocale("id-ID", idID);
-        fetchAcademicYears();
-    }, [fetchAcademicYears]);
-
-    const selectAcademicYearHandler = useCallback((academicYearId) => {
-        setFilterState(prev => ({
-            ...prev,
-            selectedAcademicYear: academicYearId,
-            selectedClass: null
-        }));
-
-        setDisplayState(prev => ({
-            ...prev,
-            attendanceData: null,
-            overallAttendances: null,
-            violationData: null
-        }));
-
-        setClassesList([]);
-
-        if (academicYearId !== '') {
-            fetchClassesList();
-        }
-    }, []);
-
-    const fetchClassesList = useCallback(async () => {
-        const url = `${import.meta.env.VITE_BACKEND_URL}/classes/get-by-ids`
-        const body = JSON.stringify({ classIds: auth.userClassIds })
-        console.log(body)
-
-        try {
-            const responseData = await sendRequest(url, 'POST', body, {
-                'Content-Type': 'application/json'
-            })
-            setClassesList(responseData.classes)
-            console.log(responseData.classes)
-        } catch (err) { }
-    }, [sendRequest, auth.userClassIds]);
-
-    const selectClassHandler = useCallback((classId) => {
-        setFilterState(prev => ({
-            ...prev,
-            selectedClass: classId
-        }));
-
-        setDisplayState(prev => ({
-            ...prev,
-            attendanceData: null,
-            overallAttendances: null,
-            violationData: null
-        }));
-    }, []);
-
-    const selectDateRangeHandler = useCallback((dates) => {
-        let startingWeek = null;
-        let endOfWeek = null;
-        let period = null;
-
-        if (dates) {
-            startingWeek = getMonday(dates);
-            endOfWeek = new Date(startingWeek);
-            endOfWeek.setDate(startingWeek.getDate() + 6);
-
-            console.log(startingWeek)
-            console.log(endOfWeek)
-
-            period = startingWeek.toLocaleDateString('id-ID', {
-                day: '2-digit',
-                timeZone: 'Asia/Jakarta'
-            }) + " - " +
-                endOfWeek.toLocaleDateString('id-ID', {
-                    day: '2-digit',
-                    month: 'long',
-                    year: 'numeric',
-                    timeZone: 'Asia/Jakarta'
-                });
-        }
-
-        console.log(period)
-
-        setFilterState(prev => ({
-            ...prev,
-            startDate: startingWeek,
-            endDate: endOfWeek,
-            period: period
-        }));
-
-        setDisplayState(prev => ({
-            ...prev,
-            attendanceData: null,
-            overallAttendances: null,
-            violationData: null
-        }));
-    }, []);
-
-    const handleApplyFilter = useCallback(() => {
-        if (!filterState.selectedAcademicYear) {
-            alert('Silakan pilih tahun ajaran terlebih dahulu');
-            return;
-        }
-
-        // Clear previous data while loading
-        setDisplayState(prev => ({
-            ...prev,
-            attendanceData: null,
-            overallAttendances: null,
-            violationData: null
-        }));
-
-        fetchAttendanceData();
-    }, [filterState.selectedAcademicYear, fetchAttendanceData]);
-
-    const handleResetFilter = useCallback(() => {
-        // Reset filter selections to initial values
-        setFilterState({ ...initialFilterState });
-
-        // Clear displayed data
-        setDisplayState({
-            attendanceData: null,
-            overallAttendances: null,
-            violationData: null,
-            appliedFilters: null
-        });
-
-        // Clear dependent lists
-        setClassesList([]);
-    }, []);
-
-    // Memoized values to prevent unnecessary re-renders
-    const memoizedOverallAttendances = useMemo(() => {
-        return displayState.overallAttendances;
-    }, [displayState.overallAttendances]);
-
-    const memoizedViolationData = useMemo(() => {
-        return displayState.violationData;
-    }, [displayState.violationData]);
 
     return (
         <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">
@@ -422,7 +400,7 @@ const TeacherPerformanceView = () => {
                                         </select>
                                         <DatePicker
                                             dateFormat="dd/MM/yyyy"
-                                            maxDate={new Date(getMonday(new Date()).setDate(getMonday(new Date()).getDate() + 6))}
+                                            maxDate={maxDate}
                                             selected={filterState.startDate}
                                             onChange={selectDateRangeHandler}
                                             startDate={filterState.startDate}
