@@ -13,11 +13,8 @@ import PieChart from '../components/PieChart';
 import { academicYearFormatter } from '../../shared/Utilities/academicYearFormatter';
 import { getMonday } from '../../shared/Utilities/getMonday';
 import DataTable from '../../shared/Components/UIElements/DataTable';
-import StudentInitial from '../../shared/Components/UIElements/StudentInitial';
-import StudentReportView from '../../students/pages/StudentReportView';
 
 const SubBranchPerformanceView = () => {
-  const navigate = useNavigate();
 
   const { isLoading, error, sendRequest, setError } = useHttp();
 
@@ -132,12 +129,12 @@ const SubBranchPerformanceView = () => {
 
     // Batch clear display state to a single update
     setDisplayState({
-      attendanceData: null,
-      overallAttendances: null,
-      violationData: null,
+      // attendanceData: null,
+      // overallAttendances: null,
+      // violationData: null,
       appliedFilters: null,
       classData: null,
-      studentsData: null
+      // studentsData: null
     });
 
     setClassesList([]);
@@ -156,12 +153,12 @@ const SubBranchPerformanceView = () => {
 
     // Batch clear
     setDisplayState({
-      attendanceData: null,
-      overallAttendances: null,
-      violationData: null,
+      // attendanceData: null,
+      // overallAttendances: null,
+      // violationData: null,
       appliedFilters: null,
       classData: null,
-      studentsData: null
+      // studentsData: null
     });
   }, []);
 
@@ -194,12 +191,12 @@ const SubBranchPerformanceView = () => {
     }));
 
     setDisplayState({
-      attendanceData: null,
-      overallAttendances: null,
-      violationData: null,
+      // attendanceData: null,
+      // overallAttendances: null,
+      // violationData: null,
       appliedFilters: null,
       classData: null,
-      studentsData: null
+      // studentsData: null
     });
   }, []);
 
@@ -210,12 +207,12 @@ const SubBranchPerformanceView = () => {
     }
 
     // Clear previous data while loading
-    setDisplayState(prev => ({
-      ...prev,
-      attendanceData: null,
-      overallAttendances: null,
-      violationData: null
-    }));
+    // setDisplayState(prev => ({
+    //   ...prev,
+    //   attendanceData: null,
+    //   overallAttendances: null,
+    //   violationData: null
+    // }));
 
     fetchAttendanceData();
   }, [filterState.selectedAcademicYear, fetchAttendanceData]);
@@ -225,14 +222,14 @@ const SubBranchPerformanceView = () => {
     setFilterState({ ...initialFilterState });
 
     // Clear displayed data in one shot
-    setDisplayState({
-      attendanceData: null,
-      overallAttendances: null,
-      violationData: null,
-      appliedFilters: null,
-      classData: null,
-      studentsData: null
-    });
+    // setDisplayState({
+    //   attendanceData: null,
+    //   overallAttendances: null,
+    //   violationData: null,
+    //   appliedFilters: null,
+    //   classData: null,
+    //   studentsData: null
+    // });
 
     // Clear dependent lists
     setClassesList([]);
