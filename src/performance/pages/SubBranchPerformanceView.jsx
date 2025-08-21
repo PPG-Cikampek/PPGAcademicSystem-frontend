@@ -21,6 +21,7 @@ import { getMonday } from "../../shared/Utilities/getMonday";
 import DataTable from "../../shared/Components/UIElements/DataTable";
 import ClassPerformanceTable from "../components/ClassPerformanceTable";
 import StudentPerformanceTable from "../components/StudentPerformanceTable";
+import { set } from "react-hook-form";
 
 const SubBranchPerformanceView = () => {
     const { isLoading, error, sendRequest, setError } = useHttp();
@@ -148,16 +149,13 @@ const SubBranchPerformanceView = () => {
                 ...prev,
                 selectedAcademicYear: academicYearId,
                 selectedClass: null,
+                currentView: "classesTable",
             }));
 
             // Batch clear display state to a single update
             setDisplayState({
-                // attendanceData: null,
-                // overallAttendances: null,
-                // violationData: null,
                 appliedFilters: null,
                 classData: null,
-                // studentsData: null
             });
 
             setClassesList([]);
@@ -173,17 +171,11 @@ const SubBranchPerformanceView = () => {
         setFilterState((prev) => ({
             ...prev,
             selectedClass: classId,
+            currentView: "classesTable",
         }));
-
-        // Batch clear
-        setDisplayState({
-            // attendanceData: null,
-            // overallAttendances: null,
-            // violationData: null,
-            appliedFilters: null,
-            classData: null,
-            // studentsData: null
-        });
+        setDisplayState((prev) => ({
+            ...prev,
+        }));
     }, []);
 
     const selectDateRangeHandler = useCallback((dates) => {
@@ -213,16 +205,12 @@ const SubBranchPerformanceView = () => {
             startDate: start,
             endDate: end,
             period: period,
+            currentView: "classesTable",
         }));
 
-        setDisplayState({
-            // attendanceData: null,
-            // overallAttendances: null,
-            // violationData: null,
-            appliedFilters: null,
-            classData: null,
-            // studentsData: null
-        });
+        setDisplayState((prev) => ({
+            ...prev,
+        }));
     }, []);
 
     const handleApplyFilter = useCallback(() => {
@@ -242,19 +230,6 @@ const SubBranchPerformanceView = () => {
     const handleResetFilter = useCallback(() => {
         // Reset filter selections to initial values
         setFilterState({ ...initialFilterState });
-
-        // Clear displayed data in one shot
-        // setDisplayState({
-        //   attendanceData: null,
-        //   overallAttendances: null,
-        //   violationData: null,
-        //   appliedFilters: null,
-        //   classData: null,
-        //   studentsData: null
-        // });
-
-        // Clear dependent lists
-        setClassesList([]);
     }, []);
 
     // Memoized values to prevent unnecessary re-renders

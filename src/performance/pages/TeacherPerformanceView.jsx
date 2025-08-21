@@ -148,14 +148,9 @@ const TeacherPerformanceView = () => {
             }));
 
             // Batch clear display state to a single update
-            setDisplayState({
-                attendanceData: null,
-                overallAttendances: null,
-                violationData: null,
-                appliedFilters: null,
-                classData: null,
-                studentsData: null,
-            });
+            setDisplayState((prev) => ({
+                ...prev,
+            }));
 
             setClassesList([]);
 
@@ -172,15 +167,9 @@ const TeacherPerformanceView = () => {
             selectedClass: classId,
         }));
 
-        // Batch clear
-        setDisplayState({
-            attendanceData: null,
-            overallAttendances: null,
-            violationData: null,
-            appliedFilters: null,
-            classData: null,
-            studentsData: null,
-        });
+        setDisplayState((prev) => ({
+            ...prev,
+        }));
     }, []);
 
     const selectDateRangeHandler = useCallback((dates) => {
@@ -219,14 +208,9 @@ const TeacherPerformanceView = () => {
             period: period,
         }));
 
-        setDisplayState({
-            attendanceData: null,
-            overallAttendances: null,
-            violationData: null,
-            appliedFilters: null,
-            classData: null,
-            studentsData: null,
-        });
+        setDisplayState((prev) => ({
+            ...prev,
+        }));
     }, []);
 
     const handleApplyFilter = useCallback(() => {
