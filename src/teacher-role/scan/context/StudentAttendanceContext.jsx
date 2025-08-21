@@ -135,6 +135,7 @@ const fetchAttendanceData = async (classId, attendanceDate, dispatch) => {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${JSON.parse(localStorage.getItem('userData')).token}`
             },
             body: body,
         });
@@ -159,6 +160,7 @@ const fetchAttendanceData = async (classId, attendanceDate, dispatch) => {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${JSON.parse(localStorage.getItem('userData')).token}`
             }
         });
         if (!response.ok) {
