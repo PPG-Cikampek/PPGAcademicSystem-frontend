@@ -23,7 +23,7 @@ const DEFAULT_SCORE_CATEGORIES = [
     { key: 'memorizingSurah', label: 'Hafalan Surat-surat Al-Quran' },
     { key: 'memorizingHadith', label: 'Hafalan Hadits' },
     { key: 'memorizingDua', label: "Hafalan Do'a" },
-    { key: 'memorizingBeautifulName', label: 'Hafalan Asmaul Husna' },
+    { key: 'memorizingBeautifulName', label: 'Hafalan Asma\'ul Husna' },
     { key: 'knowledge', label: 'Keilmuan dan Kefahaman Agama' },
     { key: 'independence', label: 'Kemandirian' }
 ];

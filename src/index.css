@@ -1,15 +1,19 @@
-@import 'tailwindcss';
+@import "tailwindcss";
 
 @theme {
-  --color-primary: #008ee6;
-  --color-primary-subtle: #e5e7eb;
-  --color-primary-darker: #0278c2;
-  --color-secondary: #facc15;
-  --color-secondary-subtle: #fef08a;
-  --color-danger: #ef4444;
-  --color-danger-subtle: #fca5a5;
+    --color-primary: #008ee6;
+    --color-primary-subtle: #e5e7eb;
+    --color-primary-darker: #0278c2;
+    --color-secondary: #facc15;
+    --color-secondary-subtle: #fef08a;
+    --color-danger: #ef4444;
+    --color-danger-subtle: #fca5a5;
 
-  --font-sans: Roboto, sans-serif;
+    --font-sans: Roboto, sans-serif;
+}
+
+h2 {
+    @apply text-2xl font-semibold text-gray-800 mb-2;
 }
 
 /*
@@ -21,161 +25,158 @@
   color utility to any element that depends on these defaults.
 */
 @layer base {
-
-  *,
-  ::after,
-  ::before,
-  ::backdrop,
-  ::file-selector-button {
-    border-color: var(--color-gray-200, currentcolor);
-  }
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentcolor);
+    }
 }
 
 @utility font-lpmq {
-  font-family: 'LPMQ', sans-serif;
+    font-family: "LPMQ", sans-serif;
 }
 
 @utility font-urdu {
-  font-family: 'urdu', sans-serif;
+    font-family: "urdu", sans-serif;
 }
 
 @utility card-interactive {
-  @apply mt-4 p-4 flex justify-center rounded-3xl md:mx-8 bg-white shadow-xs ring-1 ring-gray-200 transition ease-out hover:-translate-y-1 hover:scale-[1.025] hover:cursor-pointer hover:shadow-lg duration-200;
+    @apply mt-4 p-4 flex justify-center rounded-3xl md:mx-8 bg-white shadow-xs ring-1 ring-gray-200 transition ease-out hover:-translate-y-1 hover:scale-[1.025] hover:cursor-pointer hover:shadow-lg duration-200;
 }
 
 @utility icon-button-primary {
-  @apply p-3 rounded-full max-md:border max-md:border-blue-500 hover:cursor-pointer hover:bg-gray-200 hover:text-blue-700 text-blue-500 active:cursor-pointer active:bg-blue-500 active:text-white transition
+    @apply p-3 rounded-full max-md:border max-md:border-blue-500 hover:cursor-pointer hover:bg-gray-200 hover:text-blue-700 text-blue-500 active:cursor-pointer active:bg-blue-500 active:text-white transition;
 }
 
 @utility icon-button-danger {
-  @apply p-3 rounded-full max-md:border max-md:border-red-500 hover:cursor-pointer hover:bg-gray-200 hover:text-red-700 text-red-500 active:cursor-pointer active:bg-red-500 active:text-white transition
+    @apply p-3 rounded-full max-md:border max-md:border-red-500 hover:cursor-pointer hover:bg-gray-200 hover:text-red-700 text-red-500 active:cursor-pointer active:bg-red-500 active:text-white transition;
 }
 
 @utility card-basic {
-  @apply mt-4 p-5 flex justify-center rounded-3xl bg-white shadow-xs ring-1 ring-gray-200;
+    @apply my-4 p-5 flex justify-center rounded-3xl bg-white shadow-xs ring-1 ring-gray-200;
 }
 
 @utility button-primary {
-  @apply mt-3 p-2 px-4 flex justify-center rounded-md border-2 border-primary shadow-xs transition ease-out hover:scale-[1.025] bg-primary text-white hover:cursor-pointer hover:shadow-lg active:bg-primary-darker focus:outline-hidden focus:ring-2 focus:ring-primary-subtle duration-150;
+    @apply mt-3 p-2 px-4 flex justify-center rounded-md border-2 border-primary shadow-xs transition ease-out hover:scale-[1.025] bg-primary text-white hover:cursor-pointer hover:shadow-lg active:bg-primary-darker focus:outline-hidden focus:ring-2 focus:ring-primary-subtle duration-150;
 }
 
 @utility button-primary-subtle-outline {
-  @apply mt-3 p-2 px-4 flex justify-center rounded-md border-2 border-primary-subtle shadow-xs transition ease-out text-black hover:bg-gray-100 hover:cursor-pointer active:bg-primary active:text-white focus:outline-hidden focus:ring-2 focus:ring-primary-subtle duration-150;
+    @apply mt-3 p-2 px-4 flex justify-center rounded-md border-2 border-primary-subtle shadow-xs transition ease-out text-black hover:bg-gray-100 hover:cursor-pointer active:bg-primary active:text-white focus:outline-hidden focus:ring-2 focus:ring-primary-subtle duration-150;
 }
 
 @utility button-secondary {
-  @apply mt-3 p-2 px-4 flex justify-center rounded-md border border-secondary bg-white shadow-xs transition ease-out hover:scale-105 hover:bg-secondary hover:text-white hover:cursor-pointer hover:shadow-lg focus:outline-hidden focus:ring-2 focus:ring-secondary-subtle duration-150;
+    @apply mt-3 p-2 px-4 flex justify-center rounded-md border border-secondary bg-white shadow-xs transition ease-out hover:scale-105 hover:bg-secondary hover:text-white hover:cursor-pointer hover:shadow-lg focus:outline-hidden focus:ring-2 focus:ring-secondary-subtle duration-150;
 }
 
 @utility button-danger {
-  @apply mt-3 p-2 px-4 flex justify-center rounded-md border-2 border-danger text-black bg-white shadow-xs transition ease-out hover:scale-[1.025] hover:bg-danger hover:text-white hover:cursor-pointer hover:shadow-lg focus:outline-hidden focus:ring-2 focus:ring-danger-subtle disabled:opacity-60 duration-150;
+    @apply mt-3 p-2 px-4 flex justify-center rounded-md border-2 border-danger text-black bg-white shadow-xs transition ease-out hover:scale-[1.025] hover:bg-danger hover:text-white hover:cursor-pointer hover:shadow-lg focus:outline-hidden focus:ring-2 focus:ring-danger-subtle disabled:opacity-60 duration-150;
 }
 
 @utility btn-danger-outline {
-  @apply p-2 px-4 ring-2 ring-danger-subtle hover:bg-danger hover:ring-danger hover:text-white hover:cursor-pointer rounded-[5px] disabled:opacity-60 disabled:hover:cursor-not-allowed transition-all duration-150;
+    @apply p-2 px-4 ring-2 ring-danger-subtle hover:bg-danger hover:ring-danger hover:text-white hover:cursor-pointer rounded-[5px] disabled:opacity-60 disabled:hover:cursor-not-allowed transition-all duration-150;
 }
 
 @utility btn-primary-outline {
-  @apply p-2 px-4 ring-2 ring-primary-subtle hover:bg-primary hover:ring-primary hover:text-white hover:cursor-pointer rounded-[5px] disabled:opacity-60 disabled:hover:cursor-not-allowed transition-all duration-150;
+    @apply p-2 px-4 ring-2 ring-primary-subtle hover:bg-primary hover:ring-primary hover:text-white hover:cursor-pointer rounded-[5px] disabled:opacity-60 disabled:hover:cursor-not-allowed transition-all duration-150;
 }
 
 @utility btn-neutral-outline {
-  @apply p-2 px-4 ring-2 ring-primary-subtle hover:bg-gray-500 hover:ring-gray-500 hover:text-white hover:cursor-pointer rounded-[5px] disabled:opacity-60 disabled:hover:cursor-not-allowed transition-all duration-150;
+    @apply p-2 px-4 ring-2 ring-primary-subtle hover:bg-gray-500 hover:ring-gray-500 hover:text-white hover:cursor-pointer rounded-[5px] disabled:opacity-60 disabled:hover:cursor-not-allowed transition-all duration-150;
 }
 
 @utility btn-secondary-outline-sharp {
-  @apply p-2 px-4 hover:ring-1 hover:ring-primary-subtle hover:cursor-pointer focus:bg-primary-subtle focus:ring-primary-subtle rounded-[2px] transition-all duration-150;
+    @apply p-2 px-4 hover:ring-1 hover:ring-primary-subtle hover:cursor-pointer focus:bg-primary-subtle focus:ring-primary-subtle rounded-[2px] transition-all duration-150;
 }
 
 @utility badge-primary {
-  @apply p-1 rounded-full bg-blue-100 text-primary font-normal;
+    @apply p-1 rounded-full bg-blue-100 text-primary font-normal;
 }
 
 @utility badge-green {
-  @apply p-1 rounded-full bg-green-100 text-green-700 font-normal;
+    @apply p-1 rounded-full bg-green-100 text-green-700 font-normal;
 }
 
 @utility badge-yellow {
-  @apply p-1 rounded-full bg-yellow-100 text-yellow-700 font-normal;
+    @apply p-1 rounded-full bg-yellow-100 text-yellow-700 font-normal;
 }
 
 @utility badge-orange {
-  @apply p-1 rounded-full bg-orange-100 text-orange-700 font-normal;
+    @apply p-1 rounded-full bg-orange-100 text-orange-700 font-normal;
 }
 
 @utility badge-red {
-  @apply p-1 rounded-full bg-red-100 text-red-700 font-normal;
+    @apply p-1 rounded-full bg-red-100 text-red-700 font-normal;
 }
 
 @utility badge-violet {
-  @apply p-1 rounded-full bg-violet-100 text-violet-700 font-normal;
+    @apply p-1 rounded-full bg-violet-100 text-violet-700 font-normal;
 }
 
 @utility badge-primary-outline {
-  @apply p-2 rounded-md border border-primary-subtle;
+    @apply p-2 rounded-md border border-primary-subtle;
 }
 
 @utility btn-mobile-secondary-outline {
-  @apply p-2 px-4 rounded-md border border-secondary hover:cursor-pointer active:text-white active:bg-secondary disabled:border-primary-subtle disabled:opacity-60 transition-all duration-200;
+    @apply p-2 px-4 rounded-md border border-secondary hover:cursor-pointer active:text-white active:bg-secondary disabled:border-primary-subtle disabled:opacity-60 transition-all duration-200;
 }
 
 @utility btn-mobile-danger-outline {
-  @apply p-2 px-4 rounded-md border border-danger hover:cursor-pointer active:text-white active:bg-danger disabled:border-primary-subtle disabled:opacity-60 transition-all duration-200;
+    @apply p-2 px-4 rounded-md border border-danger hover:cursor-pointer active:text-white active:bg-danger disabled:border-primary-subtle disabled:opacity-60 transition-all duration-200;
 }
 
 @utility btn-mobile-primary {
-  @apply p-2 px-4 rounded-md border border-primary bg-primary hover:cursor-pointer scale-100 active:scale-[1.01] active:ring-2 focus:ring-2 text-white disabled:opacity-55 ease-out transition-all duration-200;
+    @apply p-2 px-4 rounded-md border border-primary bg-primary hover:cursor-pointer scale-100 active:scale-[1.01] active:ring-2 focus:ring-2 text-white disabled:opacity-55 ease-out transition-all duration-200;
 }
 
 @utility btn-mobile-primary-round {
-  @apply p-2 px-4 rounded-full border border-primary bg-primary hover:cursor-pointer scale-100 active:scale-[1.01] active:ring-2 focus:ring-2 text-white disabled:opacity-60 ease-out transition-all duration-200;
+    @apply p-2 px-4 rounded-full border border-primary bg-primary hover:cursor-pointer scale-100 active:scale-[1.01] active:ring-2 focus:ring-2 text-white disabled:opacity-60 ease-out transition-all duration-200;
 }
 
 @utility btn-mobile-primary-round-gray {
-  @apply flex items-center gap-2 px-4 py-2 border border-gray-300 hover:bg-gray-200 disabled:text-gray-500 disabled:hover:bg-white disabled:cursor-not-allowed  hover:cursor-pointer rounded-full text-sm font-medium transition-colors;
+    @apply flex items-center gap-2 px-4 py-2 border border-gray-300 hover:bg-gray-200 disabled:text-gray-500 disabled:hover:bg-white disabled:cursor-not-allowed  hover:cursor-pointer rounded-full text-sm font-medium transition-colors;
 }
 
 @utility stat-card {
-  @apply bg-white rounded-lg shadow-xs p-6 mb-4 transition-all hover:shadow-md;
+    @apply bg-white rounded-lg shadow-xs p-6 mb-4 transition-all hover:shadow-md;
 }
 
 @layer utilities {
-  @font-face {
-    font-family: 'LPMQ';
-    src: url('./assets/fonts/LPMQ-IsepMisbah.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-  }
+    @font-face {
+        font-family: "LPMQ";
+        src: url("./assets/fonts/LPMQ-IsepMisbah.ttf") format("truetype");
+        font-weight: normal;
+        font-style: normal;
+    }
 
-  @font-face {
-    font-family: 'urdu';
-    src: url('./assets/fonts/UrdTypeb.ttf') format('truetype');
-    /* font-weight: bold; */
-    /* font-style: normal; */
-  }
+    @font-face {
+        font-family: "urdu";
+        src: url("./assets/fonts/UrdTypeb.ttf") format("truetype");
+        /* font-weight: bold; */
+        /* font-style: normal; */
+    }
 
-  html {
-    @apply font-sans;
-  }
+    html {
+        @apply font-sans;
+    }
 }
-
 
 @layer components {
-  div * {
-    /* @apply border-solid border border-red-600 box-border; */
-  }
+    div * {
+        /* @apply border-solid border border-red-600 box-border; */
+    }
 
-  #frame {
-    background-image: url("data:image/svg+xml,%3csvg width='100%' height='100%' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%' height='100%' fill='none' rx='4' ry='4' stroke='white' stroke-width='12' stroke-dasharray='75' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
-    border-radius: 5px;
-  }
+    #frame {
+        background-image: url("data:image/svg+xml,%3csvg width='100%' height='100%' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%' height='100%' fill='none' rx='4' ry='4' stroke='white' stroke-width='12' stroke-dasharray='75' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
+        border-radius: 5px;
+    }
 
-  table {
-    @apply border border-gray-200
-  }
+    table {
+        @apply border border-gray-200;
+    }
 }
 
-
 body {
-  @apply bg-gray-50 text-sm font-normal h-full;
+    @apply bg-gray-50 text-sm font-normal h-full;
 }

@@ -458,20 +458,26 @@ const SubBranchPerformanceView = () => {
                     !isLoading &&
                     filterState.selectedAcademicYear &&
                     (filterState.currentView === "classesTable" ? (
-                        <ClassPerformanceTable
-                            data={displayState.studentsDataByClass}
-                            filterState={filterState}
-                            setFilterState={setFilterState}
-                        />
+                        <div>
+                            <h2>Performa Kelompok</h2>
+                            <ClassPerformanceTable
+                                data={displayState.studentsDataByClass}
+                                filterState={filterState}
+                                setFilterState={setFilterState}
+                            />
+                        </div>
                     ) : (
-                        <StudentPerformanceTable
-                            selectedAcademicYear={
-                                filterState.selectedAcademicYear
-                            }
-                            selectedClass={filterState.selectedClass}
-                            startDate={filterState.startDate}
-                            endDate={filterState.endDate}
-                        />
+                        <div>
+                            <h2>Performa Kelas</h2>
+                            <StudentPerformanceTable
+                                selectedAcademicYear={
+                                    filterState.selectedAcademicYear
+                                }
+                                selectedClass={filterState.selectedClass}
+                                startDate={filterState.startDate}
+                                endDate={filterState.endDate}
+                            />
+                        </div>
                     ))}
             </main>
         </div>
