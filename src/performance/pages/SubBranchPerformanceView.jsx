@@ -20,6 +20,7 @@ import { academicYearFormatter } from "../../shared/Utilities/academicYearFormat
 import { getMonday } from "../../shared/Utilities/getMonday";
 import DataTable from "../../shared/Components/UIElements/DataTable";
 import ClassPerformanceTable from "../components/ClassPerformanceTable";
+import StudentPerformanceTable from "../components/StudentPerformanceTable";
 
 const SubBranchPerformanceView = () => {
     const { isLoading, error, sendRequest, setError } = useHttp();
@@ -42,6 +43,7 @@ const SubBranchPerformanceView = () => {
         endDate: null,
         period: null,
         selectedClass: null,
+        currentView: "classesTable",
     });
 
     // Display state - for currently shown data (only updates when filters are applied)
@@ -229,13 +231,10 @@ const SubBranchPerformanceView = () => {
             return;
         }
 
-        // Clear previous data while loading
-        // setDisplayState(prev => ({
-        //   ...prev,
-        //   attendanceData: null,
-        //   overallAttendances: null,
-        //   violationData: null
-        // }));
+        setFilterState((prev) => ({
+            ...prev,
+            currentView: "classesTable",
+        }));
 
         fetchAttendanceData();
     }, [filterState.selectedAcademicYear, fetchAttendanceData]);
@@ -482,12 +481,23 @@ const SubBranchPerformanceView = () => {
                 )}
                 {displayState.violationData &&
                     !isLoading &&
-                    filterState.selectedAcademicYear && (
+                    filterState.selectedAcademicYear &&
+                    (filterState.currentView === "classesTable" ? (
                         <ClassPerformanceTable
                             data={displayState.studentsDataByClass}
                             filterState={filterState}
+                            setFilterState={setFilterState}
                         />
-                    )}
+                    ) : (
+                        <StudentPerformanceTable
+                            selectedAcademicYear={
+                                filterState.selectedAcademicYear
+                            }
+                            selectedClass={filterState.selectedClass}
+                            startDate={filterState.startDate}
+                            endDate={filterState.endDate}
+                        />
+                    ))}
             </main>
         </div>
     );
