@@ -31,29 +31,30 @@ class RouteErrorBoundary extends React.Component {
                 <div className="flex flex-col items-center justify-center h-screen bg-gray-50">
                     <div className="text-center p-8 bg-white rounded-lg shadow-md max-w-md">
                         <div className="text-red-500 text-6xl mb-4">⚠️</div>
-                        <h2 className="text-2xl font-bold text-gray-800 mb-4">
-                            Something went wrong
+                        <h2 className="text-2xl font-bold text-red-500 mb-4">
+                            Terjadi Kesalahan
                         </h2>
                         <p className="text-gray-600 mb-6">
-                            An error occurred while loading the application.
-                            This might be due to a routing issue or corrupted
-                            session data.
+                            Sistem mengalami kesalahan yang tidak terduga. Mohon
+                            coba lagi atau hubungi tim ICT jika masalah
+                            berlanjut. Sertakan screenshot dan kronologis
+                            kejadian jika perlu.
                         </p>
                         <div className="space-y-3">
                             <button
                                 onClick={this.handleRetry}
-                                className="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
+                                className="button-primary w-full"
                             >
-                                Reload Application
+                                Refresh Halaman
                             </button>
                             <button
                                 onClick={() => {
                                     localStorage.clear();
                                     window.location.href = "/";
                                 }}
-                                className="w-full bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition-colors"
+                                className="btn-neutral-outline w-full"
                             >
-                                Clear Data & Restart
+                                Bersihkan cache & Login Kembali
                             </button>
                         </div>
                         {process.env.NODE_ENV === "development" && (
