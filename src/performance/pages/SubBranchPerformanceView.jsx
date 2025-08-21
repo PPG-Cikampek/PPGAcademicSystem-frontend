@@ -468,7 +468,23 @@ const SubBranchPerformanceView = () => {
                         </div>
                     ) : (
                         <div>
-                            <h2>Performa Kelas</h2>
+                            <div className="flex justify-between">
+                                <h2>Performa Kelas</h2>
+                                <div className="flex gap-2">
+                                    <button
+                                        className="btn-mobile-primary-round-gray"
+                                        onClick={() =>
+                                            setFilterState((prev) => ({
+                                                ...prev,
+                                                currentView: "classesTable",
+                                                selectedClass: null,
+                                            }))
+                                        }
+                                    >
+                                        Kembali
+                                    </button>
+                                </div>
+                            </div>
                             <StudentPerformanceTable
                                 selectedAcademicYear={
                                     filterState.selectedAcademicYear
