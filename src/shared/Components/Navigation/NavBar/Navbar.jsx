@@ -39,7 +39,10 @@ const Navbar = () => {
                         icon: LogOut,
                         label: "Logout",
                         variant: "danger",
-                        onClick: () => auth.logout(),
+                        onClick: () => {
+                            auth.logout();
+                            navigate("/");
+                        },
                     },
                 ]}
             />

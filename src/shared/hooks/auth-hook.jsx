@@ -13,6 +13,7 @@ export const useAuth = () => {
     const [currentBranchYear, setCurrentBranchYear] = useState(null);
     const [currentBranchYearId, setCurrentBranchYearId] = useState(null);
     const [userClassIds, setUserClassIds] = useState([]);
+    const [isInitialized, setIsInitialized] = useState(false);
 
     const login = useCallback(
         (
@@ -86,25 +87,82 @@ export const useAuth = () => {
     }, [token, logout, tokenExpirationDate]);
 
     useEffect(() => {
-        const storedData = JSON.parse(localStorage.getItem("userData"));
-        if (
-            storedData &&
-            storedData.token &&
-            new Date(storedData.expiration) > new Date()
-        ) {
-            login(
-                storedData.userId,
-                storedData.role,
-                storedData.name,
-                storedData.branchId,
-                storedData.subBranchId,
-                storedData.currentBranchYear,
-                storedData.currentBranchYearId,
-                storedData.userClassIds,
-                storedData.token,
-                new Date(storedData.expiration)
-            );
-        }
+        let isMounted = true;
+
+        const initializeAuth = () => {
+            try {
+                const storedData = localStorage.getItem("userData");
+
+                if (!storedData) {
+                    // No stored data, user is not logged in
+                    if (isMounted) {
+                        setIsInitialized(true);
+                    }
+                    return;
+                }
+
+                const parsedData = JSON.parse(storedData);
+
+                // Validate stored data structure
+                if (
+                    !parsedData ||
+                    !parsedData.token ||
+                    !parsedData.expiration ||
+                    !parsedData.role
+                ) {
+                    // Invalid stored data, clear it
+                    localStorage.removeItem("userData");
+                    if (isMounted) {
+                        setIsInitialized(true);
+                    }
+                    return;
+                }
+
+                // Check if token is expired
+                const expirationDate = new Date(parsedData.expiration);
+                if (expirationDate <= new Date()) {
+                    // Token expired, clear stored data
+                    localStorage.removeItem("userData");
+                    if (isMounted) {
+                        setIsInitialized(true);
+                    }
+                    return;
+                }
+
+                // Valid stored data, restore auth state
+                if (isMounted) {
+                    login(
+                        parsedData.userId,
+                        parsedData.role,
+                        parsedData.name,
+                        parsedData.branchId,
+                        parsedData.subBranchId,
+                        parsedData.currentBranchYear,
+                        parsedData.currentBranchYearId,
+                        parsedData.userClassIds,
+                        parsedData.token,
+                        expirationDate
+                    );
+                    setIsInitialized(true);
+                }
+            } catch (error) {
+                console.error(
+                    "Error initializing auth from localStorage:",
+                    error
+                );
+                // Clear potentially corrupted data
+                localStorage.removeItem("userData");
+                if (isMounted) {
+                    setIsInitialized(true);
+                }
+            }
+        };
+
+        initializeAuth();
+
+        return () => {
+            isMounted = false;
+        };
     }, [login]);
 
     const setAttributes = useCallback((branchId, subBranchId, userClassIds) => {
@@ -126,5 +184,6 @@ export const useAuth = () => {
         currentBranchYearId,
         userClassIds,
         setAttributes,
+        isInitialized,
     };
 };

@@ -79,10 +79,8 @@ const NewMaterialProgresslView = lazy(() =>
     import("../teacher-role/materialProgress/pages/NewMaterialProgressView")
 );
 
-const queryClient = new QueryClient();
-
 export const teacherRoutes = [
-    { path: "/", element: <HomeScreenView /> },
+    { path: "/dashboard", element: <HomeScreenView /> },
     { path: "/scan", element: <ScannerView /> },
     { path: "/scan/select-class", element: <SelectClassView /> },
     {

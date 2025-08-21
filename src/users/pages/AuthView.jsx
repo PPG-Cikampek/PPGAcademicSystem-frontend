@@ -112,6 +112,7 @@ const AuthView = () => {
             );
 
             console.log("logged IN");
+            navigate("/dashboard");
         } catch (err) {
             console.log(err);
         }

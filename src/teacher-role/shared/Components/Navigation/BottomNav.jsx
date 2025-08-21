@@ -15,7 +15,7 @@ const BottomNav = () => {
                   {
                       id: 1,
                       label: "Home",
-                      path: "/",
+                      path: "/dashboard",
                       icon: <Home size={24} />,
                       end: true,
                   },
