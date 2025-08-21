@@ -1,10 +1,13 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft } from "lucide-react";
-import { attendanceCount } from "../../shared/Utilities/attendanceCount";
+import { attendanceCount } from "../../../shared/Utilities/attendanceCount";
 
-
-const calculateStats = (attendances, semesterTarget = null, uniqueStudents = null) => {
+const calculateStats = (
+    attendances,
+    semesterTarget = null,
+    uniqueStudents = null
+) => {
     const total = attendances.length;
     const stats = attendances.reduce((acc, curr) => {
         acc[curr.status] = (acc[curr.status] || 0) + 1;
@@ -15,92 +18,96 @@ const calculateStats = (attendances, semesterTarget = null, uniqueStudents = nul
 
     return Object.entries(stats).map(([status, count]) => ({
         status,
-        percentage: Math.round((count / base) * 100)
+        percentage: Math.round((count / base) * 100),
     }));
 };
 
-
 const getStatusColor = (status) => {
     const colors = {
-        'Hadir': 'bg-emerald-100 text-emerald-800',
-        'Terlambat': 'bg-amber-100 text-amber-800',
-        'Izin': 'bg-blue-100 text-blue-800',
-        'Sakit': 'bg-purple-100 text-purple-800',
-        'Tanpa Keterangan': 'bg-red-100 text-red-800'
+        Hadir: "bg-emerald-100 text-emerald-800",
+        Terlambat: "bg-amber-100 text-amber-800",
+        Izin: "bg-blue-100 text-blue-800",
+        Sakit: "bg-purple-100 text-purple-800",
+        "Tanpa Keterangan": "bg-red-100 text-red-800",
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || "bg-gray-100 text-gray-800";
 };
 
 const StatBadge = ({ status, percentage }) => (
-    <span className={`px-2 py-1 rounded-full text-center ${getStatusColor(status)}`}>
+    <span
+        className={`px-2 py-1 rounded-full text-center ${getStatusColor(
+            status
+        )}`}
+    >
         {status} {percentage}%
     </span>
 );
 
 const PerformanceCards = ({ data }) => {
-    const [view, setView] = useState('branches');
+    const [view, setView] = useState("branches");
     const [selectedBranch, setSelectedBranch] = useState(null);
     const [selectedSubBranch, setSelectedSubBranch] = useState(null);
     const [selectedClass, setSelectedClass] = useState(null);
     const [showRelativeToTarget, setShowRelativeToTarget] = useState(false);
-
 
     const containerVariants = {
         hidden: { opacity: 0 },
         visible: {
             opacity: 1,
             transition: {
-                staggerChildren: 0.1
-            }
-        }
+                staggerChildren: 0.1,
+            },
+        },
     };
 
     const itemVariants = {
         hidden: { y: 20, opacity: 0 },
         visible: {
             y: 0,
-            opacity: 1
-        }
+            opacity: 1,
+        },
     };
 
     const handleBack = () => {
-        if (view === 'students') {
-            setView('classes');
+        if (view === "students") {
+            setView("classes");
             setSelectedClass(null);
-        } else if (view === 'classes') {
-            setView('subBranches');
+        } else if (view === "classes") {
+            setView("subBranches");
             setSelectedSubBranch(null);
-        } else if (view === 'subBranches') {
-            setView('branches');
+        } else if (view === "subBranches") {
+            setView("branches");
             setSelectedBranch(null);
         } else {
-            setView('branches');
+            setView("branches");
         }
     };
 
     const renderBranches = () => {
         const branches = {};
-        data.subBranchYears.forEach(year => {
+        data.subBranchYears.forEach((year) => {
             const branchId = year.subBranchId.branchId._id;
             if (!branches[branchId]) {
                 branches[branchId] = {
                     name: year.subBranchId.branchId.name,
                     attendances: [],
                     uniqueStudents: new Set(),
-                    semesterTarget: year.semesterTarget
+                    semesterTarget: year.semesterTarget,
                 };
             }
-            year.classes.forEach(cls => {
+            year.classes.forEach((cls) => {
                 branches[branchId].attendances.push(...cls.attendances);
-                cls.students.forEach(studentId => branches[branchId].uniqueStudents.add(studentId));
+                cls.students.forEach((studentId) =>
+                    branches[branchId].uniqueStudents.add(studentId)
+                );
             });
         });
 
-        console.log(branches)
+        console.log(branches);
 
         if (Object.keys(branches).length === 1) {
             setSelectedBranch(Object.keys(branches)[0]);
-            setView('subBranches');
+            setView("subBranches");
         }
 
         return (
@@ -119,11 +126,13 @@ const PerformanceCards = ({ data }) => {
                         className="card-interactive justify-between"
                         onClick={() => {
                             setSelectedBranch(id);
-                            setView('subBranches');
+                            setView("subBranches");
                         }}
                     >
                         <div className="flex flex-col gap-1">
-                            <h3 className="text-lg font-medium">{branch.name}</h3>
+                            <h3 className="text-lg font-medium">
+                                {branch.name}
+                            </h3>
                             <p className="text-sm text-gray-600">
                                 Jumlah Siswa: {branch.uniqueStudents.size} siswa
                             </p>
@@ -137,8 +146,12 @@ const PerformanceCards = ({ data }) => {
                         <div className="flex flex-wrap gap-2 items-center">
                             {calculateStats(
                                 branch.attendances,
-                                showRelativeToTarget ? branch.semesterTarget : null,
-                                showRelativeToTarget ? branch.uniqueStudents.size : null
+                                showRelativeToTarget
+                                    ? branch.semesterTarget
+                                    : null,
+                                showRelativeToTarget
+                                    ? branch.uniqueStudents.size
+                                    : null
                             ).map((stat, idx) => (
                                 <StatBadge key={idx} {...stat} />
                             ))}
@@ -149,26 +162,28 @@ const PerformanceCards = ({ data }) => {
         );
     };
 
-
-
     const renderSubBranches = () => {
         const subBranchYear = data.subBranchYears.find(
-            year => year.subBranchId.branchId._id === selectedBranch
+            (year) => year.subBranchId.branchId._id === selectedBranch
         );
 
         const subBranches = data.subBranchYears
-            .filter(year => year.subBranchId.branchId._id === selectedBranch) // Fixed key
-            .map(year => ({
+            .filter((year) => year.subBranchId.branchId._id === selectedBranch) // Fixed key
+            .map((year) => ({
                 id: year.subBranchId._id,
                 name: year.subBranchId.name,
-                attendances: year.classes.flatMap(cls => cls.attendances),
+                attendances: year.classes.flatMap((cls) => cls.attendances),
                 semesterTarget: year.semesterTarget,
                 uniqueStudents: new Set(
-                    year.classes.flatMap(cls => cls.students.map(studentId => studentId))
-                ).size // Count unique student IDs
+                    year.classes.flatMap((cls) =>
+                        cls.students.map((studentId) => studentId)
+                    )
+                ).size, // Count unique student IDs
             }));
 
-        const branchName = data.subBranchYears.find(year => year.subBranchId.branchId._id === selectedBranch)?.subBranchId.branchId.name;
+        const branchName = data.subBranchYears.find(
+            (year) => year.subBranchId.branchId._id === selectedBranch
+        )?.subBranchId.branchId.name;
 
         return (
             <motion.div
@@ -184,24 +199,29 @@ const PerformanceCards = ({ data }) => {
                     </p> */}
                 </div>
 
-                {subBranches.map(subBranch => (
+                {subBranches.map((subBranch) => (
                     <motion.div
                         key={subBranch.id}
                         variants={itemVariants}
                         className="card-interactive justify-between"
                         onClick={() => {
                             setSelectedSubBranch(subBranch.id);
-                            setView('classes');
+                            setView("classes");
                         }}
                     >
                         <div className="flex flex-col gap-1">
-                            <h3 className="text-lg font-medium">{subBranch.name}</h3>
+                            <h3 className="text-lg font-medium">
+                                {subBranch.name}
+                            </h3>
                             <p className="text-sm text-gray-600">
                                 Jumlah Siswa: {subBranch.uniqueStudents} siswa
                             </p>
                             <p className="text-sm text-gray-600">
-                                Total Pertemuan: {subBranch.attendances.length / subBranch.uniqueStudents} hari
-                                Total Pertemuan: {attendanceCount(subBranch)} hari
+                                Total Pertemuan:{" "}
+                                {subBranch.attendances.length /
+                                    subBranch.uniqueStudents}{" "}
+                                hari Total Pertemuan:{" "}
+                                {attendanceCount(subBranch)} hari
                             </p>
                             {/* <p className="text-sm text-gray-600">
                                 Target Semester: {subBranch.semesterTarget} hari
@@ -222,24 +242,25 @@ const PerformanceCards = ({ data }) => {
         );
     };
 
-
-
     const renderClasses = () => {
         const subBranchYear = data.subBranchYears.find(
-            year => year.subBranchId._id === selectedSubBranch
+            (year) => year.subBranchId._id === selectedSubBranch
         );
 
         if (!subBranchYear) return null;
 
-        const classes = subBranchYear.classes.map(cls => ({
+        const classes = subBranchYear.classes.map((cls) => ({
             id: cls._id,
             name: cls.name,
             attendances: cls.attendances,
-            uniqueStudents: new Set(cls.students.map(studentId => studentId)).size,
+            uniqueStudents: new Set(cls.students.map((studentId) => studentId))
+                .size,
             semesterTarget: subBranchYear.semesterTarget,
         }));
 
-        const subBranchName = data.subBranchYears.find(year => year.subBranchId._id === selectedSubBranch)?.subBranchId.name;
+        const subBranchName = data.subBranchYears.find(
+            (year) => year.subBranchId._id === selectedSubBranch
+        )?.subBranchId.name;
 
         return (
             <motion.div
@@ -249,20 +270,22 @@ const PerformanceCards = ({ data }) => {
                 className="flex flex-col items-stretch"
             >
                 <div className="mx-8 flex flex-col">
-                    <h2 className="text-xl font-bold">Kelompok {subBranchName}</h2>
+                    <h2 className="text-xl font-bold">
+                        Kelompok {subBranchName}
+                    </h2>
                     {/* <p className="text-sm text-gray-600">
                         Target Semester: {subBranchYear.semesterTarget} hari
                     </p> */}
                 </div>
 
-                {classes.map(cls => (
+                {classes.map((cls) => (
                     <motion.div
                         key={cls.id}
                         variants={itemVariants}
                         className="card-interactive justify-between"
                         onClick={() => {
                             setSelectedClass(cls.id);
-                            setView('students');
+                            setView("students");
                         }}
                     >
                         <div className="flex flex-col gap-1">
@@ -271,14 +294,18 @@ const PerformanceCards = ({ data }) => {
                                 Jumlah Siswa: {cls.uniqueStudents} siswa
                             </p>
                             <p className="text-sm text-gray-600">
-                                Total Pertemuan: {cls.attendances.length / cls.uniqueStudents} hari
-                                Total Pertemuan: {attendanceCount(cls.attendances)} hari
+                                Total Pertemuan:{" "}
+                                {cls.attendances.length / cls.uniqueStudents}{" "}
+                                hari Total Pertemuan:{" "}
+                                {attendanceCount(cls.attendances)} hari
                             </p>
                         </div>
                         <div className="flex flex-wrap gap-2 items-center">
                             {calculateStats(
                                 cls.attendances,
-                                showRelativeToTarget ? cls.semesterTarget : null,
+                                showRelativeToTarget
+                                    ? cls.semesterTarget
+                                    : null,
                                 showRelativeToTarget ? cls.uniqueStudents : null
                             ).map((stat, idx) => (
                                 <StatBadge key={idx} {...stat} />
@@ -290,31 +317,39 @@ const PerformanceCards = ({ data }) => {
         );
     };
 
-
     const renderStudents = () => {
         const subBranchYear = data.subBranchYears.find(
-            year => year.subBranchId._id === selectedSubBranch
+            (year) => year.subBranchId._id === selectedSubBranch
         );
-        const selectedClassData = subBranchYear?.classes.find(cls => cls._id === selectedClass);
+        const selectedClassData = subBranchYear?.classes.find(
+            (cls) => cls._id === selectedClass
+        );
 
         if (!selectedClassData) return null;
 
         // Extract unique students from the attendance records
-        const students = selectedClassData.attendances.reduce((acc, attendance) => {
-            const student = attendance.studentId;
-            if (!acc.some(s => s.id === student._id)) {
-                acc.push({
-                    id: student._id,
-                    name: student.name,
-                    attendances: selectedClassData.attendances.filter(
-                        a => a.studentId._id === student._id
-                    ),
-                    uniqueStudents: new Set(selectedClassData.students.map(studentId => studentId)).size,
-                    semesterTarget: subBranchYear.semesterTarget,
-                });
-            }
-            return acc;
-        }, []);
+        const students = selectedClassData.attendances.reduce(
+            (acc, attendance) => {
+                const student = attendance.studentId;
+                if (!acc.some((s) => s.id === student._id)) {
+                    acc.push({
+                        id: student._id,
+                        name: student.name,
+                        attendances: selectedClassData.attendances.filter(
+                            (a) => a.studentId._id === student._id
+                        ),
+                        uniqueStudents: new Set(
+                            selectedClassData.students.map(
+                                (studentId) => studentId
+                            )
+                        ).size,
+                        semesterTarget: subBranchYear.semesterTarget,
+                    });
+                }
+                return acc;
+            },
+            []
+        );
 
         return (
             <motion.div
@@ -324,12 +359,14 @@ const PerformanceCards = ({ data }) => {
                 className="flex flex-col items-stretch"
             >
                 <div className="mx-8 flex flex-col">
-                    <h2 className="text-xl font-bold">Kelompok {selectedClassData.name}</h2>
+                    <h2 className="text-xl font-bold">
+                        Kelompok {selectedClassData.name}
+                    </h2>
                     {/* <p className="text-sm text-gray-600">
                         Target Semester: {subBranchYear.semesterTarget} hari
                     </p> */}
                 </div>
-                {students.map(student => (
+                {students.map((student) => (
                     <motion.div
                         key={student.id}
                         variants={itemVariants}
@@ -339,8 +376,12 @@ const PerformanceCards = ({ data }) => {
                         <div className="flex flex-wrap gap-2 items-center">
                             {calculateStats(
                                 student.attendances,
-                                showRelativeToTarget ? student.semesterTarget : null,
-                                showRelativeToTarget ? student.uniqueStudents : null,
+                                showRelativeToTarget
+                                    ? student.semesterTarget
+                                    : null,
+                                showRelativeToTarget
+                                    ? student.uniqueStudents
+                                    : null
                             ).map((stat, idx) => (
                                 <StatBadge key={idx} {...stat} />
                             ))}
@@ -357,14 +398,21 @@ const PerformanceCards = ({ data }) => {
                 <button
                     onClick={handleBack}
                     className="flex items-center text-primary hover:text-primary/80 transition-colors disabled:text-gray-400"
-                    disabled={view === 'branches'}
+                    disabled={view === "branches"}
                 >
                     <ChevronLeft className="w-4 h-4 mr-1" />
                     Kembali
                 </button>
 
                 <div className="flex flex-col gap-2">
-                    <p>Kalkulasi Berdasarkan: {!showRelativeToTarget ? <strong>Hari berjalan</strong> : <strong>Hari efektif</strong>}</p>
+                    <p>
+                        Kalkulasi Berdasarkan:{" "}
+                        {!showRelativeToTarget ? (
+                            <strong>Hari berjalan</strong>
+                        ) : (
+                            <strong>Hari efektif</strong>
+                        )}
+                    </p>
                     {/* <button
                         onClick={() => setShowRelativeToTarget(!showRelativeToTarget)}
                         className="text-primary px-4 py-2 rounded-sm border border-primary hover:bg-primary hover:text-white transition"
@@ -382,10 +430,10 @@ const PerformanceCards = ({ data }) => {
             </h1> */}
 
             <AnimatePresence mode="wait">
-                {view === 'branches' && renderBranches()}
-                {view === 'subBranches' && renderSubBranches()}
-                {view === 'classes' && renderClasses()}
-                {view === 'students' && renderStudents()}
+                {view === "branches" && renderBranches()}
+                {view === "subBranches" && renderSubBranches()}
+                {view === "classes" && renderClasses()}
+                {view === "students" && renderStudents()}
             </AnimatePresence>
         </div>
     );
