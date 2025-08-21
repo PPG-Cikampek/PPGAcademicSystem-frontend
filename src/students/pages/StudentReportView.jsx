@@ -1,14 +1,20 @@
-import { useState, useEffect } from "react";
+import { useState, lazy } from "react";
 
-import {
-    Document,
-    Page,
-    Text,
-    View,
-    pdf,
-    PDFViewer,
-    Image,
-} from "@react-pdf/renderer";
+const PDFRenderer = lazy(() =>
+    import("@react-pdf/renderer").then((module) => ({
+        default: module,
+        Document: module.Document,
+        Page: module.Page,
+        Text: module.Text,
+        View: module.View,
+        pdf: module.pdf,
+        PDFViewer: module.PDFViewer,
+        Image: module.Image,
+    }))
+);
+
+const { Document, Page, Text, View, pdf, PDFViewer, Image } = PDFRenderer;
+
 import { saveAs } from "file-saver";
 
 import logo from "../../assets/logos/ppgcikampek.png";
@@ -469,7 +475,7 @@ const StudentReportView = ({
                                     style={{
                                         fontFamily: "Times-Bold",
                                         textDecoration: "underline",
-                                        fontStyle: "italic",
+                                        // fontStyle: "italic",
                                         marginBottom: 5,
                                     }}
                                 >

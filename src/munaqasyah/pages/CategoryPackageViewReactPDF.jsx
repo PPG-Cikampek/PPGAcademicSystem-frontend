@@ -1,15 +1,23 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import {
-    Document,
-    Page,
-    Text,
-    View,
-    StyleSheet,
-    Font,
-    PDFViewer,
-    Image,
-} from "@react-pdf/renderer";
+
+const PDFRenderer = lazy(() =>
+    import("@react-pdf/renderer").then((module) => ({
+        Document: module.Document,
+        default: module,
+        Page: module.Page,
+        Text: module.Text,
+        View: module.View,
+        StyleSheet: module.StyleSheet,
+        pdf: module.pdf,
+        PDFViewer: module.PDFViewer,
+        Image: module.Image,
+    }))
+);
+
+const { Document, Page, Text, View, StyleSheet, pdf, PDFViewer, Image } =
+    PDFRenderer;
+
 import useHttp from "../../shared/hooks/http-hook";
 
 import getCategoryName from "../utilities/getCategoryName";

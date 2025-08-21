@@ -1,10 +1,19 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
+import { visualizer } from "rollup-plugin-visualizer";
 
 // https://vite.dev/config/
 export default defineConfig({
-    plugins: [tailwindcss(), react()],
+    plugins: [
+        tailwindcss(),
+        react(),
+        visualizer({
+            open: true, // opens report in browser
+            gzipSize: true, // show gzip sizes
+            brotliSize: true, // show brotli sizes
+        }),
+    ],
     resolve: {
         // Uncomment and customize if you use custom conditions
         // conditions: ['custom', ...defaultClientConditions],
@@ -37,6 +46,15 @@ export default defineConfig({
         cssMinify: "esbuild", // Default for SSR too
         commonjsOptions: {
             strictRequires: true, // Now true by default
+        },
+        rollupOptions: {
+            output: {
+                manualChunks: {
+                    pdf: ["@react-pdf/renderer", "jspdf", "html2canvas"],
+                    chart: ["chart.js"],
+                    motion: ["framer-motion"],
+                },
+            },
         },
         // lib: {
         //   entry: './src/index.js',
