@@ -1,30 +1,29 @@
-import React, { useContext } from 'react'
+import { useContext } from "react";
 
-import { SidebarContext } from '../../../shared/Components/Context/sidebar-context';
+import { SidebarContext } from "../../../shared/Components/Context/sidebar-context";
 
 const Profile = ({ user, isLoading }) => {
-    const sidebar = useContext(SidebarContext)
+    const sidebar = useContext(SidebarContext);
 
     const sidebarHandler = () => {
-        sidebar.toggle()
-    }
+        sidebar.toggle();
+    };
 
     const getInitials = (name) => {
         return name
-            ?.split(' ')
+            ?.split(" ")
             .map((word) => word[0])
-            .join('')
+            .join("")
             .toUpperCase()
             .slice(0, 2);
     };
 
     const getPositionName = {
-        branchTeacher: 'MT Desa',
-        subBranchTeacher: 'MT Kelompok',
-        localTeacher: 'MS',
-        assistant: 'Asisten',
-    }
-
+        branchTeacher: "MT Desa",
+        subBranchTeacher: "MT Kelompok",
+        localTeacher: "MS",
+        assistant: "Asisten",
+    };
 
     return (
         <div className="bg-white mb-2 p-4 shadow-xs fixed top-0 w-full ">
@@ -32,14 +31,18 @@ const Profile = ({ user, isLoading }) => {
                 {!isLoading && user?.image ? (
                     <img
                         onClick={sidebarHandler}
-                        src={`${import.meta.env.VITE_BACKEND_URL}/${user.image}`}
+                        src={`${import.meta.env.VITE_BACKEND_URL}/${
+                            user.image
+                        }`}
                         alt={user.name}
                         className="w-12 h-12 rounded-full border border-gray-200 bg-white focus:bg-gray-200 hover:outline-hidden hover:ring-1 hover:ring-offset-1 hover:ring-gray-400"
                     />
                 ) : (
                     <div
                         onClick={sidebarHandler}
-                        className={`${isLoading && 'animate-pulse'} w-12 h-12 rounded-full bg-green-200 text-green-500 flex items-center justify-center font-medium  focus:bg-gray-200 hover:outline-hidden hover:ring-1 hover:ring-offset-1 hover:ring-gray-400`}
+                        className={`${
+                            isLoading && "animate-pulse"
+                        } w-12 h-12 rounded-full bg-green-200 text-green-500 flex items-center justify-center font-medium  focus:bg-gray-200 hover:outline-hidden hover:ring-1 hover:ring-offset-1 hover:ring-gray-400`}
                     >
                         {getInitials(user?.name)}
                     </div>
@@ -55,7 +58,9 @@ const Profile = ({ user, isLoading }) => {
                     )}
                     {!isLoading && (
                         <>
-                            <h1 className="text-xl font-medium">{getPositionName[user.position] || 'Guru'}</h1>
+                            <h1 className="text-xl font-medium">
+                                {getPositionName[user.position] || "Guru"}
+                            </h1>
                             {/* <h2 className="text-xl font-medium">{user.name || 'Unknown'}</h2>
                             <h3 className='font-normal text-gray-600'>
                                 {user.userId?.subBranchId?.branchId?.name || 'No Branch'} - {user.userId?.subBranchId?.name || 'No SubBranch'}
@@ -63,10 +68,9 @@ const Profile = ({ user, isLoading }) => {
                         </>
                     )}
                 </div>
-
             </div>
         </div>
-    )
-}
+    );
+};
 
 export default Profile;

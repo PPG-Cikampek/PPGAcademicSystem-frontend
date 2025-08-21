@@ -1,5 +1,5 @@
 // components/Modal.js
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 export default function Modal_2({ isOpen, onClose, children }) {
     const [showModal, setShowModal] = useState(isOpen);
@@ -16,13 +16,15 @@ export default function Modal_2({ isOpen, onClose, children }) {
 
     return (
         <div
-            className={`fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50 transition-opacity duration-300 ${isOpen ? 'opacity-100' : 'opacity-0'
-                }`}
+            className={`fixed inset-0 z-50 flex items-center justify-center bg-gray-900 bg-opacity-50 transition-opacity duration-300 ${
+                isOpen ? "opacity-100" : "opacity-0"
+            }`}
             onClick={onClose}
         >
             <div
-                className={`bg-white rounded-lg shadow-lg p-6 w-full max-w-md transform transition-all duration-300 ${isOpen ? 'scale-100' : 'scale-95'
-                    }`}
+                className={`bg-white rounded-lg shadow-lg p-6 w-full max-w-md transform transition-all duration-300 ${
+                    isOpen ? "scale-100" : "scale-95"
+                }`}
                 onClick={(e) => e.stopPropagation()} // Prevents click from closing modal
             >
                 <button

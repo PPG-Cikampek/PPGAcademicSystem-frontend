@@ -1,6 +1,5 @@
 // MunaqasyahScoreContext.jsx
-import React, { createContext, useReducer } from 'react';
-
+import { createContext, useReducer } from "react";
 
 const MunaqasyahScoreContext = createContext();
 
@@ -19,50 +18,54 @@ const initialState = {
 
 const reducer = (state, action) => {
     switch (action.type) {
-        case 'SET_ERROR':
+        case "SET_ERROR":
             return { ...state, error: action.payload };
-        case 'SET_IS_LOADING':
+        case "SET_IS_LOADING":
             return { ...state, isLoading: action.payload };
-        case 'SET_SCORE_DATA':
+        case "SET_SCORE_DATA":
             return { ...state, studentScore: action.payload };
-        case 'SET_STUDENT_DATA':
+        case "SET_STUDENT_DATA":
             return { ...state, studentData: action.payload };
-        case 'SET_IS_ACADEMIC_YEAR_MUNAQASYAH_STARTED':
-            return { ...state, isAcademicYearhMunaqasyahStarted: action.payload };
-        case 'SET_IS_SUB_BRANCH_MUNAQASYAH_STARTED':
+        case "SET_IS_ACADEMIC_YEAR_MUNAQASYAH_STARTED":
+            return {
+                ...state,
+                isAcademicYearhMunaqasyahStarted: action.payload,
+            };
+        case "SET_IS_SUB_BRANCH_MUNAQASYAH_STARTED":
             return { ...state, isSubBranchMunaqasyahStarted: action.payload };
-        case 'SET_IS_BRANCH_YEAR_MUNAQASYAH_STARTED':
+        case "SET_IS_BRANCH_YEAR_MUNAQASYAH_STARTED":
             return { ...state, isBranchYearMunaqasyahStarted: action.payload };
-        case 'UPDATE_SCORE_DATA':
+        case "UPDATE_SCORE_DATA":
             return {
                 ...state,
                 studentScore: {
                     ...state.studentScore,
                     [Object.keys(action.payload)[0]]: {
                         ...state.studentScore[Object.keys(action.payload)[0]],
-                        ...action.payload[Object.keys(action.payload)[0]]
-                    }
-                }
+                        ...action.payload[Object.keys(action.payload)[0]],
+                    },
+                },
             };
-        case 'TOGGLE_SELECTED':
+        case "TOGGLE_SELECTED":
             return {
                 ...state,
-                studentList: state.studentList.map(student =>
+                studentList: state.studentList.map((student) =>
                     student.studentId.nis === action.payload.id
                         ? { ...student, isSelected: !student.isSelected }
                         : student
                 ),
             };
-        case 'TOGGLE_SELECT_ALL':
+        case "TOGGLE_SELECT_ALL":
             return {
                 ...state,
                 selectAll: !state.selectAll,
-                studentList: state.studentList.map(student =>
-                    student.status === 'Hadir' || student.status === 'Terlambat'
+                studentList: state.studentList.map((student) =>
+                    student.status === "Hadir" || student.status === "Terlambat"
                         ? { ...student, isSelected: false }
-                        : student.status !== 'Hadir' || student.status === 'Terlambat'
-                            ? { ...student, isSelected: !state.selectAll }
-                            : student
+                        : student.status !== "Hadir" ||
+                          student.status === "Terlambat"
+                        ? { ...student, isSelected: !state.selectAll }
+                        : student
                 ),
             };
         default:
@@ -71,104 +74,138 @@ const reducer = (state, action) => {
 };
 
 const fetchYearData = async (branchYearId, subBranchId, dispatch) => {
-    const url = `${import.meta.env.VITE_BACKEND_URL}/branchYears/${branchYearId}?populate=subBranches`;
+    const url = `${
+        import.meta.env.VITE_BACKEND_URL
+    }/branchYears/${branchYearId}?populate=subBranches`;
 
     try {
         const response = await fetch(url, {
-            method: 'GET',
+            method: "GET",
             headers: {
-                'Content-Type': 'application/json',
-            }
+                "Content-Type": "application/json",
+            },
         });
         if (!response.ok) {
             const errorData = await response.json();
-            await dispatch({ type: 'SET_ERROR', payload: errorData.message || 'Failed to fetch data' });
-            throw new Error(errorData.message || 'Failed to fetch data');
+            await dispatch({
+                type: "SET_ERROR",
+                payload: errorData.message || "Failed to fetch data",
+            });
+            throw new Error(errorData.message || "Failed to fetch data");
         }
         const data = await response.json();
 
-        console.log(data.branchYear)
+        console.log(data.branchYear);
 
-        const isMunaqasyahInProgress = (data, subBranchId) => (data.teachingGroups?.flatMap(g => g.subBranches || []).find(sub => sub._id === subBranchId)?.munaqasyahStatus) === 'inProgress';
+        const isMunaqasyahInProgress = (data, subBranchId) =>
+            data.teachingGroups
+                ?.flatMap((g) => g.subBranches || [])
+                .find((sub) => sub._id === subBranchId)?.munaqasyahStatus ===
+            "inProgress";
 
-        dispatch({ type: 'SET_IS_BRANCH_YEAR_MUNAQASYAH_STARTED', payload: data.branchYear.munaqasyahStatus === 'inProgress' });
-        dispatch({ type: 'SET_IS_SUB_BRANCH_MUNAQASYAH_STARTED', payload: isMunaqasyahInProgress(data.branchYear, subBranchId) });
-
+        dispatch({
+            type: "SET_IS_BRANCH_YEAR_MUNAQASYAH_STARTED",
+            payload: data.branchYear.munaqasyahStatus === "inProgress",
+        });
+        dispatch({
+            type: "SET_IS_SUB_BRANCH_MUNAQASYAH_STARTED",
+            payload: isMunaqasyahInProgress(data.branchYear, subBranchId),
+        });
     } catch (error) {
-        console.error('Error fetching attendance data:', error);
+        console.error("Error fetching attendance data:", error);
     }
-
 };
 
 const fetchScoreData = async (studentNis, branchYearId, dispatch, userId) => {
-    const url = `${import.meta.env.VITE_BACKEND_URL}/scores?branchYearId=${branchYearId}&&studentNis=${studentNis}`;
+    const url = `${
+        import.meta.env.VITE_BACKEND_URL
+    }/scores?branchYearId=${branchYearId}&&studentNis=${studentNis}`;
     const header = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${JSON.parse(localStorage.getItem('userData')).token}`
-    }
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${
+            JSON.parse(localStorage.getItem("userData")).token
+        }`,
+    };
 
     try {
         const response = await fetch(url, {
-            method: 'GET',
-            headers: header
+            method: "GET",
+            headers: header,
         });
         if (!response.ok) {
             const errorData = await response.json();
-            await dispatch({ type: 'SET_ERROR', payload: errorData.message || 'Failed to fetch data' });
-            throw new Error(errorData.message || 'Failed to fetch data');
+            await dispatch({
+                type: "SET_ERROR",
+                payload: errorData.message || "Failed to fetch data",
+            });
+            throw new Error(errorData.message || "Failed to fetch data");
         }
         const data = await response.json();
 
-        const student = { ...data.scores[0].studentId, className: data.scores[0].classId.name };
+        const student = {
+            ...data.scores[0].studentId,
+            className: data.scores[0].classId.name,
+        };
 
-        await dispatch({ type: 'SET_SCORE_DATA', payload: data.scores[0] });
-        await dispatch({ type: 'SET_STUDENT_DATA', payload: student });
-        await dispatch({ type: 'SET_ERROR', payload: null });
+        await dispatch({ type: "SET_SCORE_DATA", payload: data.scores[0] });
+        await dispatch({ type: "SET_STUDENT_DATA", payload: student });
+        await dispatch({ type: "SET_ERROR", payload: null });
 
         // patchScoreData(data.scores[0]);
-
     } catch (error) {
-        console.error('Error fetching attendance data:', error);
+        console.error("Error fetching attendance data:", error);
     }
 };
 
 const patchScoreData = async (scoreData, dispatch) => {
     const url = `${import.meta.env.VITE_BACKEND_URL}/scores/${scoreData.id}`;
     const header = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${JSON.parse(localStorage.getItem('userData')).token}`
-    }
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${
+            JSON.parse(localStorage.getItem("userData")).token
+        }`,
+    };
 
     // console.log(state.studentScore)
 
     try {
         const response = await fetch(url, {
-            method: 'PATCH',
+            method: "PATCH",
             headers: header,
-            body: JSON.stringify(scoreData)
+            body: JSON.stringify(scoreData),
         });
         if (!response.ok) {
             const errorData = await response.json();
-            await dispatch({ type: 'SET_ERROR', payload: errorData.message || 'Failed to fetch data' });
-            throw new Error(errorData.message || 'Failed to fetch data');
+            await dispatch({
+                type: "SET_ERROR",
+                payload: errorData.message || "Failed to fetch data",
+            });
+            throw new Error(errorData.message || "Failed to fetch data");
         }
 
         const result = await response.json();
 
-        await dispatch({ type: 'SET_SCORE_DATA', payload: result.score });
+        await dispatch({ type: "SET_SCORE_DATA", payload: result.score });
 
         // dispatch({ type: 'SET_STATUS', payload: data.message });
-
     } catch (error) {
-        console.error('Error fetching attendance data:', error);
+        console.error("Error fetching attendance data:", error);
     }
-}
+};
 
 const MunaqasyahScoreProvider = ({ children }) => {
     const [state, dispatch] = useReducer(reducer, initialState);
 
     return (
-        <MunaqasyahScoreContext.Provider value={{ state, dispatch, fetchYearData, fetchScoreData, patchScoreData }}>
+        <MunaqasyahScoreContext.Provider
+            value={{
+                state,
+                dispatch,
+                fetchYearData,
+                fetchScoreData,
+                patchScoreData,
+            }}
+        >
             {children}
         </MunaqasyahScoreContext.Provider>
     );

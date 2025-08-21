@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 
 const LeftSidebar = ({ menuItems }) => {
     const [isOpen, setIsOpen] = useState(false);

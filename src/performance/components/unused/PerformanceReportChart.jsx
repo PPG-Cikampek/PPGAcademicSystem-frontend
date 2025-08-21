@@ -1,25 +1,34 @@
-import React, { useEffect, useState } from 'react';
-import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { useEffect, useState } from "react";
+import {
+    PieChart,
+    Pie,
+    Cell,
+    Tooltip,
+    Legend,
+    ResponsiveContainer,
+} from "recharts";
 
 const getChartColors = (status) => {
     const colors = {
-        Hadir: '#10B981',
-        Terlambat: '#F59E0B',
-        Izin: '#3B82F6',
-        Sakit: '#8B5CF6',
-        'Tanpa Keterangan': '#EF4444',
-        'Tidak Hadir': '#F59E0B',
+        Hadir: "#10B981",
+        Terlambat: "#F59E0B",
+        Izin: "#3B82F6",
+        Sakit: "#8B5CF6",
+        "Tanpa Keterangan": "#EF4444",
+        "Tidak Hadir": "#F59E0B",
     };
-    return colors[status] || '#6B7280';
+    return colors[status] || "#6B7280";
 };
 
 const CombinedPieChart = ({ attendanceData }) => {
-    console.log('Showing charts!')
-    const filteredData = attendanceData.filter(item => item.percentage > 0).map(item => ({
-        name: `${item.status} ${item.percentage}%`,
-        value: item.percentage,
-        fill: getChartColors(item.status),
-    }));
+    console.log("Showing charts!");
+    const filteredData = attendanceData
+        .filter((item) => item.percentage > 0)
+        .map((item) => ({
+            name: `${item.status} ${item.percentage}%`,
+            value: item.percentage,
+            fill: getChartColors(item.status),
+        }));
 
     return (
         <PieChart width={128} height={256}>
@@ -72,11 +81,17 @@ const PerformanceReportChart = ({ attendanceData }) => {
         );
 
         setTransformedData(
-            [hadir, tidakHadir, tanpaKeterangan && tanpaKeterangan.count > 0 ? {
-                status: "Tanpa Keterangan",
-                count: tanpaKeterangan.count,
-                percentage: tanpaKeterangan.percentage,
-            } : null].filter(Boolean)
+            [
+                hadir,
+                tidakHadir,
+                tanpaKeterangan && tanpaKeterangan.count > 0
+                    ? {
+                          status: "Tanpa Keterangan",
+                          count: tanpaKeterangan.count,
+                          percentage: tanpaKeterangan.percentage,
+                      }
+                    : null,
+            ].filter(Boolean)
         );
     };
 

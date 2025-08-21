@@ -1,70 +1,88 @@
-import React, { useContext, useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useContext, useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
-import useHttp from '../../shared/hooks/http-hook';
-import DynamicForm from '../../shared/Components/UIElements/DynamicForm';
+import useHttp from "../../shared/hooks/http-hook";
+import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
 
-import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
-import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
-import Modal from '../../shared/Components/UIElements/ModalBottomClose';
-
+import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
+import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
+import Modal from "../../shared/Components/UIElements/ModalBottomClose";
 
 const UpdateSubBranchView = () => {
-    const [modal, setModal] = useState({ title: '', message: '', onConfirm: null });
+    const [modal, setModal] = useState({
+        title: "",
+        message: "",
+        onConfirm: null,
+    });
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const { isLoading, error, sendRequest, setError } = useHttp();
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [loadedLevel, setLoadedLevel] = useState();
 
-    const subBranchId = useParams().subBranchId
-    const navigate = useNavigate()
-
+    const subBranchId = useParams().subBranchId;
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchSubBranch = async () => {
             try {
-                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/levels/branches/sub-branches/${subBranchId}`)
-                setLoadedLevel(responseData.subBranch)
-                console.log(responseData)
-                console.log(responseData.subBranch)
-            } catch (err) { }
-        }
+                const responseData = await sendRequest(
+                    `${
+                        import.meta.env.VITE_BACKEND_URL
+                    }/levels/branches/sub-branches/${subBranchId}`
+                );
+                setLoadedLevel(responseData.subBranch);
+                console.log(responseData);
+                console.log(responseData.subBranch);
+            } catch (err) {}
+        };
         fetchSubBranch();
-    }, [sendRequest])
+    }, [sendRequest]);
 
     const handleFormSubmit = async (data) => {
-        const url = `${import.meta.env.VITE_BACKEND_URL}/levels/branches/sub-branches/${subBranchId}`
+        const url = `${
+            import.meta.env.VITE_BACKEND_URL
+        }/levels/branches/sub-branches/${subBranchId}`;
 
         const body = JSON.stringify({ name: data.name, address: data.address });
 
-        console.log(body)
+        console.log(body);
 
-        let responseData
+        let responseData;
         try {
-            responseData = await sendRequest(url, 'PATCH', body, {
-                'Content-Type': 'application/json'
+            responseData = await sendRequest(url, "PATCH", body, {
+                "Content-Type": "application/json",
             });
-
         } catch (err) {
             // Error is already handled by useHttp
         }
-        setModal({ title: 'Berhasil!', message: responseData.message, onConfirm: null });
-        setModalIsOpen(true)
+        setModal({
+            title: "Berhasil!",
+            message: responseData.message,
+            onConfirm: null,
+        });
+        setModalIsOpen(true);
     };
 
     const ModalFooter = () => (
         <div className="flex gap-2 items-center">
             <button
                 onClick={() => {
-                    setModalIsOpen(false)
-                    !error && navigate(-1)
+                    setModalIsOpen(false);
+                    !error && navigate(-1);
                 }}
-                className={`${modal.onConfirm ? 'btn-danger-outline' : 'button-primary mt-0 '}`}
+                className={`${
+                    modal.onConfirm
+                        ? "btn-danger-outline"
+                        : "button-primary mt-0 "
+                }`}
             >
-                {modal.onConfirm ? 'Batal' : 'Tutup'}
+                {modal.onConfirm ? "Batal" : "Tutup"}
             </button>
             {modal.onConfirm && (
-                <button onClick={modal.onConfirm} className="button-primary mt-0 ">
+                <button
+                    onClick={modal.onConfirm}
+                    className="button-primary mt-0 "
+                >
                     Ya
                 </button>
             )}
@@ -73,9 +91,8 @@ const UpdateSubBranchView = () => {
 
     return (
         <div className="m-auto max-w-md mt-14 md:mt-8">
-
             {!loadedLevel && isLoading && (
-                < div className="flex justify-center mt-16">
+                <div className="flex justify-center mt-16">
                     <LoadingCircle size={32} />
                 </div>
             )}
@@ -91,21 +108,44 @@ const UpdateSubBranchView = () => {
                         <LoadingCircle size={32} />
                     </div>
                 )}
-                {!isLoading && (
-                    modal.message
-                )}
+                {!isLoading && modal.message}
             </Modal>
 
-
-            <div className={`pb-24 transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
-                {error && <ErrorCard error={error} onClear={() => setError(null)} />}
+            <div
+                className={`pb-24 transition-opacity duration-300 ${
+                    isTransitioning ? "opacity-0" : "opacity-100"
+                }`}
+            >
+                {error && (
+                    <ErrorCard error={error} onClear={() => setError(null)} />
+                )}
                 <DynamicForm
-                    title='Update Data Kelompok'
-                    subtitle={'Sistem Akademik Digital'}
+                    title="Update Data Kelompok"
+                    subtitle={"Sistem Akademik Digital"}
                     fields={[
-                        { name: 'name', label: 'Nama Kelompok', placeholder: 'Nama Kelompok', type: 'text', required: true, value: loadedLevel?.name || '' },
-                        { name: 'address', label: 'Alamat', type: 'textarea', required: true, value: loadedLevel?.address || '' },
-                        { name: 'branch', label: 'Desa', type: 'text', required: false, disabled: true, value: loadedLevel?.branchId?.name || '' },
+                        {
+                            name: "name",
+                            label: "Nama Kelompok",
+                            placeholder: "Nama Kelompok",
+                            type: "text",
+                            required: true,
+                            value: loadedLevel?.name || "",
+                        },
+                        {
+                            name: "address",
+                            label: "Alamat",
+                            type: "textarea",
+                            required: true,
+                            value: loadedLevel?.address || "",
+                        },
+                        {
+                            name: "branch",
+                            label: "Desa",
+                            type: "text",
+                            required: false,
+                            disabled: true,
+                            value: loadedLevel?.branchId?.name || "",
+                        },
                     ]}
                     onSubmit={handleFormSubmit}
                     disabled={isLoading}
@@ -115,10 +155,18 @@ const UpdateSubBranchView = () => {
                         <div className="flex flex-col justify-stretch mt-4">
                             <button
                                 type="submit"
-                                className={`button-primary ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                className={`button-primary ${
+                                    isLoading
+                                        ? "opacity-50 cursor-not-allowed"
+                                        : ""
+                                }`}
                                 disabled={isLoading}
                             >
-                                {isLoading ? (<LoadingCircle>Processing...</LoadingCircle>) : ('Update')}
+                                {isLoading ? (
+                                    <LoadingCircle>Processing...</LoadingCircle>
+                                ) : (
+                                    "Update"
+                                )}
                             </button>
                             {/* <button
                                 type="button"
@@ -137,5 +185,3 @@ const UpdateSubBranchView = () => {
 };
 
 export default UpdateSubBranchView;
-
-

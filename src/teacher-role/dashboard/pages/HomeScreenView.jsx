@@ -1,21 +1,20 @@
-import React, { useContext, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { useContext, useEffect } from "react";
+import { Link } from "react-router-dom";
 
-import { useQuery } from '@tanstack/react-query';
-import { AuthContext } from '../../../shared/Components/Context/auth-context';
-import { StudentAttendanceContext } from '../../scan/context/StudentAttendanceContext';
+import { useQuery } from "@tanstack/react-query";
+import { AuthContext } from "../../../shared/Components/Context/auth-context";
+import { StudentAttendanceContext } from "../../scan/context/StudentAttendanceContext";
 
-import Profile from '../components/Profile';
-import Dashboard from '../components/Dashboard';
-import CurrentTime from '../components/CurrentTime';
+import Profile from "../components/Profile";
+import Dashboard from "../components/Dashboard";
+import CurrentTime from "../components/CurrentTime";
 
-import SequentialAnimation from '../../shared/Components/Animation/SequentialAnimation';
-import InfoCard from '../../shared/Components/UIElements/InfoCard';
-import SkeletonLoader from '../../../shared/Components/UIElements/SkeletonLoader';
+import SequentialAnimation from "../../shared/Components/Animation/SequentialAnimation";
+import InfoCard from "../../shared/Components/UIElements/InfoCard";
+import SkeletonLoader from "../../../shared/Components/UIElements/SkeletonLoader";
 
 const HomeScreenView = () => {
     const auth = useContext(AuthContext);
-
 
     // console.log(auth.isLoggedIn)
     // console.log(auth.userId)
@@ -28,27 +27,30 @@ const HomeScreenView = () => {
     // console.log(auth.token)
 
     const fetchUser = async () => {
-        console.log(`fetching profile...`)
-        const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/teachers/user/${auth.userId}`);
+        console.log(`fetching profile...`);
+        const response = await fetch(
+            `${import.meta.env.VITE_BACKEND_URL}/teachers/user/${auth.userId}`
+        );
         if (!response.ok) {
-            throw new Error('Failed to fetch user data');
+            throw new Error("Failed to fetch user data");
         }
         const responseData = await response.json();
 
-        console.log(responseData)
+        console.log(responseData);
 
-        const classIds = responseData.teacher?.classIds.map(item => item._id) || []
+        const classIds =
+            responseData.teacher?.classIds.map((item) => item._id) || [];
 
         auth.setAttributes(
             responseData.teacher?.userId?.subBranchId?.branchId?.id,
             responseData.teacher?.userId?.subBranchId?.id,
             classIds
-        )
+        );
         return responseData.teacher;
     };
 
     const { data, isLoading, error } = useQuery({
-        queryKey: ['teacherData'],
+        queryKey: ["teacherData"],
         queryFn: fetchUser,
         staleTime: 1000 * 60 * 5,
     });
@@ -56,7 +58,6 @@ const HomeScreenView = () => {
     useEffect(() => {
         console.log(`${auth.userClassIds}`);
     }, [data]);
-
 
     let activeClassCount = 0;
 
@@ -91,10 +92,11 @@ const HomeScreenView = () => {
                         </div> */}
 
                         <div>
-                            <p className='text-lg font-medium mt-4 mb-1'>
-                                Assalamu'alaikum, {data.name?.split(' ').slice(0, 2).join(' ')}!
+                            <p className="text-lg font-medium mt-4 mb-1">
+                                Assalamu'alaikum,{" "}
+                                {data.name?.split(" ").slice(0, 2).join(" ")}!
                             </p>
-                            <hr className='mb-2' />
+                            <hr className="mb-2" />
                             <CurrentTime />
                         </div>
 
@@ -103,20 +105,29 @@ const HomeScreenView = () => {
                             <CurrentTime />
                         </div> */}
 
-
-                        {auth.userRole === 'teacher' && (
+                        {auth.userRole === "teacher" && (
                             <div className="mb-2">
                                 {data.classIds.map((item, index) => {
-                                    const isClassInActiveAcademicYear = item?.teachingGroupId?.branchYearId?.academicYearId?.isActive
-                                    console.log(item)
+                                    const isClassInActiveAcademicYear =
+                                        item?.teachingGroupId?.branchYearId
+                                            ?.academicYearId?.isActive;
+                                    console.log(item);
                                     if (isClassInActiveAcademicYear) {
                                         activeClassCount++;
-                                        return <Dashboard key={index} data={item} />
+                                        return (
+                                            <Dashboard
+                                                key={index}
+                                                data={item}
+                                            />
+                                        );
                                     }
                                 })}
                                 {activeClassCount === 0 && (
                                     <InfoCard>
-                                        <p>Belum terdaftar di kelas manapun. Hubungi PJP Kelompok!</p>
+                                        <p>
+                                            Belum terdaftar di kelas manapun.
+                                            Hubungi PJP Kelompok!
+                                        </p>
                                         {/* <p>Buat kelas baru di <Link to={'/dashboard/academic'} className='active:text-blue-400 underline'>pengaturan akademik</Link></p> */}
                                     </InfoCard>
                                 )}

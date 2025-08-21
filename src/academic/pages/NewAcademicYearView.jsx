@@ -1,15 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import useHttp from '../../shared/hooks/http-hook';
-import DynamicForm from '../../shared/Components/UIElements/DynamicForm';
+import useHttp from "../../shared/hooks/http-hook";
+import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
 
-import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
-import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
-import Modal from '../../shared/Components/UIElements/ModalBottomClose'
-
-
-
+import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
+import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
+import Modal from "../../shared/Components/UIElements/ModalBottomClose";
 
 const NewAcademicYearView = () => {
     const [modalIsOpen, setModalIsOpen] = useState(false);
@@ -17,17 +14,23 @@ const NewAcademicYearView = () => {
 
     const [isTransitioning, setIsTransitioning] = useState(false);
     const { isLoading, error, sendRequest, setError } = useHttp();
-    const [signUpFields, setSignUpFields] = useState()
+    const [signUpFields, setSignUpFields] = useState();
 
     // const auth = useContext(AuthContext);
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
     const academicYearFields = [
-        { name: 'name', label: 'Tahun Ajaran', placeholder: '20241', type: 'text', required: true },
-    ]
+        {
+            name: "name",
+            label: "Tahun Ajaran",
+            placeholder: "20241",
+            type: "text",
+            required: true,
+        },
+    ];
 
     const handleFormSubmit = async (data) => {
-        const url = `${import.meta.env.VITE_BACKEND_URL}/academicYears`
+        const url = `${import.meta.env.VITE_BACKEND_URL}/academicYears`;
 
         const body = JSON.stringify({
             name: data.name,
@@ -36,12 +39,11 @@ const NewAcademicYearView = () => {
         // console.log(body)
         let responseData;
         try {
-            responseData = await sendRequest(url, 'POST', body, {
-                'Content-Type': 'application/json'
+            responseData = await sendRequest(url, "POST", body, {
+                "Content-Type": "application/json",
             });
-            setModalMessage(responseData.message)
-            setModalIsOpen(true)
-
+            setModalMessage(responseData.message);
+            setModalIsOpen(true);
         } catch (err) {
             // Error is already handled by useHttp
         }
@@ -52,15 +54,15 @@ const NewAcademicYearView = () => {
             <Modal
                 isOpen={modalIsOpen}
                 onClose={() => setModalIsOpen(false)}
-                title='Berhasil!'
+                title="Berhasil!"
                 footer={
                     <>
                         <button
                             onClick={() => {
-                                setModalIsOpen(false)
-                                navigate('/academic/')
+                                setModalIsOpen(false);
+                                navigate("/academic/");
                             }}
-                            className='btn-danger-outline'
+                            className="btn-danger-outline"
                         >
                             Tutup
                         </button>
@@ -70,16 +72,22 @@ const NewAcademicYearView = () => {
                 {modalMessage}
             </Modal>
 
-
-            <div className={`pb-24 transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
-                {error &&
+            <div
+                className={`pb-24 transition-opacity duration-300 ${
+                    isTransitioning ? "opacity-0" : "opacity-100"
+                }`}
+            >
+                {error && (
                     <div className="px-2">
-                        <ErrorCard error={error} onClear={() => setError(null)} />
+                        <ErrorCard
+                            error={error}
+                            onClear={() => setError(null)}
+                        />
                     </div>
-                }
+                )}
                 <DynamicForm
-                    title='Tambah Tahun Ajaran'
-                    subtitle={'Sistem Akademik Digital'}
+                    title="Tambah Tahun Ajaran"
+                    subtitle={"Sistem Akademik Digital"}
                     fields={academicYearFields}
                     onSubmit={handleFormSubmit}
                     disabled={isLoading}
@@ -89,16 +97,24 @@ const NewAcademicYearView = () => {
                         <div className="flex flex-col justify-stretch mt-4">
                             <button
                                 type="submit"
-                                className={`button-primary ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                className={`button-primary ${
+                                    isLoading
+                                        ? "opacity-50 cursor-not-allowed"
+                                        : ""
+                                }`}
                                 disabled={isLoading}
                             >
-                                {isLoading ? (<LoadingCircle>Processing...</LoadingCircle>) : ('Tambah')}
+                                {isLoading ? (
+                                    <LoadingCircle>Processing...</LoadingCircle>
+                                ) : (
+                                    "Tambah"
+                                )}
                             </button>
                         </div>
                     }
                 />
             </div>
-        </div >
+        </div>
     );
 };
 

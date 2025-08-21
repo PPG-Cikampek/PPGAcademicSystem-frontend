@@ -1,30 +1,31 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from "react";
 
 const Carousel = ({
     items = [
         {
             title: "Kisah Inspiratif",
-            description: "Generasi emas adalah calon pemimpin di masa depan, baik dalam bidang politik, ekonomi, sosial, maupun budaya. Mereka memiliki potensi untuk membawa inovasi, perubahan, dan kemajuan bagi masyarakat dan bangsa, mereka memegang peran penting dalam meneruskan nilai-nilai, tradisi, dan identitas budaya suatu bangsa. Melalui pendidikan dan pembinaan yang tepat, mereka dapat mempertahankan warisan budaya dan spiritual yang menjadi ciri khas bangsa.",
+            description:
+                "Generasi emas adalah calon pemimpin di masa depan, baik dalam bidang politik, ekonomi, sosial, maupun budaya. Mereka memiliki potensi untuk membawa inovasi, perubahan, dan kemajuan bagi masyarakat dan bangsa, mereka memegang peran penting dalam meneruskan nilai-nilai, tradisi, dan identitas budaya suatu bangsa. Melalui pendidikan dan pembinaan yang tepat, mereka dapat mempertahankan warisan budaya dan spiritual yang menjadi ciri khas bangsa.",
             image: "https://ldiikarawang.or.id/wp-content/uploads/2023/04/kisah.jpg",
-            link: "https://ldiikarawang.or.id/index.php/2023/02/15/kisah-inspiratif-salah-satu-warga-ldii-yang-memiliki-semangat-juang-tinggi-dalam-pengetahuan-hukum-walau-sudah-lanjut-usia/"
+            link: "https://ldiikarawang.or.id/index.php/2023/02/15/kisah-inspiratif-salah-satu-warga-ldii-yang-memiliki-semangat-juang-tinggi-dalam-pengetahuan-hukum-walau-sudah-lanjut-usia/",
         },
         {
             title: "Second Slide",
             description: "Description for second slide",
             image: "/api/placeholder/800/400",
-            link: "/page2"
+            link: "/page2",
         },
         {
             title: "Third Slide",
             description: "Description for third slide",
             image: "/api/placeholder/800/400",
-            link: "/page3"
-        }
+            link: "/page3",
+        },
     ],
     autoSlideInterval = 5000,
     showDots = true,
     showArrows = true,
-    onNavigate = (link) => window.location.href = link
+    onNavigate = (link) => (window.location.href = link),
 }) => {
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isPlaying, setIsPlaying] = useState(true);
@@ -60,7 +61,7 @@ const Carousel = ({
 
     const handleSlideClick = (e, link) => {
         // Get the closest parent with data-control attribute
-        const controlElement = e.target.closest('[data-control]');
+        const controlElement = e.target.closest("[data-control]");
 
         // Only navigate if the click is not on a control element
         if (!controlElement) {
@@ -123,8 +124,18 @@ const Carousel = ({
                         onClick={previousSlide}
                         className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/30 hover:bg-white/50 transition-colors z-10"
                     >
-                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        <svg
+                            className="w-6 h-6 text-white"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M15 19l-7-7 7-7"
+                            />
                         </svg>
                     </button>
                     <button
@@ -132,8 +143,18 @@ const Carousel = ({
                         onClick={nextSlide}
                         className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-white/30 hover:bg-white/50 transition-colors z-10"
                     >
-                        <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        <svg
+                            className="w-6 h-6 text-white"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                        >
+                            <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M9 5l7 7-7 7"
+                            />
                         </svg>
                     </button>
                 </>
@@ -146,12 +167,32 @@ const Carousel = ({
                 className="absolute bottom-4 right-4 p-2 rounded-full bg-white/30 hover:bg-white/50 transition-colors z-10"
             >
                 {isPlaying ? (
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 9v6m4-6v6" />
+                    <svg
+                        className="w-6 h-6 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M10 9v6m4-6v6"
+                        />
                     </svg>
                 ) : (
-                    <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                    <svg
+                        className="w-6 h-6 text-white"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                        />
                     </svg>
                 )}
             </button>
@@ -167,10 +208,11 @@ const Carousel = ({
                             key={index}
                             data-control="dot"
                             onClick={() => goToSlide(index)}
-                            className={`w-2 h-2 rounded-full transition-all duration-300 ${index === currentIndex
-                                ? 'bg-white w-6'
-                                : 'bg-white/50 hover:bg-white/75'
-                                }`}
+                            className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                                index === currentIndex
+                                    ? "bg-white w-6"
+                                    : "bg-white/50 hover:bg-white/75"
+                            }`}
                         />
                     ))}
                 </div>

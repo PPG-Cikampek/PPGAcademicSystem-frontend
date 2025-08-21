@@ -1,39 +1,44 @@
-import React, { useState, useContext } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useState, useContext } from "react";
+import { NavLink, useNavigate } from "react-router-dom";
 
-import { SidebarContext } from '../../Context/sidebar-context';
-import { AuthContext } from '../../Context/auth-context';
-import getUserRoleTitle from '../../../Utilities/getUserRoleTitle';
-import FloatingMenu from '../../UIElements/FloatingMenu';
-import BackButton from '../../UIElements/BackButton';
-import { User, Settings, ChevronLeft, ChevronRight, LogOut } from 'lucide-react';
+import { SidebarContext } from "../../Context/sidebar-context";
+import { AuthContext } from "../../Context/auth-context";
+import getUserRoleTitle from "../../../Utilities/getUserRoleTitle";
+import FloatingMenu from "../../UIElements/FloatingMenu";
+import BackButton from "../../UIElements/BackButton";
+import {
+    User,
+    Settings,
+    ChevronLeft,
+    ChevronRight,
+    LogOut,
+} from "lucide-react";
 
 const Navbar = () => {
-
-    const sidebar = useContext(SidebarContext)
-    const auth = useContext(AuthContext)
-    const navigate = useNavigate()
+    const sidebar = useContext(SidebarContext);
+    const auth = useContext(AuthContext);
+    const navigate = useNavigate();
 
     const sidebarHandler = () => {
-        sidebar.toggle()
-    }
+        sidebar.toggle();
+    };
 
     const ProfileButton = () => {
         return (
             <FloatingMenu
-                boxWidth='w-36'
+                boxWidth="w-36"
                 label={auth.userName}
                 style={`btn-secondary-outline-sharp py-3`}
                 buttons={[
                     {
                         icon: User,
-                        label: 'Profile',
+                        label: "Profile",
                         onClick: () => navigate(`/profile/${auth.userId}`),
                     },
                     {
                         icon: LogOut,
-                        label: 'Logout',
-                        variant: 'danger',
+                        label: "Logout",
+                        variant: "danger",
                         onClick: () => auth.logout(),
                     },
                 ]}
@@ -42,10 +47,17 @@ const Navbar = () => {
     };
 
     const navLinks = [
-        ...(auth.currentBranchYear ? [
-            // { id: 1, name: formatAcademicYear(auth.currentSubBranchYear), path: '/academic', icon: <Calendar /> }
-        ] : []),
-        { id: 2, name: getUserRoleTitle(auth.userRole), path: '', icon: <Settings /> },
+        ...(auth.currentBranchYear
+            ? [
+                  // { id: 1, name: formatAcademicYear(auth.currentSubBranchYear), path: '/academic', icon: <Calendar /> }
+              ]
+            : []),
+        {
+            id: 2,
+            name: getUserRoleTitle(auth.userRole),
+            path: "",
+            icon: <Settings />,
+        },
     ];
 
     return (
@@ -59,13 +71,16 @@ const Navbar = () => {
                                 className="p-2 rounded-full focus:bg-gray-200 hover:outline-hidden hover:ring-1 hover:ring-offset-1 hover:ring-gray-400"
                                 onClick={sidebarHandler}
                             >
-                                {sidebar.isSidebarOpen ? <ChevronLeft size={24} /> : <ChevronRight size={24} />}
+                                {sidebar.isSidebarOpen ? (
+                                    <ChevronLeft size={24} />
+                                ) : (
+                                    <ChevronRight size={24} />
+                                )}
                             </button>
                         </div>
 
                         <BackButton />
                     </div>
-
 
                     {/* Desktop Navigation */}
                     <div className="hidden md:flex space-x-8">

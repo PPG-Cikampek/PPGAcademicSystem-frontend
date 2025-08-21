@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const PreviewReport = () => {
     const location = useLocation();
@@ -20,7 +20,7 @@ const PreviewReport = () => {
     }
 
     const downloadPDF = () => {
-        const link = document.createElement('a');
+        const link = document.createElement("a");
         link.href = pdfUrl;
         link.download = `${studentName}_Raport.pdf`;
         link.click();
@@ -29,7 +29,9 @@ const PreviewReport = () => {
     return (
         <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">
             <div className="max-w-6xl mx-auto">
-                <h1 className="text-2xl font-semibold text-gray-900 mb-4">Preview Raport: {studentName}</h1>
+                <h1 className="text-2xl font-semibold text-gray-900 mb-4">
+                    Preview Raport: {studentName}
+                </h1>
                 <div className="card-basic rounded-md mx-0">
                     <iframe
                         src={pdfUrl}

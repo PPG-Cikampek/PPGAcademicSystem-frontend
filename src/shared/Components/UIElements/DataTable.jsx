@@ -1,12 +1,12 @@
-import { Filter, X } from 'lucide-react';
-import React, { useState, useEffect, useMemo } from 'react';
+import { Filter, X } from "lucide-react";
+import { useState, useEffect, useMemo } from "react";
 
 const DataTable = ({
     data,
     columns,
     onRowClick,
     searchableColumns = [],
-    initialSort = { key: null, direction: 'ascending' },
+    initialSort = { key: null, direction: "ascending" },
     initialEntriesPerPage = 10,
     isLoading = false,
     filterOptions = [],
@@ -17,9 +17,9 @@ const DataTable = ({
         showBottomEntries: true,
         showPagination: true,
         clickableRows: true,
-        entriesOptions: [5, 10, 25, 50, 100]
+        entriesOptions: [5, 10, 25, 50, 100],
     },
-    tableId
+    tableId,
 }) => {
     const storageKey = tableId ? `datatable-state-${tableId}` : null;
     const loadPersistedState = () => {
@@ -34,10 +34,14 @@ const DataTable = ({
 
     const persisted = loadPersistedState();
 
-    const [searchTerm, setSearchTerm] = useState(persisted.searchTerm ?? '');
-    const [entriesPerPage, setEntriesPerPage] = useState(persisted.entriesPerPage ?? initialEntriesPerPage);
+    const [searchTerm, setSearchTerm] = useState(persisted.searchTerm ?? "");
+    const [entriesPerPage, setEntriesPerPage] = useState(
+        persisted.entriesPerPage ?? initialEntriesPerPage
+    );
     const [currentPage, setCurrentPage] = useState(persisted.currentPage ?? 1);
-    const [sortConfig, setSortConfig] = useState(persisted.sortConfig ?? initialSort);
+    const [sortConfig, setSortConfig] = useState(
+        persisted.sortConfig ?? initialSort
+    );
     const [filters, setFilters] = useState(persisted.filters ?? {});
     const [showFilters, setShowFilters] = useState(false);
 
@@ -45,14 +49,24 @@ const DataTable = ({
         if (!storageKey) return;
         // console.log(currentPage)
         // console.log(persisted)
-        localStorage.setItem(storageKey, JSON.stringify({
-            searchTerm,
-            entriesPerPage,
-            currentPage,
-            sortConfig,
-            filters
-        }));
-    }, [searchTerm, entriesPerPage, currentPage, sortConfig, filters, storageKey]);
+        localStorage.setItem(
+            storageKey,
+            JSON.stringify({
+                searchTerm,
+                entriesPerPage,
+                currentPage,
+                sortConfig,
+                filters,
+            })
+        );
+    }, [
+        searchTerm,
+        entriesPerPage,
+        currentPage,
+        sortConfig,
+        filters,
+        storageKey,
+    ]);
 
     const filteredData = useMemo(() => {
         // Debug logs to investigate "Cannot read properties of undefined (reading 'filter')"
@@ -65,21 +79,27 @@ const DataTable = ({
         // });
 
         if (!Array.isArray(data)) {
-            console.error('Data is not an array, skipping filter step', { data });
+            console.error("Data is not an array, skipping filter step", {
+                data,
+            });
             return [];
         }
 
-        let filtered = data.filter(item =>
-            searchableColumns.some(column =>
-            (item?.[column]?.toString() ?? '').toLowerCase().includes((searchTerm ?? '').toLowerCase())
+        let filtered = data.filter((item) =>
+            searchableColumns.some((column) =>
+                (item?.[column]?.toString() ?? "")
+                    .toLowerCase()
+                    .includes((searchTerm ?? "").toLowerCase())
             )
         );
-        
+
         Object.entries(filters).forEach(([key, value]) => {
             if (value) {
-                filtered = filtered.filter(item => {
-                    const column = columns.find(col => col.key === key);
-                    const itemValue = column.render ? column.render(item) : item[key];
+                filtered = filtered.filter((item) => {
+                    const column = columns.find((col) => col.key === key);
+                    const itemValue = column.render
+                        ? column.render(item)
+                        : item[key];
                     return itemValue === value;
                 });
             }
@@ -89,7 +109,7 @@ const DataTable = ({
 
     const sortedData = useMemo(() => {
         if (!sortConfig.key) return filteredData;
-        const column = columns.find(col => col.key === sortConfig.key);
+        const column = columns.find((col) => col.key === sortConfig.key);
         if (!column) return filteredData;
         const sorted = [...filteredData].sort((a, b) => {
             const aValue = column.render ? column.render(a) : a[sortConfig.key];
@@ -97,7 +117,7 @@ const DataTable = ({
             if (!aValue && !bValue) return 0;
             if (!aValue) return 1;
             if (!bValue) return -1;
-            return sortConfig.direction === 'ascending'
+            return sortConfig.direction === "ascending"
                 ? aValue.toString().localeCompare(bValue.toString())
                 : bValue.toString().localeCompare(aValue.toString());
         });
@@ -105,8 +125,12 @@ const DataTable = ({
     }, [filteredData, columns, sortConfig]);
 
     const totalPages = Math.ceil(sortedData.length / entriesPerPage);
-    const indexOfLastItem = config.showPagination ? currentPage * entriesPerPage : sortedData.length;
-    const indexOfFirstItem = config.showPagination ? indexOfLastItem - entriesPerPage : 0;
+    const indexOfLastItem = config.showPagination
+        ? currentPage * entriesPerPage
+        : sortedData.length;
+    const indexOfFirstItem = config.showPagination
+        ? indexOfLastItem - entriesPerPage
+        : 0;
     const currentItems = config.showPagination
         ? sortedData.slice(indexOfFirstItem, indexOfLastItem)
         : sortedData;
@@ -118,9 +142,9 @@ const DataTable = ({
     // }, [totalPages, currentPage]);
 
     const sortData = (key) => {
-        let direction = 'ascending';
-        if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-            direction = 'descending';
+        let direction = "ascending";
+        if (sortConfig.key === key && sortConfig.direction === "ascending") {
+            direction = "descending";
         }
         setSortConfig({ key, direction });
     };
@@ -147,13 +171,17 @@ const DataTable = ({
 
     const resetFilters = () => {
         setFilters({});
-        setSearchTerm('');
+        setSearchTerm("");
         setCurrentPage(1);
         setSortConfig(initialSort);
     };
 
     const FilterCard = () => (
-        <div className={`w-full my-2 overflow-hidden transition-all duration-300 ${showFilters ? 'max-h-96' : 'max-h-0'}`}>
+        <div
+            className={`w-full my-2 overflow-hidden transition-all duration-300 ${
+                showFilters ? "max-h-96" : "max-h-0"
+            }`}
+        >
             <div className="card-basic flex-col rounded-md m-0 border p-4">
                 <div className="flex items-center gap-2 mb-4">
                     <h3 className="font-normal text-base">Filter Data</h3>
@@ -167,22 +195,34 @@ const DataTable = ({
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     {filterOptions.map(({ key, label, options }) => (
                         <div key={key}>
-                            <label className="text-sm font-medium text-gray-700 mb-1">{label}</label>
+                            <label className="text-sm font-medium text-gray-700 mb-1">
+                                {label}
+                            </label>
                             <select
                                 className="w-full border rounded-full px-2 py-2 text-sm focus:ring-1 focus:ring-primary focus:outline-hidden"
-                                value={filters[key] || ''}
-                                onChange={(e) => setFilters(prev => ({
-                                    ...prev,
-                                    [key]: e.target.value || undefined
-                                }))}
+                                value={filters[key] || ""}
+                                onChange={(e) =>
+                                    setFilters((prev) => ({
+                                        ...prev,
+                                        [key]: e.target.value || undefined,
+                                    }))
+                                }
                             >
                                 <option value="">Semua</option>
-                                {options.map(option => {
+                                {options.map((option) => {
                                     // Handle both string arrays and object arrays
-                                    const value = typeof option === 'string' ? option : option.value;
-                                    const label = typeof option === 'string' ? option : option.label;
+                                    const value =
+                                        typeof option === "string"
+                                            ? option
+                                            : option.value;
+                                    const label =
+                                        typeof option === "string"
+                                            ? option
+                                            : option.label;
                                     return (
-                                        <option key={value} value={value}>{label}</option>
+                                        <option key={value} value={value}>
+                                            {label}
+                                        </option>
                                     );
                                 })}
                             </select>
@@ -213,10 +253,16 @@ const DataTable = ({
                                 <select
                                     className="border rounded-sm px-2 py-1"
                                     value={entriesPerPage}
-                                    onChange={(e) => setEntriesPerPage(Number(e.target.value))}
+                                    onChange={(e) =>
+                                        setEntriesPerPage(
+                                            Number(e.target.value)
+                                        )
+                                    }
                                 >
-                                    {config.entriesOptions.map(value => (
-                                        <option key={value} value={value}>{value}</option>
+                                    {config.entriesOptions.map((value) => (
+                                        <option key={value} value={value}>
+                                            {value}
+                                        </option>
                                     ))}
                                 </select>
                                 <span>item</span>
@@ -230,7 +276,9 @@ const DataTable = ({
                                         type="text"
                                         className="bg-white px-2 py-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300"
                                         value={searchTerm}
-                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        onChange={(e) =>
+                                            setSearchTerm(e.target.value)
+                                        }
                                     />
                                 </div>
                             )}
@@ -255,48 +303,99 @@ const DataTable = ({
                             <SkeletonHeader />
                         ) : (
                             <tr>
-                                {columns.map(({ key, label, sortable, headerAlign }) => (
-                                    <th
-                                        key={key}
-                                        onClick={() => sortable && sortData(key)}
-                                        className={`min-w-14 p-2 md:p-4 text-xs font-medium text-gray-500 uppercase tracking-wider ${sortable ? 'cursor-pointer hover:bg-gray-50' : ''} ${headerAlign === 'center' ? 'text-center' : headerAlign === 'right' ? 'text-right' : 'text-left'
+                                {columns.map(
+                                    ({ key, label, sortable, headerAlign }) => (
+                                        <th
+                                            key={key}
+                                            onClick={() =>
+                                                sortable && sortData(key)
+                                            }
+                                            className={`min-w-14 p-2 md:p-4 text-xs font-medium text-gray-500 uppercase tracking-wider ${
+                                                sortable
+                                                    ? "cursor-pointer hover:bg-gray-50"
+                                                    : ""
+                                            } ${
+                                                headerAlign === "center"
+                                                    ? "text-center"
+                                                    : headerAlign === "right"
+                                                    ? "text-right"
+                                                    : "text-left"
                                             }`}
-                                    >
-                                        {label}
-                                        {sortable && sortConfig.key === key && (
-                                            sortConfig.direction === 'ascending' ? ' ↑' : ' ↓'
-                                        )}
-                                    </th>
-                                ))}
+                                        >
+                                            {label}
+                                            {sortable &&
+                                                sortConfig.key === key &&
+                                                (sortConfig.direction ===
+                                                "ascending"
+                                                    ? " ↑"
+                                                    : " ↓")}
+                                        </th>
+                                    )
+                                )}
                             </tr>
                         )}
                     </thead>
                     <tbody className="divide-y divide-gray-200">
                         {isLoading ? (
-                            Array(entriesPerPage).fill(0).map((_, index) => (
-                                <SkeletonRow key={index} />
-                            ))
+                            Array(entriesPerPage)
+                                .fill(0)
+                                .map((_, index) => <SkeletonRow key={index} />)
                         ) : (
                             <>
                                 {currentItems.map((item, index) => (
                                     <tr
                                         key={index}
-                                        onClick={() => onRowClick && onRowClick(item)}
-                                        className={`${config.clickableRows === true ? 'hover:bg-gray-50 hover:cursor-pointer' : ''}  transition`}
+                                        onClick={() =>
+                                            onRowClick && onRowClick(item)
+                                        }
+                                        className={`${
+                                            config.clickableRows === true
+                                                ? "hover:bg-gray-50 hover:cursor-pointer"
+                                                : ""
+                                        }  transition`}
                                     >
-                                        {columns.map(({ key, render, cellStyle, cellAlign }) => (
-                                            <td key={key} className={`${key === 'actions' ? 'p-1' : 'p-2 md:p-4'} ${cellAlign === 'center' ? 'text-center' : cellAlign === 'right' ? 'text-right' : 'text-left'
-                                                }`}>
-                                                <span className={cellStyle?.(item)}>
-                                                    {render ? render(item) : item[key]}
-                                                </span>
-                                            </td>
-                                        ))}
+                                        {columns.map(
+                                            ({
+                                                key,
+                                                render,
+                                                cellStyle,
+                                                cellAlign,
+                                            }) => (
+                                                <td
+                                                    key={key}
+                                                    className={`${
+                                                        key === "actions"
+                                                            ? "p-1"
+                                                            : "p-2 md:p-4"
+                                                    } ${
+                                                        cellAlign === "center"
+                                                            ? "text-center"
+                                                            : cellAlign ===
+                                                              "right"
+                                                            ? "text-right"
+                                                            : "text-left"
+                                                    }`}
+                                                >
+                                                    <span
+                                                        className={cellStyle?.(
+                                                            item
+                                                        )}
+                                                    >
+                                                        {render
+                                                            ? render(item)
+                                                            : item[key]}
+                                                    </span>
+                                                </td>
+                                            )
+                                        )}
                                     </tr>
                                 ))}
                                 {currentItems.length === 0 && (
                                     <tr>
-                                        <td colSpan={columns.length} className='p-4 text-center italic text-gray-500'>
+                                        <td
+                                            colSpan={columns.length}
+                                            className="p-4 text-center italic text-gray-500"
+                                        >
                                             Tidak ada data
                                         </td>
                                     </tr>
@@ -321,22 +420,40 @@ const DataTable = ({
                             <div>
                                 {sortedData.length === 0
                                     ? "Menampilkan 0 - 0 dari 0 item"
-                                    : `Menampilkan ${indexOfFirstItem + 1} - ${Math.min(indexOfLastItem, sortedData.length)} dari ${sortedData.length} item`
-                                }
+                                    : `Menampilkan ${
+                                          indexOfFirstItem + 1
+                                      } - ${Math.min(
+                                          indexOfLastItem,
+                                          sortedData.length
+                                      )} dari ${sortedData.length} item`}
                             </div>
                         )}
                         {config.showPagination && (
                             <div className="flex gap-2">
                                 <button
-                                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                                    disabled={currentPage === 1 || sortedData.length === 0}
+                                    onClick={() =>
+                                        setCurrentPage((prev) =>
+                                            Math.max(prev - 1, 1)
+                                        )
+                                    }
+                                    disabled={
+                                        currentPage === 1 ||
+                                        sortedData.length === 0
+                                    }
                                     className="btn-primary-outline"
                                 >
                                     Sebelumnya
                                 </button>
                                 <button
-                                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                                    disabled={currentPage === totalPages || sortedData.length === 0}
+                                    onClick={() =>
+                                        setCurrentPage((prev) =>
+                                            Math.min(prev + 1, totalPages)
+                                        )
+                                    }
+                                    disabled={
+                                        currentPage === totalPages ||
+                                        sortedData.length === 0
+                                    }
                                     className="btn-primary-outline"
                                 >
                                     Berikutnya

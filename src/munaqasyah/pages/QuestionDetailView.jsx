@@ -1,34 +1,38 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import useHttp from '../../shared/hooks/http-hook';
-import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
-import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
+import { useState, useEffect, useContext } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import useHttp from "../../shared/hooks/http-hook";
+import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
+import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 
-import getCategoryName from '../utilities/getCategoryName';
-import { Pencil, Trash } from 'lucide-react';
-import Modal from '../../shared/Components/UIElements/ModalBottomClose';
-import { AuthContext } from '../../shared/Components/Context/auth-context';
+import getCategoryName from "../utilities/getCategoryName";
+import { Pencil, Trash } from "lucide-react";
+import Modal from "../../shared/Components/UIElements/ModalBottomClose";
+import { AuthContext } from "../../shared/Components/Context/auth-context";
 
 const QuestionDetailView = () => {
     const [question, setQuestion] = useState(null);
     const { isLoading, error, sendRequest } = useHttp();
-    const [modal, setModal] = useState({ title: '', message: '', onConfirm: null });
+    const [modal, setModal] = useState({
+        title: "",
+        message: "",
+        onConfirm: null,
+    });
     const [modalIsOpen, setModalIsOpen] = useState(false);
 
     const { questionId } = useParams();
     const navigate = useNavigate();
-    const auth = useContext(AuthContext)
+    const auth = useContext(AuthContext);
 
     const getStatusStyle = (type) => {
         switch (type) {
-            case 'active':
-                return 'text-green-500';
-            case 'inactive':
-                return 'text-gray-500';
-            case 'checkNeeded':
-                return 'text-red-500';
+            case "active":
+                return "text-green-500";
+            case "inactive":
+                return "text-gray-500";
+            case "checkNeeded":
+                return "text-red-500";
             default:
-                return 'text-red-500';
+                return "text-red-500";
         }
     };
 
@@ -38,14 +42,15 @@ const QuestionDetailView = () => {
             inactive: "Non-aktif",
             checkneeded: "Periksa!",
         };
-        return statusMap[status] || 'Periksa!';
+        return statusMap[status] || "Periksa!";
     };
 
-    const getTypeName = (type) => ({
-        multipleChoices: 'Pilihan Ganda',
-        shortAnswer: 'Jawab Cermat',
-        practice: 'Praktik',
-    }[type]);
+    const getTypeName = (type) =>
+        ({
+            multipleChoices: "Pilihan Ganda",
+            shortAnswer: "Jawab Cermat",
+            practice: "Praktik",
+        }[type]);
 
     const getMothName = (month) => {
         const monthMap = {
@@ -60,21 +65,22 @@ const QuestionDetailView = () => {
             9: "September",
             10: "Oktober",
             11: "November",
-            12: "Desember"
+            12: "Desember",
         };
-        return monthMap[month] || 'kosong';
+        return monthMap[month] || "kosong";
     };
 
-    const getClassGrade = (grade) => ({
-        'pra-paud': 'Kelas Pra-Paud',
-        'paud': 'Kelas Paud',
-        '1': 'Kelas 1',
-        '2': 'Kelas 2',
-        '3': 'Kelas 3',
-        '4': 'Kelas 4',
-        '5': 'Kelas 5',
-        '6': 'Kelas 6',
-    }[grade]);
+    const getClassGrade = (grade) =>
+        ({
+            "pra-paud": "Kelas Pra-Paud",
+            paud: "Kelas Paud",
+            1: "Kelas 1",
+            2: "Kelas 2",
+            3: "Kelas 3",
+            4: "Kelas 4",
+            5: "Kelas 5",
+            6: "Kelas 6",
+        }[grade]);
 
     useEffect(() => {
         let isActive = true;
@@ -82,11 +88,13 @@ const QuestionDetailView = () => {
         const fetchQuestion = async () => {
             try {
                 const responseData = await sendRequest(
-                    `${import.meta.env.VITE_BACKEND_URL}/munaqasyahs/questions/${questionId}`
+                    `${
+                        import.meta.env.VITE_BACKEND_URL
+                    }/munaqasyahs/questions/${questionId}`
                 );
                 if (isActive) {
                     setQuestion(responseData.question);
-                    console.log(responseData)
+                    console.log(responseData);
                 }
             } catch (err) {
                 // Error handled by useHttp
@@ -102,22 +110,29 @@ const QuestionDetailView = () => {
     const handleDeleteQuestion = (questionId) => {
         const confirmDelete = async () => {
             try {
-                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/munaqasyahs/questions/${questionId}`, 'DELETE', null, {
-                    'Content-Type': 'application/json',
-                    Authorization: 'Bearer ' + auth.token
-                });
+                const responseData = await sendRequest(
+                    `${
+                        import.meta.env.VITE_BACKEND_URL
+                    }/munaqasyahs/questions/${questionId}`,
+                    "DELETE",
+                    null,
+                    {
+                        "Content-Type": "application/json",
+                        Authorization: "Bearer " + auth.token,
+                    }
+                );
                 setModal({
-                    title: 'Berhasil!',
+                    title: "Berhasil!",
                     message: responseData.message,
-                    onConfirm: null
+                    onConfirm: null,
                 });
             } catch (err) {
                 // Error handled by useHttp
             }
         };
         setModal({
-            title: 'Peringatan!',
-            message: 'Hapus Soal?',
+            title: "Peringatan!",
+            message: "Hapus Soal?",
             onConfirm: confirmDelete,
         });
         setModalIsOpen(true);
@@ -127,23 +142,30 @@ const QuestionDetailView = () => {
         const confirmDelete = async () => {
             const body = JSON.stringify({ status: status });
             try {
-                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/munaqasyahs/questions/${questionId}/status`, 'PATCH', body, {
-                    'Content-Type': 'application/json',
-                    Authorization: 'Bearer ' + auth.token
-                });
+                const responseData = await sendRequest(
+                    `${
+                        import.meta.env.VITE_BACKEND_URL
+                    }/munaqasyahs/questions/${questionId}/status`,
+                    "PATCH",
+                    body,
+                    {
+                        "Content-Type": "application/json",
+                        Authorization: "Bearer " + auth.token,
+                    }
+                );
                 setQuestion({ ...question, status: status });
                 setModal({
-                    title: 'Berhasil!',
+                    title: "Berhasil!",
                     message: responseData.message,
-                    onConfirm: null
+                    onConfirm: null,
                 });
             } catch (err) {
                 // Error handled by useHttp
             }
         };
         setModal({
-            title: 'Peringatan!',
-            message: 'Ubah Status Soal?',
+            title: "Peringatan!",
+            message: "Ubah Status Soal?",
             onConfirm: confirmDelete,
         });
         setModalIsOpen(true);
@@ -153,15 +175,22 @@ const QuestionDetailView = () => {
         <div className="flex gap-2 items-center">
             <button
                 onClick={() => {
-                    setModalIsOpen(false)
+                    setModalIsOpen(false);
                     // !error && navigate(-1);
                 }}
-                className={`${modal.onConfirm ? 'btn-danger-outline' : 'button-primary mt-0 '}`}
+                className={`${
+                    modal.onConfirm
+                        ? "btn-danger-outline"
+                        : "button-primary mt-0 "
+                }`}
             >
-                {modal.onConfirm ? 'Batal' : 'Tutup'}
+                {modal.onConfirm ? "Batal" : "Tutup"}
             </button>
             {modal.onConfirm && (
-                <button onClick={modal.onConfirm} className="button-primary mt-0 ">
+                <button
+                    onClick={modal.onConfirm}
+                    className="button-primary mt-0 "
+                >
                     Ya
                 </button>
             )}
@@ -198,17 +227,19 @@ const QuestionDetailView = () => {
                             <LoadingCircle size={32} />
                         </div>
                     )}
-                    {!isLoading && (
-                        modal.message
-                    )}
+                    {!isLoading && modal.message}
                 </Modal>
 
                 <div className="flex flex-col md:flex-row  gap-2 mb-6 md:items-center">
-                    <h1 className="text-2xl font-semibold text-gray-900">Detail Soal</h1>
+                    <h1 className="text-2xl font-semibold text-gray-900">
+                        Detail Soal
+                    </h1>
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
-                            navigate(`/munaqasyah/question-bank/${question.classGrade}/${questionId}/update`);
+                            navigate(
+                                `/munaqasyah/question-bank/${question.classGrade}/${questionId}/update`
+                            );
                         }}
                         className="button-primary m-0 pl-3 gap-1"
                     >
@@ -225,117 +256,176 @@ const QuestionDetailView = () => {
                         <Trash className="w-4 h-4" />
                         Hapus
                     </button>
-                    {
-                        question.status !== 'active' &&
+                    {question.status !== "active" && (
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
-                                handleUpdateQuestionStatus(questionId, 'active');
+                                handleUpdateQuestionStatus(
+                                    questionId,
+                                    "active"
+                                );
                             }}
                             className="button-danger border-green-600 hover:bg-green-600 focus:ring-green-600 m-0 pl-3 gap-1"
                         >
                             Aktifkan
                         </button>
-                    }
-                    {
-                        question.status !== 'inactive' && question.status !== 'checkneeded' &&
-                        < button
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleUpdateQuestionStatus(questionId, 'inactive');
-                            }}
-                            className="button-danger border-gray-600 hover:bg-gray-600 focus:ring-gray-600 m-0 pl-3 gap-1"
-                        >
-                            Nonaktifkan
-                        </button>
-                    }
-                    {
-                        question.status !== 'checkneeded' &&
+                    )}
+                    {question.status !== "inactive" &&
+                        question.status !== "checkneeded" && (
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleUpdateQuestionStatus(
+                                        questionId,
+                                        "inactive"
+                                    );
+                                }}
+                                className="button-danger border-gray-600 hover:bg-gray-600 focus:ring-gray-600 m-0 pl-3 gap-1"
+                            >
+                                Nonaktifkan
+                            </button>
+                        )}
+                    {question.status !== "checkneeded" && (
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
-                                handleUpdateQuestionStatus(questionId, 'checkneeded');
+                                handleUpdateQuestionStatus(
+                                    questionId,
+                                    "checkneeded"
+                                );
                             }}
                             className="button-danger border-yellow-600 hover:bg-yellow-600 focus:ring-yellow-600 m-0 pl-3 gap-1"
                         >
                             Tandai Periksa
                         </button>
-                    }
+                    )}
                 </div>
 
                 <div className="space-y-6">
                     <div className="flex flex-col gap-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <h3 className="text-sm font-medium text-gray-500">Status</h3>
-                                <p className={`${getStatusStyle(question.status)}`}>{getStatusName(question.status)}</p>
+                                <h3 className="text-sm font-medium text-gray-500">
+                                    Status
+                                </h3>
+                                <p
+                                    className={`${getStatusStyle(
+                                        question.status
+                                    )}`}
+                                >
+                                    {getStatusName(question.status)}
+                                </p>
                             </div>
                             <div>
-                                <h3 className="text-sm font-medium text-gray-500">Tipe Soal</h3>
-                                <p className="mt-1 text-gray-900">{getTypeName(question.type)}</p>
+                                <h3 className="text-sm font-medium text-gray-500">
+                                    Tipe Soal
+                                </h3>
+                                <p className="mt-1 text-gray-900">
+                                    {getTypeName(question.type)}
+                                </p>
                             </div>
                             <div>
-                                <h3 className="text-sm font-medium text-gray-500">Kategori</h3>
-                                <p className="mt-1 text-gray-900">{getCategoryName(question.category)}</p>
+                                <h3 className="text-sm font-medium text-gray-500">
+                                    Kategori
+                                </h3>
+                                <p className="mt-1 text-gray-900">
+                                    {getCategoryName(question.category)}
+                                </p>
                             </div>
                             <div>
-                                <h3 className="text-sm font-medium text-gray-500">Semester</h3>
-                                <p className="mt-1 text-gray-900">{question.semester === '1' ? 'Ganjil' : 'Genap'}</p>
+                                <h3 className="text-sm font-medium text-gray-500">
+                                    Semester
+                                </h3>
+                                <p className="mt-1 text-gray-900">
+                                    {question.semester === "1"
+                                        ? "Ganjil"
+                                        : "Genap"}
+                                </p>
                             </div>
                             <div>
-                                <h3 className="text-sm font-medium text-gray-500">Bulan Materi</h3>
-                                <p className="mt-1 text-gray-900">{getMothName(question.curriculumMonth)}</p>
+                                <h3 className="text-sm font-medium text-gray-500">
+                                    Bulan Materi
+                                </h3>
+                                <p className="mt-1 text-gray-900">
+                                    {getMothName(question.curriculumMonth)}
+                                </p>
                             </div>
                             <div>
-                                <h3 className="text-sm font-medium text-gray-500">Bobot Nilai Maksimal</h3>
-                                <p className="mt-1 text-blue-600 font-medium">{question.maxScore} Poin</p>
+                                <h3 className="text-sm font-medium text-gray-500">
+                                    Bobot Nilai Maksimal
+                                </h3>
+                                <p className="mt-1 text-blue-600 font-medium">
+                                    {question.maxScore} Poin
+                                </p>
                             </div>
                             <div>
-                                <h3 className="text-sm font-medium text-gray-500">Kelas</h3>
-                                <p className="mt-1 text-gray-900 font-medium">{getClassGrade(question.classGrade)}</p>
+                                <h3 className="text-sm font-medium text-gray-500">
+                                    Kelas
+                                </h3>
+                                <p className="mt-1 text-gray-900 font-medium">
+                                    {getClassGrade(question.classGrade)}
+                                </p>
                             </div>
                         </div>
 
                         <div className="border-t pt-4">
-                            <h3 className="text-sm font-medium text-gray-500">Pertanyaan</h3>
-                            <p className="font-lpmq mt-1 text-gray-900 whitespace-pre-line">{question.question}</p>
+                            <h3 className="text-sm font-medium text-gray-500">
+                                Pertanyaan
+                            </h3>
+                            <p className="font-lpmq mt-1 text-gray-900 whitespace-pre-line">
+                                {question.question}
+                            </p>
                         </div>
 
                         <div className="border-t pt-4">
-                            <h3 className="text-sm font-medium text-gray-500">Jawaban</h3>
+                            <h3 className="text-sm font-medium text-gray-500">
+                                Jawaban
+                            </h3>
                             {question.answers.map((answer, index) => (
-                                <p key={index} className="font-lpmq mt-1 text-gray-900 whitespace-pre-line">{answer}</p>
+                                <p
+                                    key={index}
+                                    className="font-lpmq mt-1 text-gray-900 whitespace-pre-line"
+                                >
+                                    {answer}
+                                </p>
                             ))}
                         </div>
 
                         {question.instruction && (
                             <div className="border-t pt-4">
-                                <h3 className="text-sm font-medium text-gray-500">Petunjuk Penilaian</h3>
+                                <h3 className="text-sm font-medium text-gray-500">
+                                    Petunjuk Penilaian
+                                </h3>
                                 <pre className="mt-1 text-gray-900 whitespace-pre-line font-sans">
                                     {question.instruction}
                                 </pre>
                             </div>
                         )}
 
-                        {question.scoreOptions && question.scoreOptions.length > 0 && (
-                            <div className="border-t pt-4">
-                                <h3 className="text-sm font-medium text-gray-500">Opsi Nilai</h3>
-                                <div className="mt-1 flex gap-2 flex-wrap">
-                                    {question.scoreOptions.map((score, index) => (
-                                        <span
-                                            key={index}
-                                            className="px-2 py-1 bg-gray-100 text-gray-700 rounded-md"
-                                        >
-                                            {score}
-                                        </span>
-                                    ))}
+                        {question.scoreOptions &&
+                            question.scoreOptions.length > 0 && (
+                                <div className="border-t pt-4">
+                                    <h3 className="text-sm font-medium text-gray-500">
+                                        Opsi Nilai
+                                    </h3>
+                                    <div className="mt-1 flex gap-2 flex-wrap">
+                                        {question.scoreOptions.map(
+                                            (score, index) => (
+                                                <span
+                                                    key={index}
+                                                    className="px-2 py-1 bg-gray-100 text-gray-700 rounded-md"
+                                                >
+                                                    {score}
+                                                </span>
+                                            )
+                                        )}
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
                     </div>
                 </div>
             </div>
-        </div >
+        </div>
     );
 };
 

@@ -1,11 +1,10 @@
-import React, { useRef, useEffect, useState, useContext } from 'react';
-import QrScanner from 'qr-scanner';
+import { useRef, useEffect, useState, useContext } from "react";
+import QrScanner from "qr-scanner";
 
-import { StudentAttendanceContext } from '../context/StudentAttendanceContext';
+import { StudentAttendanceContext } from "../context/StudentAttendanceContext";
 
-import beep from '../../../assets/audios/store-scanner-beep-90395.mp3'
-import SequentialAnimation from '../../shared/Components/Animation/SequentialAnimation';
-import LoadingCircle from '../../../shared/Components/UIElements/LoadingCircle';
+import beep from "../../../assets/audios/store-scanner-beep-90395.mp3";
+import SequentialAnimation from "../../shared/Components/Animation/SequentialAnimation";
 
 const QRCodeScanner = () => {
     const videoRef = useRef(null);
@@ -16,7 +15,7 @@ const QRCodeScanner = () => {
     const [scanSuccess, setScanSuccess] = useState(false);
     const { state, dispatch } = useContext(StudentAttendanceContext);
     const [opacity, setOpacity] = useState(0);
-    const [status, setStatus] = useState('Initializing...');
+    const [status, setStatus] = useState("Initializing...");
     const [retryCount, setRetryCount] = useState(0);
 
     useEffect(() => {
@@ -26,7 +25,7 @@ const QRCodeScanner = () => {
             if (videoRef.current) {
                 qrScanner = new QrScanner(
                     videoRef.current,
-                    async result => {
+                    async (result) => {
                         if (!cooldown) {
                             await handleScan(result.data);
                         }
@@ -36,23 +35,26 @@ const QRCodeScanner = () => {
 
                 // Start scanning
                 try {
-                    setStatus('Sedang mengakses kamera...');
+                    setStatus("Sedang mengakses kamera...");
                     await qrScanner.start();
-                    setStatus('Membaca kode QR...');
+                    setStatus("Membaca kode QR...");
                     setScanning(true);
                 } catch (error) {
-                    console.error('Camera access denied or unavailable:', error);
-                    setStatus('Camera error: ' + error.message);
+                    console.error(
+                        "Camera access denied or unavailable:",
+                        error
+                    );
+                    setStatus("Camera error: " + error.message);
 
                     // Retry once if error occurs
                     if (retryCount === 0) {
-                        setStatus('Sedang mencoba ulang...');
+                        setStatus("Sedang mencoba ulang...");
                         setRetryCount(1);
                         setTimeout(setupScanner, 2000);
                     }
                 }
             } else {
-                setStatus('Error: Element video tidak ditemukan!');
+                setStatus("Error: Element video tidak ditemukan!");
             }
         };
 
@@ -79,13 +81,19 @@ const QRCodeScanner = () => {
         const currentMinutes = now.getMinutes();
 
         // Parse the input time string
-        const [inputHours, inputMinutes] = timeString.split(':').map(Number);
+        const [inputHours, inputMinutes] = timeString.split(":").map(Number);
 
         // Compare the times
-        if (currentHours > inputHours || (currentHours === inputHours && currentMinutes > inputMinutes)) {
+        if (
+            currentHours > inputHours ||
+            (currentHours === inputHours && currentMinutes > inputMinutes)
+        ) {
             return "Terlambat"; // Current time is later
         }
-        if (currentHours < inputHours || (currentHours === inputHours && currentMinutes < inputMinutes)) {
+        if (
+            currentHours < inputHours ||
+            (currentHours === inputHours && currentMinutes < inputMinutes)
+        ) {
             return "Hadir"; // Current time is earlier
         }
         return "Hadir"; // Times are equal
@@ -93,21 +101,29 @@ const QRCodeScanner = () => {
 
     const dataHandler = (data) => {
         dispatch({
-            type: 'SET_STATUS',
-            payload: data
-        })
-    }
+            type: "SET_STATUS",
+            payload: data,
+        });
+    };
 
     let attendanceData;
     const handleScan = async (data) => {
-        setScanSuccess(true)
+        setScanSuccess(true);
         setCooldown(true); // Enable cooldown to prevent rapid re-scanning
 
-        const isFound = state.studentList.some(student => student.studentId.nis === data)
+        const isFound = state.studentList.some(
+            (student) => student.studentId.nis === data
+        );
         if (!isFound) {
-            setScannedData('Kode QR tidak dikenali!');
+            setScannedData("Kode QR tidak dikenali!");
         } else {
-            setScannedData({ nis: data, status: getPresenceStatus(state.classStartTime), name: state.studentList.find(student => student.studentId.nis === data).studentId.name });
+            setScannedData({
+                nis: data,
+                status: getPresenceStatus(state.classStartTime),
+                name: state.studentList.find(
+                    (student) => student.studentId.nis === data
+                ).studentId.name,
+            });
         }
 
         // console.log(state.studentList)
@@ -121,14 +137,14 @@ const QRCodeScanner = () => {
         attendanceData = {
             id: data,
             newStatus: getPresenceStatus(state.classStartTime),
-            timestamp: Date.now()
-        }
-        dataHandler(attendanceData)
+            timestamp: Date.now(),
+        };
+        dataHandler(attendanceData);
         console.log(attendanceData);
 
         // Wait for beep sound to finish and add a brief cooldown before resuming scanning
         if (beepRef.current) {
-            await new Promise(resolve => {
+            await new Promise((resolve) => {
                 beepRef.current.onended = resolve;
             });
         }
@@ -136,7 +152,7 @@ const QRCodeScanner = () => {
         // Set a short delay to avoid immediate re-scanning after the beep
         setTimeout(() => {
             setCooldown(false); // Re-enable scanning after cooldown period
-            setScanSuccess(false)
+            setScanSuccess(false);
         }, 1000); // Adjust delay as needed (500ms is often sufficient)
     };
 
@@ -144,17 +160,27 @@ const QRCodeScanner = () => {
         <div className="flex flex-col items-center justify-center h-full w-full p-4">
             <div className="relative w-72 h-72 border-2 border-gray-700 shadow-md rounded-md overflow-hidden">
                 {cooldown === true ? (
-                    <div className=' absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2'>
-                        <SequentialAnimation variant={typeof scannedData === 'string' ? 6 : 2}>
+                    <div className=" absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                        <SequentialAnimation
+                            variant={typeof scannedData === "string" ? 6 : 2}
+                        >
                             {scannedData && (
                                 <div className="flex-col text-center">
-                                    {typeof scannedData === 'string' ? (
-                                        <p className="text-red-500 font-semibold text-base">{scannedData}</p>
+                                    {typeof scannedData === "string" ? (
+                                        <p className="text-red-500 font-semibold text-base">
+                                            {scannedData}
+                                        </p>
                                     ) : (
                                         <>
-                                            <p className="text-gray-700 text-lg">{scannedData.name}</p>
-                                            <p className="text-gray-700 text-lg">{scannedData.nis}</p>
-                                            <p className="text-green-500 font-bold text-2xl">{scannedData.status}</p>
+                                            <p className="text-gray-700 text-lg">
+                                                {scannedData.name}
+                                            </p>
+                                            <p className="text-gray-700 text-lg">
+                                                {scannedData.nis}
+                                            </p>
+                                            <p className="text-green-500 font-bold text-2xl">
+                                                {scannedData.status}
+                                            </p>
                                         </>
                                     )}
                                 </div>

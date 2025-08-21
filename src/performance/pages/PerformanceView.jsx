@@ -1,31 +1,30 @@
-import React, { useContext, useState, useEffect, useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useContext, useState, useEffect, useCallback, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 
-import DatePicker, { registerLocale } from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
+import DatePicker, { registerLocale } from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import idID from "date-fns/locale/id";
 
-import useHttp from '../../shared/hooks/http-hook';
-import { AuthContext } from '../../shared/Components/Context/auth-context';
+import useHttp from "../../shared/hooks/http-hook";
+import { AuthContext } from "../../shared/Components/Context/auth-context";
 
-import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
+import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 
-import PieChart from '../components/PieChart';
-import { academicYearFormatter } from '../../shared/Utilities/academicYearFormatter';
-import { getMonday } from '../../shared/Utilities/getMonday';
+import PieChart from "../components/PieChart";
+import { academicYearFormatter } from "../../shared/Utilities/academicYearFormatter";
+import { getMonday } from "../../shared/Utilities/getMonday";
 
 const PerformanceView = () => {
-
     const { isLoading, error, sendRequest, setError } = useHttp();
 
     const initialFilterState = {
-        selectedAcademicYear: '',
+        selectedAcademicYear: "",
         startDate: null,
         endDate: null,
         periode: null,
-        selectedBranch: '',
-        selectedSubBranch: '',
-        selectedClass: ''
+        selectedBranch: "",
+        selectedSubBranch: "",
+        selectedClass: "",
     };
 
     // Academic years list (static data)
@@ -39,7 +38,7 @@ const PerformanceView = () => {
         periode: null,
         selectedBranch: null,
         selectedSubBranch: null,
-        selectedClass: null
+        selectedClass: null,
     });
 
     // Display state - for currently shown data (only updates when "Tampilkan" is clicked)
@@ -47,7 +46,7 @@ const PerformanceView = () => {
         attendanceData: null,
         overallAttendances: null,
         violationData: null,
-        appliedFilters: null // Keep track of which filters were used for the current data
+        appliedFilters: null, // Keep track of which filters were used for the current data
     });
 
     // Dropdown options lists
@@ -66,9 +65,13 @@ const PerformanceView = () => {
 
     const fetchAcademicYears = useCallback(async () => {
         try {
-            const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/academicYears/?populate=subBranchYears`);
+            const responseData = await sendRequest(
+                `${
+                    import.meta.env.VITE_BACKEND_URL
+                }/academicYears/?populate=subBranchYears`
+            );
             setAcademicYearsList(responseData.academicYears);
-        } catch (err) { }
+        } catch (err) {}
     }, [sendRequest]);
 
     const fetchAttendanceData = useCallback(async () => {
@@ -78,8 +81,12 @@ const PerformanceView = () => {
             branchId: filterState.selectedBranch,
             subBranchId: filterState.selectedSubBranch,
             classId: filterState.selectedClass,
-            startDate: filterState.startDate ? filterState.startDate.toISOString() : null,
-            endDate: filterState.endDate ? filterState.endDate.toISOString() : null,
+            startDate: filterState.startDate
+                ? filterState.startDate.toISOString()
+                : null,
+            endDate: filterState.endDate
+                ? filterState.endDate.toISOString()
+                : null,
         });
 
         console.log({
@@ -87,27 +94,32 @@ const PerformanceView = () => {
             branchId: filterState.selectedBranch,
             subBranchId: filterState.selectedSubBranch,
             classId: filterState.selectedClass,
-            startDate: filterState.startDate ? filterState.startDate.toISOString() : null,
-            endDate: filterState.endDate ? filterState.endDate.toISOString() : null,
-        })
+            startDate: filterState.startDate
+                ? filterState.startDate.toISOString()
+                : null,
+            endDate: filterState.endDate
+                ? filterState.endDate.toISOString()
+                : null,
+        });
 
         try {
-            const attendanceData = await sendRequest(url, 'POST', body, {
-                'Content-Type': 'application/json',
+            const attendanceData = await sendRequest(url, "POST", body, {
+                "Content-Type": "application/json",
             });
 
-            console.log(attendanceData)
+            console.log(attendanceData);
 
-            const { overallStats, violationStats, ...cardsData } = attendanceData
+            const { overallStats, violationStats, ...cardsData } =
+                attendanceData;
 
             // Update display state with new data and record applied filters
             setDisplayState({
                 attendanceData: cardsData,
                 overallAttendances: attendanceData.overallStats,
                 violationData: attendanceData.violationStats,
-                appliedFilters: { ...filterState } // Snapshot of current filters
+                appliedFilters: { ...filterState }, // Snapshot of current filters
             });
-        } catch (err) { }
+        } catch (err) {}
     }, [sendRequest, filterState]);
 
     useEffect(() => {
@@ -116,101 +128,117 @@ const PerformanceView = () => {
     }, [fetchAcademicYears]);
 
     const selectAcademicYearHandler = useCallback((academicYearId) => {
-        setFilterState(prev => ({
+        setFilterState((prev) => ({
             ...prev,
             selectedAcademicYear: academicYearId,
             selectedBranch: null,
             selectedSubBranch: null,
-            selectedClass: null
+            selectedClass: null,
         }));
 
-        setDisplayState(prev => ({
+        setDisplayState((prev) => ({
             ...prev,
             attendanceData: null,
             overallAttendances: null,
-            violationData: null
+            violationData: null,
         }));
 
         setBranchesList([]);
         setSubBranchesList([]);
         setClassesList([]);
 
-        if (academicYearId !== '') {
+        if (academicYearId !== "") {
             fetchBranches();
         }
     }, []);
 
     const fetchBranches = useCallback(async () => {
-        console.log('fetching branches!')
+        console.log("fetching branches!");
         try {
-            const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/levels/branches/`);
+            const responseData = await sendRequest(
+                `${import.meta.env.VITE_BACKEND_URL}/levels/branches/`
+            );
             setBranchesList(responseData.branches);
-        } catch (err) { }
+        } catch (err) {}
     }, [sendRequest]);
 
     const selectBranchHandler = useCallback((branchId) => {
-        setFilterState(prev => ({
+        setFilterState((prev) => ({
             ...prev,
             selectedBranch: branchId,
             selectedSubBranch: null,
-            selectedClass: null
+            selectedClass: null,
         }));
 
-        setDisplayState(prev => ({
+        setDisplayState((prev) => ({
             ...prev,
             attendanceData: null,
             overallAttendances: null,
-            violationData: null
+            violationData: null,
         }));
 
         setSubBranchesList([]);
         setClassesList([]);
 
-        if (branchId !== '') {
+        if (branchId !== "") {
             fetchSubBranchesList(branchId);
         }
     }, []);
 
-    const fetchSubBranchesList = useCallback(async (branchId) => {
-        try {
-            const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/levels/branches/${branchId}?populate=true`);
-            setSubBranchesList(responseData.branch.subBranches);
-        } catch (err) { }
-    }, [sendRequest]);
+    const fetchSubBranchesList = useCallback(
+        async (branchId) => {
+            try {
+                const responseData = await sendRequest(
+                    `${
+                        import.meta.env.VITE_BACKEND_URL
+                    }/levels/branches/${branchId}?populate=true`
+                );
+                setSubBranchesList(responseData.branch.subBranches);
+            } catch (err) {}
+        },
+        [sendRequest]
+    );
 
     const selectSubBranchHandler = useCallback((subBranchId) => {
-        setFilterState(prev => ({
+        setFilterState((prev) => ({
             ...prev,
             selectedSubBranch: subBranchId,
-            selectedClass: null
+            selectedClass: null,
         }));
 
-        setDisplayState(prev => ({
+        setDisplayState((prev) => ({
             ...prev,
             attendanceData: null,
             overallAttendances: null,
-            violationData: null
+            violationData: null,
         }));
 
         setClassesList([]);
 
-        if (subBranchId !== '') {
+        if (subBranchId !== "") {
             fetchClassesList(subBranchId);
         }
     }, []);
 
-    const fetchClassesList = useCallback(async (subBranchId) => {
-        const url = `${import.meta.env.VITE_BACKEND_URL}/classes/sub-branch/${subBranchId}/academic-year/${filterState.selectedAcademicYear}`;
-        try {
-            const responseData = await sendRequest(url);
-            setClassesList(responseData.subBranchYear.classes);
-        } catch (err) { }
-    }, [sendRequest, filterState.selectedAcademicYear]);
+    const fetchClassesList = useCallback(
+        async (subBranchId) => {
+            const url = `${
+                import.meta.env.VITE_BACKEND_URL
+            }/classes/sub-branch/${subBranchId}/academic-year/${
+                filterState.selectedAcademicYear
+            }`;
+            try {
+                const responseData = await sendRequest(url);
+                setClassesList(responseData.subBranchYear.classes);
+            } catch (err) {}
+        },
+        [sendRequest, filterState.selectedAcademicYear]
+    );
 
     const selectClassHandler = useCallback((classId) => {
-        setFilterState(prev => ({
+        setFilterState((prev) => ({
             ...prev,
-            selectedClass: classId
+            selectedClass: classId,
         }));
     }, []);
 
@@ -219,45 +247,47 @@ const PerformanceView = () => {
         let periode = null;
 
         if (start && end) {
-            periode = start.toLocaleDateString('id-ID', {
-                day: '2-digit',
-                timeZone: 'Asia/Jakarta'
-            }) + " - " +
-                end.toLocaleDateString('id-ID', {
-                    day: '2-digit',
-                    month: 'long',
-                    year: 'numeric',
-                    timeZone: 'Asia/Jakarta'
+            periode =
+                start.toLocaleDateString("id-ID", {
+                    day: "2-digit",
+                    timeZone: "Asia/Jakarta",
+                }) +
+                " - " +
+                end.toLocaleDateString("id-ID", {
+                    day: "2-digit",
+                    month: "long",
+                    year: "numeric",
+                    timeZone: "Asia/Jakarta",
                 });
         }
 
-        setFilterState(prev => ({
+        setFilterState((prev) => ({
             ...prev,
             startDate: start,
             endDate: end,
-            periode: periode
+            periode: periode,
         }));
 
-        setDisplayState(prev => ({
+        setDisplayState((prev) => ({
             ...prev,
             attendanceData: null,
             overallAttendances: null,
-            violationData: null
+            violationData: null,
         }));
     }, []);
 
     const handleApplyFilter = useCallback(() => {
         if (!filterState.selectedAcademicYear) {
-            alert('Silakan pilih tahun ajaran terlebih dahulu');
+            alert("Silakan pilih tahun ajaran terlebih dahulu");
             return;
         }
 
         // Clear previous data while loading
-        setDisplayState(prev => ({
+        setDisplayState((prev) => ({
             ...prev,
             attendanceData: null,
             overallAttendances: null,
-            violationData: null
+            violationData: null,
         }));
 
         fetchAttendanceData();
@@ -272,7 +302,7 @@ const PerformanceView = () => {
             attendanceData: null,
             overallAttendances: null,
             violationData: null,
-            appliedFilters: null
+            appliedFilters: null,
         });
 
         // Clear dependent lists
@@ -293,13 +323,13 @@ const PerformanceView = () => {
     return (
         <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">
             <main className="max-w-6xl mx-auto">
-
                 {academicYearsList && (
                     <div className="card-basic rounded-md flex-col gap-4">
-
                         <div className="flex justify-between">
                             <div className={`flex flex-col`}>
-                                <h2 className="text-xl font-bold">Daerah Cikampek</h2>
+                                <h2 className="text-xl font-bold">
+                                    Daerah Cikampek
+                                </h2>
                                 {/* <p className="text-sm text-gray-600">
                           Target Semester: {subBranchData.semesterTarget} hari
                       </p> */}
@@ -307,84 +337,178 @@ const PerformanceView = () => {
                         </div>
 
                         <div className="flex flex-col md:flex-row justify-between gap-4">
-
                             <div className="flex flex-col gap-5 items-start">
                                 <div className="flex flex-row gap-4 items-center">
-                                    <div className='flex flex-col gap-[18px]'>
+                                    <div className="flex flex-col gap-[18px]">
                                         <div>Tahun Ajaran</div>
                                         <div>Periode</div>
                                         <div>Desa</div>
                                         <div>Kelompok</div>
                                         <div>Kelas</div>
                                     </div>
-                                    <div className='flex flex-col gap-2 '>
+                                    <div className="flex flex-col gap-2 ">
                                         <select
-                                            value={filterState.selectedAcademicYear ? filterState.selectedAcademicYear : ''}
-                                            onChange={(e) => selectAcademicYearHandler(e.target.value)}
+                                            value={
+                                                filterState.selectedAcademicYear
+                                                    ? filterState.selectedAcademicYear
+                                                    : ""
+                                            }
+                                            onChange={(e) =>
+                                                selectAcademicYearHandler(
+                                                    e.target.value
+                                                )
+                                            }
                                             className="border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300"
                                             disabled={false}
                                         >
-                                            {!filterState.selectedAcademicYear && <option value={''}>Pilih</option>}
-                                            {academicYearsList && academicYearsList.map((academicYear, index) => (
-                                                <option key={index} value={academicYear._id}>
-                                                    {academicYearFormatter(academicYear.name)}
+                                            {!filterState.selectedAcademicYear && (
+                                                <option value={""}>
+                                                    Pilih
                                                 </option>
-                                            ))}
+                                            )}
+                                            {academicYearsList &&
+                                                academicYearsList.map(
+                                                    (academicYear, index) => (
+                                                        <option
+                                                            key={index}
+                                                            value={
+                                                                academicYear._id
+                                                            }
+                                                        >
+                                                            {academicYearFormatter(
+                                                                academicYear.name
+                                                            )}
+                                                        </option>
+                                                    )
+                                                )}
                                         </select>
                                         <DatePicker
                                             dateFormat="dd/MM/yyyy"
                                             selected={filterState.startDate}
                                             onChange={selectDateRangeHandler}
-                                            maxDate={new Date(getMonday(new Date()).setDate(getMonday(new Date()).getDate() + 6))}
+                                            maxDate={
+                                                new Date(
+                                                    getMonday(
+                                                        new Date()
+                                                    ).setDate(
+                                                        getMonday(
+                                                            new Date()
+                                                        ).getDate() + 6
+                                                    )
+                                                )
+                                            }
                                             startDate={filterState.startDate}
                                             endDate={filterState.endDate}
-                                            locale={'id-ID'}
+                                            locale={"id-ID"}
                                             isClearable
                                             selectsRange
-                                            withPortal={window.innerWidth <= 768}
-                                            className={`${filterState.selectedAcademicYear && 'pr-8'} border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300`}
-                                            disabled={!filterState.selectedAcademicYear}
-                                            placeholderText={`${filterState.selectedAcademicYear ? 'Masukkan Periode' : 'Pilih Tahun Ajaran'}`}
-                                            onFocus={(e) => e.target.readOnly = true}
+                                            withPortal={
+                                                window.innerWidth <= 768
+                                            }
+                                            className={`${
+                                                filterState.selectedAcademicYear &&
+                                                "pr-8"
+                                            } border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300`}
+                                            disabled={
+                                                !filterState.selectedAcademicYear
+                                            }
+                                            placeholderText={`${
+                                                filterState.selectedAcademicYear
+                                                    ? "Masukkan Periode"
+                                                    : "Pilih Tahun Ajaran"
+                                            }`}
+                                            onFocus={(e) =>
+                                                (e.target.readOnly = true)
+                                            }
                                         />
                                         <select
-                                            value={filterState.selectedBranch ? filterState.selectedBranch : ''}
-                                            onChange={(e) => selectBranchHandler(e.target.value)}
+                                            value={
+                                                filterState.selectedBranch
+                                                    ? filterState.selectedBranch
+                                                    : ""
+                                            }
+                                            onChange={(e) =>
+                                                selectBranchHandler(
+                                                    e.target.value
+                                                )
+                                            }
                                             className="border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300"
-                                            disabled={!filterState.selectedAcademicYear}
+                                            disabled={
+                                                !filterState.selectedAcademicYear
+                                            }
                                         >
-                                            <option value={''}>Semua</option>
-                                            {branchesList && branchesList.map((branch, index) => (
-                                                <option key={index} value={branch._id}>
-                                                    {branch.name}
-                                                </option>
-                                            ))}
+                                            <option value={""}>Semua</option>
+                                            {branchesList &&
+                                                branchesList.map(
+                                                    (branch, index) => (
+                                                        <option
+                                                            key={index}
+                                                            value={branch._id}
+                                                        >
+                                                            {branch.name}
+                                                        </option>
+                                                    )
+                                                )}
                                         </select>
                                         <select
-                                            value={filterState.selectedSubBranch ? filterState.selectedSubBranch : ''}
-                                            onChange={(e) => selectSubBranchHandler(e.target.value)}
+                                            value={
+                                                filterState.selectedSubBranch
+                                                    ? filterState.selectedSubBranch
+                                                    : ""
+                                            }
+                                            onChange={(e) =>
+                                                selectSubBranchHandler(
+                                                    e.target.value
+                                                )
+                                            }
                                             className="border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300"
-                                            disabled={!filterState.selectedBranch}
+                                            disabled={
+                                                !filterState.selectedBranch
+                                            }
                                         >
-                                            <option value={''}>Semua</option>
-                                            {subBranchesList && subBranchesList.map((subBranch, index) => (
-                                                <option key={index} value={subBranch._id}>
-                                                    {subBranch.name}
-                                                </option>
-                                            ))}
+                                            <option value={""}>Semua</option>
+                                            {subBranchesList &&
+                                                subBranchesList.map(
+                                                    (subBranch, index) => (
+                                                        <option
+                                                            key={index}
+                                                            value={
+                                                                subBranch._id
+                                                            }
+                                                        >
+                                                            {subBranch.name}
+                                                        </option>
+                                                    )
+                                                )}
                                         </select>
                                         <select
-                                            value={filterState.selectedClass ? filterState.selectedClass : ''}
-                                            onChange={(e) => selectClassHandler(e.target.value)}
+                                            value={
+                                                filterState.selectedClass
+                                                    ? filterState.selectedClass
+                                                    : ""
+                                            }
+                                            onChange={(e) =>
+                                                selectClassHandler(
+                                                    e.target.value
+                                                )
+                                            }
                                             className="border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300"
-                                            disabled={!filterState.selectedSubBranch}
+                                            disabled={
+                                                !filterState.selectedSubBranch
+                                            }
                                         >
-                                            <option value={''}>Semua</option>
-                                            {classesList && classesList.map((cls, index) => (
-                                                <option key={index} value={cls._id}>
-                                                    {cls.name}
-                                                </option>
-                                            ))}
+                                            <option value={""}>Semua</option>
+                                            {classesList &&
+                                                classesList.map(
+                                                    (cls, index) => (
+                                                        <option
+                                                            key={index}
+                                                            value={cls._id}
+                                                        >
+                                                            {cls.name}
+                                                        </option>
+                                                    )
+                                                )}
                                         </select>
                                     </div>
                                 </div>
@@ -392,10 +516,13 @@ const PerformanceView = () => {
                                 <div className="flex justify-center mt-4 gap-2">
                                     <button
                                         onClick={handleApplyFilter}
-                                        disabled={!filterState.selectedAcademicYear || isLoading}
+                                        disabled={
+                                            !filterState.selectedAcademicYear ||
+                                            isLoading
+                                        }
                                         className="btn-mobile-primary-round-gray"
                                     >
-                                        {isLoading ? 'Memuat...' : 'Tampilkan'}
+                                        {isLoading ? "Memuat..." : "Tampilkan"}
                                     </button>
 
                                     <button
@@ -410,20 +537,38 @@ const PerformanceView = () => {
                                 <div className="self-start flex flex-row gap-2">
                                     {/* Left Column: Violation Names */}
                                     <div className="flex flex-col gap-1">
-                                        {memoizedViolationData && !isLoading && filterState.selectedAcademicYear && memoizedViolationData.map(({ violation }, index) => (
-                                            <div key={index} className="">
-                                                {violationTranslations[violation] || violation}
-                                            </div>
-                                        ))}
+                                        {memoizedViolationData &&
+                                            !isLoading &&
+                                            filterState.selectedAcademicYear &&
+                                            memoizedViolationData.map(
+                                                ({ violation }, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className=""
+                                                    >
+                                                        {violationTranslations[
+                                                            violation
+                                                        ] || violation}
+                                                    </div>
+                                                )
+                                            )}
                                     </div>
 
                                     {/* Right Column: Case Counts */}
                                     <div className="flex flex-col gap-1 ">
-                                        {memoizedViolationData && !isLoading && filterState.selectedAcademicYear && memoizedViolationData.map(({ count }, index) => (
-                                            <div key={index} className="font-bold">
-                                                : {count} Temuan
-                                            </div>
-                                        ))}
+                                        {memoizedViolationData &&
+                                            !isLoading &&
+                                            filterState.selectedAcademicYear &&
+                                            memoizedViolationData.map(
+                                                ({ count }, index) => (
+                                                    <div
+                                                        key={index}
+                                                        className="font-bold"
+                                                    >
+                                                        : {count} Temuan
+                                                    </div>
+                                                )
+                                            )}
                                     </div>
                                 </div>
                             </div>
@@ -432,16 +577,20 @@ const PerformanceView = () => {
                                     <LoadingCircle size={32} />
                                 </div>
                             )}
-                            {memoizedOverallAttendances && !isLoading && filterState.selectedAcademicYear && (
-                                <div className=''>
-                                    <PieChart attendanceData={memoizedOverallAttendances} />
-                                </div>
-                            )}
+                            {memoizedOverallAttendances &&
+                                !isLoading &&
+                                filterState.selectedAcademicYear && (
+                                    <div className="">
+                                        <PieChart
+                                            attendanceData={
+                                                memoizedOverallAttendances
+                                            }
+                                        />
+                                    </div>
+                                )}
                         </div>
                     </div>
-
                 )}
-
             </main>
         </div>
     );

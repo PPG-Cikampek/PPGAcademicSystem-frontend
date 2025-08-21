@@ -1,13 +1,21 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
-const DefaultFooter = ({ onClose, onConfirm, confirmText, cancelText, isLoading }) => (
+const DefaultFooter = ({
+    onClose,
+    onConfirm,
+    confirmText,
+    cancelText,
+    isLoading,
+}) => (
     <div className="flex gap-2 items-center">
         <button
             onClick={onClose}
             disabled={isLoading}
-            className={`${onConfirm ? 'btn-danger-outline' : 'button-primary mt-0'} disabled:opacity-50`}
+            className={`${
+                onConfirm ? "btn-danger-outline" : "button-primary mt-0"
+            } disabled:opacity-50`}
         >
-            {cancelText || (onConfirm ? 'Batal' : 'Tutup')}
+            {cancelText || (onConfirm ? "Batal" : "Tutup")}
         </button>
         {onConfirm && (
             <button
@@ -15,26 +23,36 @@ const DefaultFooter = ({ onClose, onConfirm, confirmText, cancelText, isLoading 
                 disabled={isLoading}
                 className="button-primary mt-0 disabled:opacity-50"
             >
-                {confirmText || 'Ya'}
+                {confirmText || "Ya"}
             </button>
         )}
     </div>
 );
 
-const Modal = ({ isOpen, onClose, title, children, footer, confirmText, cancelText, onConfirm, isLoading }) => {
+const Modal = ({
+    isOpen,
+    onClose,
+    title,
+    children,
+    footer,
+    confirmText,
+    cancelText,
+    onConfirm,
+    isLoading,
+}) => {
     const [isVisible, setIsVisible] = useState(false);
 
     useEffect(() => {
         if (isOpen) {
             setIsVisible(true);
-            document.body.style.overflow = 'hidden';
+            document.body.style.overflow = "hidden";
         } else {
             setIsVisible(false);
-            document.body.style.overflow = 'unset';
+            document.body.style.overflow = "unset";
         }
 
         return () => {
-            document.body.style.overflow = 'unset';
+            document.body.style.overflow = "unset";
         };
     }, [isOpen]);
 
@@ -54,7 +72,7 @@ const Modal = ({ isOpen, onClose, title, children, footer, confirmText, cancelTe
             <div
                 className={`
                     absolute inset-0 bg-black transition-opacity duration-300 ease-in-out
-                    ${isVisible ? 'opacity-50' : 'opacity-0'}
+                    ${isVisible ? "opacity-50" : "opacity-0"}
                 `}
             />
 
@@ -63,9 +81,13 @@ const Modal = ({ isOpen, onClose, title, children, footer, confirmText, cancelTe
                 className={`
                     relative w-full max-w-md md:max-w-2xl mx-4 bg-white rounded-lg shadow-xl 
                     transform transition-all duration-300 ease-in-out
-                    ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}
+                    ${
+                        isVisible
+                            ? "translate-y-0 opacity-100"
+                            : "translate-y-4 opacity-0"
+                    }
                 `}
-                onClick={e => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
                 <div className="p-4 border-b">
@@ -73,9 +95,7 @@ const Modal = ({ isOpen, onClose, title, children, footer, confirmText, cancelTe
                 </div>
 
                 {/* Content */}
-                <div className="p-4">
-                    {children}
-                </div>
+                <div className="p-4">{children}</div>
 
                 {/* Footer */}
                 {(footer || onConfirm) && (

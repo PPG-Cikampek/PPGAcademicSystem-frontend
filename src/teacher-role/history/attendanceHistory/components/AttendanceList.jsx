@@ -13,7 +13,9 @@ const AttendanceList = ({ data }) => {
         <div className="p-4 space-y-6">
             {Object.entries(groupedByDate).map(([date, attendances]) => (
                 <div key={date} className="space-y-4">
-                    <h2 className="text-lg font-semibold text-gray-800">{date}</h2>
+                    <h2 className="text-lg font-semibold text-gray-800">
+                        {date}
+                    </h2>
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                         {attendances.map((attendance) => (
                             <div
@@ -24,10 +26,12 @@ const AttendanceList = ({ data }) => {
                                     <strong>Status:</strong> {attendance.status}
                                 </p>
                                 <p className="text-sm text-gray-500">
-                                    <strong>Student ID:</strong> {attendance.studentId}
+                                    <strong>Student ID:</strong>{" "}
+                                    {attendance.studentId}
                                 </p>
                                 <p className="text-sm text-gray-500">
-                                    <strong>Class ID:</strong> {attendance.classId}
+                                    <strong>Class ID:</strong>{" "}
+                                    {attendance.classId}
                                 </p>
                             </div>
                         ))}
@@ -47,14 +51,10 @@ export default AttendanceList;
 
 // <AttendanceCards data={data} />;
 
-
-
-// import React, { useState } from 'react';
-
+// import { useState } from 'react';
 
 // import { motion, AnimatePresence } from 'framer-motion';
 // import { Plus, Minus } from 'lucide-react'
-
 
 // const GroupedData = ({ data }) => {
 //     const [expandedDate, setExpandedDate] = useState(null);

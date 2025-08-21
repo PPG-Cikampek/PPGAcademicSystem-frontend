@@ -1,10 +1,4 @@
-import React, {
-    useContext,
-    useState,
-    useEffect,
-    useCallback,
-    useMemo,
-} from "react";
+import { useContext, useState, useEffect, useCallback, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";

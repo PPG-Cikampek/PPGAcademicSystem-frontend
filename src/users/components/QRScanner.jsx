@@ -1,25 +1,25 @@
-import React, { useRef, useEffect, useState, useContext } from 'react';
-import QrScanner from 'qr-scanner';
+import { useRef, useEffect, useState, useContext } from "react";
+import QrScanner from "qr-scanner";
 
-import beep from '../../assets/audios/store-scanner-beep-90395.mp3'
-import useHttp from '../../shared/hooks/http-hook';
-import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
+import beep from "../../assets/audios/store-scanner-beep-90395.mp3";
+import useHttp from "../../shared/hooks/http-hook";
+import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 
 const QRScanner = ({ setStudentLoginField, setNis }) => {
     const videoRef = useRef(null);
     const beepRef = useRef(null);
     const [scannedData, setScannedData] = useState(null);
 
-    const { isLoading, error, sendRequest, setError, setIsLoading } = useHttp()
+    const { isLoading, error, sendRequest, setError, setIsLoading } = useHttp();
 
     useEffect(() => {
-        setIsLoading(true)
+        setIsLoading(true);
         let qrScanner;
         const setupScanner = async () => {
             if (videoRef.current) {
                 qrScanner = new QrScanner(
                     videoRef.current,
-                    async result => {
+                    async (result) => {
                         await handleScan(result.data);
                     },
                     { returnDetailedScanResult: true }
@@ -27,13 +27,16 @@ const QRScanner = ({ setStudentLoginField, setNis }) => {
 
                 // Start scanning
                 try {
-                    setIsLoading(false)
+                    setIsLoading(false);
                     await qrScanner.start();
                 } catch (error) {
-                    console.error('Camera access denied or unavailable:', error);
+                    console.error(
+                        "Camera access denied or unavailable:",
+                        error
+                    );
                 }
             } else {
-                console.error('Video element not found');
+                console.error("Video element not found");
             }
         };
         setupScanner();
@@ -43,26 +46,45 @@ const QRScanner = ({ setStudentLoginField, setNis }) => {
     }, []);
 
     const handleScan = async (data) => {
-
         const fetchUser = async () => {
-            const url = `${import.meta.env.VITE_BACKEND_URL}/students/login/${data}`;
+            const url = `${
+                import.meta.env.VITE_BACKEND_URL
+            }/students/login/${data}`;
             try {
                 const responseData = await sendRequest(url);
                 setNis(responseData.student.nis);
                 setScannedData(responseData.student); // Update scannedData with fetched user data
                 console.log(responseData.student);
-                setStudentLoginField(
-                    [
-                        { name: 'nis', label: 'nis', type: 'text', required: false, value: responseData.student.nis, disabled: true },
-                        { name: 'name', label: 'name', type: 'text', required: false, value: responseData.student.name, disabled: true },
-                        { name: 'password', label: 'Password', placeholder: 'Password', type: 'password', required: true },
-                    ]
-                )
+                setStudentLoginField([
+                    {
+                        name: "nis",
+                        label: "nis",
+                        type: "text",
+                        required: false,
+                        value: responseData.student.nis,
+                        disabled: true,
+                    },
+                    {
+                        name: "name",
+                        label: "name",
+                        type: "text",
+                        required: false,
+                        value: responseData.student.name,
+                        disabled: true,
+                    },
+                    {
+                        name: "password",
+                        label: "Password",
+                        placeholder: "Password",
+                        type: "password",
+                        required: true,
+                    },
+                ]);
             } catch (err) {
                 // Error is handled by useHttp
             }
-        }
-        fetchUser()
+        };
+        fetchUser();
 
         if (beepRef.current) {
             beepRef.current.play();
@@ -73,7 +95,7 @@ const QRScanner = ({ setStudentLoginField, setNis }) => {
         <div className="flex flex-col items-center justify-center h-full w-full p-4">
             <div className="relative w-72 h-72 border-2 border-gray-700 shadow-md rounded-md overflow-hidden">
                 {isLoading === true ? (
-                    <div className=' absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2'>
+                    <div className=" absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
                         <LoadingCircle size={32} />
                     </div>
                 ) : (

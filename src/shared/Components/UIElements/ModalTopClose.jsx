@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { X } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { X } from "lucide-react";
 
 const Modal = ({ isOpen, onClose, title, children }) => {
     const [isVisible, setIsVisible] = useState(false);
@@ -7,14 +7,14 @@ const Modal = ({ isOpen, onClose, title, children }) => {
     useEffect(() => {
         if (isOpen) {
             setIsVisible(true);
-            document.body.style.overflow = 'hidden';
+            document.body.style.overflow = "hidden";
         } else {
             setIsVisible(false);
-            document.body.style.overflow = 'unset';
+            document.body.style.overflow = "unset";
         }
 
         return () => {
-            document.body.style.overflow = 'unset';
+            document.body.style.overflow = "unset";
         };
     }, [isOpen]);
 
@@ -34,7 +34,7 @@ const Modal = ({ isOpen, onClose, title, children }) => {
             <div
                 className={`
                     absolute inset-0 bg-black transition-opacity duration-300 ease-in-out
-                    ${isVisible ? 'opacity-50' : 'opacity-0'}
+                    ${isVisible ? "opacity-50" : "opacity-0"}
                 `}
             />
 
@@ -43,25 +43,24 @@ const Modal = ({ isOpen, onClose, title, children }) => {
                 className={`
                     relative w-full max-w-md mx-4 bg-white rounded-lg shadow-xl 
                     transform transition-all duration-300 ease-in-out
-                    ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}
+                    ${
+                        isVisible
+                            ? "translate-y-0 opacity-100"
+                            : "translate-y-4 opacity-0"
+                    }
                 `}
-                onClick={e => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
             >
                 {/* Header */}
                 <div className="flex items-center justify-between p-4 border-b">
                     <h2 className="text-xl font-semibold">{title}</h2>
-                    <button
-                        onClick={handleClose}
-                        className="btn-sqr-danger"
-                    >
+                    <button onClick={handleClose} className="btn-sqr-danger">
                         <X className="h-5 w-5" />
                     </button>
                 </div>
 
                 {/* Content */}
-                <div className="p-4">
-                    {children}
-                </div>
+                <div className="p-4">{children}</div>
             </div>
         </div>
     );
