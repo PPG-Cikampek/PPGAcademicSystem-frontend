@@ -166,40 +166,76 @@ const TeacherPerformanceView = () => {
         }));
     }, []);
 
+    // // Week Picker
+    // const selectDateRangeHandler = useCallback((dates) => {
+    //     let startingWeek = null;
+    //     let endOfWeek = null;
+    //     let period = null;
+
+    //     if (dates) {
+    //         startingWeek = getMonday(dates);
+    //         endOfWeek = new Date(startingWeek);
+    //         endOfWeek.setDate(startingWeek.getDate() + 6);
+
+    //         console.log(startingWeek);
+    //         console.log(endOfWeek);
+
+    //         period =
+    //             startingWeek.toLocaleDateString("id-ID", {
+    //                 day: "2-digit",
+    //                 timeZone: "Asia/Jakarta",
+    //             }) +
+    //             " s.d. " +
+    //             endOfWeek.toLocaleDateString("id-ID", {
+    //                 day: "2-digit",
+    //                 month: "long",
+    //                 year: "numeric",
+    //                 timeZone: "Asia/Jakarta",
+    //             });
+    //     }
+
+    //     console.log(period);
+
+    //     setFilterState((prev) => ({
+    //         ...prev,
+    //         startDate: startingWeek,
+    //         endDate: endOfWeek,
+    //         period: period,
+    //     }));
+
+    //     setDisplayState((prev) => ({
+    //         ...prev,
+    //     }));
+    // }, []);
+
     const selectDateRangeHandler = useCallback((dates) => {
-        let startingWeek = null;
-        let endOfWeek = null;
+        const [start, end] = dates;
+
         let period = null;
 
-        if (dates) {
-            startingWeek = getMonday(dates);
-            endOfWeek = new Date(startingWeek);
-            endOfWeek.setDate(startingWeek.getDate() + 6);
-
-            console.log(startingWeek);
-            console.log(endOfWeek);
-
+        if (start && end) {
             period =
-                startingWeek.toLocaleDateString("id-ID", {
+                start.toLocaleDateString("id-ID", {
                     day: "2-digit",
+                    month: "2-digit",
+                    year: "2-digit",
                     timeZone: "Asia/Jakarta",
                 }) +
-                " s.d. " +
-                endOfWeek.toLocaleDateString("id-ID", {
+                " - " +
+                end.toLocaleDateString("id-ID", {
                     day: "2-digit",
-                    month: "long",
-                    year: "numeric",
+                    month: "2-digit",
+                    year: "2-digit",
                     timeZone: "Asia/Jakarta",
                 });
         }
 
-        console.log(period);
-
         setFilterState((prev) => ({
             ...prev,
-            startDate: startingWeek,
-            endDate: endOfWeek,
+            startDate: start,
+            endDate: end,
             period: period,
+            currentView: "classesTable",
         }));
 
         setDisplayState((prev) => ({
@@ -263,7 +299,7 @@ const TeacherPerformanceView = () => {
                                 <div className="flex flex-row gap-4 items-center">
                                     <div className="flex flex-col gap-[18px] items-start">
                                         <div>Tahun Ajaran</div>
-                                        <div>Minggu</div>
+                                        <div>Periode</div>
                                         <div>Kelas</div>
                                     </div>
                                     <div className="flex flex-col gap-2">
@@ -302,6 +338,7 @@ const TeacherPerformanceView = () => {
                                                     )
                                                 )}
                                         </select>
+                                        {/* Week Picker
                                         <DatePicker
                                             dateFormat="dd/MM/yyyy"
                                             maxDate={maxDate}
@@ -329,7 +366,42 @@ const TeacherPerformanceView = () => {
                                             }
                                             placeholderText={`${
                                                 filterState.selectedAcademicYear
-                                                    ? "Pilih Minggu"
+                                                    ? "Pilih Periode"
+                                                    : "Pilih Tahun Ajaran"
+                                            }`}
+                                            onFocus={(e) =>
+                                                (e.target.readOnly = true)
+                                            }
+                                        />
+                                         */}
+                                        <DatePicker
+                                            dateFormat="dd/MM/yyyy"
+                                            selected={filterState.startDate}
+                                            maxDate={maxDate}
+                                            startDate={filterState.startDate}
+                                            endDate={filterState.endDate}
+                                            onChange={selectDateRangeHandler}
+                                            value={filterState.period}
+                                            locale={"id-ID"}
+                                            selectsRange
+                                            isClearable
+                                            withPortal={
+                                                window.innerWidth <= 768
+                                            }
+                                            className={`${
+                                                filterState.selectedAcademicYear &&
+                                                "pr-8"
+                                            } border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300 ${
+                                                filterState.selectedAcademicYear
+                                                    ? ""
+                                                    : "opacity-50 cursor-not-allowed"
+                                            }`}
+                                            disabled={
+                                                !filterState.selectedAcademicYear
+                                            }
+                                            placeholderText={`${
+                                                filterState.selectedAcademicYear
+                                                    ? "Semua"
                                                     : "Pilih Tahun Ajaran"
                                             }`}
                                             onFocus={(e) =>
@@ -391,7 +463,7 @@ const TeacherPerformanceView = () => {
                                         ) : !filterState.selectedAcademicYear ? (
                                             "Pilih Tahun Ajaran"
                                         ) : !filterState.period ? (
-                                            "Pilih Minggu"
+                                            "Pilih Periode"
                                         ) : (
                                             "Tampilkan"
                                         )}
