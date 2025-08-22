@@ -49,7 +49,7 @@ const HomeNavigation = ({ children }) => {
                   {
                       link: "/performances",
                       icon: <Gauge />,
-                      label: "Laporan Mingguan",
+                      label: "Laporan Kehadiran",
                   },
                   // {
                   //     link: '/dashboard/academic',

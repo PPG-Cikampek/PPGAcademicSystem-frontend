@@ -9,8 +9,6 @@ const Profile = ({ user, isLoading }) => {
         sidebar.toggle();
     };
 
-    console.log(user);
-
     const getInitials = (name) => {
         return name
             ?.split(" ")
