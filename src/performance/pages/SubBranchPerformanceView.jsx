@@ -16,6 +16,10 @@ import { getMonday } from "../../shared/Utilities/getMonday";
 import ClassPerformanceTable from "../components/ClassPerformanceTable";
 import StudentPerformanceTable from "../components/StudentPerformanceTable";
 import { CircleX, FileDown } from "lucide-react";
+import {
+    hasUnappliedFilters as hasUnappliedFiltersHelper,
+    hasFiltersChanged as hasFiltersChangedHelper,
+} from "../utilities/filterHelpers";
 
 const SubBranchPerformanceView = () => {
     const { isLoading, error, sendRequest, setError } = useHttp();
@@ -247,37 +251,24 @@ const SubBranchPerformanceView = () => {
     }, []);
 
     // Helper functions for button display logic
-    const hasUnappliedFilters = useMemo(() => {
-        if (!displayState.appliedFilters) {
-            // If no filters have been applied yet, check if any filter is set
-            return !!(
-                filterState.selectedAcademicYear ||
-                filterState.startDate ||
-                filterState.endDate ||
-                filterState.selectedClass
-            );
-        }
+    const hasUnappliedFilters = useMemo(
+        () =>
+            hasUnappliedFiltersHelper(filterState, displayState, [
+                "selectedAcademicYear",
+            ]),
+        [filterState, displayState.appliedFilters]
+    );
 
-        // Compare current filterState with applied filters
-        return (
-            filterState.selectedAcademicYear !==
-                displayState.appliedFilters.selectedAcademicYear ||
-            filterState.startDate !== displayState.appliedFilters.startDate ||
-            filterState.endDate !== displayState.appliedFilters.endDate ||
-            filterState.selectedClass !==
-                displayState.appliedFilters.selectedClass
-        );
-    }, [filterState, displayState.appliedFilters]);
-
-    const hasFiltersChanged = useMemo(() => {
-        return (
-            filterState.selectedAcademicYear !==
-                initialFilterState.selectedAcademicYear ||
-            filterState.startDate !== initialFilterState.startDate ||
-            filterState.endDate !== initialFilterState.endDate ||
-            filterState.selectedClass !== initialFilterState.selectedClass
-        );
-    }, [filterState]);
+    const hasFiltersChanged = useMemo(
+        () =>
+            hasFiltersChangedHelper(filterState, initialFilterState, [
+                "selectedAcademicYear",
+                "startDate",
+                "endDate",
+                "selectedClass",
+            ]),
+        [filterState]
+    );
 
     // Memoized values to prevent unnecessary re-renders
     const memoizedOverallAttendances = useMemo(() => {
@@ -567,7 +558,7 @@ const SubBranchPerformanceView = () => {
                                             className={`${
                                                 filterState.selectedAcademicYear &&
                                                 "pr-8"
-                                            } border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300 ${
+                                            } border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300${
                                                 filterState.selectedAcademicYear
                                                     ? ""
                                                     : "opacity-50 cursor-not-allowed"

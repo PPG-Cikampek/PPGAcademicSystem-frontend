@@ -13,15 +13,19 @@ import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import PieChart from "../components/PieChart";
 import { academicYearFormatter } from "../../shared/Utilities/academicYearFormatter";
 import { getMonday } from "../../shared/Utilities/getMonday";
+import {
+    hasUnappliedFilters as hasUnappliedFiltersHelper,
+    hasFiltersChanged as hasFiltersChangedHelper,
+} from "../utilities/filterHelpers";
 
 const BranchPerformanceView = () => {
     const { isLoading, error, sendRequest, setError } = useHttp();
 
     const initialFilterState = {
-        selectedAcademicYear: "",
-        selectedTeachingGroup: "",
-        selectedSubBranch: "",
-        selectedClass: "",
+        selectedAcademicYear: null,
+        selectedTeachingGroup: null,
+        selectedSubBranch: null,
+        selectedClass: null,
         startDate: null,
         endDate: null,
         periode: null,
@@ -154,7 +158,7 @@ const BranchPerformanceView = () => {
         [sendRequest]
     );
 
-    const selectBranchHandler = useCallback((teachingGroupId) => {
+    const selectTeachingGroupHandler = useCallback((teachingGroupId) => {
         setFilterState((prev) => ({
             ...prev,
             selectedTeachingGroup: teachingGroupId,
@@ -174,6 +178,7 @@ const BranchPerformanceView = () => {
 
         if (teachingGroupId !== "") {
             fetchSubBranchesList(teachingGroupId);
+            fetchClassesList((teachingGroupId = teachingGroupId));
         }
     }, []);
 
@@ -208,12 +213,12 @@ const BranchPerformanceView = () => {
         setClassesList([]);
 
         if (subBranchId !== "") {
-            fetchClassesList(subBranchId);
+            fetchClassesList((subBranchId = subBranchId));
         }
     }, []);
 
     const fetchClassesList = useCallback(
-        async (subBranchId) => {
+        async (teachingGroupId = null, subBranchId = null) => {
             const url = `${
                 import.meta.env.VITE_BACKEND_URL
             }/classes/sub-branch/${subBranchId}/academic-year/${
@@ -312,6 +317,27 @@ const BranchPerformanceView = () => {
     const memoizedViolationData = useMemo(() => {
         return displayState.violationData;
     }, [displayState.violationData]);
+
+    const hasUnappliedFilters = useMemo(
+        () =>
+            hasUnappliedFiltersHelper(filterState, displayState, [
+                "selectedAcademicYear",
+            ]),
+        [filterState, displayState.appliedFilters]
+    );
+
+    const hasFiltersChanged = useMemo(
+        () =>
+            hasFiltersChangedHelper(filterState, initialFilterState, [
+                "selectedAcademicYear",
+                "startDate",
+                "endDate",
+                "selectedTeachingGroup",
+                "selectedSubBranch",
+                "selectedClass",
+            ]),
+        [filterState]
+    );
 
     return (
         <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">
@@ -425,7 +451,7 @@ const BranchPerformanceView = () => {
                                                     : ""
                                             }
                                             onChange={(e) =>
-                                                selectBranchHandler(
+                                                selectTeachingGroupHandler(
                                                     e.target.value
                                                 )
                                             }
@@ -516,15 +542,25 @@ const BranchPerformanceView = () => {
                                                 )
                                             }
                                             className={`border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300 ${
-                                                filterState.selectedSubBranch
+                                                filterState.selectedTeachingGroup
                                                     ? ""
                                                     : "opacity-50 cursor-not-allowed"
                                             }`}
                                             disabled={
-                                                !filterState.selectedSubBranch
+                                                !filterState.selectedTeachingGroup
                                             }
                                         >
-                                            <option value={""}>Semua</option>
+                                            <option value={""}>
+                                                {!filterState.selectedAcademicYear ? (
+                                                    <span>
+                                                        Pilih Tahun Ajaran
+                                                    </span>
+                                                ) : !filterState.selectedTeachingGroup ? (
+                                                    <span>Pilih KBM</span>
+                                                ) : (
+                                                    <span>Semua</span>
+                                                )}
+                                            </option>
                                             {classesList &&
                                                 classesList.map(
                                                     (cls, index) => (
@@ -541,24 +577,29 @@ const BranchPerformanceView = () => {
                                 </div>
 
                                 <div className="flex justify-center mt-4 gap-2">
-                                    <button
-                                        onClick={handleApplyFilter}
-                                        disabled={
-                                            !filterState.selectedAcademicYear ||
-                                            isLoading
-                                        }
-                                        className="btn-mobile-primary-round-gray"
-                                    >
-                                        {isLoading ? "Memuat..." : "Tampilkan"}
-                                    </button>
-
-                                    <button
-                                        onClick={handleResetFilter}
-                                        disabled={isLoading}
-                                        className="btn-danger-outline rounded-full"
-                                    >
-                                        Reset Filter
-                                    </button>
+                                    {hasUnappliedFilters && (
+                                        <button
+                                            onClick={handleApplyFilter}
+                                            disabled={
+                                                !filterState.selectedAcademicYear ||
+                                                isLoading
+                                            }
+                                            className="btn-mobile-primary-round-gray"
+                                        >
+                                            {isLoading
+                                                ? "Memuat..."
+                                                : "Tampilkan"}
+                                        </button>
+                                    )}
+                                    {hasFiltersChanged && (
+                                        <button
+                                            onClick={handleResetFilter}
+                                            disabled={isLoading}
+                                            className="btn-danger-outline rounded-full"
+                                        >
+                                            Reset Filter
+                                        </button>
+                                    )}
                                 </div>
 
                                 <div className="self-start flex flex-row gap-2">

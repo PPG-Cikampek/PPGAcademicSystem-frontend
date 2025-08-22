@@ -13,6 +13,10 @@ import PieChart from "../components/PieChart";
 import { academicYearFormatter } from "../../shared/Utilities/academicYearFormatter";
 import { getMonday } from "../../shared/Utilities/getMonday";
 import StudentPerformanceTable from "../components/StudentPerformanceTable";
+import {
+    hasUnappliedFilters as hasUnappliedFiltersHelper,
+    hasFiltersChanged as hasFiltersChangedHelper,
+} from "../utilities/filterHelpers";
 
 const TeacherPerformanceView = () => {
     const navigate = useNavigate();
@@ -20,11 +24,11 @@ const TeacherPerformanceView = () => {
     const { isLoading, error, sendRequest, setError } = useHttp();
 
     const initialFilterState = {
-        selectedAcademicYear: "",
+        selectedAcademicYear: null,
         startDate: null,
         endDate: null,
         period: null,
-        selectedClass: "",
+        selectedClass: null,
     };
 
     // Academic years list (static data)
@@ -287,6 +291,27 @@ const TeacherPerformanceView = () => {
         return displayState.violationData;
     }, [displayState.violationData]);
 
+    const hasUnappliedFilters = useMemo(
+        () =>
+            hasUnappliedFiltersHelper(filterState, displayState, [
+                "selectedAcademicYear",
+                "period",
+            ]),
+        [filterState, displayState.appliedFilters]
+    );
+
+    const hasFiltersChanged = useMemo(
+        () =>
+            hasFiltersChangedHelper(filterState, initialFilterState, [
+                "selectedAcademicYear",
+                "startDate",
+                "endDate",
+                "period",
+                "selectedClass",
+            ]),
+        [filterState]
+    );
+
     // studentColumns moved to StudentPerformanceTable component
 
     return (
@@ -449,33 +474,36 @@ const TeacherPerformanceView = () => {
                                 </div>
 
                                 <div className="flex justify-center mt-4 gap-2">
-                                    <button
-                                        onClick={handleApplyFilter}
-                                        disabled={
-                                            !filterState.selectedAcademicYear ||
-                                            !filterState.period ||
-                                            isLoading
-                                        }
-                                        className="btn-mobile-primary-round-gray"
-                                    >
-                                        {isLoading ? (
-                                            <LoadingCircle size={16} />
-                                        ) : !filterState.selectedAcademicYear ? (
-                                            "Pilih Tahun Ajaran"
-                                        ) : !filterState.period ? (
-                                            "Pilih Periode"
-                                        ) : (
-                                            "Tampilkan"
-                                        )}
-                                    </button>
-
-                                    <button
-                                        onClick={handleResetFilter}
-                                        disabled={isLoading}
-                                        className="btn-danger-outline rounded-full"
-                                    >
-                                        Reset Filter
-                                    </button>
+                                    {hasUnappliedFilters && (
+                                        <button
+                                            onClick={handleApplyFilter}
+                                            disabled={
+                                                !filterState.selectedAcademicYear ||
+                                                !filterState.period ||
+                                                isLoading
+                                            }
+                                            className="btn-mobile-primary-round-gray"
+                                        >
+                                            {isLoading ? (
+                                                <LoadingCircle size={16} />
+                                            ) : !filterState.selectedAcademicYear ? (
+                                                "Pilih Tahun Ajaran"
+                                            ) : !filterState.period ? (
+                                                "Pilih Periode"
+                                            ) : (
+                                                "Tampilkan"
+                                            )}
+                                        </button>
+                                    )}
+                                    {hasFiltersChanged && (
+                                        <button
+                                            onClick={handleResetFilter}
+                                            disabled={isLoading}
+                                            className="btn-danger-outline rounded-full"
+                                        >
+                                            Reset Filter
+                                        </button>
+                                    )}
                                 </div>
 
                                 <div className="self-start flex flex-row gap-2">

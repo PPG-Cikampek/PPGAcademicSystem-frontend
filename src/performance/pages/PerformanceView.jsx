@@ -13,18 +13,22 @@ import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import PieChart from "../components/PieChart";
 import { academicYearFormatter } from "../../shared/Utilities/academicYearFormatter";
 import { getMonday } from "../../shared/Utilities/getMonday";
+import {
+    hasUnappliedFilters as hasUnappliedFiltersHelper,
+    hasFiltersChanged as hasFiltersChangedHelper,
+} from "../utilities/filterHelpers";
 
 const PerformanceView = () => {
     const { isLoading, error, sendRequest, setError } = useHttp();
 
     const initialFilterState = {
-        selectedAcademicYear: "",
+        selectedAcademicYear: null,
         startDate: null,
         endDate: null,
         periode: null,
-        selectedBranch: "",
-        selectedSubBranch: "",
-        selectedClass: "",
+        selectedBranch: null,
+        selectedSubBranch: null,
+        selectedClass: null,
     };
 
     // Academic years list (static data)
@@ -320,6 +324,28 @@ const PerformanceView = () => {
         return displayState.violationData;
     }, [displayState.violationData]);
 
+    // Helper computed booleans for button visibility
+    const hasUnappliedFilters = useMemo(
+        () =>
+            hasUnappliedFiltersHelper(filterState, displayState, [
+                "selectedAcademicYear",
+            ]),
+        [filterState, displayState.appliedFilters]
+    );
+
+    const hasFiltersChanged = useMemo(
+        () =>
+            hasFiltersChangedHelper(filterState, initialFilterState, [
+                "selectedAcademicYear",
+                "startDate",
+                "endDate",
+                "selectedBranch",
+                "selectedSubBranch",
+                "selectedClass",
+            ]),
+        [filterState]
+    );
+
     return (
         <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">
             <main className="max-w-6xl mx-auto">
@@ -514,24 +540,29 @@ const PerformanceView = () => {
                                 </div>
 
                                 <div className="flex justify-center mt-4 gap-2">
-                                    <button
-                                        onClick={handleApplyFilter}
-                                        disabled={
-                                            !filterState.selectedAcademicYear ||
-                                            isLoading
-                                        }
-                                        className="btn-mobile-primary-round-gray"
-                                    >
-                                        {isLoading ? "Memuat..." : "Tampilkan"}
-                                    </button>
-
-                                    <button
-                                        onClick={handleResetFilter}
-                                        disabled={isLoading}
-                                        className="btn-danger-outline rounded-full"
-                                    >
-                                        Reset Filter
-                                    </button>
+                                    {hasUnappliedFilters && (
+                                        <button
+                                            onClick={handleApplyFilter}
+                                            disabled={
+                                                !filterState.selectedAcademicYear ||
+                                                isLoading
+                                            }
+                                            className="btn-mobile-primary-round-gray"
+                                        >
+                                            {isLoading
+                                                ? "Memuat..."
+                                                : "Tampilkan"}
+                                        </button>
+                                    )}
+                                    {hasFiltersChanged && (
+                                        <button
+                                            onClick={handleResetFilter}
+                                            disabled={isLoading}
+                                            className="btn-danger-outline rounded-full"
+                                        >
+                                            Reset Filter
+                                        </button>
+                                    )}
                                 </div>
 
                                 <div className="self-start flex flex-row gap-2">
