@@ -184,7 +184,7 @@ const TeacherPerformanceView = () => {
                     day: "2-digit",
                     timeZone: "Asia/Jakarta",
                 }) +
-                " - " +
+                " s.d. " +
                 endOfWeek.toLocaleDateString("id-ID", {
                     day: "2-digit",
                     month: "long",
