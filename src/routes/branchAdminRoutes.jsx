@@ -37,10 +37,11 @@ const UpdateStudentView = lazy(() =>
 const UpdateTeacherView = lazy(() =>
     import("../teachers/pages/UpdateTeacherView")
 );
-// const StudentReportView = lazy(() => import("../students/pages/StudentReportView"));
 const ProfileView = lazy(() => import("../users/pages/ProfileView"));
 const EmailVerifyView = lazy(() => import("../users/pages/EmailVerifyView"));
-// const SubBranchPerformanceView = lazy(() => import("../performance/pages/SubBranchPerformanceView"));
+const BranchPerformanceView = lazy(() =>
+    import("../performance/pages/BranchPerformanceView")
+);
 const RequestAccountView = lazy(() =>
     import("../users/pages/RequestAccountView")
 );
@@ -80,11 +81,11 @@ export const branchAdminRoutes = [
         path: "/dashboard/teaching-groups/:teachingGroupId/add-sub-branches/",
         element: <AddSubBranchToTeachingGroupView />,
     },
-    // { path: '/performances/student/:studentId', element: <StudentReportView /> },
     { path: "/munaqasyah/student/score", element: <PreviewReport /> },
     { path: "/academic/", element: <BranchYearsView /> },
     { path: "/academic/new", element: <NewBranchYearsView /> },
     { path: "/academic/teachingGroups/new", element: <NewTeachingGroupView /> },
+    { path: "/performance", element: <BranchPerformanceView /> },
     { path: "/settings/requestAccount", element: <RequestAccountView /> },
     {
         path: "/settings/requestAccount/:accountType",
