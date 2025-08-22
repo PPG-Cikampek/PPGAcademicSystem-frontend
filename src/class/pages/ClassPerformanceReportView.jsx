@@ -1,19 +1,14 @@
 import { useState, useEffect, lazy } from "react";
 
-const PDFRenderer = lazy(() =>
-    import("@react-pdf/renderer").then((module) => ({
-        default: module,
-        Document: module.Document,
-        Page: module.Page,
-        Text: module.Text,
-        View: module.View,
-        pdf: module.pdf,
-        PDFViewer: module.PDFViewer,
-        Image: module.Image,
-    }))
-);
-
-const { Document, Page, Text, View, pdf, PDFViewer, Image } = PDFRenderer;
+import {
+    Document,
+    Page,
+    Text,
+    View,
+    pdf,
+    PDFViewer,
+    Image,
+} from "@react-pdf/renderer";
 
 import { saveAs } from "file-saver";
 
