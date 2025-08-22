@@ -295,13 +295,13 @@ const SubBranchPerformanceView = () => {
                     scale: 2,
                     useCORS: true,
                     letterRendering: true,
-                    allowTaint: false,
+                    allowTaint: true,
                     backgroundColor: "#ffffff",
                 },
                 jsPDF: {
                     unit: "mm",
                     format: "a4",
-                    orientation: "portrait",
+                    orientation: "landscape",
                 },
                 pagebreak: {
                     mode: ["avoid-all", "css", "legacy"],
@@ -383,7 +383,7 @@ const SubBranchPerformanceView = () => {
         // Cleanup after print dialog closes
         setTimeout(() => {
             document.head.removeChild(printStyle);
-        }, 1000);
+        }, 2000);
     }, []);
 
     return (
@@ -393,7 +393,7 @@ const SubBranchPerformanceView = () => {
                 <div className="hidden print:block pdf-generation:block mb-6">
                     <div className="text-center border-b pb-4 mb-6">
                         <h1 className="text-2xl font-bold mb-2">
-                            Laporan Performa Sub-Cabang
+                            Laporan Performa Kehadiran
                         </h1>
                         <div className="text-sm text-gray-600">
                             {filterState.selectedAcademicYear &&
@@ -439,7 +439,49 @@ const SubBranchPerformanceView = () => {
                 {academicYearsList && (
                     <div className="card-basic rounded-md flex-col gap-4">
                         <div className="flex flex-col md:flex-row justify-between gap-4">
-                            <div className="flex flex-col gap-5">
+                            <div className="hidden print:flex pdf-generation:flex flex-row items-center gap-[18px]">
+                                <div className="flex flex-col gap-4">
+                                    <div>Tahun Ajaran</div>
+                                    <div>Periode</div>
+                                    <div>Kelas</div>
+                                </div>
+                                <div className="flex flex-col gap-4">
+                                    {filterState.selectedAcademicYear &&
+                                        academicYearsList && (
+                                            <p>
+                                                {":  "}
+                                                {academicYearFormatter(
+                                                    academicYearsList.find(
+                                                        (year) =>
+                                                            year._id ===
+                                                            filterState.selectedAcademicYear
+                                                    )?.name
+                                                )}
+                                            </p>
+                                        )}
+                                    {filterState.period ? (
+                                        <p>: {filterState.period}</p>
+                                    ) : (
+                                        <p>: Semua</p>
+                                    )}
+                                    {console.log(filterState)}
+                                    {filterState.selectedClass &&
+                                    classesList ? (
+                                        <p>
+                                            {": "}
+                                            {classesList.find(
+                                                (cls) =>
+                                                    cls._id ===
+                                                    filterState.selectedClass
+                                            )?.name || ": Semua Kelas"}
+                                        </p>
+                                    ) : (
+                                        <p>: Semua Kelas</p>
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col gap-5 no-print">
                                 <div className="flex flex-row gap-4 items-center">
                                     <div className="flex flex-col gap-[18px] items-start">
                                         <div>Tahun Ajaran</div>
@@ -646,6 +688,7 @@ const SubBranchPerformanceView = () => {
                                     </div>
                                 </div>
                             </div>
+
                             {(!academicYearsList || isLoading) &&
                                 displayState.attendanceData !== null && (
                                     <div className="place-self-center justify-self-center self-center mx-auto">
