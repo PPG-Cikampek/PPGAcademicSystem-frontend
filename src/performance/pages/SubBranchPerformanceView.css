@@ -1,0 +1,95 @@
+/* Print and PDF-specific styles for SubBranchPerformanceView */
+
+/* Hide elements that shouldn't appear in PDF */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+
+    .print-break {
+        page-break-before: always !important;
+    }
+
+    .print-avoid-break {
+        page-break-inside: avoid !important;
+    }
+
+    /* Ensure good contrast in print */
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    /* Optimize page layout for print */
+    body {
+        font-size: 12px !important;
+    }
+
+    h1,
+    h2,
+    h3 {
+        page-break-after: avoid !important;
+    }
+
+    /* Ensure tables don't break badly */
+    table {
+        page-break-inside: avoid !important;
+    }
+
+    /* Charts and images */
+    canvas,
+    svg {
+        max-width: 100% !important;
+        height: auto !important;
+    }
+}
+
+/* PDF generation specific styles */
+.pdf-generation .no-print {
+    display: none !important;
+}
+
+.pdf-generation .print-break {
+    page-break-before: always !important;
+}
+
+.pdf-generation .print-avoid-break {
+    page-break-inside: avoid !important;
+}
+
+.pdf-generation {
+    background-color: white !important;
+}
+
+.pdf-generation * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+}
+
+/* Ensure charts render properly in PDF */
+.pdf-generation canvas {
+    max-width: 100% !important;
+    height: auto !important;
+}
+
+.pdf-generation .recharts-wrapper {
+    background-color: white !important;
+}
+
+/* Improve table rendering in PDF */
+.pdf-generation table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+}
+
+.pdf-generation th,
+.pdf-generation td {
+    border: 1px solid #ddd !important;
+    padding: 8px !important;
+    text-align: left !important;
+}
+
+.pdf-generation th {
+    background-color: #f5f5f5 !important;
+    font-weight: bold !important;
+}

@@ -1,8 +1,9 @@
 import { useContext, useState, useEffect, useCallback, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
 import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import idID from "date-fns/locale/id";
+import html2pdf from "html2pdf.js";
+import "./SubBranchPerformanceView.css";
 
 import useHttp from "../../shared/hooks/http-hook";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
@@ -12,10 +13,9 @@ import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import PieChart from "../components/PieChart";
 import { academicYearFormatter } from "../../shared/Utilities/academicYearFormatter";
 import { getMonday } from "../../shared/Utilities/getMonday";
-import DataTable from "../../shared/Components/UIElements/DataTable";
 import ClassPerformanceTable from "../components/ClassPerformanceTable";
 import StudentPerformanceTable from "../components/StudentPerformanceTable";
-import { set } from "react-hook-form";
+import { CircleX, FileDown } from "lucide-react";
 
 const SubBranchPerformanceView = () => {
     const { isLoading, error, sendRequest, setError } = useHttp();
@@ -235,11 +235,207 @@ const SubBranchPerformanceView = () => {
         return displayState.violationData;
     }, [displayState.violationData]);
 
-    // clsColumns moved to ClassPerformanceTable component
+    // PDF download logic
+    const handleDownloadPDF = useCallback(async () => {
+        if (!displayState.violationData || !filterState.selectedAcademicYear) {
+            alert(
+                "Tidak ada data untuk dicetak. Silakan apply filter terlebih dahulu."
+            );
+            return;
+        }
+
+        try {
+            const element = document.getElementById("report");
+            if (!element) {
+                console.error("Report element not found");
+                return;
+            }
+
+            // Get the selected academic year name for filename
+            const selectedAcademicYear = academicYearsList?.find(
+                (year) => year._id === filterState.selectedAcademicYear
+            );
+            const academicYearName = selectedAcademicYear
+                ? academicYearFormatter(selectedAcademicYear.name)
+                : "Unknown";
+
+            // Generate filename with current date and filters
+            const currentDate = new Date().toLocaleDateString("id-ID", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+            });
+
+            let filename = `Laporan_Performa_${academicYearName}_${currentDate}`;
+
+            if (filterState.period) {
+                filename += `_${filterState.period
+                    .replace(/\s+/g, "_")
+                    .replace(/[/\\:*?"<>|]/g, "-")}`;
+            }
+
+            if (filterState.selectedClass && classesList) {
+                const selectedClass = classesList.find(
+                    (cls) => cls._id === filterState.selectedClass
+                );
+                if (selectedClass) {
+                    filename += `_${selectedClass.name.replace(/\s+/g, "_")}`;
+                }
+            }
+
+            // Configure html2pdf options
+            const opt = {
+                margin: [10, 10, 10, 10],
+                filename: `${filename}.pdf`,
+                image: {
+                    type: "jpeg",
+                    quality: 0.95,
+                },
+                html2canvas: {
+                    scale: 2,
+                    useCORS: true,
+                    letterRendering: true,
+                    allowTaint: false,
+                    backgroundColor: "#ffffff",
+                },
+                jsPDF: {
+                    unit: "mm",
+                    format: "a4",
+                    orientation: "portrait",
+                },
+                pagebreak: {
+                    mode: ["avoid-all", "css", "legacy"],
+                    before: ".page-break-before",
+                    after: ".page-break-after",
+                },
+            };
+
+            // Add print-specific styling temporarily
+            const printStyle = document.createElement("style");
+            printStyle.textContent = `
+                @media print {
+                    .no-print { display: none !important; }
+                    .print-break { page-break-before: always; }
+                    .print-avoid-break { page-break-inside: avoid; }
+                }
+                .pdf-generation .no-print { display: none !important; }
+                .pdf-generation .print-break { page-break-before: always; }
+                .pdf-generation .print-avoid-break { page-break-inside: avoid; }
+            `;
+            document.head.appendChild(printStyle);
+
+            // Add temporary class for PDF generation
+            element.classList.add("pdf-generation");
+
+            // Generate PDF
+            await html2pdf().set(opt).from(element).save();
+
+            // Cleanup
+            element.classList.remove("pdf-generation");
+            document.head.removeChild(printStyle);
+        } catch (error) {
+            console.error("Error generating PDF:", error);
+
+            // Fallback to browser print
+            if (
+                confirm(
+                    "Gagal mengunduh PDF. Apakah Anda ingin menggunakan Print Browser sebagai alternatif?"
+                )
+            ) {
+                handlePrintFallback();
+            }
+        }
+    }, [
+        displayState.violationData,
+        filterState,
+        academicYearsList,
+        classesList,
+    ]);
+
+    // Fallback print function
+    const handlePrintFallback = useCallback(() => {
+        // Add print-specific styles
+        const printStyle = document.createElement("style");
+        printStyle.textContent = `
+            @media print {
+                body * { visibility: hidden; }
+                #report, #report * { visibility: visible; }
+                #report { 
+                    position: absolute; 
+                    left: 0; 
+                    top: 0; 
+                    width: 100% !important;
+                    margin: 0 !important;
+                    padding: 20px !important;
+                }
+                .no-print { display: none !important; }
+                .print-break { page-break-before: always; }
+                .print-avoid-break { page-break-inside: avoid; }
+                button { display: none !important; }
+                .flex.gap-2 { display: none !important; }
+            }
+        `;
+        document.head.appendChild(printStyle);
+
+        // Trigger print
+        window.print();
+
+        // Cleanup after print dialog closes
+        setTimeout(() => {
+            document.head.removeChild(printStyle);
+        }, 1000);
+    }, []);
 
     return (
         <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">
-            <main className="max-w-6xl mx-auto mb-24">
+            <main id="report" className="max-w-6xl mx-auto mb-24">
+                {/* PDF Header - Only visible in PDF */}
+                <div className="hidden print:block pdf-generation:block mb-6">
+                    <div className="text-center border-b pb-4 mb-6">
+                        <h1 className="text-2xl font-bold mb-2">
+                            Laporan Performa Sub-Cabang
+                        </h1>
+                        <div className="text-sm text-gray-600">
+                            {filterState.selectedAcademicYear &&
+                                academicYearsList && (
+                                    <p>
+                                        Tahun Ajaran:{" "}
+                                        {academicYearFormatter(
+                                            academicYearsList.find(
+                                                (year) =>
+                                                    year._id ===
+                                                    filterState.selectedAcademicYear
+                                            )?.name || ""
+                                        )}
+                                    </p>
+                                )}
+                            {filterState.period && (
+                                <p>Periode: {filterState.period}</p>
+                            )}
+                            {filterState.selectedClass && classesList && (
+                                <p>
+                                    Kelas:{" "}
+                                    {classesList.find(
+                                        (cls) =>
+                                            cls._id ===
+                                            filterState.selectedClass
+                                    )?.name || "Semua Kelas"}
+                                </p>
+                            )}
+                            <p>
+                                Digenerate pada:{" "}
+                                {new Date().toLocaleDateString("id-ID", {
+                                    weekday: "long",
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                    hour: "2-digit",
+                                    minute: "2-digit",
+                                })}
+                            </p>
+                        </div>
+                    </div>
+                </div>
                 {academicYearsList && (
                     <div className="card-basic rounded-md flex-col gap-4">
                         <div className="flex flex-col md:flex-row justify-between gap-4">
@@ -360,7 +556,7 @@ const SubBranchPerformanceView = () => {
                                     </div>
                                 </div>
 
-                                <div className="flex justify-center mt-4 gap-2">
+                                <div className="flex justify-center mt-4 gap-2 no-print">
                                     <button
                                         onClick={handleApplyFilter}
                                         disabled={
@@ -384,13 +580,35 @@ const SubBranchPerformanceView = () => {
                                     <button
                                         onClick={handleResetFilter}
                                         disabled={isLoading}
-                                        className="btn-danger-outline rounded-full"
+                                        className="btn-danger-outline rounded-full flex flex-row items-center gap-2"
                                     >
+                                        <span>
+                                            <CircleX size={18} />
+                                        </span>
                                         Reset Filter
+                                    </button>
+
+                                    <button
+                                        onClick={handleDownloadPDF}
+                                        disabled={
+                                            isLoading ||
+                                            !displayState.violationData
+                                        }
+                                        className="button-primary mt-0 rounded-full flex flex-row items-center gap-2"
+                                        title={
+                                            !displayState.violationData
+                                                ? "Apply filter terlebih dahulu untuk mengunduh laporan"
+                                                : "Unduh laporan dalam format PDF"
+                                        }
+                                    >
+                                        <span>
+                                            <FileDown size={18} />
+                                        </span>
+                                        Print Laporan
                                     </button>
                                 </div>
 
-                                <div className="self-start flex flex-row gap-2">
+                                <div className="self-start flex flex-row gap-2 print-avoid-break">
                                     {/* Left Column: Violation Names */}
                                     <div className="flex flex-col gap-1">
                                         {memoizedViolationData &&
@@ -437,7 +655,7 @@ const SubBranchPerformanceView = () => {
                             {memoizedOverallAttendances &&
                                 !isLoading &&
                                 filterState.selectedAcademicYear && (
-                                    <div className="">
+                                    <div className="print-avoid-break">
                                         <PieChart
                                             attendanceData={
                                                 memoizedOverallAttendances
@@ -452,7 +670,7 @@ const SubBranchPerformanceView = () => {
                     !isLoading &&
                     filterState.selectedAcademicYear &&
                     (filterState.currentView === "classesTable" ? (
-                        <div>
+                        <div className="print-avoid-break">
                             <h2>Performa Kelompok</h2>
                             <ClassPerformanceTable
                                 data={displayState.studentsDataByClass}
@@ -461,10 +679,10 @@ const SubBranchPerformanceView = () => {
                             />
                         </div>
                     ) : (
-                        <div>
+                        <div className="print-avoid-break">
                             <div className="flex justify-between">
                                 <h2>Performa Kelas</h2>
-                                <div className="flex gap-2">
+                                <div className="flex gap-2 no-print">
                                     <button
                                         className="btn-mobile-primary-round-gray"
                                         onClick={() =>
