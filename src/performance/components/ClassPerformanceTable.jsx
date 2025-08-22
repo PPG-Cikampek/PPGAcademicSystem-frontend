@@ -23,7 +23,7 @@ const ClassPerformanceTable = ({ data, filterState, setFilterState }) => {
             cellAlign: "center",
             headerAlign: "center",
             render: (cls) => (
-                <div className="badge-green w-12 place-self-center">
+                <div className="badge-green w-12 place-self-center text-center">
                     {cls?.attendances?.Hadir || 0}%
                 </div>
             ),
@@ -35,7 +35,7 @@ const ClassPerformanceTable = ({ data, filterState, setFilterState }) => {
             cellAlign: "center",
             headerAlign: "center",
             render: (cls) => (
-                <div className="badge-primary w-12 place-self-center">
+                <div className="badge-primary w-12 place-self-center text-center">
                     {cls?.attendances?.Terlambat || 0}%
                 </div>
             ),
@@ -47,7 +47,7 @@ const ClassPerformanceTable = ({ data, filterState, setFilterState }) => {
             cellAlign: "center",
             headerAlign: "center",
             render: (cls) => (
-                <div className="badge-yellow w-12 place-self-center">
+                <div className="badge-yellow w-12 place-self-center text-center">
                     {cls?.attendances?.Izin || 0}%
                 </div>
             ),
@@ -59,7 +59,7 @@ const ClassPerformanceTable = ({ data, filterState, setFilterState }) => {
             cellAlign: "center",
             headerAlign: "center",
             render: (cls) => (
-                <div className="badge-violet w-12 place-self-center">
+                <div className="badge-violet w-12 place-self-center text-center">
                     {cls?.attendances?.Sakit || 0}%
                 </div>
             ),
@@ -71,7 +71,7 @@ const ClassPerformanceTable = ({ data, filterState, setFilterState }) => {
             cellAlign: "center",
             headerAlign: "center",
             render: (cls) => (
-                <div className="badge-red w-12 place-self-center">
+                <div className="badge-red w-12 place-self-center text-center">
                     {cls?.attendances["Tanpa Keterangan"]
                         ? cls.attendances["Tanpa Keterangan"]
                         : 0}

@@ -95,7 +95,7 @@ const StudentPerformanceTable = ({
                 cellAlign: "center",
                 headerAlign: "center",
                 render: (student) => (
-                    <div className="badge-green w-12 place-self-center">
+                    <div className="badge-green w-12 place-self-center text-center">
                         {student.attendances.Hadir}%
                     </div>
                 ),
@@ -107,7 +107,7 @@ const StudentPerformanceTable = ({
                 cellAlign: "center",
                 headerAlign: "center",
                 render: (student) => (
-                    <div className="badge-primary w-12 place-self-center">
+                    <div className="badge-primary w-12 place-self-center text-center">
                         {student.attendances.Terlambat}%
                     </div>
                 ),
@@ -119,7 +119,7 @@ const StudentPerformanceTable = ({
                 cellAlign: "center",
                 headerAlign: "center",
                 render: (student) => (
-                    <div className="badge-yellow w-12 place-self-center">
+                    <div className="badge-yellow w-12 place-self-center text-center">
                         {student.attendances.Izin}%
                     </div>
                 ),
@@ -131,7 +131,7 @@ const StudentPerformanceTable = ({
                 cellAlign: "center",
                 headerAlign: "center",
                 render: (student) => (
-                    <div className="badge-violet w-12 place-self-center">
+                    <div className="badge-violet w-12 place-self-center text-center">
                         {student.attendances.Sakit}%
                     </div>
                 ),
@@ -143,7 +143,7 @@ const StudentPerformanceTable = ({
                 cellAlign: "center",
                 headerAlign: "center",
                 render: (student) => (
-                    <div className="badge-red w-12 place-self-center">
+                    <div className="badge-red w-12 place-self-center text-center">
                         {student.attendances["Tanpa Keterangan"]}%
                     </div>
                 ),

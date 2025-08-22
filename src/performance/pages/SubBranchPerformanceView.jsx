@@ -21,11 +21,11 @@ const SubBranchPerformanceView = () => {
     const { isLoading, error, sendRequest, setError } = useHttp();
 
     const initialFilterState = {
-        selectedAcademicYear: "",
+        selectedAcademicYear: null,
         startDate: null,
         endDate: null,
         period: null,
-        selectedClass: "",
+        selectedClass: null,
     };
 
     // Academic years list (static data)
@@ -223,8 +223,61 @@ const SubBranchPerformanceView = () => {
 
     const handleResetFilter = useCallback(() => {
         // Reset filter selections to initial values
-        setFilterState({ ...initialFilterState });
+        setFilterState({
+            selectedAcademicYear: null,
+            startDate: null,
+            endDate: null,
+            period: null,
+            selectedClass: null,
+            currentView: "classesTable",
+        });
+
+        // Clear display state
+        setDisplayState({
+            attendanceData: null,
+            overallAttendances: null,
+            violationData: null,
+            appliedFilters: null,
+            classData: null,
+            studentsData: null,
+        });
+
+        // Clear classes list
+        setClassesList([]);
     }, []);
+
+    // Helper functions for button display logic
+    const hasUnappliedFilters = useMemo(() => {
+        if (!displayState.appliedFilters) {
+            // If no filters have been applied yet, check if any filter is set
+            return !!(
+                filterState.selectedAcademicYear ||
+                filterState.startDate ||
+                filterState.endDate ||
+                filterState.selectedClass
+            );
+        }
+
+        // Compare current filterState with applied filters
+        return (
+            filterState.selectedAcademicYear !==
+                displayState.appliedFilters.selectedAcademicYear ||
+            filterState.startDate !== displayState.appliedFilters.startDate ||
+            filterState.endDate !== displayState.appliedFilters.endDate ||
+            filterState.selectedClass !==
+                displayState.appliedFilters.selectedClass
+        );
+    }, [filterState, displayState.appliedFilters]);
+
+    const hasFiltersChanged = useMemo(() => {
+        return (
+            filterState.selectedAcademicYear !==
+                initialFilterState.selectedAcademicYear ||
+            filterState.startDate !== initialFilterState.startDate ||
+            filterState.endDate !== initialFilterState.endDate ||
+            filterState.selectedClass !== initialFilterState.selectedClass
+        );
+    }, [filterState]);
 
     // Memoized values to prevent unnecessary re-renders
     const memoizedOverallAttendances = useMemo(() => {
@@ -285,11 +338,10 @@ const SubBranchPerformanceView = () => {
 
             // Configure html2pdf options
             const opt = {
-                margin: [10, 10, 10, 10],
                 filename: `${filename}.pdf`,
                 image: {
                     type: "jpeg",
-                    quality: 0.95,
+                    quality: 1,
                 },
                 html2canvas: {
                     scale: 2,
@@ -365,8 +417,8 @@ const SubBranchPerformanceView = () => {
                     left: 0; 
                     top: 0; 
                     width: 100% !important;
-                    margin: 0 !important;
-                    padding: 20px !important;
+                    margin: auto !important;
+                    padding: 50px 100px !important;
                 }
                 .no-print { display: none !important; }
                 .print-break { page-break-before: always; }
@@ -396,34 +448,8 @@ const SubBranchPerformanceView = () => {
                             Laporan Performa Kehadiran
                         </h1>
                         <div className="text-sm text-gray-600">
-                            {filterState.selectedAcademicYear &&
-                                academicYearsList && (
-                                    <p>
-                                        Tahun Ajaran:{" "}
-                                        {academicYearFormatter(
-                                            academicYearsList.find(
-                                                (year) =>
-                                                    year._id ===
-                                                    filterState.selectedAcademicYear
-                                            )?.name || ""
-                                        )}
-                                    </p>
-                                )}
-                            {filterState.period && (
-                                <p>Periode: {filterState.period}</p>
-                            )}
-                            {filterState.selectedClass && classesList && (
-                                <p>
-                                    Kelas:{" "}
-                                    {classesList.find(
-                                        (cls) =>
-                                            cls._id ===
-                                            filterState.selectedClass
-                                    )?.name || "Semua Kelas"}
-                                </p>
-                            )}
                             <p>
-                                Digenerate pada:{" "}
+                                Diterbitkan secara elektronik pada:{" "}
                                 {new Date().toLocaleDateString("id-ID", {
                                     weekday: "long",
                                     year: "numeric",
@@ -599,55 +625,73 @@ const SubBranchPerformanceView = () => {
                                 </div>
 
                                 <div className="flex justify-center mt-4 gap-2 no-print">
-                                    <button
-                                        onClick={handleApplyFilter}
-                                        disabled={
-                                            !filterState.selectedAcademicYear ||
-                                            isLoading
-                                        }
-                                        className="btn-mobile-primary-round-gray"
-                                    >
-                                        {isLoading ? (
-                                            <span>
-                                                <LoadingCircle size={16} />{" "}
-                                                Merangkum Data...{" "}
-                                            </span>
-                                        ) : !filterState.selectedAcademicYear ? (
-                                            "Pilih Tahun Ajaran"
-                                        ) : (
-                                            "Tampilkan"
-                                        )}
-                                    </button>
+                                    {hasUnappliedFilters && (
+                                        <button
+                                            onClick={handleApplyFilter}
+                                            disabled={
+                                                !filterState.selectedAcademicYear ||
+                                                isLoading
+                                            }
+                                            className="btn-mobile-primary-round-gray"
+                                        >
+                                            {isLoading ? (
+                                                <span>
+                                                    <LoadingCircle size={16} />{" "}
+                                                    Merangkum Data...{" "}
+                                                </span>
+                                            ) : !filterState.selectedAcademicYear ? (
+                                                "Pilih Tahun Ajaran"
+                                            ) : (
+                                                "Tampilkan"
+                                            )}
+                                        </button>
+                                    )}
 
-                                    <button
-                                        onClick={handleResetFilter}
-                                        disabled={isLoading}
-                                        className="btn-danger-outline rounded-full flex flex-row items-center gap-2"
-                                    >
-                                        <span>
-                                            <CircleX size={18} />
-                                        </span>
-                                        Reset Filter
-                                    </button>
+                                    {hasFiltersChanged && (
+                                        <button
+                                            onClick={handleResetFilter}
+                                            disabled={isLoading}
+                                            className="btn-danger-outline rounded-full flex flex-row items-center gap-2"
+                                        >
+                                            {isLoading ? (
+                                                <span>
+                                                    <LoadingCircle size={16} />
+                                                </span>
+                                            ) : (
+                                                <span>
+                                                    <CircleX size={18} />
+                                                </span>
+                                            )}
+                                            Reset Filter
+                                        </button>
+                                    )}
 
-                                    <button
-                                        onClick={handleDownloadPDF}
-                                        disabled={
-                                            isLoading ||
-                                            !displayState.violationData
-                                        }
-                                        className="button-primary mt-0 rounded-full flex flex-row items-center gap-2"
-                                        title={
-                                            !displayState.violationData
-                                                ? "Apply filter terlebih dahulu untuk mengunduh laporan"
-                                                : "Unduh laporan dalam format PDF"
-                                        }
-                                    >
-                                        <span>
-                                            <FileDown size={18} />
-                                        </span>
-                                        Print Laporan
-                                    </button>
+                                    {displayState.violationData && (
+                                        <button
+                                            onClick={handleDownloadPDF}
+                                            disabled={
+                                                isLoading ||
+                                                !displayState.violationData
+                                            }
+                                            className="button-primary mt-0 rounded-full flex flex-row items-center gap-2"
+                                            title={
+                                                !displayState.violationData
+                                                    ? "Apply filter terlebih dahulu untuk mengunduh laporan"
+                                                    : "Unduh laporan dalam format PDF"
+                                            }
+                                        >
+                                            {isLoading ? (
+                                                <span>
+                                                    <LoadingCircle size={16} />
+                                                </span>
+                                            ) : (
+                                                <span>
+                                                    <FileDown size={18} />
+                                                </span>
+                                            )}
+                                            Print Laporan
+                                        </button>
+                                    )}
                                 </div>
 
                                 <div className="self-start flex flex-row gap-2 print-avoid-break">
