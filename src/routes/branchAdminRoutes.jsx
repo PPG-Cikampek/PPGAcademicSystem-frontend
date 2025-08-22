@@ -74,15 +74,15 @@ export const branchAdminRoutes = [
         element: <TeachingGroupsView />,
     },
     {
-        path: "/dashboard/teaching-groups/:teachingGroupId/add-class/",
+        path: "/dashboard/teaching-groups/:teachingGroupId/add-class",
         element: <NewClassView />,
     },
     {
-        path: "/dashboard/teaching-groups/:teachingGroupId/add-sub-branches/",
+        path: "/dashboard/teaching-groups/:teachingGroupId/add-sub-branches",
         element: <AddSubBranchToTeachingGroupView />,
     },
     { path: "/munaqasyah/student/score", element: <PreviewReport /> },
-    { path: "/academic/", element: <BranchYearsView /> },
+    { path: "/academic", element: <BranchYearsView /> },
     { path: "/academic/new", element: <NewBranchYearsView /> },
     { path: "/academic/teachingGroups/new", element: <NewTeachingGroupView /> },
     { path: "/performance", element: <BranchPerformanceView /> },
