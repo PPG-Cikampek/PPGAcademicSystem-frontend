@@ -80,7 +80,7 @@ const TeacherPerformanceView = () => {
         const body = JSON.stringify({
             academicYearId: filterState.selectedAcademicYear,
             branchId: auth.userBranchId,
-            subBranchId: auth.userSubBranchId,
+            // subBranchId: auth.userSubBranchId, // teachers should have access to all students in their classes
             classId: filterState.selectedClass,
             teacherClassIds: auth.userClassIds, // Use all classes the user has access to
             startDate: filterState.startDate
@@ -425,9 +425,11 @@ const TeacherPerformanceView = () => {
                                                 !filterState.selectedAcademicYear
                                             }
                                             placeholderText={`${
-                                                filterState.selectedAcademicYear
-                                                    ? "Semua"
-                                                    : "Pilih Tahun Ajaran"
+                                                !filterState.selectedAcademicYear
+                                                    ? "Pilih Tahun Ajaran"
+                                                    : !filterState.period
+                                                    ? "Pilih Rentang"
+                                                    : "Semua"
                                             }`}
                                             onFocus={(e) =>
                                                 (e.target.readOnly = true)
