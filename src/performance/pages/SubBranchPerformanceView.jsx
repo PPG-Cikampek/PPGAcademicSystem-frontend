@@ -481,7 +481,6 @@ const SubBranchPerformanceView = () => {
                                     ) : (
                                         <p>: Semua</p>
                                     )}
-                                    {console.log(filterState)}
                                     {filterState.selectedClass &&
                                     classesList ? (
                                         <p>

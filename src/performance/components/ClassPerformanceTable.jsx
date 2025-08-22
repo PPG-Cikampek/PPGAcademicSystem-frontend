@@ -17,6 +17,13 @@ const ClassPerformanceTable = ({ data, filterState, setFilterState }) => {
             sortable: true,
         },
         {
+            key: "attendancesCount",
+            label: "Total Pertemuan",
+            cellAlign: "center",
+            headerAlign: "center",
+            sortable: true,
+        },
+        {
             key: "present",
             label: "Hadir",
             sortable: true,
