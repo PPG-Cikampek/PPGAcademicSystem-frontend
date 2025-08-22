@@ -117,7 +117,7 @@ const BranchAdminMunaqasyahView = () => {
                             </div>
                         )}
                         {branchYears.branchYears.length > 0 && (
-                            <div className="flex flex-col items-stretch gap-4">
+                            <div className="flex flex-col items-stretch">
                                 {branchYears.branchYears.map((year) => (
                                     <MunaqasyahCard
                                         key={year._id}
