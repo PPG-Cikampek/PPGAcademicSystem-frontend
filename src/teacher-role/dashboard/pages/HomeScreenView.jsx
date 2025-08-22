@@ -1,9 +1,7 @@
 import { useContext, useEffect } from "react";
-import { Link } from "react-router-dom";
 
 import { useQuery } from "@tanstack/react-query";
 import { AuthContext } from "../../../shared/Components/Context/auth-context";
-import { StudentAttendanceContext } from "../../scan/context/StudentAttendanceContext";
 
 import Profile from "../components/Profile";
 import Dashboard from "../components/Dashboard";
@@ -16,16 +14,6 @@ import SkeletonLoader from "../../../shared/Components/UIElements/SkeletonLoader
 const HomeScreenView = () => {
     const auth = useContext(AuthContext);
 
-    // console.log(auth.isLoggedIn)
-    // console.log(auth.userId)
-    // console.log(auth.userRole)
-    // console.log(auth.userName)
-    // console.log(auth.userBranchId)
-    // console.log(auth.userSubBranchId)
-    // console.log(auth.currentSubBranchYear)
-    // console.log(auth.userClassIds)
-    // console.log(auth.token)
-
     const fetchUser = async () => {
         console.log(`fetching profile...`);
         const response = await fetch(
@@ -35,8 +23,6 @@ const HomeScreenView = () => {
             throw new Error("Failed to fetch user data");
         }
         const responseData = await response.json();
-
-        console.log(responseData);
 
         const classIds =
             responseData.teacher?.classIds.map((item) => item._id) || [];
@@ -58,6 +44,8 @@ const HomeScreenView = () => {
     useEffect(() => {
         console.log(`${auth.userClassIds}`);
     }, [data]);
+
+    data && console.log(data);
 
     let activeClassCount = 0;
 
@@ -85,25 +73,17 @@ const HomeScreenView = () => {
             {data && !isLoading && (
                 <SequentialAnimation>
                     <div className="mt-16 flex-1 h-fit p-4">
-                        {/* <div>
-                            <p className='font-urdu font-light text-center text-3xl mt-4 mb-2'>
+                        <div className="flex flex-row items-end mb-2">
+                            <p className="font-lpmq font-light text-lg mt-4 mb-2">
                                 السلام عليكم
                             </p>
-                        </div> */}
-
-                        <div>
                             <p className="text-lg font-medium mt-4 mb-1">
-                                Assalamu'alaikum,{" "}
+                                {",  "}
                                 {data.name?.split(" ").slice(0, 2).join(" ")}!
                             </p>
-                            <hr className="mb-2" />
-                            <CurrentTime />
                         </div>
-
-                        {/* <div className="card-basic mt-2 rounded-md flex-col mb-2">
-                            <h1 className="text-xl font-medium mb-2">{getPositionName[data.position] || 'Guru'}</h1>
-                            <CurrentTime />
-                        </div> */}
+                        <hr className="mb-2" />
+                        <CurrentTime />
 
                         {auth.userRole === "teacher" && (
                             <div className="mb-2">
@@ -111,7 +91,6 @@ const HomeScreenView = () => {
                                     const isClassInActiveAcademicYear =
                                         item?.teachingGroupId?.branchYearId
                                             ?.academicYearId?.isActive;
-                                    console.log(item);
                                     if (isClassInActiveAcademicYear) {
                                         activeClassCount++;
                                         return (

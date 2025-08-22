@@ -9,6 +9,8 @@ const Profile = ({ user, isLoading }) => {
         sidebar.toggle();
     };
 
+    console.log(user);
+
     const getInitials = (name) => {
         return name
             ?.split(" ")
@@ -28,12 +30,16 @@ const Profile = ({ user, isLoading }) => {
     return (
         <div className="bg-white mb-2 p-4 shadow-xs fixed top-0 w-full ">
             <div className="flex items-center space-x-4">
-                {!isLoading && user?.image ? (
+                {!isLoading && user?.thumbnail ? (
                     <img
                         onClick={sidebarHandler}
-                        src={`${import.meta.env.VITE_BACKEND_URL}/${
-                            user.image
-                        }`}
+                        src={
+                            user?.thumbnail
+                                ? user?.thumbnail
+                                : `${import.meta.env.VITE_BACKEND_URL}/${
+                                      user.image
+                                  }`
+                        }
                         alt={user.name}
                         className="w-12 h-12 rounded-full border border-gray-200 bg-white focus:bg-gray-200 hover:outline-hidden hover:ring-1 hover:ring-offset-1 hover:ring-gray-400"
                     />
@@ -61,10 +67,13 @@ const Profile = ({ user, isLoading }) => {
                             <h1 className="text-xl font-medium">
                                 {getPositionName[user.position] || "Guru"}
                             </h1>
-                            {/* <h2 className="text-xl font-medium">{user.name || 'Unknown'}</h2>
-                            <h3 className='font-normal text-gray-600'>
-                                {user.userId?.subBranchId?.branchId?.name || 'No Branch'} - {user.userId?.subBranchId?.name || 'No SubBranch'}
-                            </h3> */}
+                            <h3 className="font-normal text-gray-600">
+                                {user.userId?.subBranchId?.branchId?.name ||
+                                    "No Branch"}{" "}
+                                -{" "}
+                                {user.userId?.subBranchId?.name ||
+                                    "No SubBranch"}
+                            </h3>
                         </>
                     )}
                 </div>
