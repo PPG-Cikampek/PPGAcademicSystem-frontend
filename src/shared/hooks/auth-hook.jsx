@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
+import useClearSiteData from "./useClearSiteData";
 
 let logoutTimer;
 
@@ -14,6 +15,8 @@ export const useAuth = () => {
     const [currentBranchYearId, setCurrentBranchYearId] = useState(null);
     const [userClassIds, setUserClassIds] = useState([]);
     const [isInitialized, setIsInitialized] = useState(false);
+
+    const clearSiteData = useClearSiteData();
 
     const login = useCallback(
         (
@@ -73,7 +76,7 @@ export const useAuth = () => {
         setUserClassIds(null);
 
         setTokenExpirationDate(null);
-        localStorage.removeItem("userData");
+        clearSiteData();
     }, []);
 
     useEffect(() => {

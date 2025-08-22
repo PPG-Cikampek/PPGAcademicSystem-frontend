@@ -1,5 +1,5 @@
 import React from "react";
-import LoadingCircle from "../UIElements/LoadingCircle";
+import clearSiteData from "../../Utilities/clearSiteData";
 
 class RouteErrorBoundary extends React.Component {
     constructor(props) {
@@ -49,7 +49,7 @@ class RouteErrorBoundary extends React.Component {
                             </button>
                             <button
                                 onClick={() => {
-                                    localStorage.clear();
+                                    clearSiteData();
                                     window.location.href = "/";
                                 }}
                                 className="btn-neutral-outline w-full"
