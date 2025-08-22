@@ -263,7 +263,7 @@ const TeacherPerformanceView = () => {
                                 <div className="flex flex-row gap-4 items-center">
                                     <div className="flex flex-col gap-[18px] items-start">
                                         <div>Tahun Ajaran</div>
-                                        <div>Periode</div>
+                                        <div>Minggu</div>
                                         <div>Kelas</div>
                                     </div>
                                     <div className="flex flex-col gap-2">
@@ -329,7 +329,7 @@ const TeacherPerformanceView = () => {
                                             }
                                             placeholderText={`${
                                                 filterState.selectedAcademicYear
-                                                    ? "Pilih Periode"
+                                                    ? "Pilih Minggu"
                                                     : "Pilih Tahun Ajaran"
                                             }`}
                                             onFocus={(e) =>
