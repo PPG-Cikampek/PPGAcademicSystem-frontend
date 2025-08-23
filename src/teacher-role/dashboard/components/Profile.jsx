@@ -21,6 +21,7 @@ const Profile = ({ user, isLoading }) => {
     const getPositionName = {
         branchTeacher: "MT Desa",
         subBranchTeacher: "MT Kelompok",
+        teachingGroupTeacher: "MT Kelompok",
         localTeacher: "MS",
         assistant: "Asisten",
     };

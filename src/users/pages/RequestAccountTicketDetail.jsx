@@ -33,7 +33,7 @@ const RequestAccountTicketDetail = () => {
             <div className="max-w-6xl mx-auto">
                 <div className="flex flex-col justify-between items-start gap-2 mb-4">
                     <h1 className="text-2xl font-semibold text-gray-900">
-                        Daftar Permintaan Akun
+                        Daftar Pendaftaran Akun
                     </h1>
                     {data && console.log(data)}
                     {!isLoading && data && (

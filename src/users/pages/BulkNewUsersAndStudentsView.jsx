@@ -126,7 +126,7 @@ const BulkNewUsersAndStudentsView = () => {
             </div>
 
             <DynamicForm
-                title="Tambah Akun Peserta Didik"
+                title="Tambah Peserta Didik Baru"
                 subtitle={"Sistem Akademik Digital"}
                 fields={
                     bulkCreateFields || [

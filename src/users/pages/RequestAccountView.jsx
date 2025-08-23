@@ -39,7 +39,7 @@ const RequestAccountView = () => {
                 console.error("Failed to fetch tickets:", err);
                 showError(
                     "Gagal Memuat Data",
-                    "Tidak dapat memuat daftar permintaan akun. Silakan refresh halaman atau coba lagi nanti."
+                    "Tidak dapat memuat daftar Pendaftaran akun. Silakan refresh halaman atau coba lagi nanti."
                 );
             }
         };
@@ -136,14 +136,7 @@ const RequestAccountView = () => {
             label: "No. Tiket",
             sortable: true,
             render: (item) => (
-                <div className="font-mono text-sm">
-                    <div className="font-semibold">
-                        {item.ticketId.slice(0, 8)}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                        {item.ticketId.slice(8)}
-                    </div>
-                </div>
+                <div className="text-sm">{item.ticketId.slice(0, 6)}</div>
             ),
         },
         {
@@ -167,25 +160,20 @@ const RequestAccountView = () => {
         },
         {
             key: "accountList",
-            label: "Detail Akun",
+            label: "Jumlah Akun",
+            cellAlign: "center",
+            headerAlign: "center",
             sortable: true,
             render: (item) => (
-                <div className="text-sm">
-                    <div className="font-semibold">
-                        {item.accountList.length} akun
-                    </div>
-                    <div className="text-xs text-gray-500">
-                        {item.accountList.length > 1
-                            ? "Permintaan bulk"
-                            : "Permintaan tunggal"}
-                    </div>
-                </div>
+                <div className="">{item.accountList.length} akun</div>
             ),
         },
         {
             key: "status",
             label: "Status",
             sortable: true,
+            cellAlign: "center",
+            headerAlign: "center",
             render: (item) => (
                 <span
                     className={`px-2 py-1 rounded-full text-sm ${getStatusStyle(
@@ -199,6 +187,8 @@ const RequestAccountView = () => {
         {
             key: "actions",
             label: "Aksi",
+            cellAlign: "center",
+            headerAlign: "center",
             render: (item) =>
                 item.status === "pending" ? (
                     <button
@@ -207,7 +197,7 @@ const RequestAccountView = () => {
                             handleCancelTicket(item.ticketId, "cancelled");
                         }}
                         className="btn-danger-outline m-0 text-xs px-3 py-1"
-                        title="Batalkan permintaan"
+                        title="Batalkan Pendaftaran"
                     >
                         Batalkan
                     </button>
@@ -269,16 +259,16 @@ const RequestAccountView = () => {
                 )}
             </Modal>
 
-            <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">
-                Daftar Permintaan Akun
-            </h2>
             <div className="max-w-6xl mx-auto">
+                <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">
+                    Riwayat Pendaftaran
+                </h2>
                 {isLoading && !tickets ? (
                     <div className="bg-white rounded-lg shadow-sm border p-8">
                         <div className="flex items-center justify-center">
                             <LoadingCircle size={32} />
                             <span className="ml-3 text-gray-600">
-                                Memuat daftar permintaan...
+                                Memuat daftar Pendaftaran...
                             </span>
                         </div>
                     </div>
@@ -340,32 +330,31 @@ const RequestAccountView = () => {
                                 <Users className="h-10 w-10 text-gray-400" />
                             </div>
                             <h3 className="mt-4 text-lg font-semibold text-gray-900">
-                                Belum Ada Permintaan Akun
+                                Belum Ada Pendaftaran Baru
                             </h3>
                             <p className="mt-2 text-sm text-gray-500 max-w-sm">
-                                Anda belum memiliki permintaan akun apapun.
-                                Mulai dengan membuat permintaan akun baru di
-                                bawah ini.
+                                Anda belum memiliki Pendaftaran apapun. Mulai
+                                dengan membuat Pendaftaran baru di bawah ini.
                             </p>
                             <div className="mt-6 flex gap-3">
                                 <Link
                                     to="/settings/requestAccount/teacher"
                                     className="btn-primary-outline"
                                 >
-                                    Buat Permintaan Guru
+                                    Buat Pendaftaran Guru
                                 </Link>
                                 <Link
                                     to="/settings/requestAccount/student"
                                     className="btn-primary"
                                 >
-                                    Buat Permintaan Siswa
+                                    Buat Pendaftaran Siswa
                                 </Link>
                             </div>
                         </div>
                     </div>
                 ) : null}
                 <h2 className="text-xl md:text-2xl font-bold my-8 md:my-12 mb-4 md:mb-6">
-                    Buat Permintaan Akun
+                    Buat Pendaftaran Baru
                 </h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 max-w-4xl mx-auto">
                     <Link
@@ -381,10 +370,10 @@ const RequestAccountView = () => {
                             </div>
                             <div>
                                 <div className="font-semibold text-lg md:text-xl mb-1">
-                                    Permintaan Akun Guru
+                                    Pendaftaran Guru Baru
                                 </div>
                                 <div className="text-sm text-gray-600">
-                                    Buat permintaan akun untuk tenaga pendidik
+                                    Buat Pendaftaran tenaga pendidik baru
                                 </div>
                             </div>
                         </div>
@@ -402,10 +391,10 @@ const RequestAccountView = () => {
                             </div>
                             <div>
                                 <div className="font-semibold text-lg md:text-xl mb-1">
-                                    Permintaan Siswa Baru
+                                    Pendaftaran Siswa Baru
                                 </div>
                                 <div className="text-sm text-gray-600">
-                                    Buat permintaan peserta didik baru
+                                    Buat Pendaftaran peserta didik baru
                                 </div>
                             </div>
                         </div>

@@ -192,7 +192,7 @@ const TeachersView = () => {
                     </h1>
                     <WarningCard
                         className="items-center justify-start"
-                        warning="Penambahan tenaga pendidik baru dapat dilakukan melalui fitur Permintaan Akun."
+                        warning="Penambahan tenaga pendidik baru dapat dilakukan melalui fitur Pendaftaran Akun."
                         onClear={() => setError(null)}
                     />
                 </div>

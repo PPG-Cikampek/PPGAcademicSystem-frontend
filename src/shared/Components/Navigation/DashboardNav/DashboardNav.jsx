@@ -79,7 +79,7 @@ const DashboardNav = ({ children }) => {
                     },
                     {
                         link: "/settings/requested-accounts",
-                        label: "Permintaan Akun",
+                        label: "Pendaftaran Guru/Siswa",
                         icon: <UserRoundPlus />,
                     },
                     // { link: '/settings/more', label: 'Lainnya', icon: <Settings /> },
@@ -180,7 +180,7 @@ const DashboardNav = ({ children }) => {
                     // { link: '/settings/transfer-students', label: 'Mutasi & Pindah Sambung', icon: <ArrowRightLeft size={24}/> },
                     {
                         link: "/settings/requestAccount",
-                        label: "Permintaan Akun",
+                        label: "Pendaftaran Guru/Siswa",
                         icon: <UserRoundPlus />,
                     },
                     // { link: '/settings/more', label: 'Lainnya', icon: <Settings /> },

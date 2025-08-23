@@ -202,8 +202,8 @@ const RequestAccountForm = () => {
                     <div className="flex flex-col p-2 justify-center items-center my-6">
                         <h2 className="text-2xl mt-4 font-medium text-center">
                             {isStudent
-                                ? "Akun Peserta Didik"
-                                : "Akun Tenaga Pendidik"}
+                                ? "Peserta Didik Baru"
+                                : "Tenaga Pendidik Baru"}
                         </h2>
                     </div>
                     <form className="flex flex-col md:flex-row gap-4 items-end mb-12">
@@ -348,7 +348,7 @@ const RequestAccountForm = () => {
                                 {isLoading ? (
                                     <LoadingCircle>Processing...</LoadingCircle>
                                 ) : (
-                                    "Buat Permintaan Akun"
+                                    "Buat Pendaftaran Akun"
                                 )}
                             </button>
                         </>

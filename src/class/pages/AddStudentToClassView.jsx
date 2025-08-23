@@ -208,8 +208,8 @@ const AddStudentToClassView = () => {
                         {students.length === 0 && (
                             <div className="bg-white rounded-md shadow-md p-6 border border-gray-200">
                                 <p className="text-gray-700 text-center">
-                                    Belum ada daftar siswa. Buat permintaan akun
-                                    terlebih dahulu!
+                                    Belum ada daftar siswa. Buat Pendaftaran
+                                    siswa baru terlebih dahulu!
                                 </p>
                             </div>
                         )}

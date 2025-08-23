@@ -205,7 +205,7 @@ const RequestedAccountView = () => {
                 {!isLoading && modal.message}
             </Modal>
 
-            <h2 className="text-xl font-bold mb-4">Daftar Permintaan Akun</h2>
+            <h2 className="text-xl font-bold mb-4">Daftar Pendaftaran Akun</h2>
             <div className="max-w-6xl mx-auto">
                 {tickets && (
                     <DataTable

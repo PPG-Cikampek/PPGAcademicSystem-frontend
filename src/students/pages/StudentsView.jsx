@@ -195,7 +195,7 @@ const StudentsView = () => {
                     </h1>
                     <WarningCard
                         className="items-center justify-start"
-                        warning="Penambahan peserta didik Baru dapat dilakukan melalui fitur Permintaan Akun"
+                        warning="Penambahan peserta didik Baru dapat dilakukan melalui fitur Pendaftaran Akun"
                         onClear={() => setError(null)}
                     />
                 </div>
