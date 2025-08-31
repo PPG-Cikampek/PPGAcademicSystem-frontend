@@ -156,7 +156,7 @@ const BranchPerformanceView = () => {
                 studentsDataByClass: responseData.studentsDataByClass,
             });
         } catch (err) {}
-    }, [sendRequest]);
+    }, [sendRequest, filterState]);
 
     useEffect(() => {
         registerLocale("id-ID", idID);
@@ -313,13 +313,22 @@ const BranchPerformanceView = () => {
         return displayState.violationData;
     }, [displayState.violationData]);
 
-    const hasUnappliedFilters = useMemo(
-        () =>
-            hasUnappliedFiltersHelper(filterState, displayState, [
-                "selectedAcademicYear",
-            ]),
-        [filterState, displayState.appliedFilters]
-    );
+    const hasUnappliedFilters = useMemo(() => {
+        // When there's no appliedFilters (initial state), show the Tampilkan
+        // button as soon as the user selects an academic year (branch requires it).
+        if (!displayState || !displayState.appliedFilters) {
+            return !!filterState.selectedAcademicYear;
+        }
+
+        // After data was applied at least once, compare all relevant keys.
+        return hasUnappliedFiltersHelper(filterState, displayState, [
+            "selectedAcademicYear",
+            "period",
+            "selectedTeachingGroup",
+            "selectedSubBranch",
+            "selectedClass",
+        ]);
+    }, [filterState, displayState.appliedFilters]);
 
     const hasFiltersChanged = useMemo(
         () =>
@@ -433,7 +442,7 @@ const BranchPerformanceView = () => {
                                             }
                                             placeholderText={`${
                                                 filterState.selectedAcademicYear
-                                                    ? "Masukkan Periode"
+                                                    ? "Semua"
                                                     : "Pilih Tahun Ajaran"
                                             }`}
                                             onFocus={(e) =>
@@ -467,12 +476,14 @@ const BranchPerformanceView = () => {
                                             </option>
                                             {teachingGroupsList &&
                                                 teachingGroupsList.map(
-                                                    (branch, index) => (
+                                                    (teachingGroup, index) => (
                                                         <option
                                                             key={index}
-                                                            value={branch._id}
+                                                            value={
+                                                                teachingGroup._id
+                                                            }
                                                         >
-                                                            {branch.name}
+                                                            {teachingGroup.name}
                                                         </option>
                                                     )
                                                 )}
@@ -570,9 +581,16 @@ const BranchPerformanceView = () => {
                                             }
                                             className="btn-mobile-primary-round-gray"
                                         >
-                                            {isLoading
-                                                ? "Memuat..."
-                                                : "Tampilkan"}
+                                            {isLoading ? (
+                                                <span>
+                                                    <LoadingCircle size={16} />{" "}
+                                                    Merangkum Data...{" "}
+                                                </span>
+                                            ) : !filterState.selectedAcademicYear ? (
+                                                "Pilih Tahun Ajaran"
+                                            ) : (
+                                                "Tampilkan"
+                                            )}
                                         </button>
                                     )}
                                     {hasFiltersChanged && (
