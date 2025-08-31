@@ -122,16 +122,11 @@ const BranchPerformanceView = () => {
         setFilterState((prev) => ({
             ...prev,
             selectedAcademicYear: academicYearId,
-            selectedTeachingGroup: null,
-            selectedSubBranch: null,
-            selectedClass: null,
         }));
 
         setDisplayState((prev) => ({
+            appliedFilters: null,
             ...prev,
-            attendanceData: null,
-            overallAttendances: null,
-            violationData: null,
         }));
 
         setTeachingGroupsList([]);
@@ -162,15 +157,10 @@ const BranchPerformanceView = () => {
         setFilterState((prev) => ({
             ...prev,
             selectedTeachingGroup: teachingGroupId,
-            selectedSubBranch: null,
-            selectedClass: null,
         }));
 
         setDisplayState((prev) => ({
             ...prev,
-            attendanceData: null,
-            overallAttendances: null,
-            violationData: null,
         }));
 
         setSubBranchesList([]);
@@ -205,9 +195,6 @@ const BranchPerformanceView = () => {
 
         setDisplayState((prev) => ({
             ...prev,
-            attendanceData: null,
-            overallAttendances: null,
-            violationData: null,
         }));
 
         setClassesList([]);
@@ -237,6 +224,10 @@ const BranchPerformanceView = () => {
         setFilterState((prev) => ({
             ...prev,
             selectedClass: classId,
+        }));
+
+        setDisplayState((prev) => ({
+            ...prev,
         }));
     }, []);
 
@@ -268,9 +259,6 @@ const BranchPerformanceView = () => {
 
         setDisplayState((prev) => ({
             ...prev,
-            attendanceData: null,
-            overallAttendances: null,
-            violationData: null,
         }));
     }, []);
 
@@ -283,9 +271,6 @@ const BranchPerformanceView = () => {
         // Clear previous data while loading
         setDisplayState((prev) => ({
             ...prev,
-            attendanceData: null,
-            overallAttendances: null,
-            violationData: null,
         }));
 
         fetchAttendanceData();
@@ -322,10 +307,6 @@ const BranchPerformanceView = () => {
         () =>
             hasUnappliedFiltersHelper(filterState, displayState, [
                 "selectedAcademicYear",
-                "period",
-                "selectedTeachingGroup",
-                "selectedSubBranch",
-                "selectedClass",
             ]),
         [filterState, displayState.appliedFilters]
     );
@@ -336,6 +317,7 @@ const BranchPerformanceView = () => {
                 "selectedAcademicYear",
                 "startDate",
                 "endDate",
+                "period",
                 "selectedTeachingGroup",
                 "selectedSubBranch",
                 "selectedClass",
