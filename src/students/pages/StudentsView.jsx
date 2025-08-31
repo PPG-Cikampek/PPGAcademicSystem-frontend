@@ -61,23 +61,19 @@ const StudentsView = () => {
                     />
                 ),
         },
-        ...(auth.userRole !== "admin"
-            ? [
-                  {
-                      key: "isActive",
-                      label: "Status",
-                      sortable: true,
-                      render: (student) =>
-                          !student.isActive ? "Tidak Aktif" : "Aktif",
-                      cellStyle: (student) =>
-                          `py-1 px-2 text-sm text-center w-min border rounded-md ${
-                              !student.isActive
-                                  ? "text-red-500 bg-red-100"
-                                  : "text-green-500 bg-green-100"
-                          }`,
-                  },
-              ]
-            : []),
+
+        {
+            key: "isActive",
+            label: "Status",
+            sortable: true,
+            render: (student) => (!student.isActive ? "Tidak Aktif" : "Aktif"),
+            cellStyle: (student) =>
+                `py-1 px-2 text-sm text-center w-min border rounded-md ${
+                    !student.isActive
+                        ? "text-red-500 bg-red-100"
+                        : "text-green-500 bg-green-100"
+                }`,
+        },
         { key: "nis", label: "NIS", sortable: true },
         { key: "name", label: "Nama", sortable: true },
         {
