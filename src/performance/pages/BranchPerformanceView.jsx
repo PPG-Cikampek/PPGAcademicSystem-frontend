@@ -7,6 +7,7 @@ import idID from "date-fns/locale/id";
 
 import useHttp from "../../shared/hooks/http-hook";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
+import { useAttendancePerformanceMutation } from "../../shared/queries";
 
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 
@@ -24,6 +25,7 @@ import StudentPerformanceTable from "../components/StudentPerformanceTable";
 
 const BranchPerformanceView = () => {
     const { isLoading, error, sendRequest, setError } = useHttp();
+    const attendancePerformanceMutation = useAttendancePerformanceMutation();
 
     const initialFilterState = {
         selectedAcademicYear: null,
@@ -124,8 +126,7 @@ const BranchPerformanceView = () => {
     );
 
     const fetchAttendanceData = useCallback(async () => {
-        const url = `${import.meta.env.VITE_BACKEND_URL}/attendances/overview/`;
-        const body = JSON.stringify({
+        const requestData = {
             academicYearId: filterState.selectedAcademicYear,
             teachingGroupId: filterState.selectedTeachingGroup,
             subBranchId: filterState.selectedSubBranch,
@@ -136,12 +137,11 @@ const BranchPerformanceView = () => {
             endDate: filterState.endDate
                 ? filterState.endDate.toISOString()
                 : null,
-        });
+        };
 
         try {
-            const responseData = await sendRequest(url, "POST", body, {
-                "Content-Type": "application/json",
-            });
+            const responseData =
+                await attendancePerformanceMutation.mutateAsync(requestData);
             console.log(responseData);
 
             const { overallStats, violationStats, ...cardsData } = responseData;
@@ -158,8 +158,10 @@ const BranchPerformanceView = () => {
                 studentsDataByTeachingGroup:
                     responseData.studentsDataByTeachingGroup,
             });
-        } catch (err) {}
-    }, [sendRequest, filterState]);
+        } catch (err) {
+            console.error("Error fetching attendance data:", err);
+        }
+    }, [attendancePerformanceMutation, filterState]);
 
     useEffect(() => {
         registerLocale("id-ID", idID);

@@ -7,6 +7,7 @@ import "./SubBranchPerformanceView.css";
 
 import useHttp from "../../shared/hooks/http-hook";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
+import { useAttendancePerformanceMutation } from "../../shared/queries";
 
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 
@@ -23,6 +24,7 @@ import {
 
 const SubBranchPerformanceView = () => {
     const { isLoading, error, sendRequest, setError } = useHttp();
+    const attendancePerformanceMutation = useAttendancePerformanceMutation();
 
     const initialFilterState = {
         selectedAcademicYear: null,
@@ -78,8 +80,7 @@ const SubBranchPerformanceView = () => {
     }, [sendRequest]);
 
     const fetchAttendanceData = useCallback(async () => {
-        const url = `${import.meta.env.VITE_BACKEND_URL}/attendances/overview/`;
-        const body = JSON.stringify({
+        const requestData = {
             academicYearId: filterState.selectedAcademicYear,
             branchId: auth.userBranchId,
             subBranchId: auth.userSubBranchId,
@@ -90,12 +91,11 @@ const SubBranchPerformanceView = () => {
             endDate: filterState.endDate
                 ? filterState.endDate.toISOString()
                 : null,
-        });
+        };
 
         try {
-            const responseData = await sendRequest(url, "POST", body, {
-                "Content-Type": "application/json",
-            });
+            const responseData =
+                await attendancePerformanceMutation.mutateAsync(requestData);
             console.log(responseData);
 
             const { overallStats, violationStats, ...cardsData } = responseData;
@@ -109,8 +109,15 @@ const SubBranchPerformanceView = () => {
                 studentsData: responseData.studentsData,
                 studentsDataByClass: responseData.studentsDataByClass,
             });
-        } catch (err) {}
-    }, [sendRequest, filterState]);
+        } catch (err) {
+            console.error("Error fetching attendance data:", err);
+        }
+    }, [
+        attendancePerformanceMutation,
+        filterState,
+        auth.userBranchId,
+        auth.userSubBranchId,
+    ]);
 
     // compute maxDate only once per render to avoid repeated getMonday calls
     const maxDate = useMemo(() => {

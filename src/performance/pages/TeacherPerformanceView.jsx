@@ -6,6 +6,7 @@ import idID from "date-fns/locale/id";
 
 import useHttp from "../../shared/hooks/http-hook";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
+import { useAttendancePerformanceMutation } from "../../shared/queries";
 
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 
@@ -22,6 +23,7 @@ const TeacherPerformanceView = () => {
     const navigate = useNavigate();
 
     const { isLoading, error, sendRequest, setError } = useHttp();
+    const attendancePerformanceMutation = useAttendancePerformanceMutation();
 
     const initialFilterState = {
         selectedAcademicYear: null,
@@ -76,11 +78,10 @@ const TeacherPerformanceView = () => {
     }, [sendRequest]);
 
     const fetchAttendanceData = useCallback(async () => {
-        const url = `${import.meta.env.VITE_BACKEND_URL}/attendances/overview/`;
-        const body = JSON.stringify({
+        const requestData = {
             academicYearId: filterState.selectedAcademicYear,
             branchId: auth.userBranchId,
-            // subBranchId: auth.userSubBranchId, // teachers should have access to all students in their classes
+            // subBranchId: auth.userSubBranchId, // commented, since teachers should have access to all students in their classes
             classId: filterState.selectedClass,
             teacherClassIds: auth.userClassIds, // Use all classes the user has access to
             startDate: filterState.startDate
@@ -89,12 +90,11 @@ const TeacherPerformanceView = () => {
             endDate: filterState.endDate
                 ? filterState.endDate.toISOString()
                 : null,
-        });
+        };
 
         try {
-            const responseData = await sendRequest(url, "POST", body, {
-                "Content-Type": "application/json",
-            });
+            const responseData =
+                await attendancePerformanceMutation.mutateAsync(requestData);
             console.log(responseData);
 
             const { overallStats, violationStats, ...cardsData } = responseData;
@@ -107,8 +107,15 @@ const TeacherPerformanceView = () => {
                 appliedFilters: { ...filterState }, // Snapshot of current filters
                 studentsData: responseData.studentsData,
             });
-        } catch (err) {}
-    }, [sendRequest, filterState]);
+        } catch (err) {
+            console.error("Error fetching attendance data:", err);
+        }
+    }, [
+        attendancePerformanceMutation,
+        filterState,
+        auth.userBranchId,
+        auth.userClassIds,
+    ]);
 
     // compute maxDate only once per render to avoid repeated getMonday calls
     const maxDate = useMemo(() => {

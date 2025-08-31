@@ -1,1 +1,4 @@
-// export { useStudentPerformances } from "./useStudentPerformances";
+export {
+    useAttendancePerformance,
+    useAttendancePerformanceMutation,
+} from "./useAttendancePerformances";
