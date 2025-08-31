@@ -20,8 +20,8 @@ export function hasUnappliedFilters(
     if (!applied) {
         return keysToCheck.every((k) => {
             const val = filterState[k];
-            // treat empty string as not set
-            return val !== null && val !== undefined && val !== "";
+            // treat empty string as not set, but allow null (e.g., for optional filters like selectedClass)
+            return val !== undefined && val !== "";
         });
     }
 

@@ -322,6 +322,10 @@ const BranchPerformanceView = () => {
         () =>
             hasUnappliedFiltersHelper(filterState, displayState, [
                 "selectedAcademicYear",
+                "period",
+                "selectedTeachingGroup",
+                "selectedSubBranch",
+                "selectedClass",
             ]),
         [filterState, displayState.appliedFilters]
     );

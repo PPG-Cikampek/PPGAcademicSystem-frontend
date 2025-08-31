@@ -296,6 +296,7 @@ const TeacherPerformanceView = () => {
             hasUnappliedFiltersHelper(filterState, displayState, [
                 "selectedAcademicYear",
                 "period",
+                "selectedClass",
             ]),
         [filterState, displayState.appliedFilters]
     );
