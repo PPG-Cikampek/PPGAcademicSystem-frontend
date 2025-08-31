@@ -13,11 +13,12 @@ import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import PieChart from "../components/PieChart";
 import { academicYearFormatter } from "../../shared/Utilities/academicYearFormatter";
 import { getMonday } from "../../shared/Utilities/getMonday";
-import StudentPerformanceTable from "../components/StudentPerformanceTable";
+import StudentsPerformanceTable from "../components/StudentsPerformanceTable";
 import {
     hasUnappliedFilters as hasUnappliedFiltersHelper,
     hasFiltersChanged as hasFiltersChangedHelper,
 } from "../utilities/filterHelpers";
+import ClassesPerformanceTable from "../components/ClassesPerformanceTable";
 
 const TeacherPerformanceView = () => {
     const navigate = useNavigate();
@@ -43,6 +44,7 @@ const TeacherPerformanceView = () => {
         endDate: null,
         period: null,
         selectedClass: null,
+        currentView: "classesTable",
     });
 
     // Display state - for currently shown data (only updates when filters are applied)
@@ -106,6 +108,7 @@ const TeacherPerformanceView = () => {
                 violationData: responseData.violationStats,
                 appliedFilters: { ...filterState }, // Snapshot of current filters
                 studentsData: responseData.studentsData,
+                studentsDataByClass: responseData.studentsDataByClass,
             });
         } catch (err) {
             console.error("Error fetching attendance data:", err);
@@ -576,12 +579,41 @@ const TeacherPerformanceView = () => {
                 )}
                 {displayState.violationData &&
                     !isLoading &&
-                    filterState.selectedAcademicYear && (
-                        <StudentPerformanceTable
-                            studentsData={displayState.studentsData}
-                            filterState={filterState}
-                        />
-                    )}
+                    filterState.selectedAcademicYear &&
+                    (filterState.currentView === "classesTable" ? (
+                        <div className="print-avoid-break">
+                            <h2>Performa Siswa</h2>
+                            <ClassesPerformanceTable
+                                data={displayState.studentsDataByClass}
+                                filterState={filterState}
+                                setFilterState={setFilterState}
+                            />
+                        </div>
+                    ) : (
+                        <div className="print-avoid-break">
+                            <div className="flex justify-between">
+                                <h2>Performa Kelas</h2>
+                                <div className="flex gap-2 no-print">
+                                    <button
+                                        className="btn-mobile-primary-round-gray"
+                                        onClick={() =>
+                                            setFilterState((prev) => ({
+                                                ...prev,
+                                                currentView: "classesTable",
+                                                selectedClass: null,
+                                            }))
+                                        }
+                                    >
+                                        Kembali
+                                    </button>
+                                </div>
+                            </div>
+                            <StudentsPerformanceTable
+                                studentsData={displayState.studentsData}
+                                filterState={filterState}
+                            />
+                        </div>
+                    ))}
             </main>
         </div>
     );

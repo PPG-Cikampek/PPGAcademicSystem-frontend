@@ -14,8 +14,8 @@ import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import PieChart from "../components/PieChart";
 import { academicYearFormatter } from "../../shared/Utilities/academicYearFormatter";
 import { getMonday } from "../../shared/Utilities/getMonday";
-import ClassPerformanceTable from "../components/ClassPerformanceTable";
-import StudentPerformanceTable from "../components/StudentPerformanceTable";
+import ClassesPerformanceTable from "../components/ClassesPerformanceTable";
+import StudentsPerformanceTable from "../components/StudentsPerformanceTable";
 import { CircleX, FileDown } from "lucide-react";
 import {
     hasUnappliedFilters as hasUnappliedFiltersHelper,
@@ -758,7 +758,7 @@ const SubBranchPerformanceView = () => {
                     (filterState.currentView === "classesTable" ? (
                         <div className="print-avoid-break">
                             <h2>Performa Kelompok</h2>
-                            <ClassPerformanceTable
+                            <ClassesPerformanceTable
                                 data={displayState.studentsDataByClass}
                                 filterState={filterState}
                                 setFilterState={setFilterState}
@@ -783,7 +783,7 @@ const SubBranchPerformanceView = () => {
                                     </button>
                                 </div>
                             </div>
-                            <StudentPerformanceTable
+                            <StudentsPerformanceTable
                                 selectedAcademicYear={
                                     filterState.selectedAcademicYear
                                 }

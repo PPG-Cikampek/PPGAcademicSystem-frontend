@@ -11,11 +11,11 @@ const ClassesPerformanceTable = ({
     startDate,
     endDate,
 }) => {
-    console.log(!data && !!selectedSubBranch);
+    console.log(data);
     const auth = useContext(AuthContext);
 
-    let filteredData = [];
-    if (data) {
+    let filteredData;
+    if (data && auth.userRole !== "teacher") {
         filteredData = useMemo(
             () =>
                 data.filter(
@@ -154,6 +154,8 @@ const ClassesPerformanceTable = ({
                 attendanceData
                     ? attendanceData.studentsDataByClass
                     : filteredData
+                    ? filteredData
+                    : data
             }
             columns={clsColumns}
             searchableColumns={["name"]}

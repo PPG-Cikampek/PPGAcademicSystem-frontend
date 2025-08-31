@@ -17,7 +17,10 @@ const StudentsPerformanceTable = ({ studentsData, filterState }) => {
                 ? { branchYearId: filterState.selectedBranchYear }
                 : {}),
             branchId: auth.userBranchId,
-            subBranchId: filterState.selectedSubBranch,
+            subBranchId:
+                auth.userRole === "teacher"
+                    ? auth.userSubBranchId
+                    : filterState.selectedSubBranch,
             classId: filterState.selectedClass,
             startDate: filterState.startDate
                 ? filterState.startDate.toISOString()
@@ -47,9 +50,7 @@ const StudentsPerformanceTable = ({ studentsData, filterState }) => {
                 : null,
         },
         {
-            enabled: true, // always allow fetching
-            // ensure a fresh fetch every time the component mounts
-            // refetchOnMount: "always",
+            enabled: !!!studentsData,
         }
     );
 
@@ -161,13 +162,15 @@ const StudentsPerformanceTable = ({ studentsData, filterState }) => {
                           headerAlign: "center",
                           render: (student) => (
                               <div className="place-self-center">
-                                  {selectedAcademicYear &&
+                                  {filterState.selectedAcademicYear &&
                                   (student.id || student._id) ? (
                                       <StudentReportView
-                                          academicYearId={selectedAcademicYear}
+                                          academicYearId={
+                                              filterState.selectedAcademicYear
+                                          }
                                           studentId={student.id || student._id}
-                                          startDate={startDate}
-                                          endDate={endDate}
+                                          startDate={filterState.startDate}
+                                          endDate={filterState.endDate}
                                           noCard={true}
                                       />
                                   ) : (
@@ -190,7 +193,7 @@ const StudentsPerformanceTable = ({ studentsData, filterState }) => {
 
     return (
         <DataTable
-            data={attendanceData?.studentsData || studentsData}
+            data={studentsData || attendanceData?.studentsData}
             columns={studentColumns}
             searchableColumns={["name"]}
             initialSort={{ key: "name", direction: "ascending" }}
