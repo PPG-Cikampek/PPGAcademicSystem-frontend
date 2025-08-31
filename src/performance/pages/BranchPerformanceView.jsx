@@ -78,20 +78,17 @@ const BranchPerformanceView = () => {
         } catch (err) {}
     }, [sendRequest]);
 
-    const fetchTeachingGroups = useCallback(
-        async (selectedAcademicYear) => {
-            console.log("fetching teachingGroups!");
-            try {
-                const responseData = await sendRequest(
-                    `${
-                        import.meta.env.VITE_BACKEND_URL
-                    }/branchYears/academic-year/${selectedAcademicYear}/teaching-groups`
-                );
-                setTeachingGroupsList(responseData.teachingGroups);
-            } catch (err) {}
-        },
-        [sendRequest]
-    );
+    const fetchTeachingGroups = useCallback(async () => {
+        console.log("fetching teachingGroups!");
+        try {
+            const responseData = await sendRequest(
+                `${import.meta.env.VITE_BACKEND_URL}/branchYears/${
+                    auth.currentBranchYearId
+                }/teaching-groups`
+            );
+            setTeachingGroupsList(responseData.teachingGroups);
+        } catch (err) {}
+    }, [sendRequest]);
 
     const fetchSubBranchesList = useCallback(
         async (teachingGroupId) => {
@@ -108,19 +105,14 @@ const BranchPerformanceView = () => {
     );
 
     const fetchClassesList = useCallback(
-        async (
-            teachingGroupId = null,
-            subBranchId = null,
-            academicYearId = null
-        ) => {
-            const yearId = academicYearId;
+        async (teachingGroupId = null) => {
             const url = `${
                 import.meta.env.VITE_BACKEND_URL
-            }/classes/sub-branch/${subBranchId}/academic-year/${yearId}`;
+            }/teachingGroups/${teachingGroupId}/classes`;
 
             try {
                 const responseData = await sendRequest(url);
-                setClassesList(responseData.subBranchYear.classes);
+                setClassesList(responseData.classes);
             } catch (err) {}
         },
         [sendRequest]
@@ -205,14 +197,12 @@ const BranchPerformanceView = () => {
                 ...prev,
             }));
 
-            setSubBranchesList([]);
-            setClassesList([]);
-
             if (teachingGroupId !== "") {
                 fetchSubBranchesList(teachingGroupId);
+                fetchClassesList(teachingGroupId);
             }
         },
-        [fetchSubBranchesList]
+        [fetchSubBranchesList, fetchClassesList]
     );
 
     const selectSubBranchHandler = useCallback(
@@ -226,16 +216,6 @@ const BranchPerformanceView = () => {
             setDisplayState((prev) => ({
                 ...prev,
             }));
-
-            setClassesList([]);
-
-            if (subBranchId !== "") {
-                fetchClassesList(
-                    null,
-                    subBranchId,
-                    filterState.selectedAcademicYear
-                );
-            }
         },
         [fetchClassesList, filterState.selectedAcademicYear]
     );
