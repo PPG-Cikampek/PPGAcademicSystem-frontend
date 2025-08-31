@@ -1,56 +1,61 @@
-import { useState, useContext, useEffect, useMemo, useCallback } from "react";
+import { useState, useContext, useMemo } from "react";
 import DataTable from "../../shared/Components/UIElements/DataTable";
 import StudentInitial from "../../shared/Components/UIElements/StudentInitial";
 import StudentReportView from "../../students/pages/StudentReportView";
-import useHttp from "../../shared/hooks/http-hook";
+import { useAttendancePerformance } from "../../shared/queries/useAttendancePerformances";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
 
-const StudentPerformanceTable = ({
-    studentsData,
-    selectedAcademicYear,
-    selectedClass,
-    startDate,
-    endDate,
-}) => {
-    const { isLoading, sendRequest } = useHttp();
+const StudentsPerformanceTable = ({ studentsData, filterState }) => {
     const auth = useContext(AuthContext);
 
-    const [displayState, setDisplayState] = useState({});
-
-    const fetchAttendanceData = useCallback(async () => {
-        const url = `${import.meta.env.VITE_BACKEND_URL}/attendances/overview/`;
-        const body = JSON.stringify({
-            academicYearId: selectedAcademicYear,
+    const { data: attendanceData } = useAttendancePerformance(
+        {
+            ...(filterState.selectedAcademicYear
+                ? { academicYearId: filterState.selectedAcademicYear }
+                : {}),
+            ...(filterState.selectedBranchYear
+                ? { branchYearId: filterState.selectedBranchYear }
+                : {}),
+            branchId: auth.userBranchId,
+            subBranchId: filterState.selectedSubBranch,
+            classId: filterState.selectedClass,
+            startDate: filterState.startDate
+                ? filterState.startDate.toISOString()
+                : null,
+            endDate: filterState.endDate
+                ? filterState.endDate.toISOString()
+                : null,
+        },
+        {
+            ...(filterState.selectedAcademicYear
+                ? { academicYearId: filterState.selectedAcademicYear }
+                : {}),
+            ...(filterState.selectedBranchYear
+                ? { branchYearId: filterState.selectedBranchYear }
+                : {}),
+            ...(filterState.selectedClass
+                ? { classId: filterState.selectedClass }
+                : {}),
             branchId: auth.userBranchId,
             subBranchId: auth.userSubBranchId,
-            classId: selectedClass,
-            startDate: startDate ? startDate.toISOString() : null,
-            endDate: endDate ? endDate.toISOString() : null,
-        });
-
-        try {
-            const responseData = await sendRequest(url, "POST", body, {
-                "Content-Type": "application/json",
-            });
-            console.log(responseData);
-
-            const { overallStats, violationStats, ...cardsData } = responseData;
-
-            // Update display state with new data and record applied filters
-            setDisplayState({
-                overallAttendances: responseData.overallStats,
-                violationData: responseData.violationStats,
-                studentsData: responseData.studentsData,
-                studentsDataByClass: responseData.studentsDataByClass,
-            });
-        } catch (err) {}
-    }, [sendRequest]);
-
-    useEffect(() => {
-        if (!studentsData && selectedAcademicYear && selectedClass) {
-            fetchAttendanceData();
+            classId: filterState.selectedClass,
+            startDate: filterState.startDate
+                ? filterState.startDate.toISOString()
+                : null,
+            endDate: filterState.endDate
+                ? filterState.endDate.toISOString()
+                : null,
+        },
+        {
+            enabled: true, // always allow fetching
+            // ensure a fresh fetch every time the component mounts
+            // refetchOnMount: "always",
         }
-    }, [sendRequest]);
+    );
+
+    attendanceData
+        ? console.log(attendanceData)
+        : console.log("No attendance data available");
 
     const studentColumns = useMemo(
         () => [
@@ -176,16 +181,16 @@ const StudentPerformanceTable = ({
                   ]
                 : []),
         ],
-        [selectedAcademicYear, startDate, endDate]
+        [
+            filterState.selectedAcademicYear,
+            filterState.startDate,
+            filterState.endDate,
+        ]
     );
 
     return (
         <DataTable
-            data={
-                !isLoading && studentsData
-                    ? studentsData
-                    : displayState.studentsData
-            }
+            data={attendanceData?.studentsData || studentsData}
             columns={studentColumns}
             searchableColumns={["name"]}
             initialSort={{ key: "name", direction: "ascending" }}
@@ -202,4 +207,4 @@ const StudentPerformanceTable = ({
     );
 };
 
-export default StudentPerformanceTable;
+export default StudentsPerformanceTable;

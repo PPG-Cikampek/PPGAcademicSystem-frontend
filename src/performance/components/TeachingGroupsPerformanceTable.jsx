@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import DataTable from "../../shared/Components/UIElements/DataTable";
 
-const TeachingGroupPerformanceTable = ({
+const TeachingGroupsPerformanceTable = ({
     data,
     filterState,
     setFilterState,
@@ -18,13 +18,6 @@ const TeachingGroupPerformanceTable = ({
         {
             key: "studentsCount",
             label: "Jumlah Siswa",
-            cellAlign: "center",
-            headerAlign: "center",
-            sortable: true,
-        },
-        {
-            key: "attendancesCount",
-            label: "Total Pertemuan",
             cellAlign: "center",
             headerAlign: "center",
             sortable: true,
@@ -135,4 +128,4 @@ const TeachingGroupPerformanceTable = ({
     );
 };
 
-export default TeachingGroupPerformanceTable;
+export default TeachingGroupsPerformanceTable;

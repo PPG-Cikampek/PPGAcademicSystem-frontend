@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import DataTable from "../../shared/Components/UIElements/DataTable";
 
-const SubBranchPerformanceTable = ({ data, filterState, setFilterState }) => {
+const SubBranchesPerformanceTable = ({ data, filterState, setFilterState }) => {
     const filteredData = useMemo(
         () =>
             data.filter(
@@ -23,13 +23,6 @@ const SubBranchPerformanceTable = ({ data, filterState, setFilterState }) => {
         {
             key: "studentsCount",
             label: "Jumlah Siswa",
-            cellAlign: "center",
-            headerAlign: "center",
-            sortable: true,
-        },
-        {
-            key: "attendancesCount",
-            label: "Total Pertemuan",
             cellAlign: "center",
             headerAlign: "center",
             sortable: true,
@@ -106,7 +99,6 @@ const SubBranchPerformanceTable = ({ data, filterState, setFilterState }) => {
                     <button
                         className="btn-primary-outline"
                         onClick={() => {
-                            console.log(filterState);
                             setFilterState({
                                 ...filterState,
                                 currentView: "classesTable",
@@ -140,4 +132,4 @@ const SubBranchPerformanceTable = ({ data, filterState, setFilterState }) => {
     );
 };
 
-export default SubBranchPerformanceTable;
+export default SubBranchesPerformanceTable;

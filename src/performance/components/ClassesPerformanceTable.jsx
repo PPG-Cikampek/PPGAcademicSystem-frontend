@@ -1,17 +1,46 @@
-import { useMemo } from "react";
+import { useContext, useMemo } from "react";
 import DataTable from "../../shared/Components/UIElements/DataTable";
+import { useAttendancePerformance } from "../../shared/queries/useAttendancePerformances";
+import { AuthContext } from "../../shared/Components/Context/auth-context";
 
-const ClassPerformanceTable = ({ data, filterState, setFilterState }) => {
-    const filteredData = useMemo(
-        () =>
-            data.filter(
-                (item) => item.subBranchId === filterState.selectedSubBranch
-            ),
-        [data, filterState.selectedSubBranch]
+const ClassesPerformanceTable = ({
+    data,
+    filterState,
+    setFilterState,
+    selectedSubBranch,
+    startDate,
+    endDate,
+}) => {
+    console.log(!data && !!selectedSubBranch);
+    const auth = useContext(AuthContext);
+
+    let filteredData = [];
+    if (data) {
+        filteredData = useMemo(
+            () =>
+                data.filter(
+                    (item) => item.subBranchId === filterState.selectedSubBranch
+                ),
+            [data, filterState.selectedSubBranch]
+        );
+    }
+
+    const { data: attendanceData } = useAttendancePerformance(
+        {
+            branchYearId: auth.currentBranchYearId,
+            branchId: auth.userBranchId,
+            subBranchId: filterState.selectedSubBranch,
+            startDate: startDate ? startDate.toISOString() : null,
+            endDate: endDate ? endDate.toISOString() : null,
+        },
+        {
+            enabled: !data && !!selectedSubBranch,
+        }
     );
 
-    console.log(data);
-    console.log(filteredData);
+    attendanceData
+        ? console.log(attendanceData)
+        : console.log("No attendance data available");
 
     const clsColumns = useMemo(() => [
         {
@@ -121,7 +150,11 @@ const ClassPerformanceTable = ({ data, filterState, setFilterState }) => {
 
     return (
         <DataTable
-            data={filteredData}
+            data={
+                attendanceData
+                    ? attendanceData.studentsDataByClass
+                    : filteredData
+            }
             columns={clsColumns}
             searchableColumns={["name"]}
             initialSort={{ key: "name", direction: "ascending" }}
@@ -138,4 +171,4 @@ const ClassPerformanceTable = ({ data, filterState, setFilterState }) => {
     );
 };
 
-export default ClassPerformanceTable;
+export default ClassesPerformanceTable;

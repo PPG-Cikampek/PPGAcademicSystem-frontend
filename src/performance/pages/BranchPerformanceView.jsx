@@ -18,10 +18,10 @@ import {
     hasUnappliedFilters as hasUnappliedFiltersHelper,
     hasFiltersChanged as hasFiltersChangedHelper,
 } from "../utilities/filterHelpers";
-import TeachingGroupPerformanceTable from "../components/TeachingGroupPerformanceTable";
-import SubBranchPerformanceTable from "../components/SubBranchPerformanceTable";
-import ClassPerformanceTable from "../components/ClassPerformanceTable";
-import StudentPerformanceTable from "../components/StudentPerformanceTable";
+import TeachingGroupsPerformanceTable from "../components/TeachingGroupsPerformanceTable";
+import SubBranchesPerformanceTable from "../components/SubBranchesPerformanceTable";
+import ClassesPerformanceTable from "../components/ClassesPerformanceTable";
+import StudentsPerformanceTable from "../components/StudentsPerformanceTable";
 
 const BranchPerformanceView = () => {
     const { isLoading, error, sendRequest, setError } = useHttp();
@@ -42,7 +42,6 @@ const BranchPerformanceView = () => {
 
     // Filter state - for user selections (doesn't trigger data fetches)
     const [filterState, setFilterState] = useState({
-        selectedAcademicYear: null,
         startDate: null,
         endDate: null,
         period: null,
@@ -669,7 +668,7 @@ const BranchPerformanceView = () => {
                     (filterState.currentView === "teachingGroupsTable" ? (
                         <div className="print-avoid-break">
                             <h2>Performa Desa</h2>
-                            <TeachingGroupPerformanceTable
+                            <TeachingGroupsPerformanceTable
                                 data={displayState.studentsDataByTeachingGroup}
                                 filterState={filterState}
                                 setFilterState={setFilterState}
@@ -695,7 +694,7 @@ const BranchPerformanceView = () => {
                                     </button>
                                 </div>
                             </div>
-                            <SubBranchPerformanceTable
+                            <SubBranchesPerformanceTable
                                 data={displayState.studentsDataBySubBranch}
                                 filterState={filterState}
                                 setFilterState={setFilterState}
@@ -720,8 +719,12 @@ const BranchPerformanceView = () => {
                                     </button>
                                 </div>
                             </div>
-                            <ClassPerformanceTable
-                                data={displayState.studentsDataByClass}
+                            <ClassesPerformanceTable
+                                selectedSubBranch={
+                                    filterState.selectedSubBranch
+                                }
+                                startDate={filterState.startDate}
+                                endDate={filterState.endDate}
                                 filterState={filterState}
                                 setFilterState={setFilterState}
                             />
@@ -729,7 +732,7 @@ const BranchPerformanceView = () => {
                     ) : (
                         <div className="print-avoid-break">
                             <div className="flex justify-between">
-                                <h2>Performa Kelompok</h2>
+                                <h2>Performa Kelas</h2>
                                 <div className="flex gap-2 no-print">
                                     <button
                                         className="btn-mobile-primary-round-gray"
@@ -745,13 +748,8 @@ const BranchPerformanceView = () => {
                                     </button>
                                 </div>
                             </div>
-                            <StudentPerformanceTable
-                                selectedAcademicYear={
-                                    filterState.selectedAcademicYear
-                                }
-                                selectedClass={filterState.selectedClass}
-                                startDate={filterState.startDate}
-                                endDate={filterState.endDate}
+                            <StudentsPerformanceTable
+                                filterState={filterState}
                             />
                         </div>
                     ))}

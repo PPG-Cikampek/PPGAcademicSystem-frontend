@@ -579,11 +579,7 @@ const TeacherPerformanceView = () => {
                     filterState.selectedAcademicYear && (
                         <StudentPerformanceTable
                             studentsData={displayState.studentsData}
-                            selectedAcademicYear={
-                                filterState.selectedAcademicYear
-                            }
-                            startDate={filterState.startDate}
-                            endDate={filterState.endDate}
+                            filterState={filterState}
                         />
                     )}
             </main>
