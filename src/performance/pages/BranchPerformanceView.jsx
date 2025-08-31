@@ -17,6 +17,10 @@ import {
     hasUnappliedFilters as hasUnappliedFiltersHelper,
     hasFiltersChanged as hasFiltersChangedHelper,
 } from "../utilities/filterHelpers";
+import TeachingGroupPerformanceTable from "../components/TeachingGroupPerformanceTable";
+import SubBranchPerformanceTable from "../components/SubBranchPerformanceTable";
+import ClassPerformanceTable from "../components/ClassPerformanceTable";
+import StudentPerformanceTable from "../components/StudentPerformanceTable";
 
 const BranchPerformanceView = () => {
     const { isLoading, error, sendRequest, setError } = useHttp();
@@ -43,6 +47,7 @@ const BranchPerformanceView = () => {
         selectedTeachingGroup: null,
         selectedSubBranch: null,
         selectedClass: null,
+        currentView: "teachingGroupsTable",
     });
 
     // Display state - for currently shown data (only updates when "Tampilkan" is clicked)
@@ -118,43 +123,40 @@ const BranchPerformanceView = () => {
         [sendRequest]
     );
 
-    const fetchAttendanceData = useCallback(
-        async (filters) => {
-            const url = `${
-                import.meta.env.VITE_BACKEND_URL
-            }/attendances/overview/`;
-            const body = JSON.stringify({
-                academicYearId: filters.selectedAcademicYear,
-                teachingGroupId: filters.selectedTeachingGroup,
-                subBranchId: filters.selectedSubBranch,
-                classId: filters.selectedClass,
-                startDate: filters.startDate
-                    ? filters.startDate.toISOString()
-                    : null,
-                endDate: filters.endDate ? filters.endDate.toISOString() : null,
+    const fetchAttendanceData = useCallback(async () => {
+        const url = `${import.meta.env.VITE_BACKEND_URL}/attendances/overview/`;
+        const body = JSON.stringify({
+            academicYearId: filterState.selectedAcademicYear,
+            teachingGroupId: filterState.selectedTeachingGroup,
+            subBranchId: filterState.selectedSubBranch,
+            classId: filterState.selectedClass,
+            startDate: filterState.startDate
+                ? filterState.startDate.toISOString()
+                : null,
+            endDate: filterState.endDate
+                ? filterState.endDate.toISOString()
+                : null,
+        });
+
+        try {
+            const responseData = await sendRequest(url, "POST", body, {
+                "Content-Type": "application/json",
             });
+            console.log(responseData);
 
-            try {
-                const attendanceData = await sendRequest(url, "POST", body, {
-                    "Content-Type": "application/json",
-                });
+            const { overallStats, violationStats, ...cardsData } = responseData;
 
-                console.log(attendanceData);
-
-                const { overallStats, violationStats, ...cardsData } =
-                    attendanceData;
-
-                // Update display state with new data and record applied filters
-                setDisplayState({
-                    attendanceData: cardsData,
-                    overallAttendances: attendanceData.overallStats,
-                    violationData: attendanceData.violationStats,
-                    appliedFilters: { ...filters }, // Snapshot of current filters
-                });
-            } catch (err) {}
-        },
-        [sendRequest]
-    );
+            // Update display state with new data and record applied filters
+            setDisplayState({
+                attendanceData: cardsData,
+                overallAttendances: responseData.overallStats,
+                violationData: responseData.violationStats,
+                appliedFilters: { ...filterState }, // Snapshot of current filters
+                studentsData: responseData.studentsData,
+                studentsDataByClass: responseData.studentsDataByClass,
+            });
+        } catch (err) {}
+    }, [sendRequest]);
 
     useEffect(() => {
         registerLocale("id-ID", idID);
@@ -163,9 +165,9 @@ const BranchPerformanceView = () => {
 
     const selectAcademicYearHandler = useCallback(
         (academicYearId) => {
-            setFilterState((prev) => ({
-                ...prev,
+            setFilterState(() => ({
                 selectedAcademicYear: academicYearId,
+                currentView: "teachingGroupsTable",
             }));
 
             setDisplayState((prev) => ({
@@ -193,6 +195,7 @@ const BranchPerformanceView = () => {
                 selectedTeachingGroup: teachingGroupId,
                 selectedSubBranch: null,
                 selectedClass: null,
+                currentView: "teachingGroupsTable",
             }));
 
             setDisplayState((prev) => ({
@@ -213,6 +216,7 @@ const BranchPerformanceView = () => {
                 ...prev,
                 selectedSubBranch: subBranchId,
                 selectedClass: null,
+                currentView: "teachingGroupsTable",
             }));
 
             setDisplayState((prev) => ({
@@ -226,24 +230,28 @@ const BranchPerformanceView = () => {
         setFilterState((prev) => ({
             ...prev,
             selectedClass: classId,
+            currentView: "teachingGroupsTable",
         }));
     }, []);
 
     const selectDateRangeHandler = useCallback((dates) => {
         const [start, end] = dates;
+
         let period = null;
 
         if (start && end) {
             period =
                 start.toLocaleDateString("id-ID", {
                     day: "2-digit",
+                    month: "2-digit",
+                    year: "2-digit",
                     timeZone: "Asia/Jakarta",
                 }) +
                 " - " +
                 end.toLocaleDateString("id-ID", {
                     day: "2-digit",
-                    month: "long",
-                    year: "numeric",
+                    month: "2-digit",
+                    year: "2-digit",
                     timeZone: "Asia/Jakarta",
                 });
         }
@@ -253,6 +261,7 @@ const BranchPerformanceView = () => {
             startDate: start,
             endDate: end,
             period: period,
+            currentView: "teachingGroupsTable",
         }));
 
         setDisplayState((prev) => ({
@@ -266,17 +275,20 @@ const BranchPerformanceView = () => {
             return;
         }
 
-        // Clear previous data while loading
-        setDisplayState((prev) => ({
+        setFilterState((prev) => ({
             ...prev,
+            currentView: "teachingGroupsTable",
         }));
 
-        fetchAttendanceData(filterState);
+        fetchAttendanceData();
     }, [filterState.selectedAcademicYear, fetchAttendanceData]);
 
     const handleResetFilter = useCallback(() => {
         // Reset filter selections to initial values
-        setFilterState({ ...initialFilterState });
+        setFilterState({
+            ...initialFilterState,
+            currentView: "teachingGroupsTable",
+        });
 
         // Clear displayed data
         setDisplayState({
@@ -305,10 +317,6 @@ const BranchPerformanceView = () => {
         () =>
             hasUnappliedFiltersHelper(filterState, displayState, [
                 "selectedAcademicYear",
-                "period",
-                "selectedTeachingGroup",
-                "selectedSubBranch",
-                "selectedClass",
             ]),
         [filterState, displayState.appliedFilters]
     );
@@ -635,6 +643,105 @@ const BranchPerformanceView = () => {
                         </div>
                     </div>
                 )}
+                {displayState.violationData &&
+                    !isLoading &&
+                    filterState.selectedAcademicYear &&
+                    (filterState.currentView === "teachingGroupsTable" ? (
+                        <div className="print-avoid-break">
+                            <h2>Performa Desa</h2>
+                            <TeachingGroupPerformanceTable
+                                data={displayState.studentsDataByClass}
+                                filterState={filterState}
+                                setFilterState={setFilterState}
+                            />
+                        </div>
+                    ) : filterState.currentView ===
+                      "subBranchPerformanceTable" ? (
+                        <div className="print-avoid-break">
+                            <div className="flex justify-between">
+                                <h2>Performa KBM</h2>
+                                <div className="flex gap-2 no-print">
+                                    <button
+                                        className="btn-mobile-primary-round-gray"
+                                        onClick={() =>
+                                            setFilterState((prev) => ({
+                                                ...prev,
+                                                currentView:
+                                                    "teachingGroupsTable",
+                                                selectedClass: null,
+                                            }))
+                                        }
+                                    >
+                                        Kembali
+                                    </button>
+                                </div>
+                            </div>
+                            <SubBranchPerformanceTable
+                                selectedAcademicYear={
+                                    filterState.selectedAcademicYear
+                                }
+                                selectedClass={filterState.selectedClass}
+                                startDate={filterState.startDate}
+                                endDate={filterState.endDate}
+                            />
+                        </div>
+                    ) : filterState.currentView === "classesTable" ? (
+                        <div className="print-avoid-break">
+                            <div className="flex justify-between">
+                                <h2>Performa Kelompok</h2>
+                                <div className="flex gap-2 no-print">
+                                    <button
+                                        className="btn-mobile-primary-round-gray"
+                                        onClick={() =>
+                                            setFilterState((prev) => ({
+                                                ...prev,
+                                                currentView: "subBranchesTable",
+                                                selectedClass: null,
+                                            }))
+                                        }
+                                    >
+                                        Kembali
+                                    </button>
+                                </div>
+                            </div>
+                            <ClassPerformanceTable
+                                selectedAcademicYear={
+                                    filterState.selectedAcademicYear
+                                }
+                                selectedClass={filterState.selectedClass}
+                                startDate={filterState.startDate}
+                                endDate={filterState.endDate}
+                            />
+                        </div>
+                    ) : (
+                        <div className="print-avoid-break">
+                            <div className="flex justify-between">
+                                <h2>Performa Kelompok</h2>
+                                <div className="flex gap-2 no-print">
+                                    <button
+                                        className="btn-mobile-primary-round-gray"
+                                        onClick={() =>
+                                            setFilterState((prev) => ({
+                                                ...prev,
+                                                currentView: "subBranchesTable",
+                                                selectedClass: null,
+                                            }))
+                                        }
+                                    >
+                                        Kembali
+                                    </button>
+                                </div>
+                            </div>
+                            <StudentPerformanceTable
+                                selectedAcademicYear={
+                                    filterState.selectedAcademicYear
+                                }
+                                selectedClass={filterState.selectedClass}
+                                startDate={filterState.startDate}
+                                endDate={filterState.endDate}
+                            />
+                        </div>
+                    ))}
             </main>
         </div>
     );
