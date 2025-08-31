@@ -550,7 +550,7 @@ const TeachingGroupsView = () => {
                                             className="button-primary pl-[11px] mt-0"
                                             onClick={() => {
                                                 navigate(
-                                                    `/dashboard/teaching-groups/${teachingGroupId}/add-sub-branches/`,
+                                                    `/dashboard/teaching-groups/${teachingGroupId}/add-sub-branches`,
                                                     {
                                                         state: {
                                                             teachingGroupData:
@@ -602,7 +602,7 @@ const TeachingGroupsView = () => {
                                         ?.academicYearId.isActive &&
                                     teachingGroupData?.isLocked === false && (
                                         <Link
-                                            to={`/dashboard/teaching-groups/${teachingGroupId}/add-class/`}
+                                            to={`/dashboard/teaching-groups/${teachingGroupId}/add-class`}
                                         >
                                             <button className="button-primary pl-[11px] mt-0">
                                                 <PlusIcon className="w-4 h-4 mr-2" />

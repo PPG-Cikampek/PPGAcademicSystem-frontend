@@ -359,7 +359,7 @@ const ClassDetailView = () => {
                                     classData.class.teachingGroupId.branchYearId
                                         .academicYearId.isActive === true && (
                                         <Link
-                                            to={`/dashboard/classes/${classId}/add-teachers/`}
+                                            to={`/dashboard/classes/${classId}/add-teachers`}
                                         >
                                             <button className="button-primary pl-[11px] mt-0">
                                                 <PlusIcon className="w-4 h-4 mr-2" />
@@ -521,7 +521,7 @@ const ClassDetailView = () => {
                                     classData.class.teachingGroupId.branchYearId
                                         .academicYearId.isActive === true && (
                                         <Link
-                                            to={`/dashboard/classes/${classId}/add-students/`}
+                                            to={`/dashboard/classes/${classId}/add-students`}
                                         >
                                             <button className="button-primary pl-[11px] mt-0">
                                                 <PlusIcon className="w-4 h-4 mr-2" />
