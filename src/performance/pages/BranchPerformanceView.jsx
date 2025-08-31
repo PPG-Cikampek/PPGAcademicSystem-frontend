@@ -24,7 +24,7 @@ import ClassesPerformanceTable from "../components/ClassesPerformanceTable";
 import StudentsPerformanceTable from "../components/StudentsPerformanceTable";
 
 const BranchPerformanceView = () => {
-    const { isLoading, error, sendRequest, setError } = useHttp();
+    const { isLoading, setIsLoading, error, sendRequest, setError } = useHttp();
     const attendancePerformanceMutation = useAttendancePerformanceMutation();
 
     const initialFilterState = {
@@ -124,6 +124,7 @@ const BranchPerformanceView = () => {
     );
 
     const fetchAttendanceData = useCallback(async () => {
+        setIsLoading(true);
         const requestData = {
             branchYearId: auth.currentBranchYearId,
             teachingGroupId: filterState.selectedTeachingGroup,
@@ -159,6 +160,7 @@ const BranchPerformanceView = () => {
         } catch (err) {
             console.error("Error fetching attendance data:", err);
         }
+        setIsLoading(false);
     }, [attendancePerformanceMutation, filterState]);
 
     useEffect(() => {

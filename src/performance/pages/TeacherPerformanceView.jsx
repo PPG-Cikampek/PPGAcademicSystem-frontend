@@ -21,9 +21,7 @@ import {
 import ClassesPerformanceTable from "../components/ClassesPerformanceTable";
 
 const TeacherPerformanceView = () => {
-    const navigate = useNavigate();
-
-    const { isLoading, error, sendRequest, setError } = useHttp();
+    const { isLoading, setIsLoading, error, sendRequest, setError } = useHttp();
     const attendancePerformanceMutation = useAttendancePerformanceMutation();
 
     const initialFilterState = {
@@ -80,6 +78,7 @@ const TeacherPerformanceView = () => {
     }, [sendRequest]);
 
     const fetchAttendanceData = useCallback(async () => {
+        setIsLoading(true);
         const requestData = {
             academicYearId: filterState.selectedAcademicYear,
             branchId: auth.userBranchId,
@@ -113,6 +112,7 @@ const TeacherPerformanceView = () => {
         } catch (err) {
             console.error("Error fetching attendance data:", err);
         }
+        setIsLoading(false);
     }, [
         attendancePerformanceMutation,
         filterState,
