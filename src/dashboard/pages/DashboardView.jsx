@@ -1,7 +1,7 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext } from "react";
 
 import { AuthContext } from "../../shared/Components/Context/auth-context";
-import useHttp from "../../shared/hooks/http-hook";
+import { useDashboard } from "../../shared/queries";
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 
@@ -15,29 +15,8 @@ import {
 } from "lucide-react";
 
 const DashboardView = () => {
-    const { isLoading, error, sendRequest, setError } = useHttp();
-    const [dashboardData, setDashboardData] = useState();
     const auth = useContext(AuthContext);
-
-    useEffect(() => {
-        const fetchDashboard = async () => {
-            const url = `${import.meta.env.VITE_BACKEND_URL}/dashboard`;
-            try {
-                const responseData = await sendRequest(
-                    url,
-                    "POST",
-                    JSON.stringify({}),
-                    {
-                        "Content-Type": "application/json",
-                        Authorization: "Bearer " + auth.token,
-                    }
-                );
-                setDashboardData(responseData.dashboardData);
-                console.log(responseData.dashboardData);
-            } catch (err) {}
-        };
-        fetchDashboard();
-    }, [sendRequest]);
+    const { data: dashboardData, isLoading, error, refetch } = useDashboard();
 
     // console.log(auth.userId)
     // console.log(auth.userName)
@@ -58,43 +37,38 @@ const DashboardView = () => {
                         <LoadingCircle size={32} />
                     </div>
                 )}
-                {error && (
-                    <ErrorCard error={error} onClear={() => setError(null)} />
-                )}
+                {error && <ErrorCard error={error} onClear={() => refetch()} />}
 
                 {!isLoading && dashboardData && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8">
-                        {dashboardData.Desa && (
-                            <div className="card-interactive rounded-md gap-4 md:gap-8 flex items-center justify-start border-0 border-b-4 border-secondary md:p-8 m-0 w-full h-full">
+                        {dashboardData.dashboardData?.Desa && (
+                            <div className="card-interactive m-0 rounded-md gap-4 md:gap-8 flex items-center justify-start border-0 border-b-4 border-secondary md:p-8 w-full h-full">
                                 <Layers className="size-8 md:size-10" />
                                 <div className="flex flex-col">
                                     <h1 className="text-lg md:text-3xl font-bold">
-                                        {dashboardData.Desa &&
-                                            dashboardData.Desa}
+                                        {dashboardData.dashboardData.Desa}
                                     </h1>
                                     <p className="">{"Desa"}</p>
                                 </div>
                             </div>
                         )}
-                        {dashboardData.Kelompok && (
+                        {dashboardData.dashboardData?.Kelompok && (
                             <div className="card-interactive rounded-md gap-4 md:gap-8 flex items-center justify-start border-0 border-b-4 border-secondary md:p-8 m-0 w-full h-full">
                                 <Layers2 className="size-8 md:size-10" />
                                 <div className="flex flex-col">
                                     <h1 className="text-lg md:text-3xl font-bold">
-                                        {dashboardData.Kelompok &&
-                                            dashboardData.Kelompok}
+                                        {dashboardData.dashboardData.Kelompok}
                                     </h1>
                                     <p className="">{"Kelompok"}</p>
                                 </div>
                             </div>
                         )}
-                        {dashboardData.kelas && (
+                        {dashboardData.dashboardData?.kelas && (
                             <div className="card-interactive rounded-md gap-4 md:gap-8 flex items-center justify-start border-0 border-b-4 border-secondary md:p-8 m-0 w-full h-full">
                                 <Presentation className="size-8 md:size-10" />
                                 <div className="flex flex-col">
                                     <h1 className="text-lg md:text-3xl font-bold">
-                                        {dashboardData.Kelas &&
-                                            dashboardData.Kelas}
+                                        {dashboardData.dashboardData.Kelas}
                                     </h1>
                                     <p className="">{"Kelas"}</p>
                                 </div>
@@ -104,8 +78,9 @@ const DashboardView = () => {
                             <Users className="size-8 md:size-10" />
                             <div className="flex flex-col">
                                 <h1 className="text-lg md:text-3xl font-bold">
-                                    {dashboardData["Peserta Didik"] &&
-                                        dashboardData["Peserta Didik"]}
+                                    {dashboardData.dashboardData?.[
+                                        "Peserta Didik"
+                                    ] || 0}
                                 </h1>
                                 <p className="">{"Peserta Didik"}</p>
                             </div>
@@ -114,8 +89,9 @@ const DashboardView = () => {
                             <GraduationCap className="size-8 md:size-10" />
                             <div className="flex flex-col">
                                 <h1 className="text-lg md:text-3xl font-bold">
-                                    {dashboardData["Tenaga Pendidik"] &&
-                                        dashboardData["Tenaga Pendidik"]}
+                                    {dashboardData.dashboardData?.[
+                                        "Tenaga Pendidik"
+                                    ] || 0}
                                 </h1>
                                 <p className="">{"Tenaga Pendidik"}</p>
                             </div>
@@ -124,9 +100,11 @@ const DashboardView = () => {
                             <Gauge className="size-8 md:size-10" />
                             <div className="flex flex-col">
                                 <h1 className="text-lg md:text-3xl font-bold">
-                                    {dashboardData.Kehadiran &&
-                                        dashboardData.Kehadiran.toFixed(1)}
-                                    {dashboardData.Kehadiran ? "%" : "-"}
+                                    {dashboardData.dashboardData?.Kehadiran
+                                        ? `${dashboardData.dashboardData.Kehadiran.toFixed(
+                                              1
+                                          )}%`
+                                        : "-"}
                                 </h1>
                                 <p className="">{"Kehadiran"}</p>
                             </div>
