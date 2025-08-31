@@ -191,6 +191,8 @@ const BranchPerformanceView = () => {
             setFilterState((prev) => ({
                 ...prev,
                 selectedTeachingGroup: teachingGroupId,
+                selectedSubBranch: null,
+                selectedClass: null,
             }));
 
             setDisplayState((prev) => ({
@@ -303,6 +305,10 @@ const BranchPerformanceView = () => {
         () =>
             hasUnappliedFiltersHelper(filterState, displayState, [
                 "selectedAcademicYear",
+                "period",
+                "selectedTeachingGroup",
+                "selectedSubBranch",
+                "selectedClass",
             ]),
         [filterState, displayState.appliedFilters]
     );
