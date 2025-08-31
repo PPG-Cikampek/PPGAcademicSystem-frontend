@@ -1,8 +1,18 @@
 import { useMemo } from "react";
 import DataTable from "../../shared/Components/UIElements/DataTable";
-import { set } from "react-hook-form";
 
 const ClassPerformanceTable = ({ data, filterState, setFilterState }) => {
+    const filteredData = useMemo(
+        () =>
+            data.filter(
+                (item) => item.subBranchId === filterState.selectedSubBranch
+            ),
+        [data, filterState.selectedSubBranch]
+    );
+
+    console.log(data);
+    console.log(filteredData);
+
     const clsColumns = useMemo(() => [
         {
             key: "clsName",
@@ -111,7 +121,7 @@ const ClassPerformanceTable = ({ data, filterState, setFilterState }) => {
 
     return (
         <DataTable
-            data={data}
+            data={filteredData}
             columns={clsColumns}
             searchableColumns={["name"]}
             initialSort={{ key: "name", direction: "ascending" }}

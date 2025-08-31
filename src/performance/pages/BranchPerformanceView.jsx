@@ -66,7 +66,6 @@ const BranchPerformanceView = () => {
     const [classesList, setClassesList] = useState();
 
     const auth = useContext(AuthContext);
-    const navigate = useNavigate();
 
     const violationTranslations = {
         attribute: "Perlengkapan Belajar",
@@ -127,7 +126,7 @@ const BranchPerformanceView = () => {
 
     const fetchAttendanceData = useCallback(async () => {
         const requestData = {
-            academicYearId: filterState.selectedAcademicYear,
+            branchYearId: auth.currentBranchYearId,
             teachingGroupId: filterState.selectedTeachingGroup,
             subBranchId: filterState.selectedSubBranch,
             classId: filterState.selectedClass,
@@ -356,9 +355,7 @@ const BranchPerformanceView = () => {
                     <div className="card-basic rounded-md flex-col gap-4">
                         <div className="flex justify-between">
                             <div className={`flex flex-col`}>
-                                <h2 className="text-xl font-bold">
-                                    Daerah Cikampek
-                                </h2>
+                                <h2 className="text-xl font-bold">Desa</h2>
                                 {/* <p className="text-sm text-gray-600">
                           Target Semester: {subBranchData.semesterTarget} hari
                       </p> */}

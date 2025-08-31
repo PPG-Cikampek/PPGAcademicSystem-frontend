@@ -2,11 +2,23 @@ import { useMemo } from "react";
 import DataTable from "../../shared/Components/UIElements/DataTable";
 
 const SubBranchPerformanceTable = ({ data, filterState, setFilterState }) => {
+    const filteredData = useMemo(
+        () =>
+            data.filter(
+                (item) =>
+                    item.teachingGroupId === filterState.selectedTeachingGroup
+            ),
+        [data, filterState.selectedTeachingGroup]
+    );
+
     const subBranchColumns = useMemo(() => [
         {
             key: "subBranchName",
-            label: "Nama",
+            label: "Nama Kelompok",
             sortable: true,
+            render: (subBranch) => (
+                <span>Kelompok {subBranch.subBranchName}</span>
+            ),
         },
         {
             key: "studentsCount",
@@ -98,6 +110,7 @@ const SubBranchPerformanceTable = ({ data, filterState, setFilterState }) => {
                             setFilterState({
                                 ...filterState,
                                 currentView: "classesTable",
+                                selectedSubBranch: subBranch.subBranchId,
                             });
                         }}
                     >
@@ -110,7 +123,7 @@ const SubBranchPerformanceTable = ({ data, filterState, setFilterState }) => {
 
     return (
         <DataTable
-            data={data}
+            data={filteredData}
             columns={subBranchColumns}
             searchableColumns={["name"]}
             initialSort={{ key: "name", direction: "ascending" }}

@@ -9,8 +9,11 @@ const TeachingGroupPerformanceTable = ({
     const teachingGroupColumns = useMemo(() => [
         {
             key: "teachingGroupName",
-            label: "Nama",
+            label: "Nama KBM",
             sortable: true,
+            render: (teachingGroup) => (
+                <span>KBM {teachingGroup.teachingGroupName}</span>
+            ),
         },
         {
             key: "studentsCount",
