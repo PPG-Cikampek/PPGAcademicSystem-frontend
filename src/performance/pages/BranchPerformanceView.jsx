@@ -154,6 +154,9 @@ const BranchPerformanceView = () => {
                 appliedFilters: { ...filterState }, // Snapshot of current filters
                 studentsData: responseData.studentsData,
                 studentsDataByClass: responseData.studentsDataByClass,
+                studentsDataBySubBranch: responseData.studentsDataBySubBranch,
+                studentsDataByTeachingGroup:
+                    responseData.studentsDataByTeachingGroup,
             });
         } catch (err) {}
     }, [sendRequest, filterState]);
@@ -668,13 +671,12 @@ const BranchPerformanceView = () => {
                         <div className="print-avoid-break">
                             <h2>Performa Desa</h2>
                             <TeachingGroupPerformanceTable
-                                data={displayState.studentsDataByClass}
+                                data={displayState.studentsDataByTeachingGroup}
                                 filterState={filterState}
                                 setFilterState={setFilterState}
                             />
                         </div>
-                    ) : filterState.currentView ===
-                      "subBranchPerformanceTable" ? (
+                    ) : filterState.currentView === "subBranchesTable" ? (
                         <div className="print-avoid-break">
                             <div className="flex justify-between">
                                 <h2>Performa KBM</h2>
@@ -695,12 +697,9 @@ const BranchPerformanceView = () => {
                                 </div>
                             </div>
                             <SubBranchPerformanceTable
-                                selectedAcademicYear={
-                                    filterState.selectedAcademicYear
-                                }
-                                selectedClass={filterState.selectedClass}
-                                startDate={filterState.startDate}
-                                endDate={filterState.endDate}
+                                data={displayState.studentsDataBySubBranch}
+                                filterState={filterState}
+                                setFilterState={setFilterState}
                             />
                         </div>
                     ) : filterState.currentView === "classesTable" ? (
@@ -723,12 +722,9 @@ const BranchPerformanceView = () => {
                                 </div>
                             </div>
                             <ClassPerformanceTable
-                                selectedAcademicYear={
-                                    filterState.selectedAcademicYear
-                                }
-                                selectedClass={filterState.selectedClass}
-                                startDate={filterState.startDate}
-                                endDate={filterState.endDate}
+                                data={displayState.studentsDataByClass}
+                                filterState={filterState}
+                                setFilterState={setFilterState}
                             />
                         </div>
                     ) : (
@@ -741,7 +737,7 @@ const BranchPerformanceView = () => {
                                         onClick={() =>
                                             setFilterState((prev) => ({
                                                 ...prev,
-                                                currentView: "subBranchesTable",
+                                                currentView: "classesTable",
                                                 selectedClass: null,
                                             }))
                                         }

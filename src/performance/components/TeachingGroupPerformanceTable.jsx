@@ -6,9 +6,9 @@ const TeachingGroupPerformanceTable = ({
     filterState,
     setFilterState,
 }) => {
-    const tgColumns = useMemo(() => [
+    const teachingGroupColumns = useMemo(() => [
         {
-            key: "tgName",
+            key: "teachingGroupName",
             label: "Nama",
             sortable: true,
         },
@@ -32,9 +32,9 @@ const TeachingGroupPerformanceTable = ({
             sortable: true,
             cellAlign: "center",
             headerAlign: "center",
-            render: (tg) => (
+            render: (teachingGroup) => (
                 <div className="badge-green w-12 place-self-center text-center">
-                    {tg?.attendances?.Hadir || 0}%
+                    {teachingGroup?.attendances?.Hadir || 0}%
                 </div>
             ),
         },
@@ -44,9 +44,9 @@ const TeachingGroupPerformanceTable = ({
             sortable: true,
             cellAlign: "center",
             headerAlign: "center",
-            render: (tg) => (
+            render: (teachingGroup) => (
                 <div className="badge-primary w-12 place-self-center text-center">
-                    {tg?.attendances?.Terlambat || 0}%
+                    {teachingGroup?.attendances?.Terlambat || 0}%
                 </div>
             ),
         },
@@ -56,9 +56,9 @@ const TeachingGroupPerformanceTable = ({
             sortable: true,
             cellAlign: "center",
             headerAlign: "center",
-            render: (tg) => (
+            render: (teachingGroup) => (
                 <div className="badge-yellow w-12 place-self-center text-center">
-                    {tg?.attendances?.Izin || 0}%
+                    {teachingGroup?.attendances?.Izin || 0}%
                 </div>
             ),
         },
@@ -68,9 +68,9 @@ const TeachingGroupPerformanceTable = ({
             sortable: true,
             cellAlign: "center",
             headerAlign: "center",
-            render: (tg) => (
+            render: (teachingGroup) => (
                 <div className="badge-violet w-12 place-self-center text-center">
-                    {tg?.attendances?.Sakit || 0}%
+                    {teachingGroup?.attendances?.Sakit || 0}%
                 </div>
             ),
         },
@@ -80,10 +80,10 @@ const TeachingGroupPerformanceTable = ({
             sortable: true,
             cellAlign: "center",
             headerAlign: "center",
-            render: (tg) => (
+            render: (teachingGroup) => (
                 <div className="badge-red w-12 place-self-center text-center">
-                    {tg?.attendances["Tanpa Keterangan"]
-                        ? tg.attendances["Tanpa Keterangan"]
+                    {teachingGroup?.attendances["Tanpa Keterangan"]
+                        ? teachingGroup.attendances["Tanpa Keterangan"]
                         : 0}
                     %
                 </div>
@@ -93,17 +93,18 @@ const TeachingGroupPerformanceTable = ({
             key: "actions",
             label: "Aksi",
             headerAlign: "center",
-            render: (tg) => (
+            render: (teachingGroup) => (
                 <div className="place-self-center">
                     <button
                         className="btn-primary-outline"
-                        onClick={() =>
+                        onClick={() => {
                             setFilterState({
                                 ...filterState,
-                                currentView: "studentsTable",
-                                selectedClass: tg.classId,
-                            })
-                        }
+                                currentView: "subBranchesTable",
+                                selectedTeachingGroup:
+                                    teachingGroup.teachingGroupId,
+                            });
+                        }}
                     >
                         Lihat Detail
                     </button>
@@ -115,7 +116,7 @@ const TeachingGroupPerformanceTable = ({
     return (
         <DataTable
             data={data}
-            columns={tgColumns}
+            columns={teachingGroupColumns}
             searchableColumns={["name"]}
             initialSort={{ key: "name", direction: "ascending" }}
             initialEntriesPerPage={50}

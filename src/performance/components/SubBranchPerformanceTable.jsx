@@ -93,13 +93,13 @@ const SubBranchPerformanceTable = ({ data, filterState, setFilterState }) => {
                 <div className="place-self-center">
                     <button
                         className="btn-primary-outline"
-                        onClick={() =>
+                        onClick={() => {
+                            console.log(filterState);
                             setFilterState({
                                 ...filterState,
-                                currentView: "studentsTable",
-                                selectedClass: subBranch.classId,
-                            })
-                        }
+                                currentView: "classesTable",
+                            });
+                        }}
                     >
                         Lihat Detail
                     </button>
