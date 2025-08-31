@@ -43,7 +43,7 @@ h2 {
 }
 
 @utility card-interactive {
-    @apply p-4 flex justify-center rounded-3xl bg-white shadow-xs ring-1 ring-gray-200 transition ease-out hover:-translate-y-1 hover:scale-[1.025] hover:cursor-pointer hover:shadow-lg duration-200;
+    @apply p-4 rounded-3xl bg-white shadow-xs ring-1 ring-gray-200 transition ease-out hover:-translate-y-1 hover:scale-[1.025] hover:cursor-pointer hover:shadow-lg duration-200;
 }
 
 @utility icon-button-primary {

@@ -1,6 +1,3 @@
-import { useContext } from "react";
-
-import { AuthContext } from "../../shared/Components/Context/auth-context";
 import { useDashboard } from "../../shared/queries";
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
@@ -15,13 +12,7 @@ import {
 } from "lucide-react";
 
 const DashboardView = () => {
-    const auth = useContext(AuthContext);
     const { data: dashboardData, isLoading, error, refetch } = useDashboard();
-
-    // console.log(auth.userId)
-    // console.log(auth.userName)
-    // console.log(auth.userRole)
-    // console.log(auth.userSubBranchId)
 
     return (
         <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">
@@ -40,73 +31,83 @@ const DashboardView = () => {
                 {error && <ErrorCard error={error} onClear={() => refetch()} />}
 
                 {!isLoading && dashboardData && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-8">
+                    <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6">
                         {dashboardData.dashboardData?.Desa && (
-                            <div className="card-interactive m-0 rounded-md gap-4 md:gap-8 flex items-center justify-start border-0 border-b-4 border-secondary md:p-8 w-full h-full">
+                            <div className="card-interactive m-0 rounded-md gap-4 flex items-center justify-start border-0 border-b-4 border-secondary p-4 md:p-6 lg:p-8 w-full h-full min-h-[120px] overflow-hidden">
                                 <Layers className="size-8 md:size-10" />
                                 <div className="flex flex-col">
-                                    <h1 className="text-lg md:text-3xl font-bold">
+                                    <h1 className="text-2xl font-bold truncate">
                                         {dashboardData.dashboardData.Desa}
                                     </h1>
-                                    <p className="">{"Desa"}</p>
+                                    <p className="truncate text-sm">{"Desa"}</p>
                                 </div>
                             </div>
                         )}
                         {dashboardData.dashboardData?.Kelompok && (
-                            <div className="card-interactive rounded-md gap-4 md:gap-8 flex items-center justify-start border-0 border-b-4 border-secondary md:p-8 m-0 w-full h-full">
+                            <div className="card-interactive rounded-md gap-4 flex items-center justify-start border-0 border-b-4 border-secondary p-4 md:p-6 lg:p-8 m-0 w-full h-full min-h-[120px] overflow-hidden">
                                 <Layers2 className="size-8 md:size-10" />
                                 <div className="flex flex-col">
-                                    <h1 className="text-lg md:text-3xl font-bold">
+                                    <h1 className="text-2xl font-bold truncate">
                                         {dashboardData.dashboardData.Kelompok}
                                     </h1>
-                                    <p className="">{"Kelompok"}</p>
+                                    <p className="truncate text-sm">
+                                        {"Kelompok"}
+                                    </p>
                                 </div>
                             </div>
                         )}
                         {dashboardData.dashboardData?.kelas && (
-                            <div className="card-interactive rounded-md gap-4 md:gap-8 flex items-center justify-start border-0 border-b-4 border-secondary md:p-8 m-0 w-full h-full">
+                            <div className="card-interactive rounded-md gap-4 flex items-center justify-start border-0 border-b-4 border-secondary p-4 md:p-6 lg:p-8 m-0 w-full h-full min-h-[120px] overflow-hidden">
                                 <Presentation className="size-8 md:size-10" />
                                 <div className="flex flex-col">
-                                    <h1 className="text-lg md:text-3xl font-bold">
-                                        {dashboardData.dashboardData.Kelas}
+                                    <h1 className="text-2xl font-bold truncate">
+                                        {dashboardData.dashboardData.kelas}
                                     </h1>
-                                    <p className="">{"Kelas"}</p>
+                                    <p className="truncate text-sm">
+                                        {"Kelas"}
+                                    </p>
                                 </div>
                             </div>
                         )}
-                        <div className="card-interactive rounded-md gap-4 md:gap-8 flex items-center justify-start border-0 border-b-4 border-secondary md:p-8 m-0 w-full h-full">
+                        <div className="card-interactive rounded-md gap-4 flex items-center justify-start border-0 border-b-4 border-secondary p-4 md:p-6 lg:p-8 m-0 w-full h-full min-h-[120px] overflow-hidden">
                             <Users className="size-8 md:size-10" />
                             <div className="flex flex-col">
-                                <h1 className="text-lg md:text-3xl font-bold">
+                                <h1 className="text-2xl font-bold truncate">
                                     {dashboardData.dashboardData?.[
                                         "Peserta Didik"
                                     ] || 0}
                                 </h1>
-                                <p className="">{"Peserta Didik"}</p>
+                                <p className="truncate text-sm">
+                                    {"Peserta Didik"}
+                                </p>
                             </div>
                         </div>
-                        <div className="card-interactive rounded-md gap-4 md:gap-8 flex items-center justify-start border-0 border-b-4 border-secondary md:p-8 m-0 w-full h-full">
+                        <div className="card-interactive rounded-md gap-4 flex items-center justify-start border-0 border-b-4 border-secondary p-4 md:p-6 lg:p-8 m-0 w-full h-full min-h-[120px] overflow-hidden">
                             <GraduationCap className="size-8 md:size-10" />
                             <div className="flex flex-col">
-                                <h1 className="text-lg md:text-3xl font-bold">
+                                <h1 className="text-2xl font-bold truncate">
                                     {dashboardData.dashboardData?.[
                                         "Tenaga Pendidik"
                                     ] || 0}
                                 </h1>
-                                <p className="">{"Tenaga Pendidik"}</p>
+                                <p className="truncate text-sm">
+                                    {"Tenaga Pendidik"}
+                                </p>
                             </div>
                         </div>
-                        <div className="card-interactive rounded-md gap-4 md:gap-8 flex items-center justify-start border-0 border-b-4 border-secondary md:p-8 m-0 w-full h-full">
+                        <div className="card-interactive rounded-md gap-4 flex items-center justify-start border-0 border-b-4 border-secondary p-4 md:p-6 lg:p-8 m-0 w-full h-full min-h-[120px] overflow-hidden">
                             <Gauge className="size-8 md:size-10" />
                             <div className="flex flex-col">
-                                <h1 className="text-lg md:text-3xl font-bold">
+                                <h1 className="text-2xl font-bold truncate">
                                     {dashboardData.dashboardData?.Kehadiran
                                         ? `${dashboardData.dashboardData.Kehadiran.toFixed(
                                               1
                                           )}%`
                                         : "-"}
                                 </h1>
-                                <p className="">{"Kehadiran"}</p>
+                                <p className="truncate text-sm">
+                                    {"Kehadiran"}
+                                </p>
                             </div>
                         </div>
                     </div>
