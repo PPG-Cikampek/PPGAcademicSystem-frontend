@@ -33,4 +33,4 @@ const NotesField = ({ student, isOpen, onToggle, onChange, value }) => {
     );
 };
 
-export default NotesField;
+export default React.memo(NotesField);

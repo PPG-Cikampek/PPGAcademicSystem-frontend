@@ -14,4 +14,4 @@ const NotesButton = ({ onClick, isOpen }) => {
     );
 };
 
-export default NotesButton;
+export default React.memo(NotesButton);

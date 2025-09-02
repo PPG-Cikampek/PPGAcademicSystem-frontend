@@ -17,4 +17,4 @@ const StatusSelect = ({ value, onChange, disabled }) => {
     );
 };
 
-export default StatusSelect;
+export default React.memo(StatusSelect);

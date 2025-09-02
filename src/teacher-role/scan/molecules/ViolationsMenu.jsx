@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import ViolationsButton from "../atoms/ViolationsButton";
 import ViolationCheckbox from "../atoms/ViolationCheckbox";
@@ -11,6 +11,18 @@ const ViolationsMenu = ({
     disabled,
 }) => {
     const violations = student.violations || {};
+
+    const handleAttributeChange = useCallback(() => {
+        onViolationChange(student.studentId.nis, "Attribute");
+    }, [onViolationChange, student.studentId.nis]);
+
+    const handleAttitudeChange = useCallback(() => {
+        onViolationChange(student.studentId.nis, "Attitude");
+    }, [onViolationChange, student.studentId.nis]);
+
+    const handleTidinessChange = useCallback(() => {
+        onViolationChange(student.studentId.nis, "tidiness");
+    }, [onViolationChange, student.studentId.nis]);
 
     return (
         <div className="relative w-full">
@@ -36,36 +48,21 @@ const ViolationsMenu = ({
                                 <ViolationCheckbox
                                     id={`${student.studentId.nis}attribute`}
                                     checked={!!violations.attribute}
-                                    onChange={() =>
-                                        onViolationChange(
-                                            student.studentId.nis,
-                                            "Attribute"
-                                        )
-                                    }
+                                    onChange={handleAttributeChange}
                                     label="Atribut"
                                     disabled={disabled}
                                 />
                                 <ViolationCheckbox
                                     id={`${student.studentId.nis}attitude`}
                                     checked={!!violations.attitude}
-                                    onChange={() =>
-                                        onViolationChange(
-                                            student.studentId.nis,
-                                            "Attitude"
-                                        )
-                                    }
+                                    onChange={handleAttitudeChange}
                                     label="Sikap"
                                     disabled={disabled}
                                 />
                                 <ViolationCheckbox
                                     id={`${student.studentId.nis}tidiness`}
                                     checked={!!violations.tidiness}
-                                    onChange={() =>
-                                        onViolationChange(
-                                            student.studentId.nis,
-                                            "tidiness"
-                                        )
-                                    }
+                                    onChange={handleTidinessChange}
                                     label="Kerapihan"
                                     disabled={disabled}
                                 />
@@ -78,4 +75,4 @@ const ViolationsMenu = ({
     );
 };
 
-export default ViolationsMenu;
+export default React.memo(ViolationsMenu);

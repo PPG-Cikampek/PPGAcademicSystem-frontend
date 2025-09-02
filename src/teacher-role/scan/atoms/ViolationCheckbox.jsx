@@ -27,4 +27,4 @@ const ViolationCheckbox = ({ id, checked, onChange, label, disabled }) => {
     );
 };
 
-export default ViolationCheckbox;
+export default React.memo(ViolationCheckbox);

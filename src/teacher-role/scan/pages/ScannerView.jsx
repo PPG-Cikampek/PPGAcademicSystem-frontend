@@ -11,9 +11,7 @@ import StatusBar from "../molecules/StatusBar";
 import AttendedStudents from "../organisms/AttendedStudents";
 import SequentialAnimation from "../../shared/Components/Animation/SequentialAnimation";
 
-import LoadingCircle from "../../../shared/Components/UIElements/LoadingCircle";
 import { useNavigate, useParams } from "react-router-dom";
-import InfoCard from "../../shared/Components/UIElements/InfoCard";
 
 import ErrorDisplay from "../molecules/ErrorDisplay";
 import CreateAttendanceCard from "../molecules/CreateAttendanceCard";
@@ -74,8 +72,6 @@ const ScannerView = () => {
         const attendanceDate = new Date().toLocaleDateString("en-CA");
         dispatch({ type: "SET_ATTENDANCE_DATE", payload: attendanceDate });
     };
-
-    // console.log(state)
 
     return (
         <div className="flex flex-col pb-40">

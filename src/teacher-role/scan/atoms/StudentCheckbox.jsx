@@ -22,4 +22,4 @@ const StudentCheckbox = ({ id, checked, onChange, disabled }) => {
     );
 };
 
-export default StudentCheckbox;
+export default React.memo(StudentCheckbox);

@@ -16,4 +16,4 @@ const ViolationsButton = ({ onClick, isOpen, hidden }) => {
     );
 };
 
-export default ViolationsButton;
+export default React.memo(ViolationsButton);

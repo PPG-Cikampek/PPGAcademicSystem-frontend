@@ -32,4 +32,4 @@ const StudentHeader = ({ student }) => {
     );
 };
 
-export default StudentHeader;
+export default React.memo(StudentHeader);

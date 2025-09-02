@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect, useMemo } from "react";
+import { useContext, useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 
 import useHttp from "../../../shared/hooks/http-hook";
@@ -108,38 +108,62 @@ const AttendedStudents = () => {
         }
     };
 
-    const handleStatusChange = (id, newStatus, timestamp = Date.now()) => {
-        dispatch({ type: "SET_STATUS", payload: { id, newStatus, timestamp } });
-    };
+    const handleStatusChange = useCallback(
+        (id, newStatus, timestamp = Date.now()) => {
+            dispatch({
+                type: "SET_STATUS",
+                payload: { id, newStatus, timestamp },
+            });
+        },
+        [dispatch]
+    );
 
-    const handleAttributesChange = (id, newAttributes) => {
-        dispatch({ type: "SET_ATTRIBUTE", payload: { id, newAttributes } });
-    };
+    const handleAttributesChange = useCallback(
+        (id, newAttributes) => {
+            dispatch({ type: "SET_ATTRIBUTE", payload: { id, newAttributes } });
+        },
+        [dispatch]
+    );
 
-    const handleViolationsChange = (id, violationType) => {
-        dispatch({ type: "SET_VIOLATIONS", payload: { id, violationType } });
-    };
+    const handleViolationsChange = useCallback(
+        (id, violationType) => {
+            dispatch({
+                type: "SET_VIOLATIONS",
+                payload: { id, violationType },
+            });
+        },
+        [dispatch]
+    );
 
-    const handleNotesChange = (id, notes) => {
-        dispatch({ type: "SET_NOTES", payload: { id, notes } });
-    };
+    const handleNotesChange = useCallback(
+        (id, notes) => {
+            dispatch({ type: "SET_NOTES", payload: { id, notes } });
+        },
+        [dispatch]
+    );
 
-    const handleCheckboxChange = (id) => {
-        dispatch({ type: "TOGGLE_SELECTED", payload: { id } });
-    };
+    const handleCheckboxChange = useCallback(
+        (id) => {
+            dispatch({ type: "TOGGLE_SELECTED", payload: { id } });
+        },
+        [dispatch]
+    );
 
-    const handleSelectAll = () => {
+    const handleSelectAll = useCallback(() => {
         dispatch({ type: "TOGGLE_SELECT_ALL" });
-    };
+    }, [dispatch]);
 
-    const applyBulkStatus = (newStatus, timestamp = Date.now()) => {
-        dispatch({
-            type: "APPLY_BULK_STATUS",
-            payload: { newStatus, timestamp },
-        });
-    };
+    const applyBulkStatus = useCallback(
+        (newStatus, timestamp = Date.now()) => {
+            dispatch({
+                type: "APPLY_BULK_STATUS",
+                payload: { newStatus, timestamp },
+            });
+        },
+        [dispatch]
+    );
 
-    const getBorderColor = (status) => {
+    const getBorderColor = useCallback((status) => {
         switch (status) {
             case "Hadir":
                 return "bg-blue-500/50";
@@ -152,15 +176,15 @@ const AttendedStudents = () => {
             default:
                 return "bg-red-500/50";
         }
-    };
+    }, []);
 
-    const toggleViolationsMenu = (nis) => {
+    const toggleViolationsMenu = useCallback((nis) => {
         setShowViolationsMenu((prev) => ({ ...prev, [nis]: !prev[nis] }));
-    };
+    }, []);
 
-    const toggleNotesField = (nis) => {
+    const toggleNotesField = useCallback((nis) => {
         setShowNotesField((prev) => ({ ...prev, [nis]: !prev[nis] }));
-    };
+    }, []);
 
     return (
         <div className="card-basic mx-4 mb-8 flex-col box-border">
