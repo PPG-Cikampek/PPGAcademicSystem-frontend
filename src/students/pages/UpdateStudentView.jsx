@@ -41,8 +41,17 @@ const UpdateStudentView = () => {
                 );
                 setLoadedStudent(responseData.student);
 
-                const date = new Date(responseData.student.dateOfBirth);
-                setLoadedDate(date.toISOString().split("T")[0]);
+                // Safe date parsing with validation
+                if (responseData.student.dateOfBirth) {
+                    const date = new Date(responseData.student.dateOfBirth);
+                    if (!isNaN(date.getTime())) {
+                        setLoadedDate(date);
+                    } else {
+                        setLoadedDate(null);
+                    }
+                } else {
+                    setLoadedDate(null);
+                }
             } catch (err) {}
         };
         fetchStudent();
@@ -76,7 +85,7 @@ const UpdateStudentView = () => {
                     type: "date",
                     required: auth.userRole !== "admin" ? true : false,
                     disabled: isLoading,
-                    value: loadedDate || "",
+                    value: loadedDate || null,
                 },
                 {
                     name: "gender",
@@ -133,7 +142,7 @@ const UpdateStudentView = () => {
                     type: "date",
                     required: auth.userRole !== "admin" ? true : false,
                     disabled: isLoading,
-                    value: loadedDate || "",
+                    value: loadedDate || null,
                 },
                 {
                     name: "gender",
@@ -177,6 +186,12 @@ const UpdateStudentView = () => {
     }, [loadedStudent]);
 
     const handleFormSubmit = async (data) => {
+        // Prevent submission if student data isn't loaded
+        if (!loadedStudent || !loadedStudent.id) {
+            setError("Data siswa belum dimuat. Silakan tunggu...");
+            return;
+        }
+
         const url = `${import.meta.env.VITE_BACKEND_URL}/students/${studentId}`;
         const formData = new FormData();
 
@@ -189,11 +204,19 @@ const UpdateStudentView = () => {
                     txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
             )
         );
-        formData.append("dateOfBirth", data.dateOfBirth);
+        formData.append(
+            "dateOfBirth",
+            data.dateOfBirth instanceof Date
+                ? data.dateOfBirth.toISOString().split("T")[0]
+                : data.dateOfBirth
+        );
         formData.append("gender", data.gender);
         formData.append("parentName", data.parentName);
         formData.append("parentPhone", data.parentPhone);
         formData.append("address", data.address);
+
+        console.log(data);
+        console.log(formData);
 
         if (croppedImage) {
             formData.append("image", croppedImage);
@@ -209,13 +232,12 @@ const UpdateStudentView = () => {
                 throw err;
             }
         } else {
-            if (auth.userRole !== "admin" && !loadedStudent.image) {
+            if (!loadedStudent?.image && auth.userRole !== "admin") {
                 setError("Tidak ada foto yang dipilih!");
                 throw new Error("Tidak ada foto yang dipilih!");
             }
         }
 
-        console.log(formData);
         let responseData;
         try {
             responseData = await sendRequest(url, "PATCH", formData);
@@ -269,16 +291,6 @@ const UpdateStudentView = () => {
                 )}
                 {!isLoading && modal.message}
             </Modal>
-
-            {error && (
-                <div className="mx-2">
-                    <ErrorCard
-                        className="mx-2"
-                        error={error}
-                        onClear={() => setError(null)}
-                    />
-                </div>
-            )}
 
             {!isLoading && fields && (
                 <div
@@ -344,7 +356,7 @@ const UpdateStudentView = () => {
                                             ? true
                                             : false,
                                     disabled: isLoading,
-                                    value: loadedDate || "",
+                                    value: loadedDate || null,
                                 },
                                 {
                                     name: "gender",
@@ -394,11 +406,11 @@ const UpdateStudentView = () => {
                                 <button
                                     type="submit"
                                     className={`button-primary ${
-                                        isLoading
+                                        isLoading || !loadedStudent
                                             ? "opacity-50 cursor-not-allowed"
                                             : ""
                                     }`}
-                                    disabled={isLoading}
+                                    disabled={isLoading || !loadedStudent}
                                 >
                                     {isLoading ? (
                                         <LoadingCircle>
@@ -408,6 +420,12 @@ const UpdateStudentView = () => {
                                         "Update"
                                     )}
                                 </button>
+                                {error && (
+                                    <ErrorCard
+                                        error={error}
+                                        onClear={() => setError(null)}
+                                    />
+                                )}
                             </div>
                         }
                     />

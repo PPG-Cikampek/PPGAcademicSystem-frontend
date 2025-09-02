@@ -46,24 +46,43 @@ const UpdateTeacherView = () => {
                 const responseData = await sendRequest(url);
                 setLoadedTeacher(responseData.teacher);
 
-                const date = new Date(responseData.teacher.dateOfBirth);
-                setLoadedDate(date.toISOString().split("T")[0]);
+                // Safe date parsing with validation
+                if (responseData.teacher.dateOfBirth) {
+                    const date = new Date(responseData.teacher.dateOfBirth);
+                    if (!isNaN(date.getTime())) {
+                        setLoadedDate(date);
+                    } else {
+                        setLoadedDate(null);
+                    }
+                } else {
+                    setLoadedDate(null);
+                }
             } catch (err) {}
         };
         fetchTeacher();
-    }, [sendRequest]);
+    }, [sendRequest, id, auth.userRole, auth.userId]);
 
     const handleFormSubmit = async (data) => {
+        // Prevent submission if teacher data isn't loaded
+        if (!loadedTeacher || !loadedTeacher.userId || !loadedTeacher.id) {
+            setError("Data guru belum dimuat. Silakan tunggu...");
+            return;
+        }
+
         const url = `${import.meta.env.VITE_BACKEND_URL}/teachers/`;
         const formData = new FormData();
 
         formData.append("name", data.name);
         formData.append("phone", data.phone);
-        formData.append("dateOfBirth", data.dateOfBirth);
+        formData.append(
+            "dateOfBirth",
+            data.dateOfBirth instanceof Date
+                ? data.dateOfBirth.toISOString().split("T")[0]
+                : data.dateOfBirth
+        );
         formData.append("gender", data.gender);
         formData.append("address", data.address);
         formData.append("position", data.position);
-        formData.append("parentName", data.parentName);
         formData.append("userId", loadedTeacher.userId);
         formData.append("teacherId", loadedTeacher.id);
 
@@ -84,7 +103,7 @@ const UpdateTeacherView = () => {
                 throw err;
             }
         } else {
-            if (auth.userRole !== "admin") {
+            if (!loadedTeacher?.image && auth.userRole !== "admin") {
                 setError("Tidak ada foto yang dipilih!");
                 throw new Error("Tidak ada foto yang dipilih!");
             }
@@ -231,7 +250,7 @@ const UpdateTeacherView = () => {
                             type: "date",
                             required: true,
                             disabled: isLoading,
-                            value: loadedDate || "",
+                            value: loadedDate || null,
                         },
                         {
                             name: "gender",
@@ -263,11 +282,11 @@ const UpdateTeacherView = () => {
                             <button
                                 type="submit"
                                 className={`button-primary ${
-                                    isLoading
+                                    isLoading || !loadedTeacher
                                         ? "opacity-50 cursor-not-allowed"
                                         : ""
                                 }`}
-                                disabled={isLoading}
+                                disabled={isLoading || !loadedTeacher}
                             >
                                 {isLoading ? (
                                     <LoadingCircle>Processing...</LoadingCircle>

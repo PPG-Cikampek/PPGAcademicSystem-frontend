@@ -37,7 +37,11 @@ const DynamicForm = ({
     useEffect(() => {
         if (Array.isArray(fields)) {
             fields.forEach((field) => {
-                if (field.value) {
+                if (
+                    field.value !== undefined &&
+                    field.value !== null &&
+                    field.value !== ""
+                ) {
                     setValue(field.name, field.value);
                     trigger(field.name);
                 }
@@ -260,12 +264,14 @@ const DynamicForm = ({
                                     name={field.name}
                                     control={control}
                                     defaultValue={field.value || null}
+                                    rules={{ required: field.required }}
                                     render={({
                                         field: { onChange, value },
                                     }) => (
                                         <DatePicker
                                             selected={value}
                                             onChange={onChange}
+                                            disabled={field.disabled}
                                             className="w-full p-2 border rounded-md shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300"
                                             dateFormat="dd/MM/yyyy"
                                             wrapperClassName="w-full"
