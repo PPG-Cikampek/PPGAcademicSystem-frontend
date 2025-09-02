@@ -6,9 +6,9 @@ import useHttp from "../../../shared/hooks/http-hook";
 import { StudentAttendanceContext } from "../context/StudentAttendanceContext";
 import { AuthContext } from "../../../shared/Components/Context/auth-context";
 
-import QRCodeScanner from "../components/QRCodeScanner";
-import StatusBar from "../components/StatusBar";
-import AttendedStudents from "../components/AttendedStudents";
+import QRCodeScanner from "../organisms/QRCodeScanner";
+import StatusBar from "../organisms/StatusBar";
+import AttendedStudents from "../organisms/AttendedStudents";
 import SequentialAnimation from "../../shared/Components/Animation/SequentialAnimation";
 
 import LoadingCircle from "../../../shared/Components/UIElements/LoadingCircle";
