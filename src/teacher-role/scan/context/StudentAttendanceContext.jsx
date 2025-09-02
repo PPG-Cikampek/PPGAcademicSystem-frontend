@@ -1,7 +1,7 @@
 // StudentAttendanceContext.jsx
 // Performance Optimization: Uses Map for O(1) student lookups instead of O(n) array operations
 // This significantly improves performance for QR code scanning and student state updates
-import { createContext, useReducer, useEffect } from "react";
+import { createContext, useReducer, useEffect, useMemo } from "react";
 
 const StudentAttendanceContext = createContext();
 
@@ -28,6 +28,7 @@ const initialState = {
     dirtyIds: new Set(), // Track which students have unsaved changes
     isLoading: false,
     error: null,
+    selectedCount: 0, // Track number of selected students
 };
 
 const reducer = (state, action) => {
@@ -45,6 +46,7 @@ const reducer = (state, action) => {
                 ...state,
                 studentMap: arrayToMap(action.payload),
                 dirtyIds: new Set(), // Clear dirty tracking when new data loads
+                selectedCount: 0, // Reset selected count
             };
         case "SET_CLASS_START_TIME":
             return { ...state, classStartTime: action.payload };
@@ -58,23 +60,35 @@ const reducer = (state, action) => {
             const student = newStudentMap.get(action.payload.id);
 
             if (student) {
+                const wasSelected = student.isSelected;
+                const newIsSelected =
+                    action.payload.newStatus === "Hadir" ||
+                    action.payload.newStatus === "Terlambat"
+                        ? false
+                        : student.isSelected;
+                const selectedCountDelta = newIsSelected
+                    ? wasSelected
+                        ? 0
+                        : 1
+                    : wasSelected
+                    ? -1
+                    : 0;
+
                 newStudentMap.set(action.payload.id, {
                     ...student,
                     status: action.payload.newStatus,
                     timestamp: action.payload.timestamp,
-                    isSelected:
-                        action.payload.newStatus === "Hadir" ||
-                        action.payload.newStatus === "Terlambat"
-                            ? false
-                            : student.isSelected,
+                    isSelected: newIsSelected,
                 });
-            }
 
-            return {
-                ...state,
-                dirtyIds: newDirtyIds,
-                studentMap: newStudentMap,
-            };
+                return {
+                    ...state,
+                    dirtyIds: newDirtyIds,
+                    studentMap: newStudentMap,
+                    selectedCount: state.selectedCount + selectedCountDelta,
+                };
+            }
+            return state;
         case "SET_ATTRIBUTE":
             const attributeDirtyIds = new Set(state.dirtyIds);
             attributeDirtyIds.add(action.payload.id);
@@ -157,36 +171,45 @@ const reducer = (state, action) => {
             const toggleStudent = toggleStudentMap.get(action.payload.id);
 
             if (toggleStudent) {
+                const wasSelected = toggleStudent.isSelected;
                 toggleStudentMap.set(action.payload.id, {
                     ...toggleStudent,
-                    isSelected: !toggleStudent.isSelected,
+                    isSelected: !wasSelected,
                 });
-            }
 
-            return {
-                ...state,
-                studentMap: toggleStudentMap,
-            };
+                return {
+                    ...state,
+                    studentMap: toggleStudentMap,
+                    selectedCount: state.selectedCount + (wasSelected ? -1 : 1),
+                };
+            }
+            return state;
         case "TOGGLE_SELECT_ALL":
             const selectAllStudentMap = new Map();
+            let newSelectedCount = 0;
 
             for (const [nis, student] of state.studentMap) {
                 const isPresent =
                     student.status === "Hadir" ||
                     student.status === "Terlambat";
 
+                const newIsSelected = isPresent
+                    ? false // Present students cannot be selected
+                    : !state.selectAll; // Toggle others
+
                 selectAllStudentMap.set(nis, {
                     ...student,
-                    isSelected: isPresent
-                        ? false // Present students cannot be selected
-                        : !state.selectAll, // Toggle others
+                    isSelected: newIsSelected,
                 });
+
+                if (newIsSelected) newSelectedCount++;
             }
 
             return {
                 ...state,
                 selectAll: !state.selectAll,
                 studentMap: selectAllStudentMap,
+                selectedCount: newSelectedCount,
             };
         case "APPLY_BULK_STATUS":
             const bulkStatusStudentMap = new Map();
@@ -291,6 +314,12 @@ const StudentAttendanceProvider = ({ children }) => {
     // Helper function to get student list as array for components that need it
     const getStudentList = () => mapToArray(state.studentMap);
 
+    // Memoized student list to avoid unnecessary conversions
+    const studentList = useMemo(
+        () => mapToArray(state.studentMap),
+        [state.studentMap]
+    );
+
     // Helper function to get a specific student by NIS
     const getStudent = (nis) => state.studentMap.get(nis);
 
@@ -302,7 +331,7 @@ const StudentAttendanceProvider = ({ children }) => {
             value={{
                 state: {
                     ...state,
-                    studentList: getStudentList(), // Maintain backward compatibility
+                    studentList: studentList, // Use memoized array
                 },
                 dispatch,
                 fetchAttendanceData,

@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 
 import useHttp from "../../../shared/hooks/http-hook";
@@ -19,8 +19,8 @@ const AttendedStudents = () => {
     const general = useContext(GeneralContext);
     const navigate = useNavigate();
 
-    // Track unsaved changes using dirtyIds from context
-    const unsavedChanges = state.dirtyIds.size;
+    // Memoize unsaved changes to prevent unnecessary recalculations
+    const unsavedChanges = useMemo(() => state.dirtyIds.size, [state.dirtyIds]);
 
     // Update general message based on unsaved changes
     useEffect(() => {

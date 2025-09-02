@@ -46,4 +46,4 @@ const AttendedStudentItem = ({
     );
 };
 
-export default AttendedStudentItem;
+export default React.memo(AttendedStudentItem);

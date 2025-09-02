@@ -36,4 +36,4 @@ const AttendedStudentsList = ({
     );
 };
 
-export default AttendedStudentsList;
+export default React.memo(AttendedStudentsList);

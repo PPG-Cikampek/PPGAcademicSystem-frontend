@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useContext } from "react";
 import { LoaderCircle } from "lucide-react";
 import { Icon } from "@iconify-icon/react";
 import BulkActions from "../molecules/BulkActions";
 import SaveButton from "../atoms/SaveButton";
+import { StudentAttendanceContext } from "../context/StudentAttendanceContext";
 
 const ActionBar = ({
     students,
@@ -13,9 +14,8 @@ const ActionBar = ({
     onBulkIzin,
     onSave,
 }) => {
-    const selectedCount = students.filter(
-        (student) => student.isSelected
-    ).length;
+    const { state } = useContext(StudentAttendanceContext);
+    const selectedCount = state.selectedCount;
 
     return (
         <div className="fixed bottom-16 left-0 right-0 bg-white border-t border-gray-300 p-4 z-10 transition-all">
