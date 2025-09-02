@@ -68,7 +68,7 @@ const Navbar = () => {
             <div className="px-4 mx-auto w-full">
                 <div className="flex justify-between items-center h-16">
                     {/* Logo */}
-                    <div className="flex gap-6 items-center">
+                    <div className="flex gap-2 md:gap-6 items-center">
                         <div className="flex shrink-0">
                             <button
                                 className="p-2 rounded-full focus:bg-gray-200 hover:outline-hidden hover:ring-1 hover:ring-offset-1 hover:ring-gray-400"
