@@ -86,13 +86,11 @@ const ScannerView = () => {
                             <button
                                 onClick={() => createAttendanceHandler()}
                                 className="btn-mobile-primary rounded-full w-full"
-                                disabled={
-                                    state.isSubBranchYearActivated === false
-                                }
+                                disabled={state.isBranchYearActivated === false}
                             >
                                 Buat daftar hadir hari ini
                             </button>
-                            {state.isSubBranchYearActivated === false ? (
+                            {state.isBranchYearActivated === false ? (
                                 <span className="text-danger">
                                     PJP Desa belum mengaktifkan tahun ajaran!
                                 </span>
@@ -103,17 +101,14 @@ const ScannerView = () => {
                     )}
                     {state.studentList.length !== 0 && !isLoading && (
                         <>
-                            {state.isSubBranchYearActivated === true && (
+                            {state.isBranchYearActivated === true && (
                                 <div className="card-basic m-4">
                                     <QRCodeScanner />
                                 </div>
                             )}
-                            {state.isSubBranchYearActivated === false ? (
+                            {state.isBranchYearActivated === false ? (
                                 <InfoCard className={"mx-4 my-12"}>
-                                    <p>
-                                        Tahun ajaran belum aktif, hubungi PJP
-                                        Kelompok!
-                                    </p>
+                                    <p>Tahun ajaran desa belum aktif</p>
                                 </InfoCard>
                             ) : (
                                 ""

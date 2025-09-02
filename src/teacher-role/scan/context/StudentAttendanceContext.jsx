@@ -20,7 +20,7 @@ const reducer = (state, action) => {
         case "SET_CLASS_START_TIME":
             return { ...state, classStartTime: action.payload };
         case "SET_IS_ACTIVE_YEAR_ACTIVATED":
-            return { ...state, isSubBranchYearActivated: action.payload };
+            return { ...state, isBranchYearActivated: action.payload };
         case "SET_STATUS":
             return {
                 ...state,
