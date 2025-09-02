@@ -66,13 +66,13 @@ const Profile = ({ user, isLoading }) => {
                             <h1 className="text-xl font-medium">
                                 {getPositionName[user.position] || "Guru"}
                             </h1>
-                            <h3 className="font-normal text-gray-600">
+                            <p className="font-normal text-gray-600">
                                 {user.userId?.subBranchId?.branchId?.name ||
                                     "No Branch"}{" "}
                                 -{" "}
                                 {user.userId?.subBranchId?.name ||
                                     "No SubBranch"}
-                            </h3>
+                            </p>
                         </>
                     )}
                 </div>

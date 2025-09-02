@@ -31,7 +31,7 @@ const ProgressList = ({ progressData, isLoading }) => {
                 ))}
             {Array.isArray(progressData) && progressData.length === 0 && (
                 <InfoCard className="mx-4">
-                    <h3 className="text-gray-500 italic">Tidak ada data</h3>
+                    <p className="text-gray-500 italic">Tidak ada data</p>
                 </InfoCard>
             )}
         </>

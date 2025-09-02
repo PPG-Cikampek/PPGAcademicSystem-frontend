@@ -32,7 +32,7 @@ const WeekNavigator = ({
                     <input
                         type="month"
                         value={currentWeek.toISOString().slice(0, 7)}
-                        className="absolute top-full -left-4 mt-1 border rounded-full px-4 py-2"
+                        className="absolute bg-white shadow-md top-full -left-0 mt-1 border rounded-full px-4 py-2"
                         onChange={handleDateChange}
                         onBlur={() => setShowDatePicker(false)}
                     />
