@@ -2,11 +2,14 @@ import { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import useHttp from "../../../shared/hooks/http-hook";
+import useListVirtualization from "../hooks/useListVirtualization";
 
 import { StudentAttendanceContext } from "../context/StudentAttendanceContext";
 
 import SelectAllCheckbox from "../atoms/SelectAllCheckbox";
 import AttendedStudentsList from "../molecules/AttendedStudentsList";
+import VirtualizedAttendedStudentsList from "../molecules/VirtualizedAttendedStudentsList";
+import AdvancedVirtualizedAttendedStudentsList from "../molecules/AdvancedVirtualizedAttendedStudentsList";
 import ActionBar from "./ActionBar";
 import { GeneralContext } from "../../../shared/Components/Context/general-context";
 
@@ -18,6 +21,13 @@ const AttendedStudents = () => {
 
     const general = useContext(GeneralContext);
     const navigate = useNavigate();
+
+    // Use the custom virtualization hook
+    const { strategy, config } = useListVirtualization(
+        state.studentList.length,
+        { showNotesField, showViolationsMenu },
+        50 // threshold
+    );
 
     // Track unsaved changes using dirtyIds from context
     const unsavedChanges = state.dirtyIds.size;
@@ -189,18 +199,57 @@ const AttendedStudents = () => {
                 } `}
             >
                 {state.isBranchYearActivated === true && (
-                    <AttendedStudentsList
-                        students={state.studentList}
-                        onCheckboxChange={handleCheckboxChange}
-                        onStatusChange={handleStatusChange}
-                        showNotesField={showNotesField}
-                        onToggleNotes={toggleNotesField}
-                        onNotesChange={handleNotesChange}
-                        showViolationsMenu={showViolationsMenu}
-                        onToggleViolations={toggleViolationsMenu}
-                        onViolationChange={handleViolationsChange}
-                        getBorderColor={getBorderColor}
-                    />
+                    <>
+                        {strategy.shouldVirtualize ? (
+                            strategy.useVariableHeight ? (
+                                // Use variable height list when items have different heights
+                                <AdvancedVirtualizedAttendedStudentsList
+                                    students={state.studentList}
+                                    onCheckboxChange={handleCheckboxChange}
+                                    onStatusChange={handleStatusChange}
+                                    showNotesField={showNotesField}
+                                    onToggleNotes={toggleNotesField}
+                                    onNotesChange={handleNotesChange}
+                                    showViolationsMenu={showViolationsMenu}
+                                    onToggleViolations={toggleViolationsMenu}
+                                    onViolationChange={handleViolationsChange}
+                                    getBorderColor={getBorderColor}
+                                    height={config.defaultListHeight}
+                                    baseItemHeight={config.baseItemHeight}
+                                />
+                            ) : (
+                                // Use fixed height list for better performance when no items are expanded
+                                <VirtualizedAttendedStudentsList
+                                    students={state.studentList}
+                                    onCheckboxChange={handleCheckboxChange}
+                                    onStatusChange={handleStatusChange}
+                                    showNotesField={showNotesField}
+                                    onToggleNotes={toggleNotesField}
+                                    onNotesChange={handleNotesChange}
+                                    showViolationsMenu={showViolationsMenu}
+                                    onToggleViolations={toggleViolationsMenu}
+                                    onViolationChange={handleViolationsChange}
+                                    getBorderColor={getBorderColor}
+                                    height={config.defaultListHeight}
+                                    itemHeight={config.baseItemHeight}
+                                />
+                            )
+                        ) : (
+                            // Use regular list for small lists (better UX, no virtualization overhead)
+                            <AttendedStudentsList
+                                students={state.studentList}
+                                onCheckboxChange={handleCheckboxChange}
+                                onStatusChange={handleStatusChange}
+                                showNotesField={showNotesField}
+                                onToggleNotes={toggleNotesField}
+                                onNotesChange={handleNotesChange}
+                                showViolationsMenu={showViolationsMenu}
+                                onToggleViolations={toggleViolationsMenu}
+                                onViolationChange={handleViolationsChange}
+                                getBorderColor={getBorderColor}
+                            />
+                        )}
+                    </>
                 )}
             </div>
             {/* Fixed action buttons at bottom */}
