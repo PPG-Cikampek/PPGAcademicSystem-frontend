@@ -1,5 +1,4 @@
-import { useContext, useEffect, useState } from "react";
-import useHttp from "../../../shared/hooks/http-hook";
+import { useContext, useState } from "react";
 import { AuthContext } from "../../../shared/Components/Context/auth-context";
 import ErrorCard from "../../../shared/Components/UIElements/ErrorCard";
 import {
@@ -12,33 +11,19 @@ import ProgressList from "../components/ProgressList";
 import DataTable from "../../../shared/Components/UIElements/DataTable";
 import { Grid3X3, List } from "lucide-react";
 import FloatingButton from "../../shared/Components/UIElements/FloatingButton";
+import { useMaterialProgress } from "../../../shared/queries";
 
 const MaterialProgressView = () => {
-    const [progressData, setProgressData] = useState();
     const [currentWeek, setCurrentWeek] = useState(getMonday(new Date()));
     const [showDatePicker, setShowDatePicker] = useState(false);
-    const { isLoading, error, sendRequest, setError } = useHttp();
-
     const auth = useContext(AuthContext);
-
     const [viewMode, setViewMode] = useState("list");
 
-    useEffect(() => {
-        const fetchProgresses = async () => {
-            const url = `${import.meta.env.VITE_BACKEND_URL}/materialProgress/${
-                auth.userId
-            }?week=${currentWeek.toISOString()}`;
-            console.log(url);
-            try {
-                const responseData = await sendRequest(url);
-                setProgressData(responseData.progresses);
-            } catch (err) {
-                setProgressData([]);
-                // handled by useHttp
-            }
-        };
-        fetchProgresses();
-    }, [sendRequest, currentWeek]);
+    const {
+        data: progressData,
+        isLoading,
+        error,
+    } = useMaterialProgress(auth.userId, currentWeek.toISOString());
 
     const handleWeekChange = (direction) => {
         const newDate = new Date(currentWeek);
@@ -70,7 +55,7 @@ const MaterialProgressView = () => {
         <div className="mx-4">
             {error && (
                 <div className="m-2">
-                    <ErrorCard error={error} onClear={() => setError(null)} />
+                    <ErrorCard error={error} />
                 </div>
             )}
 
