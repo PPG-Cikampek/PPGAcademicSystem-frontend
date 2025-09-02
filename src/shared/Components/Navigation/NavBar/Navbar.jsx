@@ -65,7 +65,7 @@ const Navbar = () => {
 
     return (
         <nav
-            className={`sticky top-0 z-20 ${
+            className={`sticky top-0 z-20 border-b-2 border-gray-400/10 ${
                 sidebar.isSidebarOpen
                     ? "bg-white max-md:bg-gray-400/10"
                     : "bg-white"
