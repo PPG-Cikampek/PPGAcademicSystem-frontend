@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import useHttp from "../../../shared/hooks/http-hook";
 import { AuthContext } from "../../../shared/Components/Context/auth-context";
@@ -17,7 +17,6 @@ const NewMaterialProgresslView = () => {
     });
     const [modalIsOpen, setModalIsOpen] = useState(false);
 
-    const [isTransitioning, setIsTransitioning] = useState(false);
     const [classData, setClassData] = useState(false);
     const [inputFields, setInputFields] = useState();
 
@@ -25,19 +24,21 @@ const NewMaterialProgresslView = () => {
 
     const auth = useContext(AuthContext);
     const classIds = auth.userClassIds;
+    const classIdsRef = useRef(classIds);
 
     const navigate = useNavigate();
     const location = useLocation();
     const { state } = location;
 
     useEffect(() => {
+        classIdsRef.current = classIds;
         const loadClasses = async () => {
             const url = `${
                 import.meta.env.VITE_BACKEND_URL
             }/classes/get-by-ids`;
-            const body = JSON.stringify({ classIds });
+            const body = JSON.stringify({ classIds: classIdsRef.current });
             console.log("fetching classes this teacher enrolled...");
-            console.log(classIds);
+            console.log(classIdsRef.current);
 
             try {
                 const responseData = await sendRequest(url, "POST", body, {
@@ -210,11 +211,7 @@ const NewMaterialProgresslView = () => {
                 </div>
             )}
 
-            <div
-                className={`pb-24 transition-opacity duration-300 ${
-                    isTransitioning ? "opacity-0" : "opacity-100"
-                }`}
-            >
+            <div className="pb-24 transition-opacity duration-300 opacity-100">
                 <DynamicForm
                     // title='Pencapaian Materi'
                     // subtitle={'Sistem Akademik Digital'}
