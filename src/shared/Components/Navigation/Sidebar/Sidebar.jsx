@@ -60,8 +60,8 @@ const Sidebar = ({ linksList, children }) => {
             {/* Sidebar */}
             <div
                 className={`
-                    fixed md:relative
-                    h-full md:h-[unset]
+                    fixed md:sticky md:top-0
+                    h-full md:h-screen
                     bg-white text-gray-800 border-gray-200 
                     transition-all duration-300 ease-in-out
                     z-30 opacity-0 md:opacity-100

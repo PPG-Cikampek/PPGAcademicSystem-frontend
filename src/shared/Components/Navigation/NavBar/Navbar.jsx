@@ -28,7 +28,7 @@ const Navbar = () => {
             <FloatingMenu
                 boxWidth="w-36"
                 label={auth.userName}
-                style={`btn-secondary-outline-sharp py-3`}
+                style={`btn-secondary-outline-sharp py-3 text-right`}
                 buttons={[
                     {
                         icon: User,
@@ -64,7 +64,13 @@ const Navbar = () => {
     ];
 
     return (
-        <nav className="bg-white">
+        <nav
+            className={`sticky top-0 z-20 ${
+                sidebar.isSidebarOpen
+                    ? "bg-white max-md:bg-gray-400/10"
+                    : "bg-white"
+            }`}
+        >
             <div className="px-4 mx-auto w-full">
                 <div className="flex justify-between items-center h-16">
                     {/* Logo */}
