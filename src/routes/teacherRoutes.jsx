@@ -73,7 +73,7 @@ const TeacherPerformanceView = lazy(() =>
     import("../performance/pages/TeacherPerformanceView")
 );
 const MaterialProgressView = lazy(() =>
-    import("../teacher-role/materialProgress/pages/materialProgressView")
+    import("../teacher-role/materialProgress/pages/MaterialProgressView")
 );
 const NewMaterialProgresslView = lazy(() =>
     import("../teacher-role/materialProgress/pages/NewMaterialProgressView")
