@@ -20,17 +20,20 @@ const AdvancedVirtualizedAttendedStudentsList = ({
     const getItemSize = useCallback(
         (index) => {
             const student = students[index];
-            const nis = student.studentId.nis;
+            if (!student || !student.studentId) {
+                return baseItemHeight;
+            }
 
+            const nis = student.studentId.nis;
             let itemHeight = baseItemHeight;
 
             // Add height for expanded notes field
-            if (showNotesField[nis]) {
+            if (showNotesField?.[nis]) {
                 itemHeight += 60; // Approximate height for notes textarea
             }
 
             // Add height for expanded violations menu
-            if (showViolationsMenu[nis]) {
+            if (showViolationsMenu?.[nis]) {
                 itemHeight += 120; // Approximate height for violations menu
             }
 
@@ -44,6 +47,11 @@ const AdvancedVirtualizedAttendedStudentsList = ({
         ({ index, style }) => {
             const student = students[index];
 
+            // Safety check
+            if (!student || !student.studentId) {
+                return <div style={style}>Loading...</div>;
+            }
+
             return (
                 <div style={style}>
                     <AttendedStudentItem
@@ -51,11 +59,13 @@ const AdvancedVirtualizedAttendedStudentsList = ({
                         student={student}
                         onCheckboxChange={onCheckboxChange}
                         onStatusChange={onStatusChange}
-                        showNotesField={showNotesField[student.studentId.nis]}
+                        showNotesField={
+                            showNotesField?.[student.studentId.nis] || false
+                        }
                         onToggleNotes={onToggleNotes}
                         onNotesChange={onNotesChange}
                         showViolationsMenu={
-                            showViolationsMenu[student.studentId.nis]
+                            showViolationsMenu?.[student.studentId.nis] || false
                         }
                         onToggleViolations={onToggleViolations}
                         onViolationChange={onViolationChange}

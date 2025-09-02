@@ -26,7 +26,7 @@ const AttendedStudents = () => {
     const { strategy, config } = useListVirtualization(
         state.studentList.length,
         { showNotesField, showViolationsMenu },
-        50 // threshold
+        4 // threshold - virtualization kicks in at 5+ items
     );
 
     // Track unsaved changes using dirtyIds from context

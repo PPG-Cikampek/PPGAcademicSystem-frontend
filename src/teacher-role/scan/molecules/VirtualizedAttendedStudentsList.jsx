@@ -21,6 +21,11 @@ const VirtualizedAttendedStudentsList = ({
         ({ index, style }) => {
             const student = students[index];
 
+            // Safety check
+            if (!student || !student.studentId) {
+                return <div style={style}>Loading...</div>;
+            }
+
             return (
                 <div style={style}>
                     <AttendedStudentItem
@@ -28,11 +33,13 @@ const VirtualizedAttendedStudentsList = ({
                         student={student}
                         onCheckboxChange={onCheckboxChange}
                         onStatusChange={onStatusChange}
-                        showNotesField={showNotesField[student.studentId.nis]}
+                        showNotesField={
+                            showNotesField?.[student.studentId.nis] || false
+                        }
                         onToggleNotes={onToggleNotes}
                         onNotesChange={onNotesChange}
                         showViolationsMenu={
-                            showViolationsMenu[student.studentId.nis]
+                            showViolationsMenu?.[student.studentId.nis] || false
                         }
                         onToggleViolations={onToggleViolations}
                         onViolationChange={onViolationChange}

@@ -6,17 +6,17 @@ import { useMemo } from "react";
  *
  * @param {number} itemCount - Total number of items in the list
  * @param {Object} expandedStates - Object containing expanded states (notes, menus, etc.)
- * @param {number} threshold - Threshold for enabling virtualization (default: 50)
+ * @param {number} threshold - Threshold for enabling virtualization (default: 4)
  * @returns {Object} - Contains rendering strategy and configuration
  */
 export const useListVirtualization = (
     itemCount,
     expandedStates = {},
-    threshold = 1
+    threshold = 4
 ) => {
     const strategy = useMemo(() => {
         // Don't virtualize for small lists
-        if (itemCount < threshold) {
+        if (itemCount <= threshold) {
             return {
                 type: "regular",
                 shouldVirtualize: false,
@@ -26,9 +26,23 @@ export const useListVirtualization = (
         }
 
         // Check if any items have dynamic height
-        const hasExpandedItems = Object.values(expandedStates).some(
-            (stateGroup) => Object.values(stateGroup || {}).some(Boolean)
-        );
+        let hasExpandedItems = false;
+        try {
+            // Safely check for expanded items
+            if (expandedStates && typeof expandedStates === "object") {
+                hasExpandedItems = Object.values(expandedStates).some(
+                    (stateGroup) => {
+                        if (stateGroup && typeof stateGroup === "object") {
+                            return Object.values(stateGroup).some(Boolean);
+                        }
+                        return false;
+                    }
+                );
+            }
+        } catch (error) {
+            console.warn("Error checking expanded states:", error);
+            hasExpandedItems = false;
+        }
 
         if (hasExpandedItems) {
             return {
