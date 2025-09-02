@@ -13,7 +13,9 @@ const QRCodeScanner = () => {
     const [scannedData, setScannedData] = useState(null);
     const [cooldown, setCooldown] = useState(false);
     const [scanSuccess, setScanSuccess] = useState(false);
-    const { state, dispatch } = useContext(StudentAttendanceContext);
+    const { state, dispatch, getStudent, hasStudent } = useContext(
+        StudentAttendanceContext
+    );
     const [status, setStatus] = useState("Initializing...");
     const [retryCount, setRetryCount] = useState(0);
 
@@ -122,18 +124,15 @@ const QRCodeScanner = () => {
         setScanSuccess(true);
         setCooldown(true); // Enable cooldown to prevent rapid re-scanning
 
-        const isFound = state.studentList.some(
-            (student) => student.studentId.nis === data
-        );
+        const isFound = hasStudent(data);
         if (!isFound) {
             setScannedData("Kode QR tidak dikenali!");
         } else {
+            const student = getStudent(data);
             setScannedData({
                 nis: data,
                 status: getPresenceStatus(state.classStartTime),
-                name: state.studentList.find(
-                    (student) => student.studentId.nis === data
-                ).studentId.name,
+                name: student.studentId.name,
             });
         }
 

@@ -1,10 +1,26 @@
 // StudentAttendanceContext.jsx
+// Performance Optimization: Uses Map for O(1) student lookups instead of O(n) array operations
+// This significantly improves performance for QR code scanning and student state updates
 import { createContext, useReducer, useEffect } from "react";
 
 const StudentAttendanceContext = createContext();
 
+// Helper function to convert array to Map
+const arrayToMap = (studentArray) => {
+    const map = new Map();
+    studentArray.forEach((student) => {
+        map.set(student.studentId.nis, student);
+    });
+    return map;
+};
+
+// Helper function to convert Map to array
+const mapToArray = (studentMap) => {
+    return Array.from(studentMap.values());
+};
+
 const initialState = {
-    studentList: [],
+    studentMap: new Map(), // Changed from studentList to studentMap for O(1) lookups
     selectAll: false,
     classId: null,
     classStartTime: null,
@@ -27,7 +43,7 @@ const reducer = (state, action) => {
         case "SET_STUDENT_LIST":
             return {
                 ...state,
-                studentList: action.payload,
+                studentMap: arrayToMap(action.payload),
                 dirtyIds: new Set(), // Clear dirty tracking when new data loads
             };
         case "SET_CLASS_START_TIME":
@@ -37,120 +53,159 @@ const reducer = (state, action) => {
         case "SET_STATUS":
             const newDirtyIds = new Set(state.dirtyIds);
             newDirtyIds.add(action.payload.id);
+
+            const newStudentMap = new Map(state.studentMap);
+            const student = newStudentMap.get(action.payload.id);
+
+            if (student) {
+                newStudentMap.set(action.payload.id, {
+                    ...student,
+                    status: action.payload.newStatus,
+                    timestamp: action.payload.timestamp,
+                    isSelected:
+                        action.payload.newStatus === "Hadir" ||
+                        action.payload.newStatus === "Terlambat"
+                            ? false
+                            : student.isSelected,
+                });
+            }
+
             return {
                 ...state,
                 dirtyIds: newDirtyIds,
-                studentList: state.studentList.map((student) => {
-                    if (student.studentId.nis === action.payload.id) {
-                        return {
-                            ...student,
-                            status: action.payload.newStatus,
-                            timestamp: action.payload.timestamp,
-                            isSelected:
-                                action.payload.newStatus === "Hadir" ||
-                                action.payload.newStatus === "Terlambat"
-                                    ? false
-                                    : student.isSelected,
-                        };
-                    }
-                    return student;
-                }),
+                studentMap: newStudentMap,
             };
         case "SET_ATTRIBUTE":
             const attributeDirtyIds = new Set(state.dirtyIds);
             attributeDirtyIds.add(action.payload.id);
+
+            const attributeStudentMap = new Map(state.studentMap);
+            const attributeStudent = attributeStudentMap.get(action.payload.id);
+
+            if (attributeStudent) {
+                attributeStudentMap.set(action.payload.id, {
+                    ...attributeStudent,
+                    attributes: action.payload.newAttributes,
+                });
+            }
+
             return {
                 ...state,
                 dirtyIds: attributeDirtyIds,
-                studentList: state.studentList.map((student) =>
-                    student.studentId.nis === action.payload.id
-                        ? {
-                              ...student,
-                              attributes: action.payload.newAttributes,
-                          }
-                        : student
-                ),
+                studentMap: attributeStudentMap,
             };
         case "SET_NOTES":
             const notesDirtyIds = new Set(state.dirtyIds);
             notesDirtyIds.add(action.payload.id);
+
+            const notesStudentMap = new Map(state.studentMap);
+            const notesStudent = notesStudentMap.get(action.payload.id);
+
+            if (notesStudent) {
+                notesStudentMap.set(action.payload.id, {
+                    ...notesStudent,
+                    teachersNotes: action.payload.notes,
+                });
+            }
+
             return {
                 ...state,
                 dirtyIds: notesDirtyIds,
-                studentList: state.studentList.map((student) =>
-                    student.studentId.nis === action.payload.id
-                        ? { ...student, teachersNotes: action.payload.notes }
-                        : student
-                ),
+                studentMap: notesStudentMap,
             };
         case "SET_VIOLATIONS":
             const violationsDirtyIds = new Set(state.dirtyIds);
             violationsDirtyIds.add(action.payload.id);
+
+            const violationsStudentMap = new Map(state.studentMap);
+            const violationsStudent = violationsStudentMap.get(
+                action.payload.id
+            );
+
+            if (violationsStudent) {
+                let updatedViolations;
+                if (action.payload.violationType === "Attribute") {
+                    updatedViolations = {
+                        ...violationsStudent.violations,
+                        attribute: !violationsStudent.violations.attribute,
+                    };
+                } else if (action.payload.violationType === "Attitude") {
+                    updatedViolations = {
+                        ...violationsStudent.violations,
+                        attitude: !violationsStudent.violations.attitude,
+                    };
+                } else {
+                    updatedViolations = {
+                        ...violationsStudent.violations,
+                        tidiness: !violationsStudent.violations.tidiness,
+                    };
+                }
+
+                violationsStudentMap.set(action.payload.id, {
+                    ...violationsStudent,
+                    violations: updatedViolations,
+                });
+            }
+
             return {
                 ...state,
                 dirtyIds: violationsDirtyIds,
-                studentList: state.studentList.map((student) =>
-                    student.studentId.nis === action.payload.id
-                        ? action.payload.violationType === "Attribute"
-                            ? {
-                                  ...student,
-                                  violations: {
-                                      ...student.violations,
-                                      attribute: !student.violations.attribute,
-                                  },
-                              }
-                            : action.payload.violationType === "Attitude"
-                            ? {
-                                  ...student,
-                                  violations: {
-                                      ...student.violations,
-                                      attitude: !student.violations.attitude,
-                                  },
-                              }
-                            : {
-                                  ...student,
-                                  violations: {
-                                      ...student.violations,
-                                      tidiness: !student.violations.tidiness,
-                                  },
-                              }
-                        : student
-                ),
+                studentMap: violationsStudentMap,
             };
         case "TOGGLE_SELECTED":
+            const toggleStudentMap = new Map(state.studentMap);
+            const toggleStudent = toggleStudentMap.get(action.payload.id);
+
+            if (toggleStudent) {
+                toggleStudentMap.set(action.payload.id, {
+                    ...toggleStudent,
+                    isSelected: !toggleStudent.isSelected,
+                });
+            }
+
             return {
                 ...state,
-                studentList: state.studentList.map((student) =>
-                    student.studentId.nis === action.payload.id
-                        ? { ...student, isSelected: !student.isSelected }
-                        : student
-                ),
+                studentMap: toggleStudentMap,
             };
         case "TOGGLE_SELECT_ALL":
+            const selectAllStudentMap = new Map();
+
+            for (const [nis, student] of state.studentMap) {
+                const isPresent =
+                    student.status === "Hadir" ||
+                    student.status === "Terlambat";
+
+                selectAllStudentMap.set(nis, {
+                    ...student,
+                    isSelected: isPresent
+                        ? false // Present students cannot be selected
+                        : !state.selectAll, // Toggle others
+                });
+            }
+
             return {
                 ...state,
                 selectAll: !state.selectAll,
-                studentList: state.studentList.map((student) => {
-                    const isPresent =
-                        student.status === "Hadir" ||
-                        student.status === "Terlambat";
-                    return isPresent
-                        ? { ...student, isSelected: false } // Present students cannot be selected
-                        : { ...student, isSelected: !state.selectAll }; // Toggle others
-                }),
+                studentMap: selectAllStudentMap,
             };
         case "APPLY_BULK_STATUS":
+            const bulkStatusStudentMap = new Map();
+
+            for (const [nis, student] of state.studentMap) {
+                if (student.isSelected && student.status !== "Hadir") {
+                    bulkStatusStudentMap.set(nis, {
+                        ...student,
+                        status: action.payload.newStatus,
+                        timestamp: action.payload.timestamp,
+                    });
+                } else {
+                    bulkStatusStudentMap.set(nis, student);
+                }
+            }
+
             return {
                 ...state,
-                studentList: state.studentList.map((student) =>
-                    student.isSelected && student.status !== "Hadir"
-                        ? {
-                              ...student,
-                              status: action.payload.newStatus,
-                              timestamp: action.payload.timestamp,
-                          }
-                        : student
-                ),
+                studentMap: bulkStatusStudentMap,
             };
         default:
             return state;
@@ -233,9 +288,28 @@ const fetchAttendanceData = async (classId, attendanceDate, dispatch) => {
 const StudentAttendanceProvider = ({ children }) => {
     const [state, dispatch] = useReducer(reducer, initialState);
 
+    // Helper function to get student list as array for components that need it
+    const getStudentList = () => mapToArray(state.studentMap);
+
+    // Helper function to get a specific student by NIS
+    const getStudent = (nis) => state.studentMap.get(nis);
+
+    // Helper function to check if a student exists
+    const hasStudent = (nis) => state.studentMap.has(nis);
+
     return (
         <StudentAttendanceContext.Provider
-            value={{ state, dispatch, fetchAttendanceData }}
+            value={{
+                state: {
+                    ...state,
+                    studentList: getStudentList(), // Maintain backward compatibility
+                },
+                dispatch,
+                fetchAttendanceData,
+                getStudentList,
+                getStudent,
+                hasStudent,
+            }}
         >
             {children}
         </StudentAttendanceContext.Provider>
