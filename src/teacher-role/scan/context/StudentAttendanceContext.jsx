@@ -9,21 +9,37 @@ const initialState = {
     classId: null,
     classStartTime: null,
     isBranchYearActivated: null,
+    dirtyIds: new Set(), // Track which students have unsaved changes
+    isLoading: false,
+    error: null,
 };
 
 const reducer = (state, action) => {
     switch (action.type) {
+        case "SET_LOADING":
+            return { ...state, isLoading: action.payload };
+        case "SET_ERROR":
+            return { ...state, error: action.payload };
+        case "CLEAR_DIRTY_IDS":
+            return { ...state, dirtyIds: new Set() };
         case "SET_CLASSID":
             return { ...state, classId: action.payload };
         case "SET_STUDENT_LIST":
-            return { ...state, studentList: action.payload };
+            return {
+                ...state,
+                studentList: action.payload,
+                dirtyIds: new Set(), // Clear dirty tracking when new data loads
+            };
         case "SET_CLASS_START_TIME":
             return { ...state, classStartTime: action.payload };
         case "SET_IS_ACTIVE_YEAR_ACTIVATED":
             return { ...state, isBranchYearActivated: action.payload };
         case "SET_STATUS":
+            const newDirtyIds = new Set(state.dirtyIds);
+            newDirtyIds.add(action.payload.id);
             return {
                 ...state,
+                dirtyIds: newDirtyIds,
                 studentList: state.studentList.map((student) => {
                     if (student.studentId.nis === action.payload.id) {
                         return {
@@ -41,8 +57,11 @@ const reducer = (state, action) => {
                 }),
             };
         case "SET_ATTRIBUTE":
+            const attributeDirtyIds = new Set(state.dirtyIds);
+            attributeDirtyIds.add(action.payload.id);
             return {
                 ...state,
+                dirtyIds: attributeDirtyIds,
                 studentList: state.studentList.map((student) =>
                     student.studentId.nis === action.payload.id
                         ? {
@@ -53,8 +72,11 @@ const reducer = (state, action) => {
                 ),
             };
         case "SET_NOTES":
+            const notesDirtyIds = new Set(state.dirtyIds);
+            notesDirtyIds.add(action.payload.id);
             return {
                 ...state,
+                dirtyIds: notesDirtyIds,
                 studentList: state.studentList.map((student) =>
                     student.studentId.nis === action.payload.id
                         ? { ...student, teachersNotes: action.payload.notes }
@@ -62,8 +84,11 @@ const reducer = (state, action) => {
                 ),
             };
         case "SET_VIOLATIONS":
+            const violationsDirtyIds = new Set(state.dirtyIds);
+            violationsDirtyIds.add(action.payload.id);
             return {
                 ...state,
+                dirtyIds: violationsDirtyIds,
                 studentList: state.studentList.map((student) =>
                     student.studentId.nis === action.payload.id
                         ? action.payload.violationType === "Attribute"
@@ -105,14 +130,14 @@ const reducer = (state, action) => {
             return {
                 ...state,
                 selectAll: !state.selectAll,
-                studentList: state.studentList.map((student) =>
-                    student.status === "Hadir" || student.status === "Terlambat"
-                        ? { ...student, isSelected: false }
-                        : student.status !== "Hadir" ||
-                          student.status === "Terlambat"
-                        ? { ...student, isSelected: !state.selectAll }
-                        : student
-                ),
+                studentList: state.studentList.map((student) => {
+                    const isPresent =
+                        student.status === "Hadir" ||
+                        student.status === "Terlambat";
+                    return isPresent
+                        ? { ...student, isSelected: false } // Present students cannot be selected
+                        : { ...student, isSelected: !state.selectAll }; // Toggle others
+                }),
             };
         case "APPLY_BULK_STATUS":
             return {
@@ -134,13 +159,14 @@ const reducer = (state, action) => {
 
 // Function to fetch attendance data from the backend
 const fetchAttendanceData = async (classId, attendanceDate, dispatch) => {
+    dispatch({ type: "SET_LOADING", payload: true });
+    dispatch({ type: "SET_ERROR", payload: null });
+
     const attendanceUrl = `${
         import.meta.env.VITE_BACKEND_URL
     }/attendances/${classId}`;
 
     const body = JSON.stringify({ date: attendanceDate });
-    // console.log(body)
-    // console.log(attendanceUrl)
 
     try {
         const response = await fetch(attendanceUrl, {
@@ -154,17 +180,17 @@ const fetchAttendanceData = async (classId, attendanceDate, dispatch) => {
             body: body,
         });
         if (!response.ok) {
-            throw new Error("Failed to fetch data");
+            throw new Error("Failed to fetch attendance data");
         }
         const data = await response.json();
         const formattedData = data.map((obj) => ({
             ...obj,
             isSelected: false, // Add isSelected property to each object
         }));
-        // console.log(formattedData)
         dispatch({ type: "SET_STUDENT_LIST", payload: formattedData });
     } catch (error) {
         console.error("Error fetching attendance data:", error);
+        dispatch({ type: "SET_ERROR", payload: error.message });
     }
 
     const classUrl = `${
@@ -182,7 +208,7 @@ const fetchAttendanceData = async (classId, attendanceDate, dispatch) => {
             },
         });
         if (!response.ok) {
-            throw new Error("Failed to fetch data");
+            throw new Error("Failed to fetch class data");
         }
         const data = await response.json();
 
@@ -197,7 +223,10 @@ const fetchAttendanceData = async (classId, attendanceDate, dispatch) => {
             payload: data.class.teachingGroupId.branchYearId.isActive,
         });
     } catch (error) {
-        console.error("Error fetching attendance data:", error);
+        console.error("Error fetching class data:", error);
+        dispatch({ type: "SET_ERROR", payload: error.message });
+    } finally {
+        dispatch({ type: "SET_LOADING", payload: false });
     }
 };
 

@@ -14,7 +14,6 @@ const QRCodeScanner = () => {
     const [cooldown, setCooldown] = useState(false);
     const [scanSuccess, setScanSuccess] = useState(false);
     const { state, dispatch } = useContext(StudentAttendanceContext);
-    const [opacity, setOpacity] = useState(0);
     const [status, setStatus] = useState("Initializing...");
     const [retryCount, setRetryCount] = useState(0);
 
@@ -64,24 +63,31 @@ const QRCodeScanner = () => {
             qrScanner?.destroy();
             setScanning(false);
         };
-    }, [cooldown, retryCount]);
-
-    useEffect(() => {
-        if (cooldown) {
-            setOpacity(100);
-        } else {
-            setOpacity(0);
-        }
-    }, [cooldown]);
+    }, [retryCount]); // Removed cooldown dependency - scanner stays alive
 
     const getPresenceStatus = (timeString) => {
+        // Guard against null/undefined timeString
+        if (!timeString || typeof timeString !== "string") {
+            return "Hadir"; // Default to present if no time configured
+        }
+
         // Get the current time
         const now = new Date();
         const currentHours = now.getHours();
         const currentMinutes = now.getMinutes();
 
-        // Parse the input time string
-        const [inputHours, inputMinutes] = timeString.split(":").map(Number);
+        // Parse the input time string safely
+        const timeParts = timeString.split(":");
+        if (timeParts.length !== 2) {
+            return "Hadir"; // Default if time format is invalid
+        }
+
+        const [inputHours, inputMinutes] = timeParts.map(Number);
+
+        // Validate parsed numbers
+        if (isNaN(inputHours) || isNaN(inputMinutes)) {
+            return "Hadir"; // Default if parsing failed
+        }
 
         // Compare the times
         if (
@@ -106,8 +112,13 @@ const QRCodeScanner = () => {
         });
     };
 
-    let attendanceData;
     const handleScan = async (data) => {
+        // Guard against scanning when classStartTime is not available
+        if (!state.classStartTime) {
+            console.warn("Class start time not available, skipping scan");
+            return;
+        }
+
         setScanSuccess(true);
         setCooldown(true); // Enable cooldown to prevent rapid re-scanning
 
@@ -126,15 +137,13 @@ const QRCodeScanner = () => {
             });
         }
 
-        // console.log(state.studentList)
-
         // Play beep sound
         if (beepRef.current) {
             beepRef.current.play();
         }
 
         // LOGIC TO PROCESS DATA HERE
-        attendanceData = {
+        const attendanceData = {
             id: data,
             newStatus: getPresenceStatus(state.classStartTime),
             timestamp: Date.now(),

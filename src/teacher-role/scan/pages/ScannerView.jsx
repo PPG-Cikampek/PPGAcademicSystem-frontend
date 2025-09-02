@@ -17,7 +17,6 @@ import InfoCard from "../../shared/Components/UIElements/InfoCard";
 
 const ScannerView = () => {
     const { error, sendRequest, setError } = useHttp();
-    const [isLoading, setIsLoading] = useState(true);
 
     const { state, dispatch, fetchAttendanceData } = useContext(
         StudentAttendanceContext
@@ -25,44 +24,54 @@ const ScannerView = () => {
 
     const navigate = useNavigate();
     const auth = useContext(AuthContext);
-    const classIds = auth.userClassIds;
     const classId = useParams().classId;
 
     useEffect(() => {
-        setIsLoading(true);
-
-        let attendanceDate;
-        attendanceDate = new Date().toLocaleDateString("en-CA");
-        fetchAttendanceData(classId, attendanceDate, dispatch);
-
-        setIsLoading(false);
-    }, [classIds, classId]); // Added `attendanceCreated` to dependencies
-
-    const createAttendanceHandler = async () => {
-        setIsLoading(true);
-        if (state.studentList.length === 0) {
-            const url = `${
-                import.meta.env.VITE_BACKEND_URL
-            }/attendances/create-new-attendances`;
-            const body = JSON.stringify({
-                classId,
-                subBranchId: auth.userSubBranchId,
-                branchId: auth.userBranchId,
-                branchYearId: auth.currentBranchYearId,
-            });
+        const loadData = async () => {
             try {
-                await sendRequest(url, "POST", body, {
-                    "Content-Type": "application/json",
-                });
-                // After successful creation, fetch new data and navigate
                 const attendanceDate = new Date().toLocaleDateString("en-CA");
                 await fetchAttendanceData(classId, attendanceDate, dispatch);
-                navigate(`/scan/class/${classId}`, { replace: true });
-            } catch (err) {
-                console.error(err);
+            } catch (error) {
+                console.error("Error loading attendance data:", error);
+                setError(error?.message || "Failed to load attendance data");
             }
+        };
+
+        if (classId) {
+            loadData();
         }
-        setIsLoading(false);
+    }, [classId]); // Fixed: Removed unnecessary classIds dependency
+
+    const createAttendanceHandler = async () => {
+        if (state.isLoading || state.studentList.length > 0) return; // Prevent double execution
+
+        dispatch({ type: "SET_LOADING", payload: true });
+        const url = `${
+            import.meta.env.VITE_BACKEND_URL
+        }/attendances/create-new-attendances`;
+        const body = JSON.stringify({
+            classId,
+            subBranchId: auth.userSubBranchId,
+            branchId: auth.userBranchId,
+            branchYearId: auth.currentBranchYearId,
+        });
+        try {
+            await sendRequest(url, "POST", body, {
+                "Content-Type": "application/json",
+            });
+            // After successful creation, fetch new data and navigate
+            const attendanceDate = new Date().toLocaleDateString("en-CA");
+            await fetchAttendanceData(classId, attendanceDate, dispatch);
+            navigate(`/scan/class/${classId}`, { replace: true });
+        } catch (err) {
+            console.error(err);
+            dispatch({
+                type: "SET_ERROR",
+                payload: err?.message || "Failed to create attendance",
+            });
+        } finally {
+            dispatch({ type: "SET_LOADING", payload: false });
+        }
     };
 
     // console.log(state)
@@ -73,22 +82,48 @@ const ScannerView = () => {
                 <StatusBar />
             </SequentialAnimation>
 
-            {isLoading && (
+            {state.isLoading && (
                 <div className={`flex justify-center mt-16 `}>
                     <LoadingCircle size={32} />
                 </div>
             )}
 
-            {!isLoading && (
+            {state.error && (
+                <div className="mx-4 my-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
+                    <p>Error: {state.error}</p>
+                    <button
+                        onClick={() => {
+                            dispatch({ type: "SET_ERROR", payload: null });
+                            const attendanceDate =
+                                new Date().toLocaleDateString("en-CA");
+                            fetchAttendanceData(
+                                classId,
+                                attendanceDate,
+                                dispatch
+                            );
+                        }}
+                        className="mt-2 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                    >
+                        Retry
+                    </button>
+                </div>
+            )}
+
+            {!state.isLoading && !state.error && (
                 <SequentialAnimation variant={2}>
-                    {state.studentList.length === 0 && !isLoading && (
+                    {state.studentList.length === 0 && !state.isLoading && (
                         <div className="card-basic m-4 justify-between items-center flex flex-col gap-2">
                             <button
                                 onClick={() => createAttendanceHandler()}
                                 className="btn-mobile-primary rounded-full w-full"
-                                disabled={state.isBranchYearActivated === false}
+                                disabled={
+                                    state.isLoading ||
+                                    state.isBranchYearActivated === false
+                                }
                             >
-                                Buat daftar hadir hari ini
+                                {state.isLoading
+                                    ? "Membuat..."
+                                    : "Buat daftar hadir hari ini"}
                             </button>
                             {state.isBranchYearActivated === false ? (
                                 <span className="text-danger">
@@ -99,7 +134,7 @@ const ScannerView = () => {
                             )}
                         </div>
                     )}
-                    {state.studentList.length !== 0 && !isLoading && (
+                    {state.studentList.length !== 0 && !state.isLoading && (
                         <>
                             {state.isBranchYearActivated === true && (
                                 <div className="card-basic m-4">

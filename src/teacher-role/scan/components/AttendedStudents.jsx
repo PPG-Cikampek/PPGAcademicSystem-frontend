@@ -1,4 +1,4 @@
-import { useContext, useRef, useState, useEffect } from "react";
+import { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import useHttp from "../../../shared/hooks/http-hook";
@@ -20,58 +20,26 @@ import { GeneralContext } from "../../../shared/Components/Context/general-conte
 
 const AttendedStudents = () => {
     const { state, dispatch } = useContext(StudentAttendanceContext);
-    const prevStudentList = useRef([]);
     const { isLoading, error, sendRequest } = useHttp();
     const [showViolationsMenu, setShowViolationsMenu] = useState({});
     const [showNotesField, setShowNotesField] = useState({});
-    const [unsavedChanges, setUnsavedChanges] = useState(0);
 
     const general = useContext(GeneralContext);
     const navigate = useNavigate();
 
-    // Initialize prevStudentList on mount and track student list
+    // Track unsaved changes using dirtyIds from context
+    const unsavedChanges = state.dirtyIds.size;
+
+    // Update general message based on unsaved changes
     useEffect(() => {
-        if (
-            prevStudentList.current.length === 0 &&
-            state.studentList.length > 0
-        ) {
-            prevStudentList.current = JSON.parse(
-                JSON.stringify(state.studentList)
-            );
-        }
-    }, [state.studentList]);
-
-    // Calculate changes on student list updates with deep comparison
-    useEffect(() => {
-        const hasChanged = (current, prev) => {
-            return (
-                prev.status !== current.status ||
-                JSON.stringify(prev.attributes) !==
-                    JSON.stringify(current.attributes) ||
-                JSON.stringify(prev.violations) !==
-                    JSON.stringify(current.violations) ||
-                prev.teachersNotes !== current.teachersNotes
-            );
-        };
-
-        let changes = 0;
-        state.studentList.forEach((student, index) => {
-            const prevStudent = prevStudentList.current[index];
-            if (prevStudent && hasChanged(student, prevStudent)) {
-                changes++;
-            }
-        });
-
-        setUnsavedChanges(changes);
-
-        if (changes > 0) {
+        if (unsavedChanges > 0) {
             general.setMessage(
-                `Perubahan untuk ${changes} siswa belum disimpan!`
+                `Perubahan untuk ${unsavedChanges} siswa belum disimpan!`
             );
         } else {
             general.setMessage(false);
         }
-    }, [state.studentList, general]);
+    }, [unsavedChanges, general]);
 
     // Add event listener for page reload/close
     useEffect(() => {
@@ -118,19 +86,9 @@ const AttendedStudents = () => {
     }
 
     const handleSave = async () => {
+        // Get changed students based on dirtyIds
         const changedStatuses = state.studentList
-            .filter((student, index) => {
-                const prevStudent = prevStudentList.current[index];
-                return (
-                    prevStudent &&
-                    (prevStudent.status !== student.status ||
-                        JSON.stringify(prevStudent.attributes) !==
-                            JSON.stringify(student.attributes) ||
-                        JSON.stringify(prevStudent.violations) !==
-                            JSON.stringify(student.violations) ||
-                        prevStudent.teachersNotes !== student.teachersNotes)
-                );
-            })
+            .filter((student) => state.dirtyIds.has(student.studentId.nis))
             .map((student) => ({
                 attendanceId: student._id,
                 status: student.status,
@@ -149,11 +107,8 @@ const AttendedStudents = () => {
                     "Content-Type": "application/json",
                 });
 
-                // Update prevStudentList with deep clone after successful save
-                prevStudentList.current = JSON.parse(
-                    JSON.stringify(state.studentList)
-                );
-                setUnsavedChanges(0);
+                // Clear dirty tracking after successful save
+                dispatch({ type: "CLEAR_DIRTY_IDS" });
                 general.setMessage(false);
             } catch (error) {
                 console.error("Error updating statuses:", error);
