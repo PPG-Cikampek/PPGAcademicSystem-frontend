@@ -23,29 +23,19 @@ import LoadingIndicator from "../molecules/LoadingIndicator";
 const ScannerView = () => {
     const { error, sendRequest, setError } = useHttp();
 
-    const { state, dispatch, fetchAttendanceData } = useContext(
-        StudentAttendanceContext
-    );
+    const { state, dispatch } = useContext(StudentAttendanceContext);
 
     const navigate = useNavigate();
     const auth = useContext(AuthContext);
     const classId = useParams().classId;
 
     useEffect(() => {
-        const loadData = async () => {
-            try {
-                const attendanceDate = new Date().toLocaleDateString("en-CA");
-                await fetchAttendanceData(classId, attendanceDate, dispatch);
-            } catch (error) {
-                console.error("Error loading attendance data:", error);
-                setError(error?.message || "Failed to load attendance data");
-            }
-        };
-
         if (classId) {
-            loadData();
+            const attendanceDate = new Date().toLocaleDateString("en-CA");
+            dispatch({ type: "SET_CLASSID", payload: classId });
+            dispatch({ type: "SET_ATTENDANCE_DATE", payload: attendanceDate });
         }
-    }, [classId]); // Fixed: Removed unnecessary classIds dependency
+    }, [classId, dispatch]);
 
     const createAttendanceHandler = async () => {
         if (state.isLoading || state.studentList.length > 0) return; // Prevent double execution
@@ -64,9 +54,9 @@ const ScannerView = () => {
             await sendRequest(url, "POST", body, {
                 "Content-Type": "application/json",
             });
-            // After successful creation, fetch new data and navigate
+            // After successful creation, update the attendance date to trigger refetch
             const attendanceDate = new Date().toLocaleDateString("en-CA");
-            await fetchAttendanceData(classId, attendanceDate, dispatch);
+            dispatch({ type: "SET_ATTENDANCE_DATE", payload: attendanceDate });
             navigate(`/scan/class/${classId}`, { replace: true });
         } catch (err) {
             console.error(err);
@@ -82,7 +72,7 @@ const ScannerView = () => {
     const handleRetry = () => {
         dispatch({ type: "SET_ERROR", payload: null });
         const attendanceDate = new Date().toLocaleDateString("en-CA");
-        fetchAttendanceData(classId, attendanceDate, dispatch);
+        dispatch({ type: "SET_ATTENDANCE_DATE", payload: attendanceDate });
     };
 
     // console.log(state)

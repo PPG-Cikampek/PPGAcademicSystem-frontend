@@ -4,3 +4,5 @@ export {
 } from "./useAttendancePerformances";
 
 export { useDashboard } from "./useDashboard";
+
+export { useAttendanceData, useClassData } from "./useAttendance";

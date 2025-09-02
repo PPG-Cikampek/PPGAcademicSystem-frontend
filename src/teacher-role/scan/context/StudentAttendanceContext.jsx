@@ -2,6 +2,7 @@
 // Performance Optimization: Uses Map for O(1) student lookups instead of O(n) array operations
 // This significantly improves performance for QR code scanning and student state updates
 import { createContext, useReducer, useEffect, useMemo } from "react";
+import { useAttendanceData, useClassData } from "../../../shared/queries";
 
 const StudentAttendanceContext = createContext();
 
@@ -23,6 +24,7 @@ const initialState = {
     studentMap: new Map(), // Changed from studentList to studentMap for O(1) lookups
     selectAll: false,
     classId: null,
+    attendanceDate: null, // Add attendanceDate to state
     classStartTime: null,
     isBranchYearActivated: null,
     dirtyIds: new Set(), // Track which students have unsaved changes
@@ -41,6 +43,8 @@ const reducer = (state, action) => {
             return { ...state, dirtyIds: new Set() };
         case "SET_CLASSID":
             return { ...state, classId: action.payload };
+        case "SET_ATTENDANCE_DATE":
+            return { ...state, attendanceDate: action.payload };
         case "SET_STUDENT_LIST":
             return {
                 ...state,
@@ -235,81 +239,55 @@ const reducer = (state, action) => {
     }
 };
 
-// Function to fetch attendance data from the backend
-const fetchAttendanceData = async (classId, attendanceDate, dispatch) => {
-    dispatch({ type: "SET_LOADING", payload: true });
-    dispatch({ type: "SET_ERROR", payload: null });
-
-    const attendanceUrl = `${
-        import.meta.env.VITE_BACKEND_URL
-    }/attendances/${classId}`;
-
-    const body = JSON.stringify({ date: attendanceDate });
-
-    try {
-        const response = await fetch(attendanceUrl, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${
-                    JSON.parse(localStorage.getItem("userData")).token
-                }`,
-            },
-            body: body,
-        });
-        if (!response.ok) {
-            throw new Error("Failed to fetch attendance data");
-        }
-        const data = await response.json();
-        const formattedData = data.map((obj) => ({
-            ...obj,
-            isSelected: false, // Add isSelected property to each object
-        }));
-        dispatch({ type: "SET_STUDENT_LIST", payload: formattedData });
-    } catch (error) {
-        console.error("Error fetching attendance data:", error);
-        dispatch({ type: "SET_ERROR", payload: error.message });
-    }
-
-    const classUrl = `${
-        import.meta.env.VITE_BACKEND_URL
-    }/classes/${classId}?populate=branchYear`;
-
-    try {
-        const response = await fetch(classUrl, {
-            method: "GET",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${
-                    JSON.parse(localStorage.getItem("userData")).token
-                }`,
-            },
-        });
-        if (!response.ok) {
-            throw new Error("Failed to fetch class data");
-        }
-        const data = await response.json();
-
-        console.log(data);
-
-        dispatch({
-            type: "SET_CLASS_START_TIME",
-            payload: data.class.startTime,
-        });
-        dispatch({
-            type: "SET_IS_ACTIVE_YEAR_ACTIVATED",
-            payload: data.class.teachingGroupId.branchYearId.isActive,
-        });
-    } catch (error) {
-        console.error("Error fetching class data:", error);
-        dispatch({ type: "SET_ERROR", payload: error.message });
-    } finally {
-        dispatch({ type: "SET_LOADING", payload: false });
-    }
-};
-
 const StudentAttendanceProvider = ({ children }) => {
     const [state, dispatch] = useReducer(reducer, initialState);
+
+    // Use React Query hooks for data fetching
+    const {
+        data: attendanceData,
+        isLoading: attendanceLoading,
+        error: attendanceError,
+    } = useAttendanceData(state.classId, state.attendanceDate);
+
+    const {
+        data: classData,
+        isLoading: classLoading,
+        error: classError,
+    } = useClassData(state.classId);
+
+    // Update state when attendance data is loaded
+    useEffect(() => {
+        if (attendanceData) {
+            dispatch({ type: "SET_STUDENT_LIST", payload: attendanceData });
+        }
+    }, [attendanceData]);
+
+    // Update state when class data is loaded
+    useEffect(() => {
+        if (classData) {
+            dispatch({
+                type: "SET_CLASS_START_TIME",
+                payload: classData.class.startTime,
+            });
+            dispatch({
+                type: "SET_IS_ACTIVE_YEAR_ACTIVATED",
+                payload: classData.class.teachingGroupId.branchYearId.isActive,
+            });
+        }
+    }, [classData]);
+
+    // Update loading and error states
+    useEffect(() => {
+        dispatch({
+            type: "SET_LOADING",
+            payload: attendanceLoading || classLoading,
+        });
+    }, [attendanceLoading, classLoading]);
+
+    useEffect(() => {
+        const error = attendanceError || classError;
+        dispatch({ type: "SET_ERROR", payload: error ? error.message : null });
+    }, [attendanceError, classError]);
 
     // Helper function to get student list as array for components that need it
     const getStudentList = () => mapToArray(state.studentMap);
@@ -334,7 +312,6 @@ const StudentAttendanceProvider = ({ children }) => {
                     studentList: studentList, // Use memoized array
                 },
                 dispatch,
-                fetchAttendanceData,
                 getStudentList,
                 getStudent,
                 hasStudent,
