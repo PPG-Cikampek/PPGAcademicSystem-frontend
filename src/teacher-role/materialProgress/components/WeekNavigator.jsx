@@ -18,7 +18,7 @@ const WeekNavigator = ({
     };
 
     return (
-        <div className="flex justify-between items-center m-5 px-10">
+        <div className="flex justify-between items-center m-5 px-6">
             <button onClick={() => handleWeekChange(-1)}>
                 <div className="p-2 border-2 rounded-full bg-white active:bg-gray-400">
                     <ChevronLeft size={24} />

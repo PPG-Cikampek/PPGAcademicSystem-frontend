@@ -34,7 +34,6 @@ const ProgressList = ({ progressData, isLoading }) => {
                     <h3 className="text-gray-500 italic">Tidak ada data</h3>
                 </InfoCard>
             )}
-            <FloatingButton link={"/materialProgress/new"} />
         </>
     );
 };

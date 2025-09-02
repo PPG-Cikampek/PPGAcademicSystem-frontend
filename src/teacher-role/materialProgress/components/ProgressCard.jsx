@@ -4,7 +4,7 @@ import { formatDate, formatTime } from "../utils/dateUtils";
 
 const ProgressCard = ({ progress }) => {
     return (
-        <div className="card-basic mx-4 rounded-3xl shadow-xs justify-start">
+        <div className="card-basic rounded-3xl shadow-xs justify-start">
             <div className="flex justify-between w-full">
                 <div className="flex flex-col">
                     <div className="flex flex-col">
