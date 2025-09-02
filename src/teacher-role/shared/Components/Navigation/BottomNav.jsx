@@ -63,7 +63,7 @@ const BottomNav = () => {
     };
 
     return (
-        <div className="bg-white border-t border-gray-200 flex grow justify-around items-center h-16 fixed bottom-0 w-full transition-all duration-300">
+        <div className="z-50 bg-white border-t border-gray-200 flex grow justify-around items-center h-16 fixed bottom-0 w-full transition-all duration-300">
             {navLinks.map((link, index) => (
                 <button key={index} className="basis-16">
                     <NavLink
