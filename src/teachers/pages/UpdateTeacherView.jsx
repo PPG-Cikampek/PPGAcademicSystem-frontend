@@ -1,4 +1,11 @@
-import { useContext, useState, useEffect, useRef } from "react";
+import {
+    useContext,
+    useState,
+    useEffect,
+    useRef,
+    useCallback,
+    useMemo,
+} from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { AuthContext } from "../../shared/Components/Context/auth-context";
@@ -12,7 +19,6 @@ import Modal from "../../shared/Components/UIElements/ModalBottomClose";
 import FileUpload from "../../shared/Components/FormElements/FileUpload";
 
 import { Icon } from "@iconify-icon/react";
-import generateBase64Thumbnail from "../../shared/Utilities/generateBase64Thumbnail";
 
 const UpdateTeacherView = () => {
     const [modal, setModal] = useState({
@@ -25,8 +31,12 @@ const UpdateTeacherView = () => {
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [loadedTeacher, setLoadedTeacher] = useState();
     const [loadedDate, setLoadedDate] = useState();
-    const [croppedImage, setCroppedImage] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Use refs for large binary data to avoid re-renders
+    const croppedImageRef = useRef(null);
     const fileInputRef = useRef();
+    const originalDataRef = useRef(null); // Store original data for comparison
 
     const auth = useContext(AuthContext);
 
@@ -46,11 +56,21 @@ const UpdateTeacherView = () => {
                 const responseData = await sendRequest(url);
                 setLoadedTeacher(responseData.teacher);
 
-                // Safe date parsing with validation
+                // Store original data for comparison to detect changes
+                originalDataRef.current = {
+                    name: responseData.teacher.name,
+                    phone: responseData.teacher.phone,
+                    position: responseData.teacher.position,
+                    gender: responseData.teacher.gender,
+                    address: responseData.teacher.address,
+                    dateOfBirth: responseData.teacher.dateOfBirth,
+                };
+
+                // Safe date parsing with validation - store as ISO string to reduce memory
                 if (responseData.teacher.dateOfBirth) {
                     const date = new Date(responseData.teacher.dateOfBirth);
                     if (!isNaN(date.getTime())) {
-                        setLoadedDate(date);
+                        setLoadedDate(date.toISOString().split("T")[0]);
                     } else {
                         setLoadedDate(null);
                     }
@@ -62,93 +82,142 @@ const UpdateTeacherView = () => {
         fetchTeacher();
     }, [sendRequest, id, auth.userRole, auth.userId]);
 
+    // Memoized function to handle cropped image
+    const handleImageCropped = useCallback((croppedImage) => {
+        croppedImageRef.current = croppedImage;
+    }, []);
+
+    // Memoized function to detect if data has changed
+    const hasDataChanged = useCallback((formData) => {
+        if (!originalDataRef.current) return true;
+
+        const original = originalDataRef.current;
+        return (
+            original.name !== formData.name ||
+            original.phone !== formData.phone ||
+            original.position !== formData.position ||
+            original.gender !== formData.gender ||
+            original.address !== formData.address ||
+            original.dateOfBirth !==
+                (formData.dateOfBirth instanceof Date
+                    ? formData.dateOfBirth.toISOString().split("T")[0]
+                    : formData.dateOfBirth) ||
+            croppedImageRef.current !== null
+        );
+    }, []);
+
     const handleFormSubmit = async (data) => {
+        // Prevent duplicate submissions
+        if (isSubmitting) {
+            return;
+        }
+
         // Prevent submission if teacher data isn't loaded
         if (!loadedTeacher || !loadedTeacher.userId || !loadedTeacher.id) {
             setError("Data guru belum dimuat. Silakan tunggu...");
             return;
         }
 
-        const url = `${import.meta.env.VITE_BACKEND_URL}/teachers/`;
-        const formData = new FormData();
-
-        formData.append("name", data.name);
-        formData.append("phone", data.phone);
-        formData.append(
-            "dateOfBirth",
-            data.dateOfBirth instanceof Date
-                ? data.dateOfBirth.toISOString().split("T")[0]
-                : data.dateOfBirth
-        );
-        formData.append("gender", data.gender);
-        formData.append("address", data.address);
-        formData.append("position", data.position);
-        formData.append("userId", loadedTeacher.userId);
-        formData.append("teacherId", loadedTeacher.id);
-
-        console.log(croppedImage);
-        console.log(fileInputRef.current.files[0]);
-
-        if (croppedImage) {
-            formData.append("image", croppedImage);
-            // Generate and append base64 thumbnail
-            try {
-                const base64Thumb = await generateBase64Thumbnail(
-                    croppedImage,
-                    128
-                );
-                formData.append("thumbnail", base64Thumb);
-            } catch (err) {
-                setError("Gagal membuat thumbnail!");
-                throw err;
-            }
-        } else {
-            if (!loadedTeacher?.image && auth.userRole !== "admin") {
-                setError("Tidak ada foto yang dipilih!");
-                throw new Error("Tidak ada foto yang dipilih!");
-            }
+        // Check if any data has actually changed
+        if (!hasDataChanged(data)) {
+            setError("Tidak ada perubahan data untuk disimpan.");
+            return;
         }
 
-        console.log(data);
-        console.log(formData);
+        setIsSubmitting(true);
 
-        let responseData;
         try {
-            responseData = await sendRequest(url, "PATCH", formData);
-            console.log(responseData);
-        } catch (err) {}
-        setModal({
-            title: "Berhasil!",
-            message: responseData.message,
-            onConfirm: null,
-        });
-        setModalIsOpen(true);
+            const url = `${import.meta.env.VITE_BACKEND_URL}/teachers/`;
+            const formData = new FormData();
+
+            // Only append changed fields to reduce payload size
+            const original = originalDataRef.current;
+
+            if (original.name !== data.name) {
+                formData.append("name", data.name);
+            }
+            if (original.phone !== data.phone) {
+                formData.append("phone", data.phone);
+            }
+
+            const formattedDate =
+                data.dateOfBirth instanceof Date
+                    ? data.dateOfBirth.toISOString().split("T")[0]
+                    : data.dateOfBirth;
+
+            if (original.dateOfBirth !== formattedDate) {
+                formData.append("dateOfBirth", formattedDate);
+            }
+            if (original.gender !== data.gender) {
+                formData.append("gender", data.gender);
+            }
+            if (original.address !== data.address) {
+                formData.append("address", data.address);
+            }
+            if (original.position !== data.position) {
+                formData.append("position", data.position);
+            }
+
+            // Always include IDs for backend identification
+            formData.append("userId", loadedTeacher.userId);
+            formData.append("teacherId", loadedTeacher.id);
+
+            // Only append image if it has been changed
+            if (croppedImageRef.current) {
+                formData.append("image", croppedImageRef.current);
+            } else {
+                if (!loadedTeacher?.image && auth.userRole !== "admin") {
+                    setError("Tidak ada foto yang dipilih!");
+                    throw new Error("Tidak ada foto yang dipilih!");
+                }
+            }
+
+            let responseData;
+            try {
+                responseData = await sendRequest(url, "PATCH", formData);
+            } catch (err) {
+                throw err;
+            }
+            setModal({
+                title: "Berhasil!",
+                message: responseData.message,
+                onConfirm: null,
+            });
+            setModalIsOpen(true);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
-    const ModalFooter = () => (
-        <div className="flex gap-2 items-center">
-            <button
-                onClick={() => {
-                    setModalIsOpen(false);
-                    !error && navigate(-1);
-                }}
-                className={`${
-                    modal.onConfirm
-                        ? "btn-danger-outline"
-                        : "button-primary mt-0 "
-                }`}
-            >
-                {modal.onConfirm ? "Batal" : "Tutup"}
-            </button>
-            {modal.onConfirm && (
-                <button
-                    onClick={modal.onConfirm}
-                    className="button-primary mt-0 "
-                >
-                    Ya
-                </button>
-            )}
-        </div>
+    // Memoized ModalFooter component to prevent unnecessary re-renders
+    const ModalFooter = useMemo(
+        () => () =>
+            (
+                <div className="flex gap-2 items-center">
+                    <button
+                        onClick={() => {
+                            setModalIsOpen(false);
+                            !error && navigate(-1);
+                        }}
+                        className={`${
+                            modal.onConfirm
+                                ? "btn-danger-outline"
+                                : "button-primary mt-0 "
+                        }`}
+                    >
+                        {modal.onConfirm ? "Batal" : "Tutup"}
+                    </button>
+                    {modal.onConfirm && (
+                        <button
+                            onClick={modal.onConfirm}
+                            className="button-primary mt-0 "
+                        >
+                            Ya
+                        </button>
+                    )}
+                </div>
+            ),
+        [modal.onConfirm, error, navigate]
     );
 
     return (
@@ -200,7 +269,7 @@ const UpdateTeacherView = () => {
                                               }/${loadedTeacher.image}`
                                             : "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"
                                     }
-                                    onImageCropped={setCroppedImage}
+                                    onImageCropped={handleImageCropped}
                                 />
                             </div>
                         </div>
@@ -282,13 +351,15 @@ const UpdateTeacherView = () => {
                             <button
                                 type="submit"
                                 className={`button-primary ${
-                                    isLoading || !loadedTeacher
+                                    isLoading || !loadedTeacher || isSubmitting
                                         ? "opacity-50 cursor-not-allowed"
                                         : ""
                                 }`}
-                                disabled={isLoading || !loadedTeacher}
+                                disabled={
+                                    isLoading || !loadedTeacher || isSubmitting
+                                }
                             >
-                                {isLoading ? (
+                                {isLoading || isSubmitting ? (
                                     <LoadingCircle>Processing...</LoadingCircle>
                                 ) : (
                                     "Update"

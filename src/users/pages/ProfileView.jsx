@@ -1,4 +1,11 @@
-import { useContext, useEffect, useState, useRef } from "react";
+import {
+    useContext,
+    useEffect,
+    useState,
+    useRef,
+    useCallback,
+    useMemo,
+} from "react";
 
 import useHttp from "../../shared/hooks/http-hook";
 
@@ -10,7 +17,6 @@ import FileUpload from "../../shared/Components/FormElements/FileUpload";
 import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
 import Modal from "../../shared/Components/UIElements/ModalBottomClose";
 import WarningCard from "../../shared/Components/UIElements/WarningCard";
-import generateBase64Thumbnail from "../../shared/Utilities/generateBase64Thumbnail";
 import { Pencil, X, Check } from "lucide-react";
 import { Icon } from "@iconify-icon/react/dist/iconify.js";
 
@@ -26,17 +32,21 @@ const ProfileView = () => {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [oldPassword, setOldPassword] = useState("");
     const [userData, setUserData] = useState();
-    const [pickedFile, setPickedFile] = useState(null);
     const [showPassword, setShowPassword] = useState(false);
     const [passwordError, setPasswordError] = useState("");
     const [emailError, setEmailError] = useState("");
     const [isEditingName, setIsEditingName] = useState(false);
     const [editedName, setEditedName] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const { isLoading, error, sendRequest, setError } = useHttp();
 
-    const auth = useContext(AuthContext);
+    // Use refs for large binary data to avoid re-renders
+    const pickedFileRef = useRef(null);
     const fileInputRef = useRef();
+    const originalDataRef = useRef(null); // Store original data for comparison
+
+    const auth = useContext(AuthContext);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -45,35 +55,36 @@ const ProfileView = () => {
                     `${import.meta.env.VITE_BACKEND_URL}/users/${auth.userId}`
                 );
                 setUserData(response.users);
-                console.log(response);
+
+                // Store original data for comparison to detect changes
+                originalDataRef.current = {
+                    name: response.users.name,
+                    email: response.users.email,
+                };
             } catch (err) {}
         };
         fetchUserData();
     }, [sendRequest, auth.userId]);
 
     const saveImageHandler = async () => {
-        const formData = new FormData();
-        if (pickedFile) {
-            formData.append("image", pickedFile);
-            // Generate and append base64 thumbnail
-            try {
-                const base64Thumb = await generateBase64Thumbnail(
-                    pickedFile,
-                    128
-                );
-                formData.append("thumbnail", base64Thumb);
-            } catch (err) {
-                setError("Gagal membuat thumbnail!");
-                throw err;
-            }
-        } else {
-            if (auth.userRole !== "admin") {
-                setError("Tidak ada foto yang dipilih!");
-                throw new Error("Tidak ada foto yang dipilih!");
-            }
+        // Prevent duplicate submissions
+        if (isSubmitting) {
+            return;
         }
 
+        setIsSubmitting(true);
+
         try {
+            const formData = new FormData();
+            if (pickedFileRef.current) {
+                formData.append("image", pickedFileRef.current);
+            } else {
+                if (auth.userRole !== "admin") {
+                    setError("Tidak ada foto yang dipilih!");
+                    throw new Error("Tidak ada foto yang dipilih!");
+                }
+            }
+
             const response = await sendRequest(
                 `${import.meta.env.VITE_BACKEND_URL}/users/image-upload/${
                     auth.userId
@@ -81,14 +92,13 @@ const ProfileView = () => {
                 "POST",
                 formData
             );
-            console.log(response);
             setModal({
                 title: "Berhasil!",
                 message: response.message,
                 onConfirm: null,
             });
             setModalIsOpen(true);
-            setPickedFile(null);
+            pickedFileRef.current = null;
         } catch (err) {
             setModal({
                 title: "Gagal!",
@@ -96,30 +106,37 @@ const ProfileView = () => {
                 onConfirm: null,
             });
             setModalIsOpen(true);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
-    const handleEmailChange = (e) => {
+    // Memoized handlers to prevent unnecessary re-renders
+    const handleImageCropped = useCallback((croppedImage) => {
+        pickedFileRef.current = croppedImage;
+    }, []);
+
+    const handleEmailChange = useCallback((e) => {
         setNewEmail(e.target.value);
-    };
+    }, []);
 
-    const handlePasswordChange = (e) => {
+    const handlePasswordChange = useCallback((e) => {
         setPassword(e.target.value);
-    };
+    }, []);
 
-    const handleConfirmPasswordChange = (e) => {
+    const handleConfirmPasswordChange = useCallback((e) => {
         setConfirmPassword(e.target.value);
-    };
+    }, []);
 
-    const handleOldPasswordChange = (e) => {
+    const handleOldPasswordChange = useCallback((e) => {
         setOldPassword(e.target.value);
-    };
+    }, []);
 
-    const toggleShowPassword = () => {
+    const toggleShowPassword = useCallback(() => {
         setShowPassword((prevState) => !prevState);
-    };
+    }, []);
 
-    const handleEmailVerification = () => {
+    const handleEmailVerification = useCallback(() => {
         const verifyEmail = async () => {
             try {
                 const responseData = await sendRequest(
@@ -158,9 +175,9 @@ const ProfileView = () => {
             onConfirm: verifyEmail,
         });
         setModalIsOpen(true);
-    };
+    }, [auth.token, sendRequest]);
 
-    const handleEmailUpdate = async () => {
+    const handleEmailUpdate = useCallback(async () => {
         if (!newEmail) {
             setEmailError(" Email tidak boleh kosong!");
             return;
@@ -205,9 +222,9 @@ const ProfileView = () => {
             onConfirm: updateEmail,
         });
         setModalIsOpen(true);
-    };
+    }, [auth.token, sendRequest, newEmail]);
 
-    const handlePasswordUpdate = async () => {
+    const handlePasswordUpdate = useCallback(async () => {
         if (password !== confirmPassword) {
             setPasswordError("Passwords tidak sama");
             return;
@@ -234,7 +251,6 @@ const ProfileView = () => {
                     message: response.message,
                     onConfirm: null,
                 });
-                console.log(response);
             } catch (err) {
                 setModal({
                     title: "Gagal!",
@@ -249,72 +265,77 @@ const ProfileView = () => {
             onConfirm: updatePassword,
         });
         setModalIsOpen(true);
-    };
+    }, [auth.token, sendRequest, password, confirmPassword, oldPassword]);
 
-    const handleSaveName = async (e) => {
-        e.preventDefault();
-        if (!editedName.trim()) return;
-        try {
-            const response = await sendRequest(
-                `${import.meta.env.VITE_BACKEND_URL}/users/${auth.userId}`,
-                "PATCH",
-                JSON.stringify({ name: editedName }),
-                {
-                    "Content-Type": "application/json",
-                    Authorization: "Bearer " + auth.token,
-                }
-            );
-            setUserData((prev) => ({ ...prev, name: editedName }));
-            setIsEditingName(false);
-            setModal({
-                title: "Berhasil!",
-                message: response.message || "Nama berhasil diubah.",
-                onConfirm: null,
-            });
-            setModalIsOpen(true);
-        } catch (err) {
-            setModal({
-                title: "Gagal!",
-                message: err.message,
-                onConfirm: null,
-            });
-            setModalIsOpen(true);
-        }
-    };
-
-    const ModalFooter = () => (
-        <div className="flex gap-2 items-center">
-            <button
-                onClick={() => {
-                    setModalIsOpen(false);
-                }}
-                className={`${
-                    modal.onConfirm
-                        ? "btn-danger-outline"
-                        : "button-primary mt-0 "
-                } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
-                disabled={isLoading}
-            >
-                {isLoading ? (
-                    <LoadingCircle />
-                ) : modal.onConfirm ? (
-                    "Batal"
-                ) : (
-                    "Tutup"
-                )}
-            </button>
-            {modal.onConfirm && (
-                <button
-                    onClick={modal.onConfirm}
-                    className={`button-primary mt-0 ${
-                        isLoading ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
-                >
-                    {isLoading ? <LoadingCircle /> : "Ya"}
-                </button>
-            )}
-        </div>
+    const handleSaveName = useCallback(
+        async (e) => {
+            e.preventDefault();
+            if (!editedName.trim()) return;
+            try {
+                const response = await sendRequest(
+                    `${import.meta.env.VITE_BACKEND_URL}/users/${auth.userId}`,
+                    "PATCH",
+                    JSON.stringify({ name: editedName }),
+                    {
+                        "Content-Type": "application/json",
+                        Authorization: "Bearer " + auth.token,
+                    }
+                );
+                setUserData((prev) => ({ ...prev, name: editedName }));
+                setIsEditingName(false);
+                setModal({
+                    title: "Berhasil!",
+                    message: response.message || "Nama berhasil diubah.",
+                    onConfirm: null,
+                });
+                setModalIsOpen(true);
+            } catch (err) {
+                setModal({
+                    title: "Gagal!",
+                    message: err.message,
+                    onConfirm: null,
+                });
+                setModalIsOpen(true);
+            }
+        },
+        [auth.userId, auth.token, sendRequest, editedName]
     );
+
+    const ModalFooter = () => {
+        return (
+            <div className="flex gap-2 items-center">
+                <button
+                    onClick={() => {
+                        setModalIsOpen(false);
+                    }}
+                    className={`${
+                        modal.onConfirm
+                            ? "btn-danger-outline"
+                            : "button-primary mt-0 "
+                    } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+                    disabled={isLoading}
+                >
+                    {isLoading ? (
+                        <LoadingCircle />
+                    ) : modal.onConfirm ? (
+                        "Batal"
+                    ) : (
+                        "Tutup"
+                    )}
+                </button>
+                {modal.onConfirm && (
+                    <button
+                        onClick={modal.onConfirm}
+                        className={`button-primary mt-0 ${
+                            isLoading ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
+                    >
+                        {isLoading ? <LoadingCircle /> : "Ya"}
+                    </button>
+                )}
+            </div>
+        );
+    };
 
     return (
         <div className="container mx-auto p-6 max-w-4xl">
@@ -383,7 +404,7 @@ const ProfileView = () => {
                                                       }/${userData.image}`
                                                     : "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"
                                             }
-                                            onImageCropped={setPickedFile}
+                                            onImageCropped={handleImageCropped}
                                         />
                                     </div>
                                 </div>
@@ -393,18 +414,18 @@ const ProfileView = () => {
                             reset={false}
                             footer={false}
                             button={
-                                pickedFile && (
+                                pickedFileRef.current && (
                                     <div className="flex flex-col justify-stretch mt-4">
                                         <button
                                             type="submit"
                                             className={`button-primary ${
-                                                isLoading
+                                                isLoading || isSubmitting
                                                     ? "opacity-50 hover:cursor-not-allowed"
                                                     : ""
                                             }`}
-                                            disabled={isLoading}
+                                            disabled={isLoading || isSubmitting}
                                         >
-                                            {isLoading ? (
+                                            {isLoading || isSubmitting ? (
                                                 <LoadingCircle>
                                                     Processing...
                                                 </LoadingCircle>
@@ -542,14 +563,18 @@ const ProfileView = () => {
                                     <button
                                         type="button"
                                         className={`button-primary mt-0 py-2 inline-block ${
-                                            isLoading
+                                            isLoading || isSubmitting
                                                 ? "opacity-50 cursor-not-allowed"
                                                 : ""
                                         }`}
-                                        disabled={isLoading}
+                                        disabled={isLoading || isSubmitting}
                                         onClick={handleEmailUpdate}
                                     >
-                                        {isLoading ? <LoadingCircle /> : "Ubah"}
+                                        {isLoading || isSubmitting ? (
+                                            <LoadingCircle />
+                                        ) : (
+                                            "Ubah"
+                                        )}
                                     </button>
                                 </div>
                                 {emailError && (
@@ -620,14 +645,14 @@ const ProfileView = () => {
                                         <button
                                             type="button"
                                             className={`button-primary py-2 inline-block ${
-                                                isLoading
+                                                isLoading || isSubmitting
                                                     ? "opacity-50 cursor-not-allowed"
                                                     : ""
                                             }`}
-                                            disabled={isLoading}
+                                            disabled={isLoading || isSubmitting}
                                             onClick={handlePasswordUpdate}
                                         >
-                                            {isLoading ? (
+                                            {isLoading || isSubmitting ? (
                                                 <LoadingCircle>
                                                     Processing...
                                                 </LoadingCircle>

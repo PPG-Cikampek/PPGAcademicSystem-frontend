@@ -1,4 +1,11 @@
-import { useContext, useState, useEffect, useRef } from "react";
+import {
+    useContext,
+    useState,
+    useEffect,
+    useRef,
+    useCallback,
+    useMemo,
+} from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import useHttp from "../../shared/hooks/http-hook";
@@ -11,7 +18,6 @@ import Modal from "../../shared/Components/UIElements/ModalBottomClose";
 import FileUpload from "../../shared/Components/FormElements/FileUpload";
 import { Icon } from "@iconify-icon/react";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
-import generateBase64Thumbnail from "../../shared/Utilities/generateBase64Thumbnail";
 
 const UpdateStudentView = () => {
     const [modal, setModal] = useState({
@@ -24,10 +30,14 @@ const UpdateStudentView = () => {
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [loadedStudent, setLoadedStudent] = useState();
     const [loadedDate, setLoadedDate] = useState();
-    const [croppedImage, setCroppedImage] = useState(null);
     const [fields, setFields] = useState([]);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
+    // Use refs for large binary data to avoid re-renders
+    const croppedImageRef = useRef(null);
     const fileInputRef = useRef();
+    const originalDataRef = useRef(null); // Store original data for comparison
+
     const auth = useContext(AuthContext);
 
     const studentId = useParams().studentId;
@@ -41,11 +51,22 @@ const UpdateStudentView = () => {
                 );
                 setLoadedStudent(responseData.student);
 
-                // Safe date parsing with validation
+                // Store original data for comparison to detect changes
+                originalDataRef.current = {
+                    nis: responseData.student.nis,
+                    name: responseData.student.name,
+                    dateOfBirth: responseData.student.dateOfBirth,
+                    gender: responseData.student.gender,
+                    parentName: responseData.student.parentName,
+                    parentPhone: responseData.student.parentPhone,
+                    address: responseData.student.address,
+                };
+
+                // Safe date parsing with validation - store as ISO string to reduce memory
                 if (responseData.student.dateOfBirth) {
                     const date = new Date(responseData.student.dateOfBirth);
                     if (!isNaN(date.getTime())) {
-                        setLoadedDate(date);
+                        setLoadedDate(date.toISOString().split("T")[0]);
                     } else {
                         setLoadedDate(null);
                     }
@@ -185,95 +206,159 @@ const UpdateStudentView = () => {
         }
     }, [loadedStudent]);
 
+    // Memoized function to handle cropped image
+    const handleImageCropped = useCallback((croppedImage) => {
+        croppedImageRef.current = croppedImage;
+    }, []);
+
+    // Memoized function to detect if data has changed
+    const hasDataChanged = useCallback(
+        (formData) => {
+            if (!originalDataRef.current) return true;
+
+            const original = originalDataRef.current;
+            const formattedDate =
+                formData.dateOfBirth instanceof Date
+                    ? formData.dateOfBirth.toISOString().split("T")[0]
+                    : formData.dateOfBirth;
+
+            return (
+                (auth.userRole === "admin" && original.nis !== formData.nis) ||
+                original.name !==
+                    formData.name?.replace(
+                        /\w\S*/g,
+                        (txt) =>
+                            txt.charAt(0).toUpperCase() +
+                            txt.substr(1).toLowerCase()
+                    ) ||
+                original.dateOfBirth !== formattedDate ||
+                original.gender !== formData.gender ||
+                original.parentName !== formData.parentName ||
+                original.parentPhone !== formData.parentPhone ||
+                original.address !== formData.address ||
+                croppedImageRef.current !== null
+            );
+        },
+        [auth.userRole]
+    );
+
     const handleFormSubmit = async (data) => {
+        // Prevent duplicate submissions
+        if (isSubmitting) {
+            return;
+        }
+
         // Prevent submission if student data isn't loaded
         if (!loadedStudent || !loadedStudent.id) {
             setError("Data siswa belum dimuat. Silakan tunggu...");
             return;
         }
 
-        const url = `${import.meta.env.VITE_BACKEND_URL}/students/${studentId}`;
-        const formData = new FormData();
+        // Check if any data has actually changed
+        if (!hasDataChanged(data)) {
+            setError("Tidak ada perubahan data untuk disimpan.");
+            return;
+        }
 
-        auth.userRole === "admin" && formData.append("nis", data.nis);
-        formData.append(
-            "name",
-            data.name.replace(
+        setIsSubmitting(true);
+
+        try {
+            const url = `${
+                import.meta.env.VITE_BACKEND_URL
+            }/students/${studentId}`;
+            const formData = new FormData();
+
+            // Only append changed fields to reduce payload size
+            const original = originalDataRef.current;
+            const formattedName = data.name.replace(
                 /\w\S*/g,
                 (txt) =>
                     txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
-            )
-        );
-        formData.append(
-            "dateOfBirth",
-            data.dateOfBirth instanceof Date
-                ? data.dateOfBirth.toISOString().split("T")[0]
-                : data.dateOfBirth
-        );
-        formData.append("gender", data.gender);
-        formData.append("parentName", data.parentName);
-        formData.append("parentPhone", data.parentPhone);
-        formData.append("address", data.address);
+            );
+            const formattedDate =
+                data.dateOfBirth instanceof Date
+                    ? data.dateOfBirth.toISOString().split("T")[0]
+                    : data.dateOfBirth;
 
-        console.log(data);
-        console.log(formData);
+            // Only append changed fields
+            if (auth.userRole === "admin" && original.nis !== data.nis) {
+                formData.append("nis", data.nis);
+            }
+            if (original.name !== formattedName) {
+                formData.append("name", formattedName);
+            }
+            if (original.dateOfBirth !== formattedDate) {
+                formData.append("dateOfBirth", formattedDate);
+            }
+            if (original.gender !== data.gender) {
+                formData.append("gender", data.gender);
+            }
+            if (original.parentName !== data.parentName) {
+                formData.append("parentName", data.parentName);
+            }
+            if (original.parentPhone !== data.parentPhone) {
+                formData.append("parentPhone", data.parentPhone);
+            }
+            if (original.address !== data.address) {
+                formData.append("address", data.address);
+            }
 
-        if (croppedImage) {
-            formData.append("image", croppedImage);
-            // Generate and append base64 thumbnail
+            // Only append image if it has been changed
+            if (croppedImageRef.current) {
+                formData.append("image", croppedImageRef.current);
+            } else {
+                if (!loadedStudent?.image && auth.userRole !== "admin") {
+                    setError("Tidak ada foto yang dipilih!");
+                    throw new Error("Tidak ada foto yang dipilih!");
+                }
+            }
+
+            let responseData;
             try {
-                const base64Thumb = await generateBase64Thumbnail(
-                    croppedImage,
-                    128
-                );
-                formData.append("thumbnail", base64Thumb);
+                responseData = await sendRequest(url, "PATCH", formData);
             } catch (err) {
-                setError("Gagal membuat thumbnail!");
                 throw err;
             }
-        } else {
-            if (!loadedStudent?.image && auth.userRole !== "admin") {
-                setError("Tidak ada foto yang dipilih!");
-                throw new Error("Tidak ada foto yang dipilih!");
-            }
+            setModal({
+                title: "Berhasil!",
+                message: responseData.message,
+                onConfirm: null,
+            });
+            setModalIsOpen(true);
+        } finally {
+            setIsSubmitting(false);
         }
-
-        let responseData;
-        try {
-            responseData = await sendRequest(url, "PATCH", formData);
-        } catch (err) {}
-        setModal({
-            title: "Berhasil!",
-            message: responseData.message,
-            onConfirm: null,
-        });
-        setModalIsOpen(true);
     };
 
-    const ModalFooter = () => (
-        <div className="flex gap-2 items-center">
-            <button
-                onClick={() => {
-                    setModalIsOpen(false);
-                    !error && navigate(-1);
-                }}
-                className={`${
-                    modal.onConfirm
-                        ? "btn-danger-outline"
-                        : "button-primary mt-0 "
-                }`}
-            >
-                {modal.onConfirm ? "Batal" : "Tutup"}
-            </button>
-            {modal.onConfirm && (
-                <button
-                    onClick={modal.onConfirm}
-                    className="button-primary mt-0 "
-                >
-                    Ya
-                </button>
-            )}
-        </div>
+    // Memoized ModalFooter component to prevent unnecessary re-renders
+    const ModalFooter = useMemo(
+        () => () =>
+            (
+                <div className="flex gap-2 items-center">
+                    <button
+                        onClick={() => {
+                            setModalIsOpen(false);
+                            !error && navigate(-1);
+                        }}
+                        className={`${
+                            modal.onConfirm
+                                ? "btn-danger-outline"
+                                : "button-primary mt-0 "
+                        }`}
+                    >
+                        {modal.onConfirm ? "Batal" : "Tutup"}
+                    </button>
+                    {modal.onConfirm && (
+                        <button
+                            onClick={modal.onConfirm}
+                            className="button-primary mt-0 "
+                        >
+                            Ya
+                        </button>
+                    )}
+                </div>
+            ),
+        [modal.onConfirm, error, navigate]
     );
 
     return (
@@ -326,7 +411,7 @@ const UpdateStudentView = () => {
                                                   }/${loadedStudent.image}`
                                                 : "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"
                                         }
-                                        onImageCropped={setCroppedImage}
+                                        onImageCropped={handleImageCropped}
                                     />
                                 </div>
                             </div>
@@ -406,13 +491,19 @@ const UpdateStudentView = () => {
                                 <button
                                     type="submit"
                                     className={`button-primary ${
-                                        isLoading || !loadedStudent
+                                        isLoading ||
+                                        !loadedStudent ||
+                                        isSubmitting
                                             ? "opacity-50 cursor-not-allowed"
                                             : ""
                                     }`}
-                                    disabled={isLoading || !loadedStudent}
+                                    disabled={
+                                        isLoading ||
+                                        !loadedStudent ||
+                                        isSubmitting
+                                    }
                                 >
-                                    {isLoading ? (
+                                    {isLoading || isSubmitting ? (
                                         <LoadingCircle>
                                             Processing...
                                         </LoadingCircle>

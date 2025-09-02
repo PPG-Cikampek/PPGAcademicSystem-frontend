@@ -1,4 +1,11 @@
-import { useContext, useState, useEffect } from "react";
+import {
+    useContext,
+    useState,
+    useEffect,
+    useRef,
+    useCallback,
+    useMemo,
+} from "react";
 import { useParams } from "react-router-dom";
 
 import useHttp from "../../shared/hooks/http-hook";
@@ -6,12 +13,19 @@ import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
 
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
+import { AuthContext } from "../../shared/Components/Context/auth-context";
 
 const UpdateUserView = () => {
     const { isLoading, error, sendRequest, setError } = useHttp();
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [loadedSubBranches, setLoadedSubBranches] = useState([]);
     const [loadedUser, setLoadedUser] = useState();
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Store original data for comparison to detect changes
+    const originalDataRef = useRef(null);
+
+    const auth = useContext(AuthContext);
 
     const userId = useParams().userId;
 
@@ -22,8 +36,15 @@ const UpdateUserView = () => {
                     `${import.meta.env.VITE_BACKEND_URL}/users/${userId}`
                 );
                 setLoadedUser(responseData.users);
-                console.log(responseData);
-                console.log(responseData.users);
+
+                // Store original data for comparison to detect changes
+                originalDataRef.current = {
+                    name: responseData.users.name,
+                    role: responseData.users.role,
+                    subBranchId:
+                        responseData.users.subBranchId?.name ||
+                        responseData.users.subBranchId,
+                };
             } catch (err) {}
         };
         fetchUser();
@@ -39,26 +60,57 @@ const UpdateUserView = () => {
             } catch (err) {}
         };
         fetchSubBranches();
-    }, [sendRequest]);
+    }, [sendRequest, userId]);
+
+    // Memoized function to detect if data has changed
+    const hasDataChanged = useCallback((formData) => {
+        if (!originalDataRef.current) return true;
+
+        const original = originalDataRef.current;
+        return (
+            original.name !== formData.name ||
+            original.role !== formData.role ||
+            original.subBranchId !== formData.subBranchId
+        );
+    }, []);
 
     const handleFormSubmit = async (data) => {
-        const url = `${import.meta.env.VITE_BACKEND_URL}/users/${userId}`;
+        // Prevent duplicate submissions
+        if (isSubmitting) {
+            return;
+        }
 
-        const body = JSON.stringify({
-            name: data.name,
-            role: data.role,
-            subBranchId: data.subBranchId,
-        });
+        // Prevent submission if user data isn't loaded
+        if (!loadedUser) {
+            setError("Data pengguna belum dimuat. Silakan tunggu...");
+            return;
+        }
 
-        console.log(body);
+        // Check if any data has actually changed
+        if (!hasDataChanged(data)) {
+            setError("Tidak ada perubahan data untuk disimpan.");
+            return;
+        }
+
+        setIsSubmitting(true);
 
         try {
-            const responseData = await sendRequest(url, "PATCH", body, {
+            const url = `${import.meta.env.VITE_BACKEND_URL}/users/${userId}`;
+
+            const body = JSON.stringify({
+                name: data.name,
+                role: data.role,
+                subBranchId: data.subBranchId,
+            });
+
+            await sendRequest(url, "PATCH", body, {
                 "Content-Type": "application/json",
                 Authorization: "Bearer " + auth.token,
             });
         } catch (err) {
             // Error is already handled by useHttp
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
@@ -146,7 +198,7 @@ const UpdateUserView = () => {
                             },
                         ]}
                         onSubmit={handleFormSubmit}
-                        disabled={isLoading}
+                        disabled={isLoading || isSubmitting}
                         reset={false}
                         footer={false}
                         button={
@@ -154,13 +206,13 @@ const UpdateUserView = () => {
                                 <button
                                     type="submit"
                                     className={`button-primary ${
-                                        isLoading
+                                        isLoading || isSubmitting
                                             ? "opacity-50 hover:cursor-not-allowed"
                                             : ""
                                     }`}
-                                    disabled={isLoading}
+                                    disabled={isLoading || isSubmitting}
                                 >
-                                    {isLoading ? (
+                                    {isLoading || isSubmitting ? (
                                         <LoadingCircle>
                                             Processing...
                                         </LoadingCircle>
@@ -168,14 +220,6 @@ const UpdateUserView = () => {
                                         "Update"
                                     )}
                                 </button>
-                                {/* <button
-                                type="button"
-                                onClick={handleToggle}
-                                className="button-secondary"
-                                disabled={isLoading}
-                            >
-                                {isAdmin ? 'Masuk Generus' : 'Masuk Pengurus'}
-                            </button> */}
                             </div>
                         }
                     />
