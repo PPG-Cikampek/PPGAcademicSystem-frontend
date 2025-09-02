@@ -8,3 +8,5 @@ export { useDashboard } from "./useDashboard";
 export { useAttendanceData, useClassData } from "./useAttendance";
 
 export { useMaterialProgress } from "./useMaterialProgress";
+
+export { useJournal } from "./useJournal";
