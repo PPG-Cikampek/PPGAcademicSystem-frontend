@@ -14,10 +14,10 @@ const ProgressCard = ({ progress }) => {
                         <p className="text-xs text-gray-400 font-medium uppercase">
                             {formatTime(progress.forDate)}
                         </p>
-                        <h3 className="my-2 text-gray-700 font-medium">
+                        <h3 className="my-2 text-gray-700">
                             {progress.category}
                         </h3>
-                        <p className=" text-gray-800 font-normal text-justify">
+                        <p className="text-gray-800 text-justify">
                             {progress.material}
                         </p>
                     </div>
