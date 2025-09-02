@@ -1,5 +1,5 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { formatDate } from "../utils/dateUtils";
+import { formatDate } from "../../../shared/Utilities/dateUtils";
 
 const WeekNavigator = ({
     currentWeek,

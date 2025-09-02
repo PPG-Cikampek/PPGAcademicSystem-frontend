@@ -1,6 +1,6 @@
 import FloatingMenu from "../../../shared/Components/UIElements/FloatingMenu";
 import { Pencil, Trash } from "lucide-react";
-import { formatDate, formatTime } from "../utils/dateUtils";
+import { formatDate, formatTime } from "../../../shared/Utilities/dateUtils";
 
 const ProgressCard = ({ progress }) => {
     return (

@@ -2,7 +2,11 @@ import { useContext, useEffect, useState } from "react";
 import useHttp from "../../../shared/hooks/http-hook";
 import { AuthContext } from "../../../shared/Components/Context/auth-context";
 import ErrorCard from "../../../shared/Components/UIElements/ErrorCard";
-import { getMonday, formatDate, formatTime } from "../utils/dateUtils";
+import {
+    getMonday,
+    formatDate,
+    formatTime,
+} from "../../../shared/Utilities/dateUtils";
 import WeekNavigator from "../components/WeekNavigator";
 import ProgressList from "../components/ProgressList";
 import DataTable from "../../../shared/Components/UIElements/DataTable";
