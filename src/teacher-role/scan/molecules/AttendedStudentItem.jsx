@@ -1,7 +1,7 @@
 import React from "react";
-import StudentCheckbox from "./StudentCheckbox";
-import StudentHeader from "../molecules/StudentHeader";
-import StudentActions from "../molecules/StudentActions";
+import StudentCheckbox from "../atoms/StudentCheckbox";
+import StudentHeader from "./StudentHeader";
+import StudentActions from "./StudentActions";
 
 const AttendedStudentItem = ({
     student,

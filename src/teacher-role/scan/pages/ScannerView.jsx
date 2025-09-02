@@ -7,7 +7,7 @@ import { StudentAttendanceContext } from "../context/StudentAttendanceContext";
 import { AuthContext } from "../../../shared/Components/Context/auth-context";
 
 import QRCodeScanner from "../organisms/QRCodeScanner";
-import StatusBar from "../organisms/StatusBar";
+import StatusBar from "../molecules/StatusBar";
 import AttendedStudents from "../organisms/AttendedStudents";
 import SequentialAnimation from "../../shared/Components/Animation/SequentialAnimation";
 

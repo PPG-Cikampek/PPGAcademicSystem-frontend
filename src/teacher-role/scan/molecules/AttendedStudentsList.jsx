@@ -1,5 +1,5 @@
 import React from "react";
-import AttendedStudentItem from "../atoms/AttendedStudentItem";
+import AttendedStudentItem from "./AttendedStudentItem";
 
 const AttendedStudentsList = ({
     students,
