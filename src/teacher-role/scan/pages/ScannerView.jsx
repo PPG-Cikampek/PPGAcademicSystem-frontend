@@ -15,6 +15,11 @@ import LoadingCircle from "../../../shared/Components/UIElements/LoadingCircle";
 import { useNavigate, useParams } from "react-router-dom";
 import InfoCard from "../../shared/Components/UIElements/InfoCard";
 
+import ErrorDisplay from "../molecules/ErrorDisplay";
+import CreateAttendanceCard from "../molecules/CreateAttendanceCard";
+import InactiveYearInfo from "../molecules/InactiveYearInfo";
+import LoadingIndicator from "../molecules/LoadingIndicator";
+
 const ScannerView = () => {
     const { error, sendRequest, setError } = useHttp();
 
@@ -74,6 +79,12 @@ const ScannerView = () => {
         }
     };
 
+    const handleRetry = () => {
+        dispatch({ type: "SET_ERROR", payload: null });
+        const attendanceDate = new Date().toLocaleDateString("en-CA");
+        fetchAttendanceData(classId, attendanceDate, dispatch);
+    };
+
     // console.log(state)
 
     return (
@@ -82,57 +93,20 @@ const ScannerView = () => {
                 <StatusBar />
             </SequentialAnimation>
 
-            {state.isLoading && (
-                <div className={`flex justify-center mt-16 `}>
-                    <LoadingCircle size={32} />
-                </div>
-            )}
+            {state.isLoading && <LoadingIndicator />}
 
             {state.error && (
-                <div className="mx-4 my-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded">
-                    <p>Error: {state.error}</p>
-                    <button
-                        onClick={() => {
-                            dispatch({ type: "SET_ERROR", payload: null });
-                            const attendanceDate =
-                                new Date().toLocaleDateString("en-CA");
-                            fetchAttendanceData(
-                                classId,
-                                attendanceDate,
-                                dispatch
-                            );
-                        }}
-                        className="mt-2 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
-                    >
-                        Retry
-                    </button>
-                </div>
+                <ErrorDisplay error={state.error} onRetry={handleRetry} />
             )}
 
             {!state.isLoading && !state.error && (
                 <SequentialAnimation variant={2}>
                     {state.studentList.length === 0 && !state.isLoading && (
-                        <div className="card-basic m-4 justify-between items-center flex flex-col gap-2">
-                            <button
-                                onClick={() => createAttendanceHandler()}
-                                className="btn-mobile-primary rounded-full w-full"
-                                disabled={
-                                    state.isLoading ||
-                                    state.isBranchYearActivated === false
-                                }
-                            >
-                                {state.isLoading
-                                    ? "Membuat..."
-                                    : "Buat daftar hadir hari ini"}
-                            </button>
-                            {state.isBranchYearActivated === false ? (
-                                <span className="text-danger">
-                                    PJP Desa belum mengaktifkan tahun ajaran!
-                                </span>
-                            ) : (
-                                ""
-                            )}
-                        </div>
+                        <CreateAttendanceCard
+                            onCreate={createAttendanceHandler}
+                            isLoading={state.isLoading}
+                            isBranchYearActivated={state.isBranchYearActivated}
+                        />
                     )}
                     {state.studentList.length !== 0 && !state.isLoading && (
                         <>
@@ -141,12 +115,8 @@ const ScannerView = () => {
                                     <QRCodeScanner />
                                 </div>
                             )}
-                            {state.isBranchYearActivated === false ? (
-                                <InfoCard className={"mx-4 my-12"}>
-                                    <p>Tahun ajaran desa belum aktif</p>
-                                </InfoCard>
-                            ) : (
-                                ""
+                            {state.isBranchYearActivated === false && (
+                                <InactiveYearInfo />
                             )}
                         </>
                     )}
