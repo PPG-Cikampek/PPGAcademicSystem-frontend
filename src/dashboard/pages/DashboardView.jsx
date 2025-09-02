@@ -1,5 +1,5 @@
 import { useDashboard } from "../../shared/queries";
-import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
+import SkeletonLoader from "../../shared/Components/UIElements/SkeletonLoader";
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 
 import {
@@ -24,8 +24,18 @@ const DashboardView = () => {
                 </div>
 
                 {isLoading && (
-                    <div className="flex justify-center mt-16">
-                        <LoadingCircle size={32} />
+                    <div className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] gap-6">
+                        {Array.from({ length: 6 }).map((_, index) => (
+                            <div
+                                key={index}
+                                className="card-interactive m-0 rounded-md gap-4 flex items-center justify-start border-0 border-b-4 border-secondary p-4 md:p-6 lg:p-8 w-full h-full min-h-[120px] overflow-hidden"
+                            >
+                                <SkeletonLoader
+                                    variant="rectangular"
+                                    height="120px"
+                                />
+                            </div>
+                        ))}
                     </div>
                 )}
                 {error && <ErrorCard error={error} onClear={() => refetch()} />}
