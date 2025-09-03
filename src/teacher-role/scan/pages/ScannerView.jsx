@@ -1,7 +1,7 @@
 // ScannerView.jsx
 import { useContext, useEffect, useState } from "react";
 
-import useHttp from "../../../shared/hooks/http-hook";
+import { useCreateAttendanceMutation } from "../../../shared/queries";
 
 import { StudentAttendanceContext } from "../context/StudentAttendanceContext";
 import { AuthContext } from "../../../shared/Components/Context/auth-context";
@@ -19,9 +19,11 @@ import InactiveYearInfo from "../molecules/InactiveYearInfo";
 import LoadingIndicator from "../molecules/LoadingIndicator";
 
 const ScannerView = () => {
-    const { error, sendRequest, setError } = useHttp();
+    const createAttendanceMutation = useCreateAttendanceMutation();
 
-    const { state, dispatch } = useContext(StudentAttendanceContext);
+    const { state, dispatch, refetchAttendance } = useContext(
+        StudentAttendanceContext
+    );
 
     const navigate = useNavigate();
     const auth = useContext(AuthContext);
@@ -36,24 +38,16 @@ const ScannerView = () => {
     }, [classId, dispatch]);
 
     const createAttendanceHandler = async () => {
-        if (state.isLoading || state.studentList.length > 0) return; // Prevent double execution
+        if (createAttendanceMutation.isPending || state.studentList.length > 0)
+            return; // Prevent double execution
 
-        dispatch({ type: "SET_LOADING", payload: true });
-        const url = `${
-            import.meta.env.VITE_BACKEND_URL
-        }/attendances/create-new-attendances`;
-        const body = JSON.stringify({
-            classId,
-            subBranchId: auth.userSubBranchId,
-            branchId: auth.userBranchId,
-            branchYearId: auth.currentBranchYearId,
-        });
         try {
-            await sendRequest(url, "POST", body, {
-                "Content-Type": "application/json",
+            await createAttendanceMutation.mutateAsync({
+                classId,
+                subBranchId: auth.userSubBranchId,
+                branchId: auth.userBranchId,
+                branchYearId: auth.currentBranchYearId,
             });
-            // After successful creation, trigger refetch to update the student list
-            dispatch({ type: "TRIGGER_REFETCH" });
             navigate(`/scan/class/${classId}`, { replace: true });
         } catch (err) {
             console.error(err);
@@ -61,14 +55,12 @@ const ScannerView = () => {
                 type: "SET_ERROR",
                 payload: err?.message || "Failed to create attendance",
             });
-        } finally {
-            dispatch({ type: "SET_LOADING", payload: false });
         }
     };
 
     const handleRetry = () => {
         dispatch({ type: "SET_ERROR", payload: null });
-        dispatch({ type: "TRIGGER_REFETCH" });
+        refetchAttendance();
     };
 
     return (
@@ -88,7 +80,7 @@ const ScannerView = () => {
                     {state.studentList.length === 0 && !state.isLoading && (
                         <CreateAttendanceCard
                             onCreate={createAttendanceHandler}
-                            isLoading={state.isLoading}
+                            isLoading={createAttendanceMutation.isPending}
                             isBranchYearActivated={state.isBranchYearActivated}
                         />
                     )}
