@@ -1,13 +1,32 @@
-import { useState, useContext } from "react";
+import { useState, useContext, memo, useMemo, useCallback } from "react";
 import { StudentAttendanceContext } from "../context/StudentAttendanceContext";
 import { QRScanner } from "../../../shared/Components/Scanner";
 import SequentialAnimation from "../../shared/Components/Animation/SequentialAnimation";
 
-const QRCodeScanner = () => {
+const QRCodeScanner = memo(() => {
     const [scannedData, setScannedData] = useState(null);
     const [scanSuccess, setScanSuccess] = useState(false);
     const { state, dispatch, getStudent, hasStudent } = useContext(
         StudentAttendanceContext
+    );
+
+    // Memoize only the specific context values we need for QR scanning
+    // This prevents re-renders when unrelated state like dirtyIds, selectedCount, etc. change
+    const memoizedContextValues = useMemo(
+        () => ({
+            classStartTime: state.classStartTime,
+            studentMap: state.studentMap, // For student lookups
+            dispatch,
+            getStudent,
+            hasStudent,
+        }),
+        [
+            state.classStartTime,
+            state.studentMap,
+            dispatch,
+            getStudent,
+            hasStudent,
+        ]
     );
 
     const getPresenceStatus = (timeString) => {
@@ -51,52 +70,59 @@ const QRCodeScanner = () => {
     };
 
     const dataHandler = (data) => {
-        dispatch({
+        memoizedContextValues.dispatch({
             type: "SET_STATUS",
             payload: data,
         });
     };
 
-    const handleScan = async (data) => {
-        // Guard against scanning when classStartTime is not available
-        if (!state.classStartTime) {
-            console.warn("Class start time not available, skipping scan");
-            return;
-        }
+    const handleScan = useCallback(
+        async (data) => {
+            // Guard against scanning when classStartTime is not available
+            if (!memoizedContextValues.classStartTime) {
+                console.warn("Class start time not available, skipping scan");
+                return;
+            }
 
-        setScanSuccess(true);
+            setScanSuccess(true);
 
-        const isFound = hasStudent(data);
-        if (!isFound) {
-            setScannedData("Kode QR tidak dikenali!");
-        } else {
-            const student = getStudent(data);
-            setScannedData({
-                nis: data,
-                status: getPresenceStatus(state.classStartTime),
-                name: student.studentId.name,
-            });
-        }
+            const isFound = memoizedContextValues.hasStudent(data);
+            if (!isFound) {
+                setScannedData("Kode QR tidak dikenali!");
+            } else {
+                const student = memoizedContextValues.getStudent(data);
+                setScannedData({
+                    nis: data,
+                    status: getPresenceStatus(
+                        memoizedContextValues.classStartTime
+                    ),
+                    name: student.studentId.name,
+                });
+            }
 
-        // LOGIC TO PROCESS DATA HERE
-        const attendanceData = {
-            id: data,
-            newStatus: getPresenceStatus(state.classStartTime),
-            timestamp: Date.now(),
-        };
-        dataHandler(attendanceData);
-        console.log(attendanceData);
+            // LOGIC TO PROCESS DATA HERE
+            const attendanceData = {
+                id: data,
+                newStatus: getPresenceStatus(
+                    memoizedContextValues.classStartTime
+                ),
+                timestamp: Date.now(),
+            };
+            dataHandler(attendanceData);
+            console.log(attendanceData);
 
-        // Set a short delay to show the result before enabling scanning again
-        setTimeout(() => {
-            setScanSuccess(false);
-        }, 1000);
-    };
+            // Set a short delay to show the result before enabling scanning again
+            setTimeout(() => {
+                setScanSuccess(false);
+            }, 1000);
+        },
+        [memoizedContextValues, getPresenceStatus, dataHandler]
+    );
 
-    const handleError = (error, instruction) => {
+    const handleError = useCallback((error, instruction) => {
         console.error("QR Scanner error:", error);
         // Handle errors if needed
-    };
+    }, []);
 
     return (
         <div className="flex flex-col items-center justify-center h-full w-full p-4">
@@ -143,6 +169,9 @@ const QRCodeScanner = () => {
             )}
         </div>
     );
-};
+});
+
+// Add display name for debugging
+QRCodeScanner.displayName = "QRCodeScanner - for debugging";
 
 export default QRCodeScanner;
