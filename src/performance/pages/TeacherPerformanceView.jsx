@@ -502,7 +502,7 @@ const TeacherPerformanceView = () => {
                                             ) : !filterState.selectedAcademicYear ? (
                                                 "Pilih Tahun Ajaran"
                                             ) : !filterState.period ? (
-                                                "Pilih Periode"
+                                                "Pilih Rentang Periode"
                                             ) : (
                                                 "Tampilkan"
                                             )}
