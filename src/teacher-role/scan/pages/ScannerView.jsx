@@ -16,7 +16,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import ErrorDisplay from "../molecules/ErrorDisplay";
 import CreateAttendanceCard from "../molecules/CreateAttendanceCard";
 import InactiveYearInfo from "../molecules/InactiveYearInfo";
-import LoadingIndicator from "../molecules/LoadingIndicator";
+import SkeletonLoader from "../../../shared/Components/UIElements/SkeletonLoader";
+import LoadingCircle from "../../../shared/Components/UIElements/LoadingCircle";
 
 const ScannerView = () => {
     const createAttendanceMutation = useCreateAttendanceMutation();
@@ -24,6 +25,8 @@ const ScannerView = () => {
     const { state, dispatch, refetchAttendance } = useContext(
         StudentAttendanceContext
     );
+
+    const [isRefetching, setIsRefetching] = useState(false);
 
     const navigate = useNavigate();
     const auth = useContext(AuthContext);
@@ -48,19 +51,32 @@ const ScannerView = () => {
                 branchId: auth.userBranchId,
                 branchYearId: auth.currentBranchYearId,
             });
-            navigate(`/scan/class/${classId}`, { replace: true });
+            setIsRefetching(true);
+
+            await refetchAttendance();
+
+            setIsRefetching(false);
         } catch (err) {
             console.error(err);
             dispatch({
                 type: "SET_ERROR",
                 payload: err?.message || "Failed to create attendance",
             });
+            setIsRefetching(false);
         }
     };
 
-    const handleRetry = () => {
+    const handleRetry = async () => {
         dispatch({ type: "SET_ERROR", payload: null });
-        refetchAttendance();
+        setIsRefetching(true);
+
+        try {
+            await refetchAttendance();
+        } catch (err) {
+            // Handle error if needed
+        } finally {
+            setIsRefetching(false);
+        }
     };
 
     return (
@@ -69,7 +85,7 @@ const ScannerView = () => {
                 <StatusBar />
             </SequentialAnimation>
 
-            {state.isLoading && <LoadingIndicator />}
+            {state.isLoading && <LoadingCircle />}
 
             {state.error && (
                 <ErrorDisplay error={state.error} onRetry={handleRetry} />
@@ -80,7 +96,10 @@ const ScannerView = () => {
                     {state.studentList.length === 0 && !state.isLoading && (
                         <CreateAttendanceCard
                             onCreate={createAttendanceHandler}
-                            isLoading={createAttendanceMutation.isPending}
+                            isLoading={
+                                createAttendanceMutation.isPending ||
+                                isRefetching
+                            }
                             isBranchYearActivated={state.isBranchYearActivated}
                         />
                     )}
@@ -98,6 +117,14 @@ const ScannerView = () => {
                     )}
                     <AttendedStudents />
                 </SequentialAnimation>
+            )}
+            {isRefetching && (
+                <SkeletonLoader
+                    count={2}
+                    variant="rectangular"
+                    height="150px"
+                    className="mx-4 mb-6"
+                />
             )}
         </div>
     );

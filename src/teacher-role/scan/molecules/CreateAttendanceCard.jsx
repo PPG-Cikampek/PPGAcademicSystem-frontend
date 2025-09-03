@@ -1,4 +1,4 @@
-import React from "react";
+import LoadingCircle from "../../../shared/Components/UIElements/LoadingCircle";
 
 const CreateAttendanceCard = ({
     onCreate,
@@ -12,7 +12,11 @@ const CreateAttendanceCard = ({
                 className="btn-mobile-primary rounded-full w-full"
                 disabled={isLoading || !isBranchYearActivated}
             >
-                {isLoading ? "Membuat..." : "Buat daftar hadir hari ini"}
+                {isLoading ? (
+                    <LoadingCircle>Memroses...</LoadingCircle>
+                ) : (
+                    "Buat daftar hadir hari ini"
+                )}
             </button>
             {!isBranchYearActivated && (
                 <span className="text-danger">

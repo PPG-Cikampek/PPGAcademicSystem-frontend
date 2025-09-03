@@ -17,7 +17,7 @@ const AttendedStudentItem = ({
 }) => {
     return (
         <div
-            className={`p-4 pr-0 -mx-4 min-h-20 flex items-center gap-4 border-b ${getBorderColor(
+            className={`p-4 pr-0 -mx-5 min-h-20 flex items-center gap-4 border-b ${getBorderColor(
                 student.status
             )} transition-all duration-500`}
         >
