@@ -76,21 +76,24 @@
   color utility to any element that depends on these defaults.
 */
 
-*,
-::after,
-::before,
-::backdrop,
-::file-selector-button {
-    border-color: var(--color-gray-200, currentcolor);
+@layer base {
+    *,
+    ::after,
+    ::before,
+    ::backdrop,
+    ::file-selector-button {
+        border-color: var(--color-gray-200, currentcolor);
+    }
 }
 
 html {
     @apply font-sans;
 }
 
+/* 
 div * {
-    /* @apply border-solid border border-red-600 box-border; */
-}
+    @apply border-solid border border-red-600 box-border;
+} */
 
 #frame {
     background-image: url("data:image/svg+xml,%3csvg width='100%' height='100%' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%' height='100%' fill='none' rx='4' ry='4' stroke='white' stroke-width='12' stroke-dasharray='75' stroke-dashoffset='0' stroke-linecap='square'/%3e%3c/svg%3e");
