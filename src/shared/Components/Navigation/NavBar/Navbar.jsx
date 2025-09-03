@@ -14,49 +14,141 @@ import {
     LogOut,
 } from "lucide-react";
 
+// Throttle utility function
+const throttle = (func, delay) => {
+    let timeoutId;
+    let lastExecTime = 0;
+    return function (...args) {
+        const currentTime = Date.now();
+
+        if (currentTime - lastExecTime > delay) {
+            func.apply(this, args);
+            lastExecTime = currentTime;
+        } else {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(() => {
+                func.apply(this, args);
+                lastExecTime = Date.now();
+            }, delay - (currentTime - lastExecTime));
+        }
+    };
+};
+
+// Hook to check for reduced motion preference
+const useReducedMotion = () => {
+    const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
+
+    useEffect(() => {
+        const mediaQuery = window.matchMedia(
+            "(prefers-reduced-motion: reduce)"
+        );
+        setPrefersReducedMotion(mediaQuery.matches);
+
+        const handleChange = (e) => setPrefersReducedMotion(e.matches);
+        mediaQuery.addListener(handleChange);
+
+        return () => mediaQuery.removeListener(handleChange);
+    }, []);
+
+    return prefersReducedMotion;
+};
+
 const Navbar = () => {
     const sidebar = useContext(SidebarContext);
     const auth = useContext(AuthContext);
     const navigate = useNavigate();
+    const prefersReducedMotion = useReducedMotion();
 
     const [translateY, setTranslateY] = useState(0);
+    const translateYRef = useRef(0);
     const lastScrollY = useRef(0);
     const debounceTimer = useRef(null);
 
+    // Keep ref in sync with state to avoid stale closures
+    useEffect(() => {
+        translateYRef.current = translateY;
+    }, [translateY]);
+
+    // Reset navbar position if user prefers reduced motion
+    useEffect(() => {
+        if (prefersReducedMotion) {
+            setTranslateY(0);
+        }
+    }, [prefersReducedMotion]);
+
     const handleScroll = useCallback(() => {
+        // Skip animation if user prefers reduced motion
+        if (prefersReducedMotion) {
+            return;
+        }
+
         const currentScrollY = window.scrollY;
         const deltaY = currentScrollY - lastScrollY.current;
+        const currentTranslateY = translateYRef.current;
 
+        // Always show navbar when near top
         if (currentScrollY < 100) {
             setTranslateY(0);
         } else {
-            const newTranslateY = Math.max(
-                -100,
-                Math.min(0, translateY - deltaY * 1)
-            );
-            setTranslateY(newTranslateY);
+            // Determine scroll direction and update accordingly
+            const isScrollingDown = deltaY > 0;
+            const isScrollingUp = deltaY < 0;
+
+            if (isScrollingDown && currentTranslateY > -100) {
+                // Hide navbar on scroll down (smooth transition)
+                const newTranslateY = Math.max(
+                    -100,
+                    currentTranslateY - Math.abs(deltaY) * 0.8
+                );
+                setTranslateY(newTranslateY);
+            } else if (isScrollingUp && currentTranslateY < 0) {
+                // Show navbar on scroll up (smooth transition)
+                const newTranslateY = Math.min(
+                    0,
+                    currentTranslateY + Math.abs(deltaY) * 1.2
+                );
+                setTranslateY(newTranslateY);
+            }
         }
 
         lastScrollY.current = currentScrollY;
 
-        // Debounce to snap on scroll end
-        if (debounceTimer.current) clearTimeout(debounceTimer.current);
+        // Clear previous timeout
+        if (debounceTimer.current) {
+            clearTimeout(debounceTimer.current);
+        }
+
+        // Debounced snap to edge (reduced delay for better UX)
         debounceTimer.current = setTimeout(() => {
-            if (translateY > -50) {
-                setTranslateY(0);
+            const finalTranslateY = translateYRef.current;
+
+            // More intuitive snap threshold
+            if (finalTranslateY > -50) {
+                setTranslateY(0); // Snap to visible
             } else {
-                setTranslateY(-100);
+                setTranslateY(-100); // Snap to hidden
             }
-        }, 500);
-    }, [translateY]);
+        }, 1500);
+    }, [prefersReducedMotion]); // Add dependency
+
+    // Throttled scroll handler for better performance
+    const throttledScroll = useCallback(
+        throttle(handleScroll, 16), // ~60fps
+        [handleScroll]
+    );
 
     useEffect(() => {
-        window.addEventListener("scroll", handleScroll);
+        window.addEventListener("scroll", throttledScroll, { passive: true });
+
         return () => {
-            window.removeEventListener("scroll", handleScroll);
-            if (debounceTimer.current) clearTimeout(debounceTimer.current);
+            window.removeEventListener("scroll", throttledScroll);
+            // Cleanup timeout on unmount
+            if (debounceTimer.current) {
+                clearTimeout(debounceTimer.current);
+                debounceTimer.current = null;
+            }
         };
-    }, [handleScroll]);
+    }, [throttledScroll]);
 
     const sidebarHandler = () => {
         sidebar.toggle();
@@ -104,12 +196,21 @@ const Navbar = () => {
 
     return (
         <nav
-            className={`fixed top-0 z-20 border-b-2 border-gray-400/10 w-full transition-transform duration-300 ${
+            className={`fixed top-0 z-20 border-b-2 border-gray-400/10 w-full ${
+                prefersReducedMotion
+                    ? ""
+                    : "transition-all duration-300 ease-out"
+            } ${
                 sidebar.isSidebarOpen
                     ? "bg-white max-md:bg-gray-400/10"
                     : "bg-white"
             }`}
-            style={{ transform: `translateY(${translateY}%)` }}
+            style={{
+                transform: prefersReducedMotion
+                    ? "translateY(0%)"
+                    : `translateY(${translateY}%)`,
+                willChange: prefersReducedMotion ? "auto" : "transform", // Optimize for transforms only when needed
+            }}
         >
             <div className="px-4 mx-auto w-full">
                 <div className="flex justify-between items-center h-16">
