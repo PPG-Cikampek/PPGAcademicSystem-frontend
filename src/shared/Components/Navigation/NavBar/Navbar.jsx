@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useRef, useCallback } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 
 import { SidebarContext } from "../../Context/sidebar-context";
@@ -19,23 +19,44 @@ const Navbar = () => {
     const auth = useContext(AuthContext);
     const navigate = useNavigate();
 
-    const [isHidden, setIsHidden] = useState(false);
-    const [lastScrollY, setLastScrollY] = useState(0);
+    const [translateY, setTranslateY] = useState(0);
+    const lastScrollY = useRef(0);
+    const debounceTimer = useRef(null);
+
+    const handleScroll = useCallback(() => {
+        const currentScrollY = window.scrollY;
+        const deltaY = currentScrollY - lastScrollY.current;
+
+        if (currentScrollY < 100) {
+            setTranslateY(0);
+        } else {
+            const newTranslateY = Math.max(
+                -100,
+                Math.min(0, translateY - deltaY * 1)
+            );
+            setTranslateY(newTranslateY);
+        }
+
+        lastScrollY.current = currentScrollY;
+
+        // Debounce to snap on scroll end
+        if (debounceTimer.current) clearTimeout(debounceTimer.current);
+        debounceTimer.current = setTimeout(() => {
+            if (translateY > -50) {
+                setTranslateY(0);
+            } else {
+                setTranslateY(-100);
+            }
+        }, 500);
+    }, [translateY]);
 
     useEffect(() => {
-        const handleScroll = () => {
-            const currentScrollY = window.scrollY;
-            if (currentScrollY > lastScrollY && currentScrollY > 100) {
-                setIsHidden(true);
-            } else if (currentScrollY < lastScrollY) {
-                setIsHidden(false);
-            }
-            setLastScrollY(currentScrollY);
-        };
-
         window.addEventListener("scroll", handleScroll);
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, [lastScrollY]);
+        return () => {
+            window.removeEventListener("scroll", handleScroll);
+            if (debounceTimer.current) clearTimeout(debounceTimer.current);
+        };
+    }, [handleScroll]);
 
     const sidebarHandler = () => {
         sidebar.toggle();
@@ -84,12 +105,11 @@ const Navbar = () => {
     return (
         <nav
             className={`fixed top-0 z-20 border-b-2 border-gray-400/10 w-full transition-transform duration-300 ${
-                isHidden ? "-translate-y-full" : "translate-y-0"
-            } ${
                 sidebar.isSidebarOpen
                     ? "bg-white max-md:bg-gray-400/10"
                     : "bg-white"
             }`}
+            style={{ transform: `translateY(${translateY}%)` }}
         >
             <div className="px-4 mx-auto w-full">
                 <div className="flex justify-between items-center h-16">
