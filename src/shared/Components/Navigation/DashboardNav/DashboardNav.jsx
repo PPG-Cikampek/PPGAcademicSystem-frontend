@@ -206,7 +206,7 @@ const DashboardNav = ({ children }) => {
     return (
         <Sidebar linksList={links}>
             <Navbar />
-            {children}
+            <div className="pt-16">{children}</div>
         </Sidebar>
     );
 };
