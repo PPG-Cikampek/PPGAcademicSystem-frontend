@@ -98,7 +98,7 @@ const Navbar = () => {
                 // Hide navbar on scroll down (smooth transition)
                 const newTranslateY = Math.max(
                     -100,
-                    currentTranslateY - Math.abs(deltaY) * 0.8
+                    currentTranslateY - Math.abs(deltaY) * 1.2
                 );
                 setTranslateY(newTranslateY);
             } else if (isScrollingUp && currentTranslateY < 0) {
@@ -128,7 +128,7 @@ const Navbar = () => {
             } else {
                 setTranslateY(-100); // Snap to hidden
             }
-        }, 1500);
+        }, 1200);
     }, [prefersReducedMotion]); // Add dependency
 
     // Throttled scroll handler for better performance
