@@ -83,12 +83,32 @@ const AttendedStudents = () => {
             .filter((student) => state.dirtyIds.has(student.studentId.nis))
             .map((student) => ({
                 attendanceId: student._id,
+                studentId: student.studentId,
                 status: student.status,
                 attributes: student.attributes,
                 violations: student.violations,
                 teachersNotes: student.teachersNotes,
                 timestamp: student.timestamp,
             }));
+
+        // Validate that students with status "Izin" have teachersNotes
+        const invalidStudents = changedStatuses.filter(
+            (student) =>
+                student.status === "Izin" &&
+                (!student.teachersNotes || student.teachersNotes.trim() === "")
+        );
+
+        if (invalidStudents.length > 0) {
+            alert(
+                `Siswa yang izin wajib disertai catatan alasan izin:\n${invalidStudents
+                    .map(
+                        (student) =>
+                            `${student.studentId.nis} - ${student.studentId.name}`
+                    )
+                    .join("\n")}`
+            );
+            return;
+        }
 
         if (changedStatuses.length > 0) {
             try {
