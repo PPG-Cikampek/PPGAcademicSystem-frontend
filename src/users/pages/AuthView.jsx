@@ -151,7 +151,9 @@ const AuthView = () => {
                         onSubmit={handleFormSubmit}
                         disabled={isLoading}
                         labels={false}
-                        className={"min-w-96"}
+                        className={
+                            "md:min-w-96 max-md:border-0 max-md:ring-0 max-md:shadow-none max-md:m-0 max-md:bg-gray-50"
+                        }
                         button={
                             <div className="flex flex-col justify-stretch mt-4">
                                 <button

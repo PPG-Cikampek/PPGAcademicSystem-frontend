@@ -80,9 +80,9 @@ const DynamicForm = ({
                     </h2>
                 )}
                 {subtitle && (
-                    <h3 className="text-lg mt-1 font-normal text-center">
+                    <p className="text-lg mt-1 font-normal text-center">
                         {subtitle}
-                    </h3>
+                    </p>
                 )}
                 {customDescription && (
                     <h4 className="mt-1 font-normal text-center">
@@ -93,7 +93,7 @@ const DynamicForm = ({
             <form onSubmit={handleSubmit(onFormSubmit)} className="">
                 {Array.isArray(fields) &&
                     fields.map((field) => (
-                        <div key={field.name} className="mt-6 w-full">
+                        <div key={field.name} className="mt-4 md:mt-6 w-full">
                             {labels && field.label && (
                                 <label className="block text-gray-700 pb-1">
                                     {field.label}
@@ -107,7 +107,7 @@ const DynamicForm = ({
                                     })}
                                     disabled={field.disabled}
                                     rows={field.textAreaRows}
-                                    className={`w-full p-2 mb-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 ${
+                                    className={`bg-white w-full p-2 mb-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 ${
                                         field.disabled ? "bg-gray-200" : ""
                                     }`}
                                 />
@@ -118,7 +118,7 @@ const DynamicForm = ({
                                         defaultChecked={field.value || false}
                                         {...register(field.name)}
                                         disabled={field.disabled}
-                                        className={`rounded-md border-gray-300 shadow-xs focus:ring-2 focus:ring-secondary ${
+                                        className={`bg-white rounded-md border-gray-300 shadow-xs focus:ring-2 focus:ring-secondary ${
                                             field.disabled
                                                 ? "bg-gray-200 cursor-not-allowed"
                                                 : ""
@@ -133,7 +133,7 @@ const DynamicForm = ({
                                         required: field.required,
                                     })}
                                     disabled={field.disabled}
-                                    className={`w-full p-2 border rounded-md shadow-xs hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 ${
+                                    className={`bg-white w-full p-2 border rounded-md shadow-xs hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 ${
                                         field.disabled ? "bg-gray-200" : ""
                                     }`}
                                 >
@@ -163,7 +163,7 @@ const DynamicForm = ({
                                     min="1900"
                                     max={currentYear + 1}
                                     step="1"
-                                    className={`w-full p-2 mb-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 ${
+                                    className={`bg-white w-full p-2 mb-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 ${
                                         field.disabled
                                             ? "bg-gray-200 cursor-not-allowed"
                                             : ""
@@ -189,7 +189,7 @@ const DynamicForm = ({
                                             },
                                         })}
                                         disabled={field.disabled}
-                                        className={`w-full pl-12 p-2 mb-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 ${
+                                        className={`bg-white w-full pl-12 p-2 mb-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 ${
                                             field.disabled
                                                 ? "bg-gray-200 cursor-not-allowed"
                                                 : ""
@@ -216,7 +216,7 @@ const DynamicForm = ({
                                                     field.disabled ||
                                                     option.disabled
                                                 }
-                                                className={`border-gray-300 shadow-xs focus:ring-2 focus:ring-primary 
+                                                className={`bg-white border-gray-300 shadow-xs focus:ring-2 focus:ring-primary 
                                             ${
                                                 field.disabled
                                                     ? "bg-gray-200 cursor-not-allowed"
@@ -251,7 +251,7 @@ const DynamicForm = ({
                                         }),
                                     })}
                                     disabled={field.disabled}
-                                    className={`w-full p-2 mb-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary 
+                                    className={`bg-white w-full p-2 mb-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary 
                                 focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 
                                 ${
                                     field.disabled
@@ -437,7 +437,7 @@ const DynamicForm = ({
                                             required: field.required,
                                         })}
                                         disabled={field.disabled}
-                                        className={`w-full p-2 mb-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 ${
+                                        className={`bg-white w-full p-2 mb-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 ${
                                             field.disabled
                                                 ? "bg-gray-200 cursor-not-allowed"
                                                 : ""

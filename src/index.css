@@ -109,11 +109,11 @@ body {
 }
 
 h2 {
-    @apply text-2xl font-semibold mb-2;
+    @apply text-2xl font-semibold;
 }
 
 h3 {
-    @apply text-xl font-semibold mb-2;
+    @apply text-xl font-semibold;
 }
 
 @utility font-lpmq {
