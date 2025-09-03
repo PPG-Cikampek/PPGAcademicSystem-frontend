@@ -159,7 +159,7 @@ const Navbar = () => {
             <FloatingMenu
                 boxWidth="w-36"
                 label={auth.userName}
-                style={`btn-secondary-outline-sharp py-3 text-right`}
+                style={`btn-secondary-outline-sharp py-3 max-md:text-right`}
                 buttons={[
                     {
                         icon: User,
@@ -196,20 +196,30 @@ const Navbar = () => {
 
     return (
         <nav
-            className={`fixed top-0 z-20 border-b-2 border-gray-400/10 w-full ${
+            className={`fixed top-0 z-20 border-b-2 border-gray-400/10 ${
                 prefersReducedMotion
                     ? ""
                     : "transition-all duration-300 ease-out"
             } ${
                 sidebar.isSidebarOpen
-                    ? "bg-white max-md:bg-gray-400/10"
+                    ? "bg-white max-md:bg-neutral-300"
                     : "bg-white"
             }`}
             style={{
                 transform: prefersReducedMotion
                     ? "translateY(0%)"
                     : `translateY(${translateY}%)`,
-                willChange: prefersReducedMotion ? "auto" : "transform", // Optimize for transforms only when needed
+                willChange: prefersReducedMotion ? "auto" : "transform",
+                left: window.matchMedia("(min-width: 768px)").matches
+                    ? sidebar.isSidebarOpen
+                        ? "256px"
+                        : "64px"
+                    : "0px",
+                width: window.matchMedia("(min-width: 768px)").matches
+                    ? sidebar.isSidebarOpen
+                        ? "calc(100% - 256px)"
+                        : "calc(100% - 64px)"
+                    : "100%",
             }}
         >
             <div className="px-4 mx-auto w-full">
