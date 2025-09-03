@@ -283,12 +283,12 @@ const AddStudentToClassView = () => {
                                                         </div>
                                                     )}
                                                     <div className="flex flex-col gap-1">
-                                                        <h2 className="text-lg font-medium text-clip overflow-hidden">
+                                                        <p className="text-lg font-semibold text-clip overflow-hidden">
                                                             {student.name}
-                                                        </h2>
-                                                        <h3 className="text-base font-normal">
+                                                        </p>
+                                                        <p className="text-base font-normal">
                                                             {student.nis}
-                                                        </h3>
+                                                        </p>
                                                     </div>
                                                 </div>
                                                 {student.isProfileComplete ===

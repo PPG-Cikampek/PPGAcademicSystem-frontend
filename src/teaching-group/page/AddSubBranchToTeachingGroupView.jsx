@@ -183,9 +183,9 @@ const AddSubBranchToTeachingGroupView = () => {
                                             }
                                         >
                                             <div className="flex justify-between items-center">
-                                                <h2 className="text-lg font-medium">
+                                                <p className="text-lg font-semibold">
                                                     {subBranch?.name}
-                                                </h2>
+                                                </p>
                                                 {hasEnrolled && (
                                                     <span className="text-sm font-base text-gray-500">
                                                         Terdaftar ✓

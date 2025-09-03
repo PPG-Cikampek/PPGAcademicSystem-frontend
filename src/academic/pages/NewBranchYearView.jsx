@@ -180,7 +180,7 @@ const NewBranchYearsView = () => {
                                             }
                                         >
                                             <div className="flex justify-between items-center">
-                                                <h2 className="text-lg font-medium">
+                                                <h2 className="text-lg font-semibold">
                                                     {academicYearFormatter(
                                                         year.name
                                                     )}
