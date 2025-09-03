@@ -3,13 +3,12 @@ import { useNavigate } from "react-router-dom";
 import useHttp from "../../shared/hooks/http-hook";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
 
-import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import WarningCard from "../../shared/Components/UIElements/WarningCard";
 import DataTable from "../../shared/Components/UIElements/DataTable";
 import getTeacherPositionName from "../../shared/Utilities/getTeacherPositionName";
 
 const TeachersView = () => {
-    const [teachers, setTeachers] = useState();
+    const [teachers, setTeachers] = useState([]);
     const { isLoading, sendRequest } = useHttp();
 
     const navigate = useNavigate();
@@ -196,11 +195,7 @@ const TeachersView = () => {
                         onClear={() => setError(null)}
                     />
                 </div>
-                {isLoading && (
-                    <div className="flex justify-center mt-16">
-                        <LoadingCircle size={32} />
-                    </div>
-                )}
+
                 {teachers && (
                     <DataTable
                         data={teachers}
