@@ -76,38 +76,43 @@ const BranchYearCard = ({
                     !year.isActive ? (
                         <div className="flex justify-between md:justify-end items-center w-full">
                             <div className="flex gap-2 my-6 md:my-0">
-                                <div
-                                    onClick={() =>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
                                         navigate(
                                             `/academic/teachingGroups/new`,
                                             {
                                                 state: year.id,
                                             }
-                                        )
-                                    }
+                                        );
+                                    }}
                                     className="btn-primary-outline m-0 text-gray-700"
                                 >
                                     Tambah KBM
-                                </div>
-                                <div
-                                    onClick={activateYearHandler(
-                                        year._id,
-                                        year.name
-                                    )}
+                                </button>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        activateYearHandler(
+                                            year._id,
+                                            year.name
+                                        )(e);
+                                    }}
                                     className="btn-primary-outline m-0 text-gray-700"
                                 >
                                     Aktifkan
-                                </div>
+                                </button>
                             </div>
 
                             <button
-                                onClick={(e) =>
+                                onClick={(e) => {
+                                    e.stopPropagation();
                                     deleteBranchYearHandler(
                                         e,
                                         year.academicYearId.name,
                                         year._id
-                                    )
-                                }
+                                    );
+                                }}
                                 className="p-3 rounded-full text-gray-400 hover:bg-gray-200 hover:text-red-500 transition"
                             >
                                 <Trash size={20} />
@@ -116,18 +121,18 @@ const BranchYearCard = ({
                     ) : (
                         auth.userRole === "branchAdmin" &&
                         year.isActive && (
-                            <div
-                                onClick={(e) =>
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
                                     deactivateYearHandler(
-                                        e,
                                         year.academicYearId.name,
                                         year._id
-                                    )
-                                }
+                                    )(e);
+                                }}
                                 className="btn-danger-outline m-0 text-gray-700 mt-4 md:mt-0"
                             >
                                 Nonaktifkan
-                            </div>
+                            </button>
                         )
                     )}
                 </div>
@@ -182,13 +187,14 @@ const BranchYearCard = ({
                                             year.academicYearId.isActive &&
                                             !year.isActive && (
                                                 <button
-                                                    onClick={(e) =>
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
                                                         deleteTeachingGroupHandler(
                                                             e,
                                                             teachingGroup.name,
                                                             teachingGroup.id
-                                                        )
-                                                    }
+                                                        );
+                                                    }}
                                                     className="border-t px-4 italic text-gray-500 hover:underline hover:text-red-500 hover:cursor-pointer"
                                                 >
                                                     Hapus KBM
@@ -203,14 +209,15 @@ const BranchYearCard = ({
                             Tidak ada riwayat KBM.
                             {year.academicYearId.isActive && (
                                 <span
-                                    onClick={() =>
+                                    onClick={(e) => {
+                                        e.stopPropagation();
                                         navigate(
                                             `/academic/teachingGroups/new`,
                                             {
                                                 state: year.id,
                                             }
-                                        )
-                                    }
+                                        );
+                                    }}
                                     className="text-gray-800 hover:underline hover:cursor-pointer"
                                 >
                                     Tambah KBM
