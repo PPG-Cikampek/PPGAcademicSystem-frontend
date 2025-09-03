@@ -2,9 +2,14 @@ import { useQuery } from "@tanstack/react-query";
 import api from "./api";
 
 // Fetch attendance data for a specific class and date
-export const useAttendanceData = (classId, attendanceDate, options = {}) => {
+export const useAttendanceData = (
+    classId,
+    attendanceDate,
+    refetchTrigger = 0,
+    options = {}
+) => {
     return useQuery({
-        queryKey: ["attendanceData", classId, attendanceDate],
+        queryKey: ["attendanceData", classId, attendanceDate, refetchTrigger],
         queryFn: async () => {
             const response = await api.post(`/attendances/${classId}`, {
                 date: attendanceDate,

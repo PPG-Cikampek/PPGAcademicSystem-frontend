@@ -31,6 +31,7 @@ const initialState = {
     isLoading: false,
     error: null,
     selectedCount: 0, // Track number of selected students
+    refetchTrigger: 0, // Add refetch trigger
 };
 
 const reducer = (state, action) => {
@@ -234,6 +235,8 @@ const reducer = (state, action) => {
                 ...state,
                 studentMap: bulkStatusStudentMap,
             };
+        case "TRIGGER_REFETCH":
+            return { ...state, refetchTrigger: state.refetchTrigger + 1 };
         default:
             return state;
     }
@@ -247,7 +250,11 @@ const StudentAttendanceProvider = ({ children }) => {
         data: attendanceData,
         isLoading: attendanceLoading,
         error: attendanceError,
-    } = useAttendanceData(state.classId, state.attendanceDate);
+    } = useAttendanceData(
+        state.classId,
+        state.attendanceDate,
+        state.refetchTrigger
+    );
 
     const {
         data: classData,

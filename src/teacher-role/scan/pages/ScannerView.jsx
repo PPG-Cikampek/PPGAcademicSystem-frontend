@@ -52,9 +52,8 @@ const ScannerView = () => {
             await sendRequest(url, "POST", body, {
                 "Content-Type": "application/json",
             });
-            // After successful creation, update the attendance date to trigger refetch
-            const attendanceDate = new Date().toLocaleDateString("en-CA");
-            dispatch({ type: "SET_ATTENDANCE_DATE", payload: attendanceDate });
+            // After successful creation, trigger refetch to update the student list
+            dispatch({ type: "TRIGGER_REFETCH" });
             navigate(`/scan/class/${classId}`, { replace: true });
         } catch (err) {
             console.error(err);
@@ -69,8 +68,7 @@ const ScannerView = () => {
 
     const handleRetry = () => {
         dispatch({ type: "SET_ERROR", payload: null });
-        const attendanceDate = new Date().toLocaleDateString("en-CA");
-        dispatch({ type: "SET_ATTENDANCE_DATE", payload: attendanceDate });
+        dispatch({ type: "TRIGGER_REFETCH" });
     };
 
     return (
