@@ -16,6 +16,10 @@ import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 
 import { FileDown } from "lucide-react";
 import useHttp from "../../shared/hooks/http-hook";
+import { academicYearFormatter } from "../../shared/Utilities/academicYearFormatter";
+
+import useNewModal from "../../shared/hooks/useNewModal";
+import NewModal from "../../shared/Components/Modal/NewModal";
 
 const styles = {
     page: {
@@ -165,6 +169,8 @@ const StudentReportView = ({
 
     const { isLoading, error, sendRequest, setError, setIsLoading } = useHttp();
 
+    const { modalState, openModal, closeModal } = useNewModal();
+
     const fetchData = async () => {
         // Validate required props before making API call
         if (!academicYearId || !studentId) {
@@ -312,7 +318,7 @@ const StudentReportView = ({
                                         </Text>
                                         <Text style={styles.fontBold}>
                                             :{" "}
-                                            {(
+                                            {academicYearFormatter(
                                                 rd.classData
                                                     ?.academicYearName || ""
                                             ).toUpperCase()}
@@ -529,17 +535,16 @@ const StudentReportView = ({
                     responseData?.studentData?.name || "Siswa"
                 }_${date}.pdf`
             );
+            openModal(
+                "Laporan berhasil diunduh!\nCek folder unduhan Anda.",
+                "success",
+                null,
+                "Berhasil!"
+            );
         } catch (err) {
             console.error("Error generating PDF:", err);
         }
     };
-
-    // const handlePreviewClick = async () => {
-    //     if (!reportState.reportData) {
-    //         await fetchData();
-    //     }
-    //     setShowPreview(prev => !prev);
-    // };
 
     return (
         <div
@@ -554,13 +559,6 @@ const StudentReportView = ({
             >
                 <div className="space-y-4">
                     <div className="md:flex flex-row justify-start gap-2 hidden">
-                        {/* <button
-                            onClick={handlePreviewClick}
-                            className="btn-primary-outline"
-                            disabled={isLoading}
-                        >
-                            {showPreview ? 'Tutup PDF' : 'Lihat PDF'}
-                        </button> */}
                         <button
                             onClick={generatePDF}
                             className="button-primary m-0"
@@ -601,6 +599,7 @@ const StudentReportView = ({
                     )}
                 </div>
             </div>
+            <NewModal modalState={modalState} onClose={closeModal} />
         </div>
     );
 };
