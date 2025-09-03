@@ -144,19 +144,6 @@ const violationTranslations = {
     tidiness: "Kerapihan",
 };
 
-const formatDate = (date) => {
-    if (!(date instanceof Date)) {
-        date = new Date(date);
-    }
-    return date.toLocaleDateString("id-ID", {
-        weekday: "long",
-        day: "2-digit",
-        month: "long",
-        year: "numeric",
-        timeZone: "Asia/Jakarta",
-    });
-};
-
 const StudentReportView = ({
     academicYearId,
     studentId,
@@ -485,7 +472,7 @@ const StudentReportView = ({
                                     >
                                         <Text style={styles.tableCell}>
                                             {index + 1}. {row.noteContent}{" "}
-                                            {`(${formatDate(row.noteDate)})`}
+                                            {`(${row.noteDate})`}
                                         </Text>
                                     </View>
                                 ))}
