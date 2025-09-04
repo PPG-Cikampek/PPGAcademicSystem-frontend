@@ -1,6 +1,5 @@
 import { useState, useEffect, useContext } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import useHttp from "../../shared/hooks/http-hook";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import Modal from "../../shared/Components/UIElements/ModalBottomClose";
@@ -19,9 +18,9 @@ import {
     KeyRound,
 } from "lucide-react";
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
+import { useClass, useLockClassMutation, useRemoveStudentFromClassMutation, useRemoveTeacherFromClassMutation } from "../../shared/queries";
 
 const ClassDetailView = () => {
-    const { isLoading, error, sendRequest, setError } = useHttp();
     const [classData, setClassData] = useState();
     const [modal, setModal] = useState({
         title: "",
@@ -34,52 +33,53 @@ const ClassDetailView = () => {
     const auth = useContext(AuthContext);
     const navigate = useNavigate();
 
+    const { data: fetchedClass, isLoading, error, refetch } = useClass(classId);
+    const [modalLoading, setModalLoading] = useState(false);
+
     useEffect(() => {
-        const fetchClassData = async () => {
-            const url = `${
-                import.meta.env.VITE_BACKEND_URL
-            }/classes/${classId}?populate=all`;
-            try {
-                const responseData = await sendRequest(url);
-                setClassData(responseData);
-                console.log(responseData);
-            } catch (err) {
-                // handled by useHttp
-            }
-        };
-        fetchClassData();
-    }, [sendRequest, classId]);
+        if (fetchedClass) {
+            setClassData({ class: fetchedClass });
+        }
+    }, [fetchedClass]);
+
+    const lockMutation = useLockClassMutation();
+
+    const removeTeacherMutation = useRemoveTeacherFromClassMutation();
+
+    const removeStudentMutation = useRemoveStudentFromClassMutation();
 
     const lockClassHandler = (className, classId) => {
+        const teachingGroupId =
+            classData?.class?.teachingGroupId?._id ||
+            classData?.class?.teachingGroupId;
+
         const confirmLock = async () => {
-            const url = `${import.meta.env.VITE_BACKEND_URL}/classes/lock`;
-            const body = JSON.stringify({ classId });
-
-            let responseData;
             try {
-                responseData = await sendRequest(url, "PATCH", body, {
-                    "Content-Type": "application/json",
+                setModalLoading(true);
+                const res = await lockMutation.mutateAsync({
+                    classId,
+                    actionType: "lock",
+                    teachingGroupId,
                 });
-
                 setModal({
                     title: "Berhasil!",
-                    message: responseData.message,
+                    message: res?.message || "Kelas berhasil dikunci",
                     onConfirm: null,
                 });
-                const updatedData = await sendRequest(
-                    `${
-                        import.meta.env.VITE_BACKEND_URL
-                    }/classes/${classId}?populate=all`
-                );
-                setClassData(updatedData);
             } catch (err) {
                 setModal({
                     title: "Gagal!",
-                    message: err.message,
+                    message:
+                        err?.response?.data?.message ||
+                        err?.message ||
+                        "Terjadi kesalahan",
                     onConfirm: null,
                 });
+            } finally {
+                setModalLoading(false);
             }
         };
+
         setModal({
             title: `Kunci kelas: ${className}?`,
             message: `Kelas tidak akan bisa di-edit lagi!`,
@@ -89,81 +89,83 @@ const ClassDetailView = () => {
     };
 
     const unlockClassHandler = (className, classId) => {
-        const confirmLock = async () => {
-            const url = `${import.meta.env.VITE_BACKEND_URL}/classes/unlock`;
-            const body = JSON.stringify({ classId });
+        const teachingGroupId =
+            classData?.class?.teachingGroupId?._id ||
+            classData?.class?.teachingGroupId;
 
-            let responseData;
+        const confirmUnlock = async () => {
             try {
-                responseData = await sendRequest(url, "PATCH", body, {
-                    "Content-Type": "application/json",
+                setModalLoading(true);
+                const res = await lockMutation.mutateAsync({
+                    classId,
+                    actionType: "unlock",
+                    teachingGroupId,
                 });
-
                 setModal({
                     title: "Berhasil!",
-                    message: responseData.message,
+                    message: res?.message || "Kelas berhasil dibuka",
                     onConfirm: null,
                 });
-                const updatedData = await sendRequest(
-                    `${
-                        import.meta.env.VITE_BACKEND_URL
-                    }/classes/${classId}?populate=all`
-                );
-                setClassData(updatedData);
             } catch (err) {
                 setModal({
                     title: "Gagal!",
-                    message: err.message,
+                    message:
+                        err?.response?.data?.message ||
+                        err?.message ||
+                        "Terjadi kesalahan",
                     onConfirm: null,
                 });
+            } finally {
+                setModalLoading(false);
             }
         };
+
         setModal({
             title: `Buka kelas: ${className}?`,
             message: `Kelas dapat di-edit kembali`,
-            onConfirm: confirmLock,
+            onConfirm: confirmUnlock,
         });
         setModalIsOpen(true);
     };
 
     const removeHandler = (role, name, id) => {
         const confirmRemove = async () => {
-            const url =
-                role === "teacher"
-                    ? `${
-                          import.meta.env.VITE_BACKEND_URL
-                      }/classes/remove-teacher`
-                    : `${
-                          import.meta.env.VITE_BACKEND_URL
-                      }/classes/remove-student`;
-
-            const body =
-                role === "teacher"
-                    ? JSON.stringify({ classId, teacherId: id })
-                    : JSON.stringify({ classId, studentId: id });
-
-            let responseData;
-
             try {
-                responseData = await sendRequest(url, "DELETE", body, {
-                    "Content-Type": "application/json",
-                });
+                setModalLoading(true);
+                if (role === "teacher") {
+                    const res = await removeTeacherMutation.mutateAsync({
+                        classId,
+                        teacherId: id,
+                    });
+                    setModal({
+                        title: "Berhasil!",
+                        message: res?.message || "Guru dihapus",
+                        onConfirm: null,
+                    });
+                } else {
+                    const res = await removeStudentMutation.mutateAsync({
+                        classId,
+                        studentId: id,
+                    });
+                    setModal({
+                        title: "Berhasil!",
+                        message: res?.message || "Siswa dihapus",
+                        onConfirm: null,
+                    });
+                }
                 setModal({
-                    title: "Berhasil!",
-                    message: responseData.message,
+                    title: "Gagal!",
+                    message:
+                        err?.response?.data?.message ||
+                        err?.message ||
+                        "Terjadi kesalahan",
                     onConfirm: null,
                 });
-
-                const updatedData = await sendRequest(
-                    `${
-                        import.meta.env.VITE_BACKEND_URL
-                    }/classes/${classId}?populate=all`
-                );
-                setClassData(updatedData);
-            } catch (err) {
-                // Error is already handled by useHttp
+            } finally {
+                setModalLoading(false);
             }
         };
+
         setModal({
             title: `Konfirmasi Penghapusan`,
             message: `Hapus ${name} dari kelas ini?`,
@@ -191,10 +193,10 @@ const ClassDetailView = () => {
                     modal.onConfirm
                         ? "btn-danger-outline"
                         : "button-primary mt-0 "
-                } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
-                disabled={isLoading}
+                } ${modalLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+                disabled={modalLoading}
             >
-                {isLoading ? (
+                {modalLoading ? (
                     <LoadingCircle />
                 ) : modal.onConfirm ? (
                     "Batal"
@@ -206,10 +208,10 @@ const ClassDetailView = () => {
                 <button
                     onClick={modal.onConfirm}
                     className={`button-primary mt-0 ${
-                        isLoading ? "opacity-50 cursor-not-allowed" : ""
+                        modalLoading ? "opacity-50 cursor-not-allowed" : ""
                     }`}
                 >
-                    {isLoading ? <LoadingCircle /> : "Ya"}
+                    {modalLoading ? <LoadingCircle /> : "Ya"}
                 </button>
             )}
         </div>
@@ -249,9 +251,7 @@ const ClassDetailView = () => {
                     </div>
                 )}
 
-                {error && (
-                    <ErrorCard error={error} onClear={() => setError(null)} />
-                )}
+                {error && <ErrorCard error={error} onClear={() => refetch()} />}
 
                 {classData && !isLoading && (
                     <>

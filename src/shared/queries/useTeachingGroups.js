@@ -99,6 +99,10 @@ export const useLockClassMutation = () => {
             queryClient.invalidateQueries({
                 queryKey: ["teachingGroup", variables.teachingGroupId],
             });
+            // Invalidate the class query to refetch data
+            queryClient.invalidateQueries({
+                queryKey: ["class", variables.classId],
+            });
         },
     });
 };
