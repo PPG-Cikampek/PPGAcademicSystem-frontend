@@ -7,6 +7,21 @@ import "./index.css";
 import App from "./App.jsx";
 import MaintenanceView from "./maintenance/pages/MaintenanceView.jsx";
 import { useVersionCheck } from "./shared/hooks/useVersionCheck.js";
+import NewModal from "./shared/Components/Modal/NewModal.jsx";
+
+// Register service worker
+if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+        navigator.serviceWorker
+            .register("/sw.js")
+            .then((registration) => {
+                console.log("SW registered: ", registration);
+            })
+            .catch((registrationError) => {
+                console.log("SW registration failed: ", registrationError);
+            });
+    });
+}
 
 // Create a client
 const queryClient = new QueryClient({
@@ -21,7 +36,7 @@ const queryClient = new QueryClient({
 });
 
 const AppWrapper = () => {
-    useVersionCheck();
+    const { modalState, closeModal } = useVersionCheck();
     const isMaintenance = false;
 
     return (
@@ -29,6 +44,7 @@ const AppWrapper = () => {
             <QueryClientProvider client={queryClient}>
                 {isMaintenance ? <MaintenanceView /> : <App />}
                 <ReactQueryDevtools initialIsOpen={false} />
+                <NewModal modalState={modalState} onClose={closeModal} />
             </QueryClientProvider>
         </StrictMode>
     );

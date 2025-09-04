@@ -1,31 +1,40 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
+    <head>
+        <!-- Google tag (gtag.js) -->
+        <script
+            async
+            src="https://www.googletagmanager.com/gtag/js?id=G-RRVPB0TFK8"
+        ></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+            gtag("js", new Date());
 
-<head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-RRVPB0TFK8"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
+            gtag("config", "G-RRVPB0TFK8");
+        </script>
+        <meta charset="UTF-8" />
+        <link
+            rel="icon"
+            type="image/svg+xml"
+            href="/src/assets/logos/ppgcikampek.png"
+        />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Sistem Akademik Digital PPG</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+        <link
+            href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&family=Poppins:wght@400;700&family=Roboto:wght@400;700&display=swap"
+            rel="stylesheet"
+        />
+        <link href="/src/index.css" rel="stylesheet" />
+    </head>
 
-    gtag('config', 'G-RRVPB0TFK8');
-  </script>
-  <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/src/assets/logos/ppgcikampek.png" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Sistem Akademik Digital PPG</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&family=Poppins:wght@400;700&family=Roboto:wght@400;700&display=swap"
-    rel="stylesheet">
-  <link href="/src/index.css" rel="stylesheet">
-</head>
-
-<body>
-  <div id="root"></div>
-  <script type="module" src="/src/main.jsx"></script>
-</body>
-
+    <body>
+        <div id="root"></div>
+        <script type="module" src="/src/main.jsx"></script>
+    </body>
 </html>
