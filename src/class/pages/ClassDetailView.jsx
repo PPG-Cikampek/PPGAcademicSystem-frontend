@@ -25,10 +25,11 @@ const ClassDetailView = () => {
     const classId = useParams().classId;
     const auth = useContext(AuthContext);
 
-    const { data: fetchedClass, isLoading, error, refetch } = useClass(classId);
+    const { data: fetchedClass, isLoading, error, refetch } = useClass(classId, { refetchOnMount: true });
 
     useEffect(() => {
         if (fetchedClass) {
+            // just update local state with the fetched class
             setClassData({ class: fetchedClass });
         }
     }, [fetchedClass]);
