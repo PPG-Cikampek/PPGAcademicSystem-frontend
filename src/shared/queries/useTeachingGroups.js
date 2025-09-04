@@ -102,3 +102,26 @@ export const useLockClassMutation = () => {
         },
     });
 };
+
+// Mutation for creating a new class
+export const useCreateClassMutation = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ name, startTime, endTime, teachingGroupId }) => {
+            const response = await api.post(`/classes/`, {
+                name,
+                startTime,
+                endTime,
+                teachingGroupId,
+            });
+            return response.data;
+        },
+        onSuccess: (data, variables) => {
+            // Invalidate the teaching group query to refetch data
+            queryClient.invalidateQueries({
+                queryKey: ["teachingGroup", variables.teachingGroupId],
+            });
+        },
+    });
+};

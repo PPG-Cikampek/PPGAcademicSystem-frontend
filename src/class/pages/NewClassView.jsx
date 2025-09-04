@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation, useParams } from "react-router-dom";
 
-import useHttp from "../../shared/hooks/http-hook";
+import { useCreateClassMutation } from "../../shared/queries/useTeachingGroups";
 import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
 
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
@@ -17,8 +17,6 @@ const NewClassView = () => {
     const [modalIsOpen, setModalIsOpen] = useState(false);
 
     const [isTransitioning, setIsTransitioning] = useState(false);
-    const { isLoading, error, sendRequest, setError } = useHttp();
-
     // const auth = useContext(AuthContext);
     const navigate = useNavigate();
     const location = useLocation();
@@ -26,6 +24,8 @@ const NewClassView = () => {
 
     const teachingGroupId = useParams().teachingGroupId;
     console.log("Teaching Group ID:", teachingGroupId);
+
+    const createClassMutation = useCreateClassMutation();
 
     const classFields = [
         {
@@ -59,20 +59,19 @@ const NewClassView = () => {
     ];
 
     const handleFormSubmit = async (data) => {
-        const url = `${import.meta.env.VITE_BACKEND_URL}/classes/`;
-
-        const body = JSON.stringify({
-            name: data.name,
-            startTime: data.startTime,
-            endTime: data.endTime,
-            teachingGroupId,
-        });
-
-        let responseData;
         try {
-            responseData = await sendRequest(url, "POST", body, {
-                "Content-Type": "application/json",
+            const responseData = await createClassMutation.mutateAsync({
+                name: data.name,
+                startTime: data.startTime,
+                endTime: data.endTime,
+                teachingGroupId,
             });
+            setModal({
+                title: "Berhasil!",
+                message: responseData.message,
+                onConfirm: null,
+            });
+            setModalIsOpen(true);
         } catch (err) {
             setModal({
                 title: "Gagal!",
@@ -81,12 +80,6 @@ const NewClassView = () => {
             });
             setModalIsOpen(true);
         }
-        setModal({
-            title: "Berhasil!",
-            message: responseData.message,
-            onConfirm: null,
-        });
-        setModalIsOpen(true);
     };
 
     const ModalFooter = () => (
@@ -123,16 +116,19 @@ const NewClassView = () => {
                 title={modal.title}
                 footer={<ModalFooter />}
             >
-                {isLoading && (
+                {createClassMutation.isPending && (
                     <div className="flex justify-center mt-16">
                         <LoadingCircle size={32} />
                     </div>
                 )}
-                {!isLoading && modal.message}
+                {!createClassMutation.isPending && modal.message}
             </Modal>
 
-            {error && (
-                <ErrorCard error={error} onClear={() => setError(null)} />
+            {createClassMutation.error && (
+                <ErrorCard
+                    error={createClassMutation.error}
+                    onClear={() => createClassMutation.reset()}
+                />
             )}
 
             <div
@@ -145,7 +141,7 @@ const NewClassView = () => {
                     subtitle={"Sistem Akademik Digital"}
                     fields={classFields}
                     onSubmit={handleFormSubmit}
-                    disabled={isLoading}
+                    disabled={createClassMutation.isPending}
                     reset={false}
                     footer={false}
                     button={
@@ -153,13 +149,13 @@ const NewClassView = () => {
                             <button
                                 type="submit"
                                 className={`button-primary ${
-                                    isLoading
+                                    createClassMutation.isPending
                                         ? "opacity-50 cursor-not-allowed"
                                         : ""
                                 }`}
-                                disabled={isLoading}
+                                disabled={createClassMutation.isPending}
                             >
-                                {isLoading ? (
+                                {createClassMutation.isPending ? (
                                     <LoadingCircle>Processing...</LoadingCircle>
                                 ) : (
                                     "Tambah"
