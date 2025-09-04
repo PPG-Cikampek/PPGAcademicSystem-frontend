@@ -62,7 +62,7 @@ const NewClassView = () => {
             openModal(
                 responseData.message,
                 "success",
-                navigate(-1),
+                () => navigate(-1),
                 "Berhasil!"
             );
         } catch (err) {
