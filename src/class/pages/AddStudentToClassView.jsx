@@ -5,6 +5,7 @@ import { AuthContext } from "../../shared/Components/Context/auth-context";
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 import SkeletonLoader from "../../shared/Components/UIElements/SkeletonLoader";
 import { useClass, useRegisterStudentToClassMutation, useStudents } from "../../shared/queries";
+import UserCard from "../components/UserCard";
 
 const AddStudentToClassView = () => {
     const navigate = useNavigate();
@@ -40,15 +41,6 @@ const AddStudentToClassView = () => {
 
     const registerStudentHandler = (_studentName, studentId) => {
         registerStudentToClass({ classId, studentId });
-    };
-
-    const getInitials = (name) => {
-        return name
-            ?.split(" ")
-            .map((word) => word[0])
-            .join("")
-            .toUpperCase()
-            .slice(0, 2);
     };
 
     return (
@@ -109,8 +101,6 @@ const AddStudentToClassView = () => {
                                 </p>
                             </div>
                         )}
-                        {students && console.log(students)}
-                        {cls && console.log(cls)}
                         {students.length > 0 && (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {students.map((student) => {
@@ -131,80 +121,23 @@ const AddStudentToClassView = () => {
                                     };
 
                                     const registered = isStudentRegistered();
+                                    const statusText = student.isProfileComplete === false
+                                        ? "Lengkapi Profil!"
+                                        : registered
+                                        ? "Terdaftar ✓"
+                                        : "";
+
                                     return (
-                                        <div
+                                        <UserCard
                                             key={student._id}
-                                            className={`p-4 border rounded-lg transition-all duration-300 ${
-                                                registered ||
-                                                student.isProfileComplete ===
-                                                    false
-                                                    ? "bg-gray-100 border-gray-300 text-gray-500 cursor-not-allowed"
-                                                    : "bg-white border-gray-200 hover:ring-4 hover:ring-blue-200 hover:border-blue-500 hover:shadow-xl cursor-pointer"
-                                            }`}
-                                            onClick={
-                                                !registered &&
-                                                student.isProfileComplete ===
-                                                    true
-                                                    ? () =>
-                                                          registerStudentHandler(
-                                                              student.name,
-                                                              student._id
-                                                          )
-                                                    : undefined
-                                            }
-                                        >
-                                            <div className="flex justify-between items-center gap-2">
-                                                <div className="flex gap-4 items-center">
-                                                    {student.image ? (
-                                                        <img
-                                                            src={
-                                                                student.thumbnail
-                                                                    ? student.thumbnail
-                                                                    : `${
-                                                                          import.meta
-                                                                              .env
-                                                                              .VITE_BACKEND_URL
-                                                                      }/${
-                                                                          student.image
-                                                                      }`
-                                                            }
-                                                            alt={student.name}
-                                                            className="w-10 h-10 rounded-full border border-gray-200 bg-white"
-                                                        />
-                                                    ) : (
-                                                        <div
-                                                            className={`flex w-10 h-10 rounded-full bg-blue-200 text-blue-500 items-center justify-center font-medium`}
-                                                        >
-                                                            {getInitials(
-                                                                student.name
-                                                            )}
-                                                        </div>
-                                                    )}
-                                                    <div className="flex flex-col gap-1">
-                                                        <p className="text-lg font-semibold text-clip overflow-hidden">
-                                                            {student.name}
-                                                        </p>
-                                                        <p className="text-base font-normal">
-                                                            {student.nis}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                                {student.isProfileComplete ===
-                                                false ? (
-                                                    <span className="text-sm font-medium text-red-500">
-                                                        Lengkapi Profil!
-                                                    </span>
-                                                ) : registered ? (
-                                                    <span className="text-sm font-base text-gray-500">
-                                                        Terdaftar ✓
-                                                    </span>
-                                                ) : (
-                                                    <span className="text-sm font-medium text-blue-500 hidden hover:block">
-                                                        Register
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </div>
+                                            user={student}
+                                            onClick={() => registerStudentHandler(student.name, student._id)}
+                                            isRegistered={registered}
+                                            identifier="nis"
+                                            statusText={statusText}
+                                            backendUrl={import.meta.env.VITE_BACKEND_URL}
+                                            avatarColor="blue"
+                                        />
                                     );
                                 })}
                             </div>

@@ -10,6 +10,7 @@ import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import NewModal from "../../shared/Components/Modal/NewModal";
 import useModal from "../../shared/hooks/useNewModal";
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
+import UserCard from "../components/UserCard";
 
 const AddTeacherToClassView = () => {
     const { modalState, openModal, closeModal } = useModal();
@@ -43,15 +44,6 @@ const AddTeacherToClassView = () => {
             "Konfirmasi Pendaftaran",
             true
         );
-    };
-
-    const getInitials = (name) => {
-        return name
-            ?.split(" ")
-            .map((word) => word[0])
-            .join("")
-            .toUpperCase()
-            .slice(0, 2);
     };
 
     return (
@@ -99,78 +91,23 @@ const AddTeacherToClassView = () => {
                                                     targetClassId
                                             );
 
+                                        const statusText = teacher.isProfileComplete === false
+                                            ? "Lengkapi Profil!"
+                                            : hasTargetClass
+                                            ? "Terdaftar ✓"
+                                            : "";
+
                                         return (
-                                            <div
+                                            <UserCard
                                                 key={teacher._id}
-                                                className={`p-4 border rounded-lg transition-all duration-300 ${
-                                                    hasTargetClass
-                                                        ? "bg-gray-100 border-gray-300 text-gray-500 cursor-not-allowed"
-                                                        : "bg-white border-gray-200 hover:ring-4 hover:ring-blue-200 hover:border-blue-500 hover:shadow-xl cursor-pointer"
-                                                }`}
-                                                onClick={
-                                                    !hasTargetClass
-                                                        ? () =>
-                                                              registerTeacherHandler(
-                                                                  teacher.name,
-                                                                  teacher.id
-                                                              )
-                                                        : undefined
-                                                }
-                                            >
-                                                <div className="flex justify-between items-center gap-2">
-                                                    <div className="flex gap-4 items-center">
-                                                        {teacher.image ? (
-                                                            <img
-                                                                src={
-                                                                    teacher.thumbnail
-                                                                        ? teacher.thumbnail
-                                                                        : `${
-                                                                              import.meta
-                                                                                  .env
-                                                                                  .VITE_BACKEND_URL
-                                                                          }/${
-                                                                              teacher.image
-                                                                          }`
-                                                                }
-                                                                alt={
-                                                                    teacher.name
-                                                                }
-                                                                className="w-10 h-10 rounded-full border border-gray-200 bg-white"
-                                                            />
-                                                        ) : (
-                                                            <div
-                                                                className={`w-10 h-10 rounded-full bg-green-200 text-green-500 hidden md:flex items-center justify-center font-medium`}
-                                                            >
-                                                                {getInitials(
-                                                                    teacher.name
-                                                                )}
-                                                            </div>
-                                                        )}
-                                                        <div className="flex flex-col gap-1">
-                                                            <p className="text-lg font-semibold">
-                                                                {teacher.name}
-                                                            </p>
-                                                            <p className="text-base font-normal">
-                                                                {teacher.nig}
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    {teacher.isProfileComplete ===
-                                                    false ? (
-                                                        <span className="text-sm font-medium text-red-500">
-                                                            Lengkapi Profil!
-                                                        </span>
-                                                    ) : hasTargetClass ? (
-                                                        <span className="text-sm font-base text-gray-500">
-                                                            Terdaftar ✓
-                                                        </span>
-                                                    ) : (
-                                                        <span className="text-sm font-medium text-blue-500 hidden hover:block">
-                                                            Register
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </div>
+                                                user={teacher}
+                                                onClick={() => registerTeacherHandler(teacher.name, teacher.id)}
+                                                isRegistered={hasTargetClass}
+                                                identifier="nig"
+                                                statusText={statusText}
+                                                backendUrl={import.meta.env.VITE_BACKEND_URL}
+                                                avatarColor="green"
+                                            />
                                         );
                                     }
                                 })}
