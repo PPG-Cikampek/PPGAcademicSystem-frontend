@@ -118,6 +118,10 @@ h3 {
     @apply text-xl font-semibold;
 }
 
+h4 {
+    @apply text-lg font-semibold;
+}
+
 @utility font-lpmq {
     font-family: "LPMQ", sans-serif;
 }
@@ -219,7 +223,11 @@ h3 {
 }
 
 @utility btn-mobile-primary-round-gray {
-    @apply flex items-center gap-2 px-4 py-2 border border-gray-300 hover:bg-gray-200 disabled:text-gray-500 disabled:hover:bg-white disabled:cursor-not-allowed  hover:cursor-pointer rounded-full text-sm font-medium transition-colors;
+    @apply flex items-center gap-2 px-4 py-2 border border-gray-300 hover:bg-gray-200 active:bg-gray-200 disabled:text-gray-500 disabled:hover:bg-white disabled:cursor-not-allowed  hover:cursor-pointer rounded-full text-sm font-medium transition-colors;
+}
+
+@utility btn-mobile-danger-round {
+    @apply flex items-center gap-2 px-4 py-2 border border-danger-darker hover:bg-danger active:bg-danger disabled:text-gray-500 disabled:hover:bg-white disabled:cursor-not-allowed  hover:cursor-pointer rounded-full text-sm font-medium transition-colors;
 }
 
 @utility btn-icon-primary {

@@ -66,36 +66,31 @@ const NewModal = ({
                 return {
                     iconBg: "bg-green-100",
                     iconColor: "text-green-600",
-                    buttonBg: "bg-green-600 hover:bg-green-700",
-                    buttonText: "text-white",
+                    buttonStyle: "btn-mobile-primary-round-gray",
                 };
             case "warning":
                 return {
                     iconBg: "bg-amber-100",
                     iconColor: "text-amber-600",
-                    buttonBg: "bg-amber-600 hover:bg-amber-700",
-                    buttonText: "text-white",
+                    buttonStyle: "btn-mobile-danger-round",
                 };
             case "error":
                 return {
                     iconBg: "bg-red-100",
                     iconColor: "text-red-600",
-                    buttonBg: "bg-red-600 hover:bg-red-700",
-                    buttonText: "text-white",
+                    buttonStyle: "btn-mobile-primary-round-gray",
                 };
             case "confirmation":
                 return {
                     iconBg: "bg-blue-100",
                     iconColor: "text-blue-600",
-                    buttonBg: "bg-blue-600 hover:bg-blue-700",
-                    buttonText: "text-white",
+                    buttonStyle: "btn-mobile-primary-round-gray",
                 };
             default:
                 return {
                     iconBg: "bg-gray-100",
                     iconColor: "text-gray-600",
-                    buttonBg: "bg-gray-600 hover:bg-gray-700",
-                    buttonText: "text-white",
+                    buttonStyle: "btn-mobile-primary-round-gray",
                 };
         }
     };
@@ -126,7 +121,7 @@ const NewModal = ({
                 beforeClose: "bg-black/0",
             }}
             className={{
-                base: `outline-none relative bg-white rounded-lg shadow-xl w-full ${getSizeStyles()} mx-auto opacity-0 transform scale-95`,
+                base: `outline-none relative bg-white rounded-md shadow-xl w-full ${getSizeStyles()} mx-auto opacity-0 transform scale-95`,
                 afterOpen: "modal-enter opacity-100 scale-100",
                 beforeClose: "modal-exit opacity-0 scale-95",
             }}
@@ -159,7 +154,7 @@ const NewModal = ({
                 {/* Modal content */}
                 <div className="p-6">
                     {/* Header with icon */}
-                    <div className="flex items-center mb-4">
+                    <div className="flex items-center mb-6 md:mb-10">
                         <div
                             className={`
               flex items-center justify-center w-12 h-12 rounded-full mr-4
@@ -169,11 +164,7 @@ const NewModal = ({
                             {getIcon()}
                         </div>
                         <div className="flex-1 min-w-0">
-                            {title && (
-                                <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                                    {title}
-                                </h3>
-                            )}
+                            {title && <h4 className="mb-1">{title}</h4>}
                             {message && (
                                 <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">
                                     {message}
@@ -191,11 +182,7 @@ const NewModal = ({
                             <button
                                 onClick={onClose}
                                 disabled={isLoading}
-                                className="
-                  px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 
-                  rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 
-                  focus:ring-blue-500 transition-colors
-                  disabled:opacity-50 disabled:cursor-not-allowed
+                                className="btn-mobile-primary-round-gray
                 "
                             >
                                 {cancelText}
@@ -215,10 +202,7 @@ const NewModal = ({
                                 }
                             }}
                             disabled={isLoading}
-                            className={`
-                px-4 py-2 text-sm font-medium rounded-md focus:outline-none 
-                focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors
-                ${typeStyles.buttonBg} ${typeStyles.buttonText}
+                            className={`${typeStyles.buttonStyle}
                 ${isLoading ? "opacity-50 cursor-not-allowed" : ""}
               `}
                         >
