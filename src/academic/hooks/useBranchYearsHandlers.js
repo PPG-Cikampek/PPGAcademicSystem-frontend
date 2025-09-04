@@ -9,7 +9,7 @@ import {
 } from "../../shared/queries/useBranchYears";
 import { formatAcademicYear } from "../utilities/academicUtils";
 
-const useBranchYearsHandlers = (setModal, setModalIsOpen) => {
+const useBranchYearsHandlers = (openModal, closeModal) => {
     const auth = useContext(AuthContext);
     const navigate = useNavigate();
 
@@ -26,29 +26,27 @@ const useBranchYearsHandlers = (setModal, setModalIsOpen) => {
                     branchYearId,
                     branchId: auth.userBranchId,
                 });
-                setModal({
-                    title: "Berhasil!",
-                    message: res.message,
-                    onConfirm: null,
-                });
+                openModal(res.message, "success", null, "Berhasil!", false);
             } catch (err) {
-                setModal({
-                    title: "Gagal!",
-                    message: err?.message || err,
-                    onConfirm: null,
-                });
+                openModal(
+                    err?.response?.data?.message || err.message || err,
+                    "error",
+                    null,
+                    "Gagal!",
+                    false
+                );
             }
-            setModalIsOpen(true);
+            // Keep modal open and replace content with success/error
+            return false;
         };
 
-        setModal({
-            title: `Konfirmasi`,
-            message: `Aktifkan tahun ajaran ${formatAcademicYear(
-                branchYearName
-            )}?`,
-            onConfirm: confirmActivate,
-        });
-        setModalIsOpen(true);
+        openModal(
+            `Aktifkan tahun ajaran ${formatAcademicYear(branchYearName)}?`,
+            "confirmation",
+            confirmActivate,
+            "Konfirmasi",
+            true
+        );
     };
 
     const deactivateYearHandler = (branchYearName, branchYearId) => (e) => {
@@ -59,28 +57,26 @@ const useBranchYearsHandlers = (setModal, setModalIsOpen) => {
                     branchYearId,
                     branchId: auth.userBranchId,
                 });
-                setModal({
-                    title: "Berhasil!",
-                    message: res.message,
-                    onConfirm: null,
-                });
+                openModal(res.message, "success", null, "Berhasil!", false);
             } catch (err) {
-                setModal({
-                    title: "Gagal!",
-                    message: err?.message || err,
-                    onConfirm: null,
-                });
+                openModal(
+                    err?.response?.data?.message || err.message || err,
+                    "error",
+                    null,
+                    "Gagal!",
+                    false
+                );
             }
-            setModalIsOpen(true);
+            // Keep modal open and replace content with success/error
+            return false;
         };
-        setModal({
-            title: `Konfirmasi`,
-            message: `Nonaktifkan tahun ajaran ${formatAcademicYear(
-                branchYearName
-            )}?`,
-            onConfirm: confirmDelete,
-        });
-        setModalIsOpen(true);
+        openModal(
+            `Nonaktifkan tahun ajaran ${formatAcademicYear(branchYearName)}?`,
+            "confirmation",
+            confirmDelete,
+            "Konfirmasi",
+            true
+        );
     };
 
     const deleteBranchYearHandler = (branchYearName, branchYearId) => (e) => {
@@ -91,28 +87,26 @@ const useBranchYearsHandlers = (setModal, setModalIsOpen) => {
                     branchYearId,
                     branchId: auth.userBranchId,
                 });
-                setModal({
-                    title: "Berhasil!",
-                    message: res.message,
-                    onConfirm: null,
-                });
+                openModal(res.message, "success", null, "Berhasil!", false);
             } catch (err) {
-                setModal({
-                    title: "Gagal!",
-                    message: err?.message || err,
-                    onConfirm: null,
-                });
+                openModal(
+                    err?.response?.data?.message || err.message || err,
+                    "error",
+                    null,
+                    "Gagal!",
+                    false
+                );
             }
-            setModalIsOpen(true);
+            // Keep modal open and replace content with success/error
+            return false;
         };
-        setModal({
-            title: `Konfirmasi Penghapusan`,
-            message: `Hapus tahun ajaran ${formatAcademicYear(
-                branchYearName
-            )}?`,
-            onConfirm: confirmDelete,
-        });
-        setModalIsOpen(true);
+        openModal(
+            `Hapus tahun ajaran ${formatAcademicYear(branchYearName)}?`,
+            "confirmation",
+            confirmDelete,
+            "Konfirmasi Penghapusan",
+            true
+        );
     };
 
     const deleteTeachingGroupHandler = (className, teachingGroupId) => (e) => {
@@ -123,26 +117,27 @@ const useBranchYearsHandlers = (setModal, setModalIsOpen) => {
                     teachingGroupId,
                     branchId: auth.userBranchId,
                 });
-                setModal({
-                    title: "Berhasil!",
-                    message: res.message,
-                    onConfirm: null,
-                });
+                openModal(res.message, "success", null, "Berhasil!", false);
             } catch (err) {
-                setModal({
-                    title: "Gagal!",
-                    message: err?.message || err,
-                    onConfirm: null,
-                });
+                console.log(err);
+                openModal(
+                    err?.response?.data?.message || err.message || err,
+                    "error",
+                    null,
+                    "Gagal!",
+                    false
+                );
             }
-            setModalIsOpen(true);
+            // Keep modal open and replace content with success/error
+            return false;
         };
-        setModal({
-            title: `Konfirmasi Penghapusan`,
-            message: `Hapus KBM: ${className}?`,
-            onConfirm: confirmDelete,
-        });
-        setModalIsOpen(true);
+        openModal(
+            `Hapus KBM: ${className}?`,
+            "confirmation",
+            confirmDelete,
+            "Konfirmasi Penghapusan",
+            true
+        );
     };
 
     return {

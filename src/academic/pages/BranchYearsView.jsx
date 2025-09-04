@@ -4,21 +4,16 @@ import { Link } from "react-router-dom";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import { PlusIcon } from "lucide-react";
-import Modal from "../../shared/Components/UIElements/ModalBottomClose";
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
-import ModalFooter from "../components/ModalFooter";
+import useModal from "../../shared/hooks/useNewModal";
+import NewModal from "../../shared/Components/Modal/NewModal";
 
 import useBranchYearsHandlers from "../hooks/useBranchYearsHandlers";
 import BranchYearCard from "../components/BranchYearCard";
 import { useBranchYears } from "../../shared/queries";
 
 const BranchYearsView = () => {
-    const [modal, setModal] = useState({
-        title: "",
-        message: "",
-        onConfirm: null,
-    });
-    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const { modalState, openModal, closeModal, handleConfirm } = useModal();
     const [expandedId, setExpandedId] = useState(null);
     const [error, setError] = useState(null);
 
@@ -42,7 +37,7 @@ const BranchYearsView = () => {
         deactivateYearHandler,
         deleteBranchYearHandler,
         deleteTeachingGroupHandler,
-    } = useBranchYearsHandlers(setModal, setModalIsOpen);
+    } = useBranchYearsHandlers(openModal, closeModal);
 
     return (
         <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">
@@ -62,24 +57,11 @@ const BranchYearsView = () => {
                     )}
                 </div>
 
-                <Modal
-                    isOpen={modalIsOpen}
-                    onClose={() => setModalIsOpen(false)}
-                    title={modal.title}
-                    footer={
-                        <ModalFooter
-                            onClose={() => setModalIsOpen(false)}
-                            onConfirm={modal.onConfirm}
-                        />
-                    }
-                >
-                    {isLoading && (
-                        <div className="flex justify-center mt-16">
-                            <LoadingCircle size={32} />
-                        </div>
-                    )}
-                    {!isLoading && modal.message}
-                </Modal>
+                <NewModal
+                    modalState={modalState}
+                    onClose={closeModal}
+                    isLoading={false}
+                />
 
                 {(!branchYears || isLoading) && (
                     <div className="flex justify-center mt-16">
