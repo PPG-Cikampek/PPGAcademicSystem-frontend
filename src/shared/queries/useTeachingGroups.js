@@ -16,6 +16,21 @@ export const useTeachingGroup = (teachingGroupId, options = {}) => {
     });
 };
 
+// Fetch sub-branches by branch ID
+export const useBranchSubBranches = (branchId, options = {}) => {
+    return useQuery({
+        queryKey: ["subBranches", branchId],
+        queryFn: async () => {
+            const response = await api.get(
+                `/levels/branches/${branchId}/sub-branches`
+            );
+            return response.data.subBranches;
+        },
+        enabled: !!branchId,
+        ...options,
+    });
+};
+
 // Mutation for removing sub-branch from teaching group
 export const useRemoveSubBranchMutation = () => {
     const queryClient = useQueryClient();
@@ -35,6 +50,15 @@ export const useRemoveSubBranchMutation = () => {
             queryClient.invalidateQueries({
                 queryKey: ["teachingGroup", variables.teachingGroupId],
             });
+            // Also invalidate sub-branches list for the related branch if provided
+            if (variables?.branchId) {
+                queryClient.invalidateQueries({
+                    queryKey: ["subBranches", variables.branchId],
+                });
+            } else {
+                // As a fallback, invalidate any subBranches queries
+                queryClient.invalidateQueries({ queryKey: ["subBranches"] });
+            }
         },
     });
 };
@@ -126,6 +150,34 @@ export const useCreateClassMutation = () => {
             queryClient.invalidateQueries({
                 queryKey: ["teachingGroup", variables.teachingGroupId],
             });
+        },
+    });
+};
+
+// Mutation for registering a sub-branch to a teaching group
+export const useRegisterSubBranchToTeachingGroupMutation = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ name, teachingGroupId, subBranchId }) => {
+            const response = await api.post(
+                `/teachingGroups/${teachingGroupId}`,
+                { name, teachingGroupId, subBranchId }
+            );
+            return response.data;
+        },
+        onSuccess: (data, variables) => {
+            // Invalidate lists dependent on this change
+            if (variables?.branchId) {
+                queryClient.invalidateQueries({
+                    queryKey: ["subBranches", variables.branchId],
+                });
+            }
+            if (variables?.teachingGroupId) {
+                queryClient.invalidateQueries({
+                    queryKey: ["teachingGroup", variables.teachingGroupId],
+                });
+            }
         },
     });
 };

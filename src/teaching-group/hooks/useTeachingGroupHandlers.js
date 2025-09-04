@@ -27,6 +27,8 @@ export const useTeachingGroupHandlers = (
                 const response = await removeSubBranchMutation.mutateAsync({
                     teachingGroupId,
                     subBranchId,
+                    // Provide branchId to allow subBranches invalidation
+                    branchId: teachingGroupData?.branch?.id || teachingGroupData?.branchId,
                 });
                 openModal(
                     response.message,

@@ -1,58 +1,46 @@
-import { useState, useContext, useEffect } from "react";
+import { useContext } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
+import {
+    useBranchSubBranches,
+    useRegisterSubBranchToTeachingGroupMutation,
+} from "../../shared/queries/useTeachingGroups";
 
 import { AuthContext } from "../../shared/Components/Context/auth-context";
-import useHttp from "../../shared/hooks/http-hook";
 import useModal from "../../shared/hooks/useNewModal";
 
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import NewModal from "../../shared/Components/Modal/NewModal";
 
 const AddSubBranchToTeachingGroupView = () => {
-    const { modalState, openModal, closeModal, handleConfirm } = useModal();
-    const [subBranches, setSubBranches] = useState();
-    const { isLoading, error, sendRequest, setError } = useHttp();
+    const { modalState, openModal, closeModal } = useModal();
 
     const targetTeachingGroupId = useParams().teachingGroupId;
-    const navigate = useNavigate();
 
     const location = useLocation();
-    const teachingGroupData = location.state?.teachingGroupData;
-    console.log(teachingGroupData);
 
     const auth = useContext(AuthContext);
 
-    useEffect(() => {
-        const loadSubBranches = async () => {
-            try {
-                const responseData = await sendRequest(
-                    `${import.meta.env.VITE_BACKEND_URL}/levels/branches/${
-                        auth.userBranchId
-                    }/sub-branches`
-                );
-                setSubBranches(responseData.subBranches);
-                console.log(responseData.subBranches);
-            } catch (err) {
-                // Error handled by useHttp
-            }
-        };
-        loadSubBranches();
-    }, [sendRequest]);
+    // Fetch sub-branches for the current branch
+    const {
+        data: subBranches,
+        isLoading: isSubsLoading,
+        refetch: refetchSubBranches,
+    } = useBranchSubBranches(auth?.userBranchId, {
+        // refetchOnMount: 'always',
+        // refetchOnWindowFocus: true,
+    });
+
+    // Mutation: register a sub-branch to the teaching group
+    const registerMutation = useRegisterSubBranchToTeachingGroupMutation();
 
     const registerSubBranchHandler = (subBranchName, subBranchId) => {
         const confirmRegister = async () => {
-            const url = `${
-                import.meta.env.VITE_BACKEND_URL
-            }/teachingGroups/${targetTeachingGroupId}`;
-            const body = JSON.stringify({
-                name: subBranchName,
-                teachingGroupId: targetTeachingGroupId,
-                subBranchId,
-            });
-            let responseData;
             try {
-                responseData = await sendRequest(url, "POST", body, {
-                    "Content-Type": "application/json",
+                const responseData = await registerMutation.mutateAsync({
+                    name: subBranchName,
+                    teachingGroupId: targetTeachingGroupId,
+                    subBranchId,
+                    branchId: auth?.userBranchId,
                 });
                 openModal(
                     responseData.message,
@@ -62,16 +50,18 @@ const AddSubBranchToTeachingGroupView = () => {
                     false,
                     "md"
                 );
-
-                const updatedData = await sendRequest(
-                    `${import.meta.env.VITE_BACKEND_URL}/levels/branches/${
-                        auth.userBranchId
-                    }/sub-branches`
-                );
-                setSubBranches(updatedData.subBranches);
+                // Ensure both lists reflect the change
+                await refetchSubBranches();
                 return false;
             } catch (err) {
-                openModal(err.message, "error", null, "Gagal!", false, "md");
+                openModal(
+                    err?.message || "Terjadi kesalahan",
+                    "error",
+                    null,
+                    "Gagal!",
+                    false,
+                    "md"
+                );
                 return false;
             }
         };
@@ -94,16 +84,16 @@ const AddSubBranchToTeachingGroupView = () => {
                 <NewModal
                     modalState={modalState}
                     onClose={closeModal}
-                    isLoading={isLoading}
+                    isLoading={registerMutation.isPending}
                 />
 
-                {(!subBranches || isLoading) && (
+                {(!subBranches || isSubsLoading) && (
                     <div className="flex justify-center mt-16">
                         <LoadingCircle size={32} />
                     </div>
                 )}
 
-                {subBranches && !isLoading && (
+                {subBranches && !isSubsLoading && (
                     <>
                         {subBranches.length === 0 && (
                             <div className="bg-white rounded-md shadow-md p-6 border border-gray-200">

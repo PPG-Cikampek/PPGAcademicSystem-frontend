@@ -23,7 +23,11 @@ const TeachingGroupsView = () => {
         data: teachingGroupData,
         isLoading,
         error: queryError,
-    } = useTeachingGroup(teachingGroupId);
+    } = useTeachingGroup(teachingGroupId, {
+        // // Ensure we always refresh on mount/navigation to this page
+        // refetchOnMount: 'always',
+        // refetchOnWindowFocus: true,
+    });
 
     // Modal state using the new hook
     const { modalState, openModal, closeModal, handleConfirm } = useModal();
