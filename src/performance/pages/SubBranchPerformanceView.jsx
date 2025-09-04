@@ -786,12 +786,7 @@ const SubBranchPerformanceView = () => {
                                 </div>
                             </div>
                             <StudentsPerformanceTable
-                                selectedAcademicYear={
-                                    filterState.selectedAcademicYear
-                                }
-                                selectedClass={filterState.selectedClass}
-                                startDate={filterState.startDate}
-                                endDate={filterState.endDate}
+                                filterState={filterState}
                             />
                         </div>
                     ))}

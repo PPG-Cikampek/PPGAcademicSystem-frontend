@@ -7,7 +7,7 @@ import { AuthContext } from "../../shared/Components/Context/auth-context";
 
 const StudentsPerformanceTable = ({ studentsData, filterState }) => {
     const auth = useContext(AuthContext);
-
+    console.log(filterState);
     const { data: attendanceData, isLoading } = useAttendancePerformance(
         {
             ...(filterState.selectedAcademicYear
@@ -19,6 +19,8 @@ const StudentsPerformanceTable = ({ studentsData, filterState }) => {
             branchId: auth.userBranchId,
             subBranchId:
                 auth.userRole === "teacher"
+                    ? null
+                    : auth.userRole === "subBranchAdmin"
                     ? auth.userSubBranchId
                     : filterState.selectedSubBranch,
             classId: filterState.selectedClass,
@@ -197,7 +199,7 @@ const StudentsPerformanceTable = ({ studentsData, filterState }) => {
 
     return (
         <DataTable
-            data={studentsData || attendanceData?.studentsData}
+            data={attendanceData?.studentsData}
             columns={studentColumns}
             searchableColumns={["name"]}
             initialSort={{ key: "name", direction: "ascending" }}

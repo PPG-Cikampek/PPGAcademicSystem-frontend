@@ -11,6 +11,7 @@ const ClassesPerformanceTable = ({
     startDate,
     endDate,
 }) => {
+    console.log(selectedSubBranch);
     console.log(data);
     const auth = useContext(AuthContext);
 
@@ -29,13 +30,13 @@ const ClassesPerformanceTable = ({
         {
             branchYearId: auth.currentBranchYearId,
             branchId: auth.userBranchId,
-            subBranchId: filterState.selectedSubBranch,
+            subBranchId: selectedSubBranch,
             startDate: startDate ? startDate.toISOString() : null,
             endDate: endDate ? endDate.toISOString() : null,
-        },
-        {
-            enabled: !data && !!selectedSubBranch,
         }
+        // {
+        //     enabled: !data && !!selectedSubBranch,
+        // }
     );
 
     attendanceData
@@ -155,11 +156,10 @@ const ClassesPerformanceTable = ({
     return (
         <DataTable
             data={
-                attendanceData
-                    ? attendanceData.studentsDataByClass
-                    : filteredData
-                    ? filteredData
-                    : data
+                auth.userRole === "subBranchAdmin" ||
+                auth.userRole === "teacher"
+                    ? data
+                    : attendanceData.studentsDataByClass
             }
             columns={clsColumns}
             searchableColumns={["name"]}
