@@ -8,6 +8,7 @@ import BranchAdminMunaqasyahView from "../munaqasyah/pages/BranchAdminMunaqasyah
 import TeachingGroupsView from "../teaching-group/page/TeachingGroupsView";
 import AddSubBranchToTeachingGroupView from "../teaching-group/page/AddSubBranchToTeachingGroupView";
 import BranchAdminMunaqasyahDetailView from "../munaqasyah/pages/BranchAdminMunaqasyahDetailView";
+import UpdateClassView from "../class/pages/UpdateClassView";
 
 const DashboardNav = lazy(() =>
     import("../shared/Components/Navigation/DashboardNav/DashboardNav")
@@ -58,6 +59,7 @@ export const branchAdminRoutes = [
     { path: "/dashboard", element: <DashboardView /> },
     { path: "/dashboard/classes", element: <SubBranchAdminClassesView /> },
     { path: "/dashboard/classes/:classId", element: <ClassDetailView /> },
+    { path: "/dashboard/classes/:classId/edit", element: <UpdateClassView /> },
     { path: "/dashboard/students", element: <StudentsView /> },
     { path: "/dashboard/students/new", element: <NewStudentView /> },
     { path: "/dashboard/students/:studentId", element: <StudentDetailView /> },
