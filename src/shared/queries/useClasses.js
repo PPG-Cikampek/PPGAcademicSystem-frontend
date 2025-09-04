@@ -68,6 +68,34 @@ export const useUpdateClassMutation = (options = {}) => {
     });
 };
 
+export const useRegisterTeacherToClassMutation = (options = {}) => {
+    const queryClient = useQueryClient();
+
+    const { onSuccess: userOnSuccess, onError: userOnError, ...rest } = options;
+
+    return useMutation({
+        mutationFn: async ({ classId, teacherId }) => {
+            const response = await api.post(`/classes/register-teacher`, {
+                classId,
+                teacherId,
+            });
+            return response.data;
+        },
+        onSuccess: (data, variables, context) => {
+            queryClient.invalidateQueries({ queryKey: ["teachers"] });
+            if (typeof userOnSuccess === "function") {
+                userOnSuccess(data, variables, context);
+            }
+        },
+        onError: (error, variables, context) => {
+            if (typeof userOnError === "function") {
+                userOnError(error, variables, context);
+            }
+        },
+        ...rest,
+    });
+};
+
 // Mutation for removing a teacher from a class
 export const useRemoveTeacherFromClassMutation = (options = {}) => {
     const queryClient = useQueryClient();
