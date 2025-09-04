@@ -5,17 +5,10 @@ import { AuthContext } from "../../shared/Components/Context/auth-context";
 import useHttp from "../../shared/hooks/http-hook";
 
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
-import Modal from "../../shared/Components/UIElements/ModalBottomClose";
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 import SkeletonLoader from "../../shared/Components/UIElements/SkeletonLoader";
 
 const AddStudentToClassView = () => {
-    const [modal, setModal] = useState({
-        title: "",
-        message: "",
-        onConfirm: null,
-    });
-    const [modalIsOpen, setModalIsOpen] = useState(false);
     const [students, setStudents] = useState();
     const [cls, setCls] = useState();
     const { isLoading, error, sendRequest, setError } = useHttp();
@@ -53,12 +46,10 @@ const AddStudentToClassView = () => {
 
         loadStudents();
         loadClassesByTeachingGroupId();
-    }, [sendRequest, modal]);
+    }, [sendRequest]);
 
     const registerStudentHandler = (studentName, studentId) => {
         const confirmRegister = async () => {
-            setModalIsOpen(false);
-
             const url = `${
                 import.meta.env.VITE_BACKEND_URL
             }/classes/register-student`;
@@ -73,10 +64,6 @@ const AddStudentToClassView = () => {
                     "Content-Type": "application/json",
                 });
 
-                setModalIsOpen(false);
-                // setModalIsOpen(true)
-                // setModal({ title: 'Berhasil!', message: responseData.message, onConfirm: null });
-
                 const updatedData = await sendRequest(
                     `${
                         import.meta.env.VITE_BACKEND_URL
@@ -89,13 +76,6 @@ const AddStudentToClassView = () => {
         };
 
         confirmRegister();
-
-        // setModal({
-        //     title: `Konfirmasi Pendaftaran`,
-        //     message: `Daftarkan peserta didik ${studentName}?`,
-        //     onConfirm: confirmRegister,
-        // });
-        // setModalIsOpen(true);
     };
 
     const getInitials = (name) => {
@@ -106,40 +86,6 @@ const AddStudentToClassView = () => {
             .toUpperCase()
             .slice(0, 2);
     };
-
-    const ModalFooter = () => (
-        <div className="flex gap-2 items-center">
-            <button
-                onClick={() => {
-                    setModalIsOpen(false);
-                }}
-                className={`${
-                    modal.onConfirm
-                        ? "btn-danger-outline"
-                        : "button-primary mt-0 "
-                } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
-                disabled={isLoading}
-            >
-                {isLoading ? (
-                    <LoadingCircle />
-                ) : modal.onConfirm ? (
-                    "Batal"
-                ) : (
-                    "Tutup"
-                )}
-            </button>
-            {modal.onConfirm && (
-                <button
-                    onClick={modal.onConfirm}
-                    className={`button-primary mt-0 ${
-                        isLoading ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
-                >
-                    {isLoading ? <LoadingCircle /> : "Ya"}
-                </button>
-            )}
-        </div>
-    );
 
     return (
         <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">
@@ -156,20 +102,6 @@ const AddStudentToClassView = () => {
                 {error && (
                     <ErrorCard error={error} onClear={() => setError(null)} />
                 )}
-
-                <Modal
-                    isOpen={modalIsOpen}
-                    onClose={() => setModalIsOpen(false)}
-                    title={modal.title}
-                    footer={<ModalFooter />}
-                >
-                    {isLoading && (
-                        <div className="flex justify-center mt-16">
-                            <LoadingCircle size={32} />
-                        </div>
-                    )}
-                    {!isLoading && modal.message}
-                </Modal>
 
                 {(!students || isLoading) && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-16">
