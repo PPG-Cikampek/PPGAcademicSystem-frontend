@@ -478,7 +478,7 @@ const ClassDetailView = () => {
                                                                             teacher._id
                                                                         );
                                                                     }}
-                                                                    className="p-3 rounded-full hover:bg-gray-200 text-red-500 hover:text-red-700 transition"
+                                                                    className="btn-icon-danger"
                                                                 >
                                                                     <Trash
                                                                         size={

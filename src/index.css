@@ -6,8 +6,10 @@
     --color-primary-darker: #0278c2;
     --color-secondary: #facc15;
     --color-secondary-subtle: #fef08a;
+    --color-secondary-darker: #eab308;
     --color-danger: #ef4444;
     --color-danger-subtle: #fca5a5;
+    --color-danger-darker: #dc2626;
 
     --font-sans: Roboto, sans-serif;
 
@@ -218,6 +220,18 @@ h3 {
 
 @utility btn-mobile-primary-round-gray {
     @apply flex items-center gap-2 px-4 py-2 border border-gray-300 hover:bg-gray-200 disabled:text-gray-500 disabled:hover:bg-white disabled:cursor-not-allowed  hover:cursor-pointer rounded-full text-sm font-medium transition-colors;
+}
+
+@utility btn-icon-primary {
+    @apply p-3 rounded-full hover:bg-gray-200 text-primary hover:text-primary-darker transition disabled:hover:bg-white hover:cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed;
+}
+
+@utility btn-icon-secondary {
+    @apply p-3 rounded-full hover:bg-gray-200 text-secondary hover:text-secondary-darker transition disabled:hover:bg-white hover:cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed;
+}
+
+@utility btn-icon-danger {
+    @apply p-3 rounded-full hover:bg-gray-200 text-danger hover:text-danger-darker transition disabled:hover:bg-white hover:cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed;
 }
 
 @utility stat-card {

@@ -106,10 +106,7 @@ const TeachingGroupsView = () => {
                     <Link
                         to={`/dashboard/teaching-groups/${teachingGroupId}/sub-branches/${item._id}`}
                     >
-                        <button
-                            className="p-3 rounded-full hover:bg-gray-200 text-blue-500 hover:text-blue-700 transition opacity-50 disabled:hover:bg-white"
-                            disabled={true}
-                        >
+                        <button className="btn-icon-primary" disabled={true}>
                             <Eye size={20} />
                         </button>
                     </Link>
@@ -120,7 +117,7 @@ const TeachingGroupsView = () => {
                                     e.stopPropagation();
                                     removeSubBranchHandler(item.name, item._id);
                                 }}
-                                className="p-3 rounded-full hover:bg-gray-200 text-red-500 hover:text-red-700 transition"
+                                className="btn-icon-danger"
                             >
                                 <Trash size={20} />
                             </button>
@@ -200,7 +197,7 @@ const TeachingGroupsView = () => {
             render: (item) => (
                 <>
                     <Link to={`/dashboard/classes/${item._id}`}>
-                        <button className="p-3 rounded-full hover:bg-gray-200 text-blue-500 hover:text-blue-700 transition">
+                        <button className="btn-icon-primary">
                             <Eye size={20} />
                         </button>
                     </Link>
@@ -224,7 +221,7 @@ const TeachingGroupsView = () => {
                                                   item._id
                                               );
                                     }}
-                                    className="p-3 rounded-full hover:bg-gray-200 text-yellow-500 hover:text-yellow-700 transition"
+                                    className="btn-icon-secondary"
                                 >
                                     <KeyRound size={20} />
                                 </button>
@@ -233,7 +230,7 @@ const TeachingGroupsView = () => {
                                         e.stopPropagation();
                                         removeClassHandler(item.name, item._id);
                                     }}
-                                    className="p-3 rounded-full hover:bg-gray-200 text-red-500 hover:text-red-700 transition"
+                                    className="btn-icon-danger"
                                 >
                                     <Trash size={20} />
                                 </button>
