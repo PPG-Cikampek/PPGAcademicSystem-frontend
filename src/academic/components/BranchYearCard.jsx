@@ -190,10 +190,9 @@ const BranchYearCard = ({
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         deleteTeachingGroupHandler(
-                                                            e,
                                                             teachingGroup.name,
                                                             teachingGroup.id
-                                                        );
+                                                        )(e);
                                                     }}
                                                     className="border-t px-4 italic text-gray-500 hover:underline hover:text-red-500 hover:cursor-pointer"
                                                 >

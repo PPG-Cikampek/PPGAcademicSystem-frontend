@@ -1,9 +1,7 @@
 import { useState, useContext, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import { AuthContext } from "../../shared/Components/Context/auth-context";
-import useHttp from "../../shared/hooks/http-hook";
-
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import { PlusIcon } from "lucide-react";
 import Modal from "../../shared/Components/UIElements/ModalBottomClose";
@@ -12,6 +10,7 @@ import ModalFooter from "../components/ModalFooter";
 
 import useBranchYearsHandlers from "../hooks/useBranchYearsHandlers";
 import BranchYearCard from "../components/BranchYearCard";
+import { useBranchYears } from "../../shared/queries";
 
 const BranchYearsView = () => {
     const [modal, setModal] = useState({
@@ -21,35 +20,29 @@ const BranchYearsView = () => {
     });
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [expandedId, setExpandedId] = useState(null);
-    const [branchYears, setBranchYears] = useState();
-    const { isLoading, error, sendRequest, setError } = useHttp();
+    const [error, setError] = useState(null);
 
     const auth = useContext(AuthContext);
-    const navigate = useNavigate();
+
+    const {
+        data: branchYears,
+        isLoading,
+        error: queryError,
+    } = useBranchYears(auth?.userBranchId, {
+        enabled: !!auth?.userBranchId,
+    });
 
     useEffect(() => {
-        const fetchBranchYears = async () => {
-            try {
-                const responseData = await sendRequest(
-                    `${import.meta.env.VITE_BACKEND_URL}/BranchYears/branch/${
-                        auth.userBranchId
-                    }`
-                );
-                setBranchYears(responseData);
-                console.log(responseData);
-            } catch (err) {
-                // Error is handled by useHttp
-            }
-        };
-        fetchBranchYears();
-    }, [sendRequest]);
+        if (queryError) setError(queryError?.message || String(queryError));
+        else setError(null);
+    }, [queryError]);
 
     const {
         activateYearHandler,
         deactivateYearHandler,
         deleteBranchYearHandler,
         deleteTeachingGroupHandler,
-    } = useBranchYearsHandlers(setModal, setModalIsOpen, setBranchYears);
+    } = useBranchYearsHandlers(setModal, setModalIsOpen);
 
     return (
         <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">
@@ -61,10 +54,6 @@ const BranchYearsView = () => {
                     </h1>
                     {auth.userRole === "branchAdmin" && (
                         <Link to="/academic/new">
-                            {/* <button className="button-primary pl-[11px]">
-              <PlusIcon className="w-4 h-4 mr-2" />
-              Daftar
-            </button> */}
                             <button className="button-primary pl-[8px]">
                                 <PlusIcon className="w-4 h-4 mr-1" />
                                 Tambah
@@ -72,6 +61,7 @@ const BranchYearsView = () => {
                         </Link>
                     )}
                 </div>
+
                 <Modal
                     isOpen={modalIsOpen}
                     onClose={() => setModalIsOpen(false)}
@@ -103,38 +93,41 @@ const BranchYearsView = () => {
 
                 {branchYears && !isLoading && (
                     <>
-                        {branchYears.branchYears.length === 0 && (
+                        {(!branchYears.branchYears ||
+                            branchYears.branchYears.length === 0) && (
                             <div className="bg-white rounded-md shadow-md p-6 border border-gray-200">
                                 <p className="text-gray-700 text-center">
                                     Belum ada tahun ajaran terdaftar.
                                 </p>
                             </div>
                         )}
-                        {branchYears.branchYears.length > 0 && (
-                            <div className="flex flex-col items-stretch gap-4">
-                                {branchYears.branchYears.map((year) => (
-                                    <BranchYearCard
-                                        key={year._id}
-                                        year={year}
-                                        expandedId={expandedId}
-                                        setExpandedId={setExpandedId}
-                                        activateYearHandler={
-                                            activateYearHandler
-                                        }
-                                        deactivateYearHandler={
-                                            deactivateYearHandler
-                                        }
-                                        deleteBranchYearHandler={
-                                            deleteBranchYearHandler
-                                        }
-                                        deleteTeachingGroupHandler={
-                                            deleteTeachingGroupHandler
-                                        }
-                                        auth={auth}
-                                    />
-                                ))}
-                            </div>
-                        )}
+
+                        {branchYears.branchYears &&
+                            branchYears.branchYears.length > 0 && (
+                                <div className="flex flex-col items-stretch gap-4">
+                                    {branchYears.branchYears.map((year) => (
+                                        <BranchYearCard
+                                            key={year._id}
+                                            year={year}
+                                            expandedId={expandedId}
+                                            setExpandedId={setExpandedId}
+                                            activateYearHandler={
+                                                activateYearHandler
+                                            }
+                                            deactivateYearHandler={
+                                                deactivateYearHandler
+                                            }
+                                            deleteBranchYearHandler={
+                                                deleteBranchYearHandler
+                                            }
+                                            deleteTeachingGroupHandler={
+                                                deleteTeachingGroupHandler
+                                            }
+                                            auth={auth}
+                                        />
+                                    ))}
+                                </div>
+                            )}
                     </>
                 )}
             </main>

@@ -1,56 +1,44 @@
 import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
-
 import { AuthContext } from "../../shared/Components/Context/auth-context";
-import useHttp from "../../shared/hooks/http-hook";
+import {
+    useActivateBranchYearMutation,
+    useDeactivateBranchYearMutation,
+    useDeleteBranchYearMutation,
+    useDeleteTeachingGroupMutation,
+} from "../../shared/queries/useBranchYears";
 import { formatAcademicYear } from "../utilities/academicUtils";
 
-const useBranchYearsHandlers = (setModal, setModalIsOpen, setBranchYears) => {
-    const { sendRequest } = useHttp();
+const useBranchYearsHandlers = (setModal, setModalIsOpen) => {
     const auth = useContext(AuthContext);
     const navigate = useNavigate();
+
+    const activateMutation = useActivateBranchYearMutation();
+    const deactivateMutation = useDeactivateBranchYearMutation();
+    const deleteBranchYearMutation = useDeleteBranchYearMutation();
+    const deleteTeachingGroupMutation = useDeleteTeachingGroupMutation();
 
     const activateYearHandler = (branchYearId, branchYearName) => (e) => {
         e.stopPropagation();
         const confirmActivate = async () => {
-            console.log("Updating ... ");
-            const url = `${
-                import.meta.env.VITE_BACKEND_URL
-            }/branchYears/activate`;
-
-            const body = JSON.stringify({
-                branchYearId: branchYearId,
-            });
-
-            console.log(body);
-
-            let responseData;
             try {
-                responseData = await sendRequest(url, "PATCH", body, {
-                    "Content-Type": "application/json",
+                const res = await activateMutation.mutateAsync({
+                    branchYearId,
+                    branchId: auth.userBranchId,
+                });
+                setModal({
+                    title: "Berhasil!",
+                    message: res.message,
+                    onConfirm: null,
                 });
             } catch (err) {
                 setModal({
                     title: "Gagal!",
-                    message: err.message,
+                    message: err?.message || err,
                     onConfirm: null,
                 });
-                setModalIsOpen(true);
-                return;
             }
-
-            setModal({
-                title: "Berhasil!",
-                message: responseData.message,
-                onConfirm: null,
-            });
-
-            const updatedData = await sendRequest(
-                `${import.meta.env.VITE_BACKEND_URL}/branchYears/branch/${
-                    auth.userBranchId
-                }`
-            );
-            setBranchYears(updatedData);
+            setModalIsOpen(true);
         };
 
         setModal({
@@ -66,37 +54,24 @@ const useBranchYearsHandlers = (setModal, setModalIsOpen, setBranchYears) => {
     const deactivateYearHandler = (branchYearName, branchYearId) => (e) => {
         e.stopPropagation();
         const confirmDelete = async () => {
-            const url = `${
-                import.meta.env.VITE_BACKEND_URL
-            }/branchYears/deactivate`;
-            const body = JSON.stringify({
-                branchYearId,
-            });
-            let responseData;
             try {
-                responseData = await sendRequest(url, "PATCH", body, {
-                    "Content-Type": "application/json",
+                const res = await deactivateMutation.mutateAsync({
+                    branchYearId,
+                    branchId: auth.userBranchId,
                 });
                 setModal({
                     title: "Berhasil!",
-                    message: responseData.message,
+                    message: res.message,
                     onConfirm: null,
                 });
-
-                const updatedData = await sendRequest(
-                    `${import.meta.env.VITE_BACKEND_URL}/branchYears/branch/${
-                        auth.userBranchId
-                    }`
-                );
-                setBranchYears(updatedData);
             } catch (err) {
                 setModal({
                     title: "Gagal!",
-                    message: err.message,
+                    message: err?.message || err,
                     onConfirm: null,
                 });
-                setModalIsOpen(true);
             }
+            setModalIsOpen(true);
         };
         setModal({
             title: `Konfirmasi`,
@@ -110,37 +85,25 @@ const useBranchYearsHandlers = (setModal, setModalIsOpen, setBranchYears) => {
 
     const deleteBranchYearHandler = (branchYearName, branchYearId) => (e) => {
         e.stopPropagation();
-        console.log(branchYearId);
         const confirmDelete = async () => {
-            const url = `${import.meta.env.VITE_BACKEND_URL}/branchYears/`;
-            const body = JSON.stringify({
-                branchYearId,
-            });
-            let responseData;
             try {
-                responseData = await sendRequest(url, "DELETE", body, {
-                    "Content-Type": "application/json",
+                const res = await deleteBranchYearMutation.mutateAsync({
+                    branchYearId,
+                    branchId: auth.userBranchId,
                 });
                 setModal({
                     title: "Berhasil!",
-                    message: responseData.message,
+                    message: res.message,
                     onConfirm: null,
                 });
-
-                const updatedData = await sendRequest(
-                    `${import.meta.env.VITE_BACKEND_URL}/branchYears/branch/${
-                        auth.userBranchId
-                    }`
-                );
-                setBranchYears(updatedData);
             } catch (err) {
                 setModal({
                     title: "Gagal!",
-                    message: err.message,
+                    message: err?.message || err,
                     onConfirm: null,
                 });
-                setModalIsOpen(true);
             }
+            setModalIsOpen(true);
         };
         setModal({
             title: `Konfirmasi Penghapusan`,
@@ -155,36 +118,24 @@ const useBranchYearsHandlers = (setModal, setModalIsOpen, setBranchYears) => {
     const deleteTeachingGroupHandler = (className, teachingGroupId) => (e) => {
         e.stopPropagation();
         const confirmDelete = async () => {
-            const url = `${import.meta.env.VITE_BACKEND_URL}/teachingGroups/`;
-            console.log(url);
-            const body = JSON.stringify({
-                teachingGroupId,
-            });
-            let responseData;
             try {
-                responseData = await sendRequest(url, "DELETE", body, {
-                    "Content-Type": "application/json",
+                const res = await deleteTeachingGroupMutation.mutateAsync({
+                    teachingGroupId,
+                    branchId: auth.userBranchId,
                 });
                 setModal({
                     title: "Berhasil!",
-                    message: responseData.message,
+                    message: res.message,
                     onConfirm: null,
                 });
-
-                const updatedData = await sendRequest(
-                    `${import.meta.env.VITE_BACKEND_URL}/branchYears/branch/${
-                        auth.userBranchId
-                    }`
-                );
-                setBranchYears(updatedData);
             } catch (err) {
                 setModal({
                     title: "Gagal!",
-                    message: err.message,
+                    message: err?.message || err,
                     onConfirm: null,
                 });
-                setModalIsOpen(true);
             }
+            setModalIsOpen(true);
         };
         setModal({
             title: `Konfirmasi Penghapusan`,

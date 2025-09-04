@@ -6,6 +6,14 @@ export {
 export { useDashboard } from "./useDashboard";
 
 export {
+    useBranchYears,
+    useActivateBranchYearMutation,
+    useDeactivateBranchYearMutation,
+    useDeleteBranchYearMutation,
+    useDeleteTeachingGroupMutation,
+} from "./useBranchYears";
+
+export {
     useAttendanceData,
     useClassData,
     useCreateAttendanceMutation,
