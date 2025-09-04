@@ -33,10 +33,10 @@ const ClassesPerformanceTable = ({
             subBranchId: selectedSubBranch,
             startDate: startDate ? startDate.toISOString() : null,
             endDate: endDate ? endDate.toISOString() : null,
+        },
+        {
+            enabled: !data,
         }
-        // {
-        //     enabled: !data && !!selectedSubBranch,
-        // }
     );
 
     attendanceData
@@ -159,7 +159,9 @@ const ClassesPerformanceTable = ({
                 auth.userRole === "subBranchAdmin" ||
                 auth.userRole === "teacher"
                     ? data
-                    : attendanceData.studentsDataByClass
+                    : attendanceData?.studentsDataByClass
+                    ? attendanceData.studentsDataByClass
+                    : filteredData
             }
             columns={clsColumns}
             searchableColumns={["name"]}
