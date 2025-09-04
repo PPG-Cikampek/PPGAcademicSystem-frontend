@@ -22,3 +22,5 @@ export {
     useLockTeachingGroupMutation,
     useLockClassMutation,
 } from "./useTeachingGroups";
+
+export { useClass, useUpdateClassMutation } from "./useClasses";
