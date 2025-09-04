@@ -57,16 +57,17 @@ class RouteErrorBoundary extends React.Component {
                                 Bersihkan cache & Login Kembali
                             </button>
                         </div>
-                        {process.env.NODE_ENV === "development" && (
-                            <details className="mt-4 text-left">
-                                <summary className="cursor-pointer text-sm text-gray-500">
-                                    Error Details (Dev Only)
-                                </summary>
-                                <pre className="mt-2 text-xs text-red-600 bg-red-50 p-2 rounded overflow-auto">
-                                    {this.state.error?.toString()}
-                                </pre>
-                            </details>
-                        )}
+                        {/* {process.env.NODE_ENV === "development" && ( */}
+                        <details className="mt-4 text-left">
+                            <summary className="cursor-pointer text-sm text-gray-500">
+                                Error Details (Dev Only)
+                            </summary>
+                            <pre className="mt-2 text-xs text-red-600 bg-red-50 p-2 rounded overflow-auto">
+                                {this.state.error?.toString()}
+                            </pre>
+                            <pre>{this.state.error?.stack.toString()}</pre>
+                        </details>
+                        {/* )} */}
                     </div>
                 </div>
             );
