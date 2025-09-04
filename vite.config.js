@@ -39,6 +39,9 @@ export default defineConfig({
         fs: {
             cachedChecks: false,
         },
+        headers: {
+            "Service-Worker-Allowed": "/",
+        },
         // proxy: { ... } // Add proxy config if needed
     },
     build: {

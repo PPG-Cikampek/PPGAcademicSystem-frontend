@@ -2,10 +2,10 @@ let CACHE_NAME = "ppg-academic-v1";
 const urlsToCache = [
     "/",
     "/index.html",
-    "/src/main.jsx",
-    "/src/App.jsx",
-    "/src/index.css",
     "/manifest.json",
+    "/version.json",
+    "/icons/icon-192x192.png",
+    "/icons/icon-512x512.png",
 ];
 
 let currentVersion = null;

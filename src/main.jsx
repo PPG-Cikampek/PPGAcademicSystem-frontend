@@ -8,20 +8,51 @@ import App from "./App.jsx";
 import MaintenanceView from "./maintenance/pages/MaintenanceView.jsx";
 import { useVersionCheck } from "./shared/hooks/useVersionCheck.js";
 import NewModal from "./shared/Components/Modal/NewModal.jsx";
+import PWAInstallPrompt from "./shared/Components/PWA/PWAInstallPrompt.jsx";
 
 // Register service worker
 if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
         navigator.serviceWorker
-            .register("/sw.js")
+            .register("/sw.js", {
+                scope: "/",
+                updateViaCache: "none",
+            })
             .then((registration) => {
                 console.log("SW registered: ", registration);
+
+                // Check for updates
+                registration.addEventListener("updatefound", () => {
+                    const newWorker = registration.installing;
+                    newWorker.addEventListener("statechange", () => {
+                        if (
+                            newWorker.state === "installed" &&
+                            navigator.serviceWorker.controller
+                        ) {
+                            // New content is available
+                            console.log(
+                                "New content is available; please refresh."
+                            );
+                        }
+                    });
+                });
             })
             .catch((registrationError) => {
                 console.log("SW registration failed: ", registrationError);
             });
     });
 }
+
+// PWA Install Detection
+let deferredPrompt;
+window.addEventListener("beforeinstallprompt", (e) => {
+    console.log("PWA install prompt available");
+    deferredPrompt = e;
+});
+
+window.addEventListener("appinstalled", (evt) => {
+    console.log("PWA was installed");
+});
 
 // Create a client
 const queryClient = new QueryClient({
@@ -44,6 +75,7 @@ const AppWrapper = () => {
             <QueryClientProvider client={queryClient}>
                 {isMaintenance ? <MaintenanceView /> : <App />}
                 <ReactQueryDevtools initialIsOpen={false} />
+                <PWAInstallPrompt />
                 <NewModal modalState={modalState} onClose={closeModal} />
             </QueryClientProvider>
         </StrictMode>
