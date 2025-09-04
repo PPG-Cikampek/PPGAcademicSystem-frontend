@@ -2,7 +2,8 @@ import { useState, useEffect, useContext } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
-import Modal from "../../shared/Components/UIElements/ModalBottomClose";
+import NewModal from "../../shared/Components/Modal/NewModal";
+import useNewModal from "../../shared/hooks/useNewModal";
 import SkeletonLoader from "../../shared/Components/UIElements/SkeletonLoader";
 
 import {
@@ -18,16 +19,16 @@ import {
     KeyRound,
 } from "lucide-react";
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
-import { useClass, useLockClassMutation, useRemoveStudentFromClassMutation, useRemoveTeacherFromClassMutation } from "../../shared/queries";
+import {
+    useClass,
+    useLockClassMutation,
+    useRemoveStudentFromClassMutation,
+    useRemoveTeacherFromClassMutation,
+} from "../../shared/queries";
 
 const ClassDetailView = () => {
     const [classData, setClassData] = useState();
-    const [modal, setModal] = useState({
-        title: "",
-        message: "",
-        onConfirm: null,
-    });
-    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const { modalState, openModal, closeModal } = useNewModal();
 
     const classId = useParams().classId;
     const auth = useContext(AuthContext);
@@ -61,31 +62,35 @@ const ClassDetailView = () => {
                     actionType: "lock",
                     teachingGroupId,
                 });
-                setModal({
-                    title: "Berhasil!",
-                    message: res?.message || "Kelas berhasil dikunci",
-                    onConfirm: null,
-                });
+                // show success notification modal
+                openModal(
+                    res?.message || "Kelas berhasil dikunci",
+                    "success",
+                    null,
+                    "Berhasil!"
+                );
             } catch (err) {
-                setModal({
-                    title: "Gagal!",
-                    message:
-                        err?.response?.data?.message ||
+                openModal(
+                    err?.response?.data?.message ||
                         err?.message ||
                         "Terjadi kesalahan",
-                    onConfirm: null,
-                });
+                    "error",
+                    null,
+                    "Gagal!"
+                );
             } finally {
                 setModalLoading(false);
             }
+            return false;
         };
 
-        setModal({
-            title: `Kunci kelas: ${className}?`,
-            message: `Kelas tidak akan bisa di-edit lagi!`,
-            onConfirm: confirmLock,
-        });
-        setModalIsOpen(true);
+        openModal(
+            `Kelas tidak akan bisa di-edit lagi!`,
+            "confirmation",
+            confirmLock,
+            `Kunci kelas: ${className}?`,
+            true
+        );
     };
 
     const unlockClassHandler = (className, classId) => {
@@ -101,31 +106,34 @@ const ClassDetailView = () => {
                     actionType: "unlock",
                     teachingGroupId,
                 });
-                setModal({
-                    title: "Berhasil!",
-                    message: res?.message || "Kelas berhasil dibuka",
-                    onConfirm: null,
-                });
+                openModal(
+                    res?.message || "Kelas berhasil dibuka",
+                    "success",
+                    null,
+                    "Berhasil!"
+                );
             } catch (err) {
-                setModal({
-                    title: "Gagal!",
-                    message:
-                        err?.response?.data?.message ||
+                openModal(
+                    err?.response?.data?.message ||
                         err?.message ||
                         "Terjadi kesalahan",
-                    onConfirm: null,
-                });
+                    "error",
+                    null,
+                    "Gagal!"
+                );
             } finally {
                 setModalLoading(false);
             }
+            return false;
         };
 
-        setModal({
-            title: `Buka kelas: ${className}?`,
-            message: `Kelas dapat di-edit kembali`,
-            onConfirm: confirmUnlock,
-        });
-        setModalIsOpen(true);
+        openModal(
+            `Kelas dapat di-edit kembali`,
+            "confirmation",
+            confirmUnlock,
+            `Buka kelas: ${className}?`,
+            true
+        );
     };
 
     const removeHandler = (role, name, id) => {
@@ -137,41 +145,46 @@ const ClassDetailView = () => {
                         classId,
                         teacherId: id,
                     });
-                    setModal({
-                        title: "Berhasil!",
-                        message: res?.message || "Guru dihapus",
-                        onConfirm: null,
-                    });
+                    openModal(
+                        res?.message || "Guru dihapus",
+                        "success",
+                        null,
+                        "Berhasil!"
+                    );
                 } else {
                     const res = await removeStudentMutation.mutateAsync({
                         classId,
                         studentId: id,
                     });
-                    setModal({
-                        title: "Berhasil!",
-                        message: res?.message || "Siswa dihapus",
-                        onConfirm: null,
-                    });
+                    openModal(
+                        res?.message || "Siswa dihapus",
+                        "success",
+                        null,
+                        "Berhasil!"
+                    );
                 }
-                setModal({
-                    title: "Gagal!",
-                    message:
-                        err?.response?.data?.message ||
+            } catch (err) {
+                openModal(
+                    err?.response?.data?.message ||
                         err?.message ||
                         "Terjadi kesalahan",
-                    onConfirm: null,
-                });
+                    "error",
+                    null,
+                    "Gagal!"
+                );
             } finally {
                 setModalLoading(false);
             }
+            return false;
         };
 
-        setModal({
-            title: `Konfirmasi Penghapusan`,
-            message: `Hapus ${name} dari kelas ini?`,
-            onConfirm: confirmRemove,
-        });
-        setModalIsOpen(true);
+        openModal(
+            `Hapus ${name} dari kelas ini?`,
+            "confirmation",
+            confirmRemove,
+            "Konfirmasi Penghapusan",
+            true
+        );
     };
 
     const getInitials = (gender) => {
@@ -183,58 +196,18 @@ const ClassDetailView = () => {
             .slice(0, 2);
     };
 
-    const ModalFooter = () => (
-        <div className="flex gap-2 items-center">
-            <button
-                onClick={() => {
-                    setModalIsOpen(false);
-                }}
-                className={`${
-                    modal.onConfirm
-                        ? "btn-danger-outline"
-                        : "button-primary mt-0 "
-                } ${modalLoading ? "opacity-50 cursor-not-allowed" : ""}`}
-                disabled={modalLoading}
-            >
-                {modalLoading ? (
-                    <LoadingCircle />
-                ) : modal.onConfirm ? (
-                    "Batal"
-                ) : (
-                    "Tutup"
-                )}
-            </button>
-            {modal.onConfirm && (
-                <button
-                    onClick={modal.onConfirm}
-                    className={`button-primary mt-0 ${
-                        modalLoading ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
-                >
-                    {modalLoading ? <LoadingCircle /> : "Ya"}
-                </button>
-            )}
-        </div>
-    );
+    // ModalFooter replaced by NewModal's built-in actions
 
     return (
         <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8 pb-24">
             <div className="max-w-6xl mx-auto">
-                <Modal
-                    isOpen={modalIsOpen}
-                    onClose={() => setModalIsOpen(false)}
-                    title={modal.title}
-                    footer={<ModalFooter />}
-                >
-                    {isLoading && (
-                        <div className="flex justify-center mt-16">
-                            <LoadingCircle size={32} />
-                        </div>
-                    )}
-                    {!isLoading && modal.message}
-                </Modal>
+                <NewModal
+                    modalState={modalState}
+                    onClose={closeModal}
+                    isLoading={modalLoading}
+                />
 
-                {(!classData || isLoading) && !modalIsOpen && (
+                {(!classData || isLoading) && (
                     <div className="flex flex-col gap-6 mt-16 px-4">
                         <SkeletonLoader
                             variant="text"
