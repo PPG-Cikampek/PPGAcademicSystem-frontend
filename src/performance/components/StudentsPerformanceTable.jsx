@@ -8,7 +8,7 @@ import { AuthContext } from "../../shared/Components/Context/auth-context";
 const StudentsPerformanceTable = ({ studentsData, filterState }) => {
     const auth = useContext(AuthContext);
 
-    const { data: attendanceData } = useAttendancePerformance(
+    const { data: attendanceData, isLoading } = useAttendancePerformance(
         {
             ...(filterState.selectedAcademicYear
                 ? { academicYearId: filterState.selectedAcademicYear }
@@ -210,6 +210,7 @@ const StudentsPerformanceTable = ({ studentsData, filterState }) => {
                 showPagination: false,
                 entriesOptions: [10, 20, 30],
             }}
+            isLoading={isLoading}
         />
     );
 };

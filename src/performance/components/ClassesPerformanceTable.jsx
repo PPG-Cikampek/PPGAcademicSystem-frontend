@@ -25,7 +25,7 @@ const ClassesPerformanceTable = ({
         );
     }
 
-    const { data: attendanceData } = useAttendancePerformance(
+    const { data: attendanceData, isLoading } = useAttendancePerformance(
         {
             branchYearId: auth.currentBranchYearId,
             branchId: auth.userBranchId,
@@ -173,6 +173,7 @@ const ClassesPerformanceTable = ({
                 showPagination: false,
                 entriesOptions: [10, 20, 30],
             }}
+            isLoading={isLoading}
         />
     );
 };
