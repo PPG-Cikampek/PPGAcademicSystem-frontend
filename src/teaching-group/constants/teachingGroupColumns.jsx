@@ -4,7 +4,8 @@ import { Link } from "react-router-dom";
 export const subBranchColumns = (
     teachingGroupId,
     teachingGroupData,
-    removeSubBranchHandler
+    removeSubBranchHandler,
+    userRole
 ) => [
     {
         key: "name",
@@ -57,7 +58,7 @@ export const subBranchColumns = (
                     </button>
                 </Link>
                 {teachingGroupData?.branchYearId?.academicYearId.isActive &&
-                    teachingGroupData?.isLocked === false && (
+                    teachingGroupData?.isLocked === false && userRole === "branchAdmin" && (
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();

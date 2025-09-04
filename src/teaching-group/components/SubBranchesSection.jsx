@@ -13,7 +13,8 @@ const SubBranchesSection = ({
     const columns = subBranchColumns(
         teachingGroupId,
         teachingGroupData,
-        removeSubBranchHandler
+        removeSubBranchHandler,
+        auth.userRole
     );
 
     return (
