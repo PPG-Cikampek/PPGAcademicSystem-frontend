@@ -76,7 +76,11 @@ const AppWrapper = () => {
                 {isMaintenance ? <MaintenanceView /> : <App />}
                 <ReactQueryDevtools initialIsOpen={false} />
                 <PWAInstallPrompt />
-                <NewModal modalState={modalState} onClose={closeModal} />
+                <NewModal
+                    modalState={modalState}
+                    onClose={closeModal}
+                    cancelText="Nanti"
+                />
             </QueryClientProvider>
         </StrictMode>
     );

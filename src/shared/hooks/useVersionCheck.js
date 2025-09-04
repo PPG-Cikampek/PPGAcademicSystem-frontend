@@ -69,7 +69,7 @@ export function useVersionCheck() {
                 console.log("SW detected update:", event.data.newVersion);
                 // Optionally, show update prompt or auto-update
                 openModal(
-                    "Versi baru aplikasi tersedia. Apakah Anda ingin memuat ulang untuk memperbarui?",
+                    "Versi baru aplikasi tersedia. Apakah Anda ingin memperbarui sekarang?",
                     "confirmation",
                     async () => {
                         await clearCacheAndReload();
