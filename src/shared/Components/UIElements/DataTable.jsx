@@ -337,7 +337,7 @@ const DataTable = ({
                     </thead>
                     <tbody className="divide-y divide-gray-200">
                         {isLoading ? (
-                            Array(entriesPerPage)
+                            Array(5 || entriesPerPage)
                                 .fill(0)
                                 .map((_, index) => <SkeletonRow key={index} />)
                         ) : (
