@@ -130,8 +130,18 @@ const NewModal = ({
                 beforeClose: "modal-exit opacity-0 scale-95",
             }}
             closeTimeoutMS={300}
-            shouldCloseOnOverlayClick={true}
-            shouldCloseOnEsc={true}
+            shouldCloseOnOverlayClick={
+                !onConfirm &&
+                (type === "success" || type === "error" || type === "info")
+                    ? false
+                    : true
+            }
+            shouldCloseOnEsc={
+                !onConfirm &&
+                (type === "success" || type === "error" || type === "info")
+                    ? false
+                    : true
+            }
             onAfterOpen={onAfterOpen}
             onAfterClose={onAfterClose}
         >
@@ -192,12 +202,16 @@ const NewModal = ({
                         )}
                         <button
                             onClick={async () => {
-                                let shouldClose = true;
+                                // If this is a confirmation modal (has onConfirm), execute it
                                 if (onConfirm) {
+                                    let shouldClose = true;
                                     const result = await onConfirm();
                                     if (result === false) shouldClose = false;
+                                    if (shouldClose) onClose();
+                                } else {
+                                    // For notification modals (success, error, info), just close
+                                    onClose();
                                 }
-                                if (shouldClose) onClose();
                             }}
                             disabled={isLoading}
                             className={`

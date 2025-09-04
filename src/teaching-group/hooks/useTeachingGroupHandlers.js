@@ -37,12 +37,19 @@ export const useTeachingGroupHandlers = (
                     "md"
                 );
             } catch (err) {
-                setError(
+                openModal(
                     err.response?.data?.message ||
                         err.message ||
-                        "Failed to remove sub-branch"
+                        "Gagal menghapus kelompok!",
+                    "error",
+                    null,
+                    "Gagal!",
+                    false,
+                    "md"
                 );
             }
+            // Keep modal open and replace content with success/error
+            return false;
         };
         openModal(
             `Hapus ${name} KBM ini?`,
@@ -84,6 +91,8 @@ export const useTeachingGroupHandlers = (
                     "md"
                 );
             }
+            // Keep modal open and replace content with success/error
+            return false;
         };
         if (actionType === "lock") {
             openModal(
@@ -127,7 +136,19 @@ export const useTeachingGroupHandlers = (
                         err.message ||
                         "Failed to remove class"
                 );
+                openModal(
+                    err.response?.data?.message ||
+                        err.message ||
+                        "Failed to remove class",
+                    "error",
+                    null,
+                    "Gagal!",
+                    false,
+                    "md"
+                );
             }
+            // Keep modal open and replace content with success/error
+            return false;
         };
         openModal(
             `Hapus ${name} dari KBM ini?`,
@@ -168,6 +189,8 @@ export const useTeachingGroupHandlers = (
                     "md"
                 );
             }
+            // Keep modal open and replace content with success/error
+            return false;
         };
         if (actionType === "lock") {
             openModal(
