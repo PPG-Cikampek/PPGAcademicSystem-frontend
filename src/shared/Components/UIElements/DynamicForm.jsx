@@ -187,7 +187,7 @@ const DynamicForm = ({
                                         {...register(field.name, {
                                             required: field.required,
                                             pattern: {
-                                                value: /^8[1-9][0-9]{6,9}$/,
+                                                value: /^8[1-9][0-9]{6,12}$/,
                                                 message:
                                                     "Nomor tidak valid! (contoh valid: 8123456789)",
                                             },
