@@ -49,7 +49,7 @@ const PWAInstallPrompt = () => {
 
     return (
         <div className="fixed bottom-4 right-4 z-50">
-            <div className="bg-blue-600 text-white p-4 rounded-lg shadow-lg max-w-sm">
+            <div className="bg-primary text-white p-4 rounded-lg shadow-lg max-w-sm">
                 <div className="flex items-start gap-3">
                     <div className="flex-1">
                         <h3 className="font-semibold text-sm">
@@ -59,27 +59,23 @@ const PWAInstallPrompt = () => {
                             Install E-Siakad PPG?
                         </p>
                     </div>
-                    <div className="flex gap-2">
-                        <button
-                            onClick={() => setShowInstallButton(false)}
-                            className="text-white/70 hover:text-white text-sm"
-                        >
-                            ✕
-                        </button>
-                    </div>
+                    <button
+                        onClick={() => setShowInstallButton(false)}
+                        className="btn-icon-white inline-flex items-center justify-center w-8 h-8 text-sm"
+                        aria-label="Close install prompt"
+                    >
+                        ✕
+                    </button>
                 </div>
                 <div className="flex gap-2 mt-3">
-                    <button
-                        onClick={onClick}
-                        className="bg-white text-blue-600 px-3 py-1 rounded text-sm font-medium hover:bg-gray-100"
-                    >
+                    <button onClick={onClick} className="btn-round-white">
                         Install
                     </button>
                     <button
                         onClick={() => setShowInstallButton(false)}
-                        className="text-white/70 hover:text-white text-sm px-2"
+                        className="text-white/70 hover:text-white text-sm px-2 hover:cursor-pointer"
                     >
-                        Tutup
+                        Nanti
                     </button>
                 </div>
             </div>

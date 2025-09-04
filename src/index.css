@@ -230,6 +230,14 @@ h4 {
     @apply flex items-center gap-2 px-4 py-2 border border-danger-darker hover:bg-danger active:bg-danger disabled:text-gray-500 disabled:hover:bg-white disabled:cursor-not-allowed  hover:cursor-pointer rounded-full text-sm font-medium transition-colors;
 }
 
+@utility btn-round-white {
+    @apply flex text-gray-700 items-center gap-2 px-4 py-2 border border-white bg-white hover:bg-gray-200 active:bg-gray-200 disabled:text-gray-500 disabled:hover:bg-gray-400 disabled:cursor-not-allowed  hover:cursor-pointer rounded-full text-sm font-medium transition-colors;
+}
+
+@utility btn-icon-white {
+    @apply p-3 rounded-full hover:bg-gray-200 text-white hover:text-gray-700 transition disabled:hover:bg-white hover:cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed;
+}
+
 @utility btn-icon-primary {
     @apply p-3 rounded-full hover:bg-gray-200 text-primary hover:text-primary-darker transition disabled:hover:bg-white hover:cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed;
 }
