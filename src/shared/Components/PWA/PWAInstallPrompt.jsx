@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 
 const PWAInstallPrompt = () => {
+    const STORAGE_KEY = "pwa_install_prompt_dismissed";
     const [supportsPWA, setSupportsPWA] = useState(false);
     const [promptInstall, setPromptInstall] = useState(null);
     const [showInstallButton, setShowInstallButton] = useState(false);
@@ -8,6 +9,10 @@ const PWAInstallPrompt = () => {
     useEffect(() => {
         const handler = (e) => {
             e.preventDefault();
+            // don't show if user has dismissed previously
+            const dismissed = localStorage.getItem(STORAGE_KEY) === "true";
+            if (dismissed) return;
+
             setSupportsPWA(true);
             setPromptInstall(e);
             setShowInstallButton(true);
@@ -21,6 +26,16 @@ const PWAInstallPrompt = () => {
             window.matchMedia("(display-mode: standalone)").matches
         ) {
             setShowInstallButton(false);
+        }
+
+        // If user previously chose "Nanti", don't show the prompt
+        try {
+            const dismissed = localStorage.getItem(STORAGE_KEY) === "true";
+            if (dismissed) {
+                setShowInstallButton(false);
+            }
+        } catch (err) {
+            // ignore localStorage errors
         }
 
         return () => window.removeEventListener("beforeinstallprompt", handler);
@@ -72,7 +87,14 @@ const PWAInstallPrompt = () => {
                         Install
                     </button>
                     <button
-                        onClick={() => setShowInstallButton(false)}
+                        onClick={() => {
+                            try {
+                                localStorage.setItem(STORAGE_KEY, "true");
+                            } catch (err) {
+                                /* ignore */
+                            }
+                            setShowInstallButton(false);
+                        }}
                         className="text-white/70 hover:text-white text-sm px-2 hover:cursor-pointer"
                     >
                         Nanti
