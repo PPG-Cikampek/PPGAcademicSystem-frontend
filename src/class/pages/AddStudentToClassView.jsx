@@ -1,81 +1,45 @@
-import { useState, useContext, useEffect } from "react";
+import { useContext, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { AuthContext } from "../../shared/Components/Context/auth-context";
-import useHttp from "../../shared/hooks/http-hook";
-
-import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 import SkeletonLoader from "../../shared/Components/UIElements/SkeletonLoader";
+import { useClass, useRegisterStudentToClassMutation, useStudents } from "../../shared/queries";
 
 const AddStudentToClassView = () => {
-    const [students, setStudents] = useState();
-    const [cls, setCls] = useState();
-    const { isLoading, error, sendRequest, setError } = useHttp();
-
     const navigate = useNavigate();
     const auth = useContext(AuthContext);
     const targetSubBranchId = auth.userSubBranchId;
 
     const classId = useParams().classId;
 
-    useEffect(() => {
-        const loadStudents = async () => {
-            try {
-                const responseData = await sendRequest(
-                    `${
-                        import.meta.env.VITE_BACKEND_URL
-                    }/students/sub-branch/${targetSubBranchId}`
-                );
-                setStudents(responseData.students);
-                console.log(responseData.students);
-            } catch (err) {
-                // Error handled by useHttp
-            }
-        };
-        const loadClassesByTeachingGroupId = async () => {
-            try {
-                const responseData = await sendRequest(
-                    `${import.meta.env.VITE_BACKEND_URL}/classes/${classId}`
-                );
-                // setCls(responseData.class);
-                console.log(responseData.class);
-                setCls(responseData.class);
-            } catch (err) {}
-        };
+    // React Query: fetch students and class data
+    const {
+        data: students,
+        isLoading: isStudentsLoading,
+        error: studentsError,
+        refetch: refetchStudents,
+    } = useStudents(targetSubBranchId);
 
-        loadStudents();
-        loadClassesByTeachingGroupId();
-    }, [sendRequest]);
+    const {
+        data: cls,
+        isLoading: isClassLoading,
+        error: classError,
+    } = useClass(classId);
 
-    const registerStudentHandler = (studentName, studentId) => {
-        const confirmRegister = async () => {
-            const url = `${
-                import.meta.env.VITE_BACKEND_URL
-            }/classes/register-student`;
-            const body = JSON.stringify({
-                classId,
-                studentId,
-            });
-            console.log(body);
-            let responseData;
-            try {
-                responseData = await sendRequest(url, "POST", body, {
-                    "Content-Type": "application/json",
-                });
+    const isLoading = isStudentsLoading || isClassLoading;
+    const error = studentsError || classError;
 
-                const updatedData = await sendRequest(
-                    `${
-                        import.meta.env.VITE_BACKEND_URL
-                    }/students/sub-branch/${targetSubBranchId}`
-                );
-                setStudents(updatedData.students);
-            } catch (err) {
-                // Error is already handled by useHttp
-            }
-        };
+    const { mutate: registerStudentToClass, isPending: isRegistering } =
+        useRegisterStudentToClassMutation({
+            onSuccess: () => {
+                // Ensure the students list refreshes to reflect registration state
+                refetchStudents();
+            },
+        });
 
-        confirmRegister();
+    const registerStudentHandler = (_studentName, studentId) => {
+        registerStudentToClass({ classId, studentId });
     };
 
     const getInitials = (name) => {
@@ -100,7 +64,7 @@ const AddStudentToClassView = () => {
                 )}
 
                 {error && (
-                    <ErrorCard error={error} onClear={() => setError(null)} />
+                    <ErrorCard error={error?.message || "Terjadi kesalahan"} onClear={() => { /* no-op for react-query */ }} />
                 )}
 
                 {(!students || isLoading) && (
@@ -145,6 +109,8 @@ const AddStudentToClassView = () => {
                                 </p>
                             </div>
                         )}
+                        {students && console.log(students)}
+                        {cls && console.log(cls)}
                         {students.length > 0 && (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {students.map((student) => {
@@ -160,7 +126,7 @@ const AddStudentToClassView = () => {
                                             (c) =>
                                                 c.teachingGroupId &&
                                                 c.teachingGroupId._id ===
-                                                    cls.teachingGroupId
+                                                    cls.teachingGroupId._id
                                         );
                                     };
 

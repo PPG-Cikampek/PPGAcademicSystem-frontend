@@ -170,3 +170,38 @@ export const useRemoveStudentFromClassMutation = (options = {}) => {
         ...rest,
     });
 };
+
+// Mutation for registering a student to a class
+export const useRegisterStudentToClassMutation = (options = {}) => {
+    const queryClient = useQueryClient();
+
+    const { onSuccess: userOnSuccess, onError: userOnError, ...rest } = options;
+
+    return useMutation({
+        mutationFn: async ({ classId, studentId }) => {
+            const response = await api.post(`/classes/register-student`, {
+                classId,
+                studentId,
+            });
+            return response.data;
+        },
+        onSuccess: (data, variables, context) => {
+            // Refresh the class and students list caches
+            if (variables?.classId) {
+                queryClient.invalidateQueries({ queryKey: ["class", variables.classId] });
+            }
+            // Invalidate any students lists; if caller passes subBranchId via context/options, they can also manually invalidate
+            queryClient.invalidateQueries({ queryKey: ["students"] });
+
+            if (typeof userOnSuccess === "function") {
+                userOnSuccess(data, variables, context);
+            }
+        },
+        onError: (error, variables, context) => {
+            if (typeof userOnError === "function") {
+                userOnError(error, variables, context);
+            }
+        },
+        ...rest,
+    });
+};

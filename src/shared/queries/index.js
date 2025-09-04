@@ -31,6 +31,8 @@ export {
     useLockClassMutation,
 } from "./useTeachingGroups";
 
-export { useClass, useUpdateClassMutation, useRegisterTeacherToClassMutation, useRemoveTeacherFromClassMutation, useRemoveStudentFromClassMutation } from "./useClasses";
+export { useClass, useUpdateClassMutation, useRegisterTeacherToClassMutation, useRemoveTeacherFromClassMutation, useRemoveStudentFromClassMutation, useRegisterStudentToClassMutation } from "./useClasses";
 
 export { useTeachers } from "./useTeachers";
+
+export { useStudents } from "./useStudents";
