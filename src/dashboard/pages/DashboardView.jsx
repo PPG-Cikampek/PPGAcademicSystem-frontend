@@ -109,8 +109,8 @@ const DashboardView = () => {
                             <Gauge className="size-8 md:size-10" />
                             <div className="flex flex-col">
                                 <h1 className="text-2xl font-bold truncate">
-                                    {dashboardData.dashboardData?.Kehadiran
-                                        ? `${dashboardData.dashboardData.Kehadiran.toFixed(
+                                    {dashboardData.dashboardData?.Kehadiran?.[0]?.attendancePercentage
+                                        ? `${dashboardData.dashboardData.Kehadiran[0].attendancePercentage.toFixed(
                                               1
                                           )}%`
                                         : "-"}
@@ -120,6 +120,30 @@ const DashboardView = () => {
                                 </p>
                             </div>
                         </div>
+                        {/* {dashboardData.dashboardData?.Kehadiran?.map(
+                            (item, index) => (
+                                <div
+                                    key={index}
+                                    className="card-interactive rounded-md gap-4 flex items-center justify-start border-0 border-b-4 border-secondary p-4 md:p-6 lg:p-8 m-0 w-full h-full min-h-[120px] overflow-hidden"
+                                >
+                                    <Gauge className="size-8 md:size-10" />
+                                    <div className="flex flex-col">
+                                        <h1 className="text-2xl font-bold truncate">
+                                            {item.attendancePercentage
+                                                ? `${item.attendancePercentage.toFixed(
+                                                      1
+                                                  )}%`
+                                                : "-"}
+                                        </h1>
+                                        <p className="truncate text-sm">
+                                            {`${academicYearFormatter(
+                                                item.academicYearName
+                                            )}`}
+                                        </p>
+                                    </div>
+                                </div>
+                            )
+                        )} */}
                     </div>
                 )}
             </main>
