@@ -7,6 +7,7 @@ import {
     FiAlertCircle,
 } from "react-icons/fi";
 import { useState, useEffect } from "react";
+import LoadingCircle from "../UIElements/LoadingCircle";
 
 // Set the app element for accessibility
 if (typeof window !== "undefined") {
@@ -18,7 +19,7 @@ const NewModal = ({
     onClose,
     children,
     confirmText = "OK",
-    cancelText = "Cancel",
+    cancelText = "Batal",
     isLoading = false,
 }) => {
     const { isOpen, message, type, title, onConfirm, showCancel, size } =
@@ -221,7 +222,11 @@ const NewModal = ({
                 ${isLoading ? "opacity-50 cursor-not-allowed" : ""}
               `}
                         >
-                            {confirmText}
+                            {isLoading ? (
+                                <LoadingCircle>Memroses...</LoadingCircle>
+                            ) : (
+                                confirmText
+                            )}
                         </button>
                     </div>
                 </div>
