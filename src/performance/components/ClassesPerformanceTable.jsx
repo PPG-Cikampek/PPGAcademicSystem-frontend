@@ -74,18 +74,22 @@ const ClassesPerformanceTable = ({
                 </div>
             ),
         },
-        {
-            key: "late",
-            label: "Terlambat",
-            sortable: true,
-            cellAlign: "center",
-            headerAlign: "center",
-            render: (cls) => (
-                <div className="badge-primary w-12 place-self-center text-center">
-                    {cls?.attendances?.Terlambat || 0}%
-                </div>
-            ),
-        },
+        ...(auth.userRole === "admin"
+            ? [
+                  {
+                      key: "late",
+                      label: "Terlambat",
+                      sortable: true,
+                      cellAlign: "center",
+                      headerAlign: "center",
+                      render: (cls) => (
+                          <div className="badge-primary w-12 place-self-center text-center">
+                              {cls?.attendances?.Terlambat || 0}%
+                          </div>
+                      ),
+                  },
+              ]
+            : []),
         {
             key: "permission",
             label: "Izin",

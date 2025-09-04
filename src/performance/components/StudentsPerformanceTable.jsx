@@ -106,18 +106,22 @@ const StudentsPerformanceTable = ({ studentsData, filterState }) => {
                     </div>
                 ),
             },
-            {
-                key: "late",
-                label: "Terlambat",
-                sortable: true,
-                cellAlign: "center",
-                headerAlign: "center",
-                render: (student) => (
-                    <div className="badge-primary w-12 place-self-center text-center">
-                        {student.attendances.Terlambat}%
-                    </div>
-                ),
-            },
+            ...(auth.userRole === "admin"
+                ? [
+                      {
+                          key: "late",
+                          label: "Terlambat",
+                          sortable: true,
+                          cellAlign: "center",
+                          headerAlign: "center",
+                          render: (student) => (
+                              <div className="badge-primary w-12 place-self-center text-center">
+                                  {student.attendances.Terlambat}%
+                              </div>
+                          ),
+                      },
+                  ]
+                : []),
             {
                 key: "permission",
                 label: "Izin",

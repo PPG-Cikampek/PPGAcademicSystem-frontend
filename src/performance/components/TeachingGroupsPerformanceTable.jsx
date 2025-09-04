@@ -6,6 +6,8 @@ const TeachingGroupsPerformanceTable = ({
     filterState,
     setFilterState,
 }) => {
+    const userRole = JSON.parse(localStorage.getItem("userData")).role;
+
     const teachingGroupColumns = useMemo(() => [
         {
             key: "teachingGroupName",
@@ -34,18 +36,22 @@ const TeachingGroupsPerformanceTable = ({
                 </div>
             ),
         },
-        {
-            key: "late",
-            label: "Terlambat",
-            sortable: true,
-            cellAlign: "center",
-            headerAlign: "center",
-            render: (teachingGroup) => (
-                <div className="badge-primary w-12 place-self-center text-center">
-                    {teachingGroup?.attendances?.Terlambat || 0}%
-                </div>
-            ),
-        },
+        ...(userRole === "admin"
+            ? [
+                  {
+                      key: "late",
+                      label: "Terlambat",
+                      sortable: true,
+                      cellAlign: "center",
+                      headerAlign: "center",
+                      render: (teachingGroup) => (
+                          <div className="badge-primary w-12 place-self-center text-center">
+                              {teachingGroup?.attendances?.Terlambat || 0}%
+                          </div>
+                      ),
+                  },
+              ]
+            : []),
         {
             key: "permission",
             label: "Izin",

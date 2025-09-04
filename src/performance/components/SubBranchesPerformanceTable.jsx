@@ -11,6 +11,8 @@ const SubBranchesPerformanceTable = ({ data, filterState, setFilterState }) => {
         [data, filterState.selectedTeachingGroup]
     );
 
+    const userRole = JSON.parse(localStorage.getItem("userData")).role;
+
     const subBranchColumns = useMemo(() => [
         {
             key: "subBranchName",
@@ -39,18 +41,22 @@ const SubBranchesPerformanceTable = ({ data, filterState, setFilterState }) => {
                 </div>
             ),
         },
-        {
-            key: "late",
-            label: "Terlambat",
-            sortable: true,
-            cellAlign: "center",
-            headerAlign: "center",
-            render: (subBranch) => (
-                <div className="badge-primary w-12 place-self-center text-center">
-                    {subBranch?.attendances?.Terlambat || 0}%
-                </div>
-            ),
-        },
+        ...(userRole === "admin"
+            ? [
+                  {
+                      key: "late",
+                      label: "Terlambat",
+                      sortable: true,
+                      cellAlign: "center",
+                      headerAlign: "center",
+                      render: (subBranch) => (
+                          <div className="badge-primary w-12 place-self-center text-center">
+                              {subBranch?.attendances?.Terlambat || 0}%
+                          </div>
+                      ),
+                  },
+              ]
+            : []),
         {
             key: "permission",
             label: "Izin",
