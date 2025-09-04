@@ -582,7 +582,7 @@ const BranchPerformanceView = () => {
                                                 !filterState.selectedAcademicYear ||
                                                 isLoading
                                             }
-                                            className="btn-mobile-primary-round-gray"
+                                            className="btn-round-gray"
                                         >
                                             {isLoading ? (
                                                 <span>
@@ -682,7 +682,7 @@ const BranchPerformanceView = () => {
                                 <h2>Performa KBM</h2>
                                 <div className="flex gap-2 no-print">
                                     <button
-                                        className="btn-mobile-primary-round-gray"
+                                        className="btn-round-gray"
                                         onClick={() =>
                                             setFilterState((prev) => ({
                                                 ...prev,
@@ -708,7 +708,7 @@ const BranchPerformanceView = () => {
                                 <h2>Performa Kelompok</h2>
                                 <div className="flex gap-2 no-print">
                                     <button
-                                        className="btn-mobile-primary-round-gray"
+                                        className="btn-round-gray"
                                         onClick={() =>
                                             setFilterState((prev) => ({
                                                 ...prev,
@@ -737,7 +737,7 @@ const BranchPerformanceView = () => {
                                 <h2>Performa Kelas</h2>
                                 <div className="flex gap-2 no-print">
                                     <button
-                                        className="btn-mobile-primary-round-gray"
+                                        className="btn-round-gray"
                                         onClick={() =>
                                             setFilterState((prev) => ({
                                                 ...prev,

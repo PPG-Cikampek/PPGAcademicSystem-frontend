@@ -17,7 +17,7 @@ const BackButton = ({ label = "kembali", className = "" }) => {
                         : window.history.back()
                     : window.history.back();
             }}
-            className={`btn-mobile-primary-round-gray pl-2 m-0 ${className}`}
+            className={`btn-round-gray pl-2 m-0 ${className}`}
         >
             <span className="flex items-center">
                 <ChevronLeft size={20} /> {label}

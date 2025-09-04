@@ -48,7 +48,7 @@ const ScoreCard = ({ category, score, onClick }) => {
                 <div className="flex gap-2 items-center">
                     {score.examinerUserId.id === auth.userId && (
                         <button
-                            className="btn-mobile-primary-round-gray bg-white"
+                            className="btn-round-gray bg-white"
                             onClick={(e) => {
                                 e.stopPropagation();
                                 onClick();
@@ -63,7 +63,7 @@ const ScoreCard = ({ category, score, onClick }) => {
                 </div>
             ) : (
                 <button
-                    className="btn-mobile-primary-round-gray"
+                    className="btn-round-gray"
                     onClick={(e) => {
                         e.stopPropagation();
                         onClick();

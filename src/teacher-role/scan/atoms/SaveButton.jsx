@@ -5,7 +5,7 @@ const SaveButton = ({ onClick, disabled, isLoading }) => {
     return (
         <button
             onClick={onClick}
-            className="btn-mobile-primary-round"
+            className="btn-round-primary"
             disabled={disabled}
         >
             {isLoading ? <LoadingCircle>Menyimpan...</LoadingCircle> : "Simpan"}

@@ -633,7 +633,7 @@ const SubBranchPerformanceView = () => {
                                                 !filterState.selectedAcademicYear ||
                                                 isLoading
                                             }
-                                            className="btn-mobile-primary-round-gray"
+                                            className="btn-round-gray"
                                         >
                                             {isLoading ? (
                                                 <span>
@@ -772,7 +772,7 @@ const SubBranchPerformanceView = () => {
                                 <h2>Performa Kelas</h2>
                                 <div className="flex gap-2 no-print">
                                     <button
-                                        className="btn-mobile-primary-round-gray"
+                                        className="btn-round-gray"
                                         onClick={() =>
                                             setFilterState((prev) => ({
                                                 ...prev,

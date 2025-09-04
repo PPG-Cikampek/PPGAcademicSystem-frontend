@@ -570,7 +570,7 @@ const StudentReportView = ({
                     <div className="md:hidden">
                         <button
                             onClick={generatePDF}
-                            className="btn-mobile-primary-round text-xs flex items-center m-0 mr-2 p-2 pr-3"
+                            className="btn-round-primary text-xs flex items-center m-0 mr-2 p-2 pr-3"
                             disabled={isLoading}
                         >
                             {!isLoading && <FileDown size={18} />}

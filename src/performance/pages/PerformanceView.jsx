@@ -547,7 +547,7 @@ const PerformanceView = () => {
                                                 !filterState.selectedAcademicYear ||
                                                 isLoading
                                             }
-                                            className="btn-mobile-primary-round-gray"
+                                            className="btn-round-gray"
                                         >
                                             {isLoading
                                                 ? "Memuat..."

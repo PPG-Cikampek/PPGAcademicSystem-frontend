@@ -218,15 +218,15 @@ h4 {
     @apply p-2 px-4 rounded-md border border-primary bg-primary hover:cursor-pointer scale-100 active:scale-[1.01] active:ring-2 focus:ring-2 text-white disabled:opacity-55 ease-out transition-all duration-200;
 }
 
-@utility btn-mobile-primary-round {
-    @apply p-2 px-4 rounded-full border border-primary bg-primary hover:cursor-pointer scale-100 active:scale-[1.01] active:ring-2 focus:ring-2 text-white disabled:opacity-60 ease-out transition-all duration-200;
+@utility btn-round-primary {
+    @apply p-2 px-4 rounded-full border border-primary bg-primary active:bg-primary-darker hover:bg-primary-darker hover:cursor-pointer focus:ring-2 text-white disabled:opacity-60 ease-out transition-all duration-200;
 }
 
-@utility btn-mobile-primary-round-gray {
+@utility btn-round-gray {
     @apply flex items-center gap-2 px-4 py-2 border border-gray-300 hover:bg-gray-200 active:bg-gray-200 disabled:text-gray-500 disabled:hover:bg-white disabled:cursor-not-allowed  hover:cursor-pointer rounded-full text-sm font-medium transition-colors;
 }
 
-@utility btn-mobile-danger-round {
+@utility btn-round-danger {
     @apply flex items-center gap-2 px-4 py-2 border border-danger-darker hover:bg-danger active:bg-danger disabled:text-gray-500 disabled:hover:bg-white disabled:cursor-not-allowed  hover:cursor-pointer rounded-full text-sm font-medium transition-colors;
 }
 

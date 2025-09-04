@@ -1,17 +1,17 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React from "react";
+import { Link } from "react-router-dom";
 
-import { Clock, Users, ChartLine, GraduationCap, Lock } from 'lucide-react';
-import InfoCard from '../../../shared/Components/UIElements/InfoCard';
-import { attendanceCount } from '../../../../shared/Utilities/attendanceCount';
+import { Clock, Users, ChartLine, GraduationCap, Lock } from "lucide-react";
+import InfoCard from "../../../shared/Components/UIElements/InfoCard";
+import { attendanceCount } from "../../../../shared/Utilities/attendanceCount";
 
 const ClassCards = ({ data }) => {
     const formatTime = (time) => {
-        const [hours, minutes] = time.split(':');
-        return new Date(0, 0, 0, hours, minutes).toLocaleTimeString('id-ID', {
-            hour: 'numeric',
-            minute: 'numeric',
-            hour12: false
+        const [hours, minutes] = time.split(":");
+        return new Date(0, 0, 0, hours, minutes).toLocaleTimeString("id-ID", {
+            hour: "numeric",
+            minute: "numeric",
+            hour12: false,
         });
     };
 
@@ -24,8 +24,10 @@ const ClassCards = ({ data }) => {
             <div className="max-w-7xl mx-auto">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-16">
                     {data.classes.map((classItem) => {
-                        const isClassInSubBranchYear = classItem?.teachingGroupId?.branchYearId?.academicYearId?.isActive;
-                        console.log(classItem)
+                        const isClassInSubBranchYear =
+                            classItem?.teachingGroupId?.branchYearId
+                                ?.academicYearId?.isActive;
+                        console.log(classItem);
                         if (isClassInSubBranchYear) {
                             activeClassCount++;
                             return (
@@ -53,7 +55,10 @@ const ClassCards = ({ data }) => {
                                         <div className="flex items-center text-gray-600">
                                             <Clock className="w-4 h-4 mr-2" />
                                             <span className="text-sm">
-                                                Mulai Kelas {formatTime(classItem.startTime)}
+                                                Mulai Kelas{" "}
+                                                {formatTime(
+                                                    classItem.startTime
+                                                )}
                                             </span>
                                         </div>
 
@@ -69,7 +74,8 @@ const ClassCards = ({ data }) => {
                                         <div className="flex items-center text-gray-600">
                                             <Users className="w-4 h-4 mr-2" />
                                             <span className="text-sm">
-                                                {classItem.students.length} Siswa
+                                                {classItem.students.length}{" "}
+                                                Siswa
                                             </span>
                                         </div>
                                         <div className="flex items-center text-gray-600">
@@ -84,13 +90,19 @@ const ClassCards = ({ data }) => {
                                     {/* Card Footer */}
                                     <div className="p-4 border-t border-gray-100">
                                         <div className="flex gap-2">
-                                            <Link to={`/dashboard/classes/${classItem._id}`} className='grow'>
-                                                <button className="btn-mobile-primary-round w-full">
+                                            <Link
+                                                to={`/dashboard/classes/${classItem._id}`}
+                                                className="grow"
+                                            >
+                                                <button className="btn-round-primary w-full">
                                                     Detail Kelas
                                                 </button>
                                             </Link>
-                                            <Link to={`/attendance/history/class/${classItem._id}`} className='grow'>
-                                                <button className="btn-mobile-primary-round w-full">
+                                            <Link
+                                                to={`/attendance/history/class/${classItem._id}`}
+                                                className="grow"
+                                            >
+                                                <button className="btn-round-primary w-full">
                                                     Riwayat Absensi
                                                 </button>
                                             </Link>
@@ -102,7 +114,7 @@ const ClassCards = ({ data }) => {
                     })}
                 </div>
                 {activeClassCount === 0 && (
-                    <InfoCard className={'mx-4 mt-12'}>
+                    <InfoCard className={"mx-4 mt-12"}>
                         <p>Belum terdaftar di kelas manapun!</p>
                     </InfoCard>
                 )}

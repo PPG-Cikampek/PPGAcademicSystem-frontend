@@ -66,31 +66,31 @@ const NewModal = ({
                 return {
                     iconBg: "bg-green-100",
                     iconColor: "text-green-600",
-                    buttonStyle: "btn-mobile-primary-round-gray",
+                    buttonStyle: "btn-round-gray",
                 };
             case "warning":
                 return {
                     iconBg: "bg-amber-100",
                     iconColor: "text-amber-600",
-                    buttonStyle: "btn-mobile-danger-round",
+                    buttonStyle: "btn-round-danger",
                 };
             case "error":
                 return {
                     iconBg: "bg-red-100",
                     iconColor: "text-red-600",
-                    buttonStyle: "btn-mobile-primary-round-gray",
+                    buttonStyle: "btn-round-gray",
                 };
             case "confirmation":
                 return {
                     iconBg: "bg-blue-100",
                     iconColor: "text-blue-600",
-                    buttonStyle: "btn-mobile-primary-round-gray",
+                    buttonStyle: "btn-round-primary",
                 };
             default:
                 return {
                     iconBg: "bg-gray-100",
                     iconColor: "text-gray-600",
-                    buttonStyle: "btn-mobile-primary-round-gray",
+                    buttonStyle: "btn-round-gray",
                 };
         }
     };
@@ -182,7 +182,7 @@ const NewModal = ({
                             <button
                                 onClick={onClose}
                                 disabled={isLoading}
-                                className="btn-mobile-primary-round-gray
+                                className="btn-round-gray
                 "
                             >
                                 {cancelText}

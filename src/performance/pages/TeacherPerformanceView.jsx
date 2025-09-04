@@ -495,7 +495,7 @@ const TeacherPerformanceView = () => {
                                                 !filterState.period ||
                                                 isLoading
                                             }
-                                            className="btn-mobile-primary-round-gray"
+                                            className="btn-round-gray"
                                         >
                                             {isLoading ? (
                                                 <LoadingCircle size={16} />
@@ -595,7 +595,7 @@ const TeacherPerformanceView = () => {
                                 <h2>Performa Kelas</h2>
                                 <div className="flex gap-2 no-print">
                                     <button
-                                        className="btn-mobile-primary-round-gray"
+                                        className="btn-round-gray"
                                         onClick={() =>
                                             setFilterState((prev) => ({
                                                 ...prev,
