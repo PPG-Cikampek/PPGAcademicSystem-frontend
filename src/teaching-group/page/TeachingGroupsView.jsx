@@ -1,8 +1,14 @@
-import { useContext, useEffect, useState } from "react";
-import useHttp from "../../shared/hooks/http-hook";
+import { useContext, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import SkeletonLoader from "../../shared/Components/UIElements/SkeletonLoader";
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
+import {
+    useTeachingGroup,
+    useRemoveSubBranchMutation,
+    useRemoveClassMutation,
+    useLockTeachingGroupMutation,
+    useLockClassMutation,
+} from "../../shared/queries";
 import {
     Eye,
     KeyRound,
@@ -10,6 +16,7 @@ import {
     Lock,
     LockOpen,
     MapPin,
+    Pencil,
     PlusIcon,
     Presentation,
     Trash,
@@ -21,14 +28,23 @@ import ModalFooter from "../../shared/Components/ModalFooter";
 import useModal from "../../shared/hooks/useModal";
 
 const TeachingGroupsView = () => {
-    const [teachingGroupData, setTeachingGroupData] = useState();
-
-    const { sendRequest, isLoading, error, setError } = useHttp();
+    const [error, setError] = useState(null);
 
     const auth = useContext(AuthContext);
     const teachingGroupId = useParams().teachingGroupId;
-
     const navigate = useNavigate();
+
+    // React Query hooks
+    const {
+        data: teachingGroupData,
+        isLoading,
+        error: queryError,
+    } = useTeachingGroup(teachingGroupId);
+
+    const removeSubBranchMutation = useRemoveSubBranchMutation();
+    const removeClassMutation = useRemoveClassMutation();
+    const lockTeachingGroupMutation = useLockTeachingGroupMutation();
+    const lockClassMutation = useLockClassMutation();
 
     // Modal state using the new hook
     const {
@@ -39,25 +55,8 @@ const TeachingGroupsView = () => {
         setModal,
     } = useModal({ title: "", message: "", onConfirm: null });
 
-    useEffect(() => {
-        const fetchTeachingGroupData = async () => {
-            try {
-                const responseData = await sendRequest(
-                    `${
-                        import.meta.env.VITE_BACKEND_URL
-                    }/teachingGroups/${teachingGroupId}`
-                );
-
-                setTeachingGroupData(responseData.identifiedTeachingGroup);
-                console.log(responseData.identifiedTeachingGroup);
-            } catch (err) {
-                // setError(err.message || 'Failed to fetch teaching groups.')
-            }
-        };
-        fetchTeachingGroupData();
-        // Expose fetchTeachingGroupData for use elsewhere
-        TeachingGroupsView.fetchTeachingGroupData = fetchTeachingGroupData;
-    }, [sendRequest]);
+    // Handle errors from React Query and manual errors
+    const displayError = error || queryError?.message;
 
     const subBranchColumns = [
         {
@@ -228,6 +227,15 @@ const TeachingGroupsView = () => {
                                 <button
                                     onClick={(e) => {
                                         e.stopPropagation();
+                                        editClassHandler(item.name, item._id);
+                                    }}
+                                    className="btn-icon-primary"
+                                >
+                                    <Pencil size={18} />
+                                </button>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
                                         removeClassHandler(item.name, item._id);
                                     }}
                                     className="btn-icon-danger"
@@ -243,26 +251,22 @@ const TeachingGroupsView = () => {
 
     const removeSubBranchHandler = (name, subBranchId) => {
         const confirmRemove = async () => {
-            const url = `${
-                import.meta.env.VITE_BACKEND_URL
-            }/teachingGroups/remove-sub-branch/`;
-            const body = JSON.stringify({ teachingGroupId, subBranchId });
-            let responseData;
             try {
-                responseData = await sendRequest(url, "DELETE", body, {
-                    "Content-Type": "application/json",
+                const response = await removeSubBranchMutation.mutateAsync({
+                    teachingGroupId,
+                    subBranchId,
                 });
                 setModal({
                     title: "Berhasil!",
-                    message: responseData.message,
+                    message: response.message,
                     onConfirm: null,
                 });
-                // Refresh teaching group data after successful delete
-                if (TeachingGroupsView.fetchTeachingGroupData) {
-                    TeachingGroupsView.fetchTeachingGroupData();
-                }
             } catch (err) {
-                // Error is already handled by useHttp
+                setError(
+                    err.response?.data?.message ||
+                        err.message ||
+                        "Failed to remove sub-branch"
+                );
             }
         };
         setModal({
@@ -281,30 +285,25 @@ const TeachingGroupsView = () => {
     const lockClassHandler = (actionType, className, classId) => {
         console.log(actionType);
         const confirmLock = async () => {
-            const url =
-                actionType === "lock"
-                    ? `${import.meta.env.VITE_BACKEND_URL}/classes/lock`
-                    : `${import.meta.env.VITE_BACKEND_URL}/classes/unlock`;
-            const body = JSON.stringify({ classId });
-
-            let responseData;
             try {
-                responseData = await sendRequest(url, "PATCH", body, {
-                    "Content-Type": "application/json",
+                const response = await lockClassMutation.mutateAsync({
+                    classId,
+                    actionType,
+                    teachingGroupId,
                 });
 
                 setModal({
                     title: "Berhasil!",
-                    message: responseData.message,
+                    message: response.message,
                     onConfirm: null,
                 });
-                if (TeachingGroupsView.fetchTeachingGroupData) {
-                    TeachingGroupsView.fetchTeachingGroupData();
-                }
             } catch (err) {
                 setModal({
                     title: "Gagal!",
-                    message: err.message,
+                    message:
+                        err.response?.data?.message ||
+                        err.message ||
+                        "Failed to lock/unlock class",
                     onConfirm: null,
                 });
             }
@@ -327,26 +326,22 @@ const TeachingGroupsView = () => {
 
     const removeClassHandler = (name, classId) => {
         const confirmRemove = async () => {
-            const url = `${
-                import.meta.env.VITE_BACKEND_URL
-            }/teachingGroups/remove-class/`;
-            const body = JSON.stringify({ teachingGroupId, classId });
-            let responseData;
             try {
-                responseData = await sendRequest(url, "DELETE", body, {
-                    "Content-Type": "application/json",
+                const response = await removeClassMutation.mutateAsync({
+                    teachingGroupId,
+                    classId,
                 });
                 setModal({
                     title: "Berhasil!",
-                    message: responseData.message,
+                    message: response.message,
                     onConfirm: null,
                 });
-                // Refresh teaching group data after successful delete
-                if (TeachingGroupsView.fetchTeachingGroupData) {
-                    TeachingGroupsView.fetchTeachingGroupData();
-                }
             } catch (err) {
-                // Error is already handled by useHttp
+                setError(
+                    err.response?.data?.message ||
+                        err.message ||
+                        "Failed to remove class"
+                );
             }
         };
         setModal({
@@ -365,32 +360,24 @@ const TeachingGroupsView = () => {
     const lockTeachingGroupHandler = (actionType, teachingGroupId) => {
         console.log(actionType);
         const confirmLock = async () => {
-            const url =
-                actionType === "lock"
-                    ? `${import.meta.env.VITE_BACKEND_URL}/teachingGroups/lock`
-                    : `${
-                          import.meta.env.VITE_BACKEND_URL
-                      }/teachingGroups/unlock`;
-            const body = JSON.stringify({ teachingGroupId });
-
-            let responseData;
             try {
-                responseData = await sendRequest(url, "PATCH", body, {
-                    "Content-Type": "application/json",
+                const response = await lockTeachingGroupMutation.mutateAsync({
+                    teachingGroupId,
+                    actionType,
                 });
 
                 setModal({
                     title: "Berhasil!",
-                    message: responseData.message,
+                    message: response.message,
                     onConfirm: null,
                 });
-                if (TeachingGroupsView.fetchTeachingGroupData) {
-                    TeachingGroupsView.fetchTeachingGroupData();
-                }
             } catch (err) {
                 setModal({
                     title: "Gagal!",
-                    message: err.message,
+                    message:
+                        err.response?.data?.message ||
+                        err.message ||
+                        "Failed to lock/unlock teaching group",
                     onConfirm: null,
                 });
             }
@@ -414,8 +401,11 @@ const TeachingGroupsView = () => {
     return (
         <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8 pb-24">
             <div className="max-w-6xl mx-auto">
-                {error && (
-                    <ErrorCard error={error} onClear={() => setError(null)} />
+                {displayError && (
+                    <ErrorCard
+                        error={displayError}
+                        onClear={() => setError(null)}
+                    />
                 )}
 
                 {(!teachingGroupData || isLoading) && (
@@ -637,7 +627,12 @@ const TeachingGroupsView = () => {
                             onConfirm={modal.onConfirm}
                             footer={
                                 <ModalFooter
-                                    isLoading={isLoading}
+                                    isLoading={
+                                        removeSubBranchMutation.isPending ||
+                                        removeClassMutation.isPending ||
+                                        lockTeachingGroupMutation.isPending ||
+                                        lockClassMutation.isPending
+                                    }
                                     onClose={closeModal}
                                     onConfirm={modal.onConfirm}
                                     showConfirm={!!modal.onConfirm}

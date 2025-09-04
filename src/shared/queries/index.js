@@ -14,3 +14,11 @@ export {
 export { useMaterialProgress } from "./useMaterialProgress";
 
 export { useJournal } from "./useJournal";
+
+export {
+    useTeachingGroup,
+    useRemoveSubBranchMutation,
+    useRemoveClassMutation,
+    useLockTeachingGroupMutation,
+    useLockClassMutation,
+} from "./useTeachingGroups";
