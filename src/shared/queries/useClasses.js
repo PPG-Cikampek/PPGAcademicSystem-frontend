@@ -18,6 +18,9 @@ export const useClass = (classId, options = {}) => {
 export const useUpdateClassMutation = (options = {}) => {
     const queryClient = useQueryClient();
 
+    // Extract user-provided handlers so we can compose them with internal logic
+    const { onSuccess: userOnSuccess, onError: userOnError, ...rest } = options;
+
     return useMutation({
         mutationFn: async ({ classId, name, startTime, endTime }) => {
             const response = await api.patch(`/classes/${classId}`, {
@@ -27,7 +30,7 @@ export const useUpdateClassMutation = (options = {}) => {
             });
             return response.data;
         },
-        onSuccess: (data, variables) => {
+        onSuccess: (data, variables, context) => {
             // Update the class data directly in the cache first
             queryClient.setQueryData(
                 ["class", variables.classId],
@@ -49,10 +52,18 @@ export const useUpdateClassMutation = (options = {}) => {
                 queryKey: ["class", variables.classId],
             });
             // Invalidate all teaching group queries to refresh classes list
-            queryClient.invalidateQueries({
-                queryKey: ["teachingGroup"],
-            });
+            queryClient.invalidateQueries({ queryKey: ["teachingGroup"] });
+
+            // Call any consumer-provided handler after cache updates
+            if (typeof userOnSuccess === "function") {
+                userOnSuccess(data, variables, context);
+            }
         },
-        ...options,
+        onError: (error, variables, context) => {
+            if (typeof userOnError === "function") {
+                userOnError(error, variables, context);
+            }
+        },
+        ...rest,
     });
 };
