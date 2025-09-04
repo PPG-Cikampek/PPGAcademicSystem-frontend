@@ -4,9 +4,8 @@ import SkeletonLoader from "../../shared/Components/UIElements/SkeletonLoader";
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 import { useTeachingGroup } from "../../shared/queries";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
-import Modal from "../../shared/Components/Modal";
-import ModalFooter from "../../shared/Components/ModalFooter";
-import useModal from "../../shared/hooks/useModal";
+import NewModal from "../../shared/Components/Modal/NewModal";
+import useModal from "../../shared/hooks/useNewModal";
 import { useTeachingGroupHandlers } from "../hooks/useTeachingGroupHandlers";
 import TeachingGroupHeader from "../components/TeachingGroupHeader";
 import SubBranchesSection from "../components/SubBranchesSection";
@@ -27,13 +26,7 @@ const TeachingGroupsView = () => {
     } = useTeachingGroup(teachingGroupId);
 
     // Modal state using the new hook
-    const {
-        isOpen: modalIsOpen,
-        modal,
-        openModal,
-        closeModal,
-        setModal,
-    } = useModal({ title: "", message: "", onConfirm: null });
+    const { modalState, openModal, closeModal, handleConfirm } = useModal();
 
     // Handlers
     const {
@@ -46,11 +39,16 @@ const TeachingGroupsView = () => {
     } = useTeachingGroupHandlers(
         teachingGroupId,
         teachingGroupData,
-        setModal,
         openModal,
         closeModal,
         setError
     );
+
+    const modalIsLoading =
+        mutations.removeSubBranchMutation.isPending ||
+        mutations.removeClassMutation.isPending ||
+        mutations.lockTeachingGroupMutation.isPending ||
+        mutations.lockClassMutation.isPending;
 
     // Handle errors from React Query and manual errors
     const displayError = error || queryError?.message;
@@ -107,28 +105,10 @@ const TeachingGroupsView = () => {
                             editClassHandler={editClassHandler}
                             removeClassHandler={removeClassHandler}
                         />
-                        <Modal
-                            isOpen={modalIsOpen}
-                            title={modal.title}
-                            message={modal.message}
+                        <NewModal
+                            modalState={modalState}
                             onClose={closeModal}
-                            onConfirm={modal.onConfirm}
-                            footer={
-                                <ModalFooter
-                                    isLoading={
-                                        mutations.removeSubBranchMutation
-                                            .isPending ||
-                                        mutations.removeClassMutation
-                                            .isPending ||
-                                        mutations.lockTeachingGroupMutation
-                                            .isPending ||
-                                        mutations.lockClassMutation.isPending
-                                    }
-                                    onClose={closeModal}
-                                    onConfirm={modal.onConfirm}
-                                    showConfirm={!!modal.onConfirm}
-                                />
-                            }
+                            isLoading={modalIsLoading}
                         />
                     </>
                 )}

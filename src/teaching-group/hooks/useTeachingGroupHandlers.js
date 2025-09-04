@@ -10,7 +10,6 @@ import {
 export const useTeachingGroupHandlers = (
     teachingGroupId,
     teachingGroupData,
-    setModal,
     openModal,
     closeModal,
     setError
@@ -29,11 +28,14 @@ export const useTeachingGroupHandlers = (
                     teachingGroupId,
                     subBranchId,
                 });
-                setModal({
-                    title: "Berhasil!",
-                    message: response.message,
-                    onConfirm: null,
-                });
+                openModal(
+                    response.message,
+                    "success",
+                    null,
+                    "Berhasil!",
+                    false,
+                    "md"
+                );
             } catch (err) {
                 setError(
                     err.response?.data?.message ||
@@ -42,12 +44,14 @@ export const useTeachingGroupHandlers = (
                 );
             }
         };
-        closeModal();
-        openModal({
-            title: `Konfirmasi Penghapusan`,
-            message: `Hapus ${name} KBM ini?`,
-            onConfirm: confirmRemove,
-        });
+        openModal(
+            `Hapus ${name} KBM ini?`,
+            "confirmation",
+            confirmRemove,
+            `Konfirmasi Penghapusan`,
+            true,
+            "md"
+        );
     };
 
     const lockClassHandler = (actionType, className, classId) => {
@@ -60,35 +64,45 @@ export const useTeachingGroupHandlers = (
                     teachingGroupId,
                 });
 
-                setModal({
-                    title: "Berhasil!",
-                    message: response.message,
-                    onConfirm: null,
-                });
+                openModal(
+                    response.message,
+                    "success",
+                    null,
+                    "Berhasil!",
+                    false,
+                    "md"
+                );
             } catch (err) {
-                setModal({
-                    title: "Gagal!",
-                    message:
-                        err.response?.data?.message ||
+                openModal(
+                    err.response?.data?.message ||
                         err.message ||
                         "Failed to lock/unlock class",
-                    onConfirm: null,
-                });
+                    "error",
+                    null,
+                    "Gagal!",
+                    false,
+                    "md"
+                );
             }
         };
-        closeModal();
         if (actionType === "lock") {
-            openModal({
-                title: `Kunci kelas: ${className}?`,
-                message: `Kelas tidak akan bisa di-edit lagi!`,
-                onConfirm: confirmLock,
-            });
+            openModal(
+                `Kelas tidak akan bisa di-edit lagi!`,
+                "confirmation",
+                confirmLock,
+                `Kunci kelas: ${className}?`,
+                true,
+                "md"
+            );
         } else {
-            openModal({
-                title: `Buka Kunci kelas: ${className}?`,
-                message: `Kelas akan bisa di-edit lagi`,
-                onConfirm: confirmLock,
-            });
+            openModal(
+                `Kelas akan bisa di-edit lagi`,
+                "confirmation",
+                confirmLock,
+                `Buka Kunci kelas: ${className}?`,
+                true,
+                "md"
+            );
         }
     };
 
@@ -99,11 +113,14 @@ export const useTeachingGroupHandlers = (
                     teachingGroupId,
                     classId,
                 });
-                setModal({
-                    title: "Berhasil!",
-                    message: response.message,
-                    onConfirm: null,
-                });
+                openModal(
+                    response.message,
+                    "success",
+                    null,
+                    "Berhasil!",
+                    false,
+                    "md"
+                );
             } catch (err) {
                 setError(
                     err.response?.data?.message ||
@@ -112,12 +129,14 @@ export const useTeachingGroupHandlers = (
                 );
             }
         };
-        closeModal();
-        openModal({
-            title: `Konfirmasi Penghapusan`,
-            message: `Hapus ${name} dari KBM ini?`,
-            onConfirm: confirmRemove,
-        });
+        openModal(
+            `Hapus ${name} dari KBM ini?`,
+            "confirmation",
+            confirmRemove,
+            `Konfirmasi Penghapusan`,
+            true,
+            "md"
+        );
     };
 
     const lockTeachingGroupHandler = (actionType) => {
@@ -129,35 +148,45 @@ export const useTeachingGroupHandlers = (
                     actionType,
                 });
 
-                setModal({
-                    title: "Berhasil!",
-                    message: response.message,
-                    onConfirm: null,
-                });
+                openModal(
+                    response.message,
+                    "success",
+                    null,
+                    "Berhasil!",
+                    false,
+                    "md"
+                );
             } catch (err) {
-                setModal({
-                    title: "Gagal!",
-                    message:
-                        err.response?.data?.message ||
+                openModal(
+                    err.response?.data?.message ||
                         err.message ||
                         "Failed to lock/unlock teaching group",
-                    onConfirm: null,
-                });
+                    "error",
+                    null,
+                    "Gagal!",
+                    false,
+                    "md"
+                );
             }
         };
-        closeModal();
         if (actionType === "lock") {
-            openModal({
-                title: `Kunci KBM: ${teachingGroupData?.name}?`,
-                message: `KBM tidak akan bisa di-edit lagi!`,
-                onConfirm: confirmLock,
-            });
+            openModal(
+                `KBM tidak akan bisa di-edit lagi!`,
+                "confirmation",
+                confirmLock,
+                `Kunci KBM: ${teachingGroupData?.name}?`,
+                true,
+                "md"
+            );
         } else {
-            openModal({
-                title: `Buka Kunci KBM: ${teachingGroupData?.name}?`,
-                message: `KBM akan bisa di-edit lagi`,
-                onConfirm: confirmLock,
-            });
+            openModal(
+                `KBM akan bisa di-edit lagi`,
+                "confirmation",
+                confirmLock,
+                `Buka Kunci KBM: ${teachingGroupData?.name}?`,
+                true,
+                "md"
+            );
         }
     };
 

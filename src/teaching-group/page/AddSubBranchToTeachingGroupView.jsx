@@ -3,17 +3,13 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 
 import { AuthContext } from "../../shared/Components/Context/auth-context";
 import useHttp from "../../shared/hooks/http-hook";
+import useModal from "../../shared/hooks/useNewModal";
 
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
-import Modal from "../../shared/Components/UIElements/ModalBottomClose";
+import NewModal from "../../shared/Components/Modal/NewModal";
 
 const AddSubBranchToTeachingGroupView = () => {
-    const [modal, setModal] = useState({
-        title: "",
-        message: "",
-        onConfirm: null,
-    });
-    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const { modalState, openModal, closeModal, handleConfirm } = useModal();
     const [subBranches, setSubBranches] = useState();
     const { isLoading, error, sendRequest, setError } = useHttp();
 
@@ -58,11 +54,14 @@ const AddSubBranchToTeachingGroupView = () => {
                 responseData = await sendRequest(url, "POST", body, {
                     "Content-Type": "application/json",
                 });
-                setModal({
-                    title: "Berhasil!",
-                    message: responseData.message,
-                    onConfirm: null,
-                });
+                openModal(
+                    responseData.message,
+                    "success",
+                    null,
+                    "Berhasil!",
+                    false,
+                    "md"
+                );
 
                 const updatedData = await sendRequest(
                     `${import.meta.env.VITE_BACKEND_URL}/levels/branches/${
@@ -70,55 +69,21 @@ const AddSubBranchToTeachingGroupView = () => {
                     }/sub-branches`
                 );
                 setSubBranches(updatedData.subBranches);
+                return false;
             } catch (err) {
-                setModal({
-                    title: `Gagal!`,
-                    message: err.message,
-                    onConfirm: null,
-                });
+                openModal(err.message, "error", null, "Gagal!", false, "md");
+                return false;
             }
         };
-        setModal({
-            title: `Konfirmasi Pendaftaran`,
-            message: `Daftarkan kelompok ${subBranchName}?`,
-            onConfirm: confirmRegister,
-        });
-        setModalIsOpen(true);
+        openModal(
+            `Daftarkan kelompok ${subBranchName}?`,
+            "confirmation",
+            confirmRegister,
+            "Konfirmasi Pendaftaran",
+            true,
+            "md"
+        );
     };
-
-    const ModalFooter = () => (
-        <div className="flex gap-2 items-center">
-            <button
-                onClick={() => {
-                    setModalIsOpen(false);
-                }}
-                className={`${
-                    modal.onConfirm
-                        ? "btn-danger-outline"
-                        : "button-primary mt-0 "
-                } ${isLoading ? "opacity-50 hover:cursor-not-allowed" : ""}`}
-                disabled={isLoading}
-            >
-                {isLoading ? (
-                    <LoadingCircle />
-                ) : modal.onConfirm ? (
-                    "Batal"
-                ) : (
-                    "Tutup"
-                )}
-            </button>
-            {modal.onConfirm && (
-                <button
-                    onClick={modal.onConfirm}
-                    className={`button-primary mt-0 ${
-                        isLoading ? "opacity-50 hover:cursor-not-allowed" : ""
-                    }`}
-                >
-                    {isLoading ? <LoadingCircle /> : "Ya"}
-                </button>
-            )}
-        </div>
-    );
 
     return (
         <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">
@@ -126,19 +91,11 @@ const AddSubBranchToTeachingGroupView = () => {
                 <h1 className="text-2xl font-bold mb-4">
                     Daftarkan Kelompok ke KBM
                 </h1>
-                <Modal
-                    isOpen={modalIsOpen}
-                    onClose={() => setModalIsOpen(false)}
-                    title={modal.title}
-                    footer={<ModalFooter />}
-                >
-                    {isLoading && (
-                        <div className="flex justify-center mt-16">
-                            <LoadingCircle size={32} />
-                        </div>
-                    )}
-                    {!isLoading && modal.message}
-                </Modal>
+                <NewModal
+                    modalState={modalState}
+                    onClose={closeModal}
+                    isLoading={isLoading}
+                />
 
                 {(!subBranches || isLoading) && (
                     <div className="flex justify-center mt-16">
