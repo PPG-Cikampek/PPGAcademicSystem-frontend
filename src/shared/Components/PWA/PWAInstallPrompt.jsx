@@ -49,7 +49,7 @@ const PWAInstallPrompt = () => {
 
     return (
         <div className="fixed bottom-4 right-4 z-50">
-            <div className="bg-primary text-white p-4 rounded-lg shadow-lg max-w-sm">
+            <div className="bg-primary text-white p-4 rounded-lg shadow-lg max-w-sm  animate-bounce-enter">
                 <div className="flex items-start gap-3">
                     <div className="flex-1">
                         <h3 className="font-semibold text-sm">
