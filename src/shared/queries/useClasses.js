@@ -82,7 +82,11 @@ export const useRegisterTeacherToClassMutation = (options = {}) => {
             return response.data;
         },
         onSuccess: (data, variables, context) => {
+            // After registering a teacher, refresh both teachers list and the specific class
             queryClient.invalidateQueries({ queryKey: ["teachers"] });
+            if (variables?.classId) {
+                queryClient.invalidateQueries({ queryKey: ["class", variables.classId] });
+            }
             if (typeof userOnSuccess === "function") {
                 userOnSuccess(data, variables, context);
             }
@@ -115,6 +119,9 @@ export const useRemoveTeacherFromClassMutation = (options = {}) => {
             queryClient.invalidateQueries({
                 queryKey: ["class", variables.classId],
             });
+
+            // Also invalidate teachers list so their classIds reflect the removal
+            queryClient.invalidateQueries({ queryKey: ["teachers"] });
 
             // Call any consumer-provided handler after cache updates
             if (typeof userOnSuccess === "function") {
