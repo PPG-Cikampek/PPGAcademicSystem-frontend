@@ -55,6 +55,24 @@ window.addEventListener("appinstalled", (evt) => {
     console.log("PWA was installed");
 });
 
+// Buffer polyfill for libraries (eg. @react-pdf/renderer) that expect Node's Buffer
+// Dynamically import the polyfill to avoid Vite externalizing `buffer` during static analysis.
+if (typeof globalThis.Buffer === "undefined") {
+    import("buffer")
+        .then(({ Buffer: Buf }) => {
+            globalThis.Buffer = Buf;
+            // also set window for any libraries referencing window.Buffer
+            try {
+                window.Buffer = Buf;
+            } catch (e) {
+                // ignore on non-browser-like environments
+            }
+        })
+        .catch(() => {
+            // If import fails, leave it undefined — libraries should handle absence gracefully
+        });
+}
+
 // Create a client
 const queryClient = new QueryClient({
     defaultOptions: {
@@ -90,7 +108,11 @@ const AppWrapper = () => {
     return (
         <StrictMode>
             <QueryClientProvider client={queryClient}>
-                {isMaintenance ? <MaintenanceView targetDate={targetDate} /> : <App />}
+
+
+                {/* {isMaintenance ? <MaintenanceView targetDate={targetDate} /> : <App />} */}
+                <App />
+                
                 <ReactQueryDevtools initialIsOpen={false} />
                 <PWAInstallPrompt />
                 <NewModal

@@ -8,8 +8,6 @@ const ClassHeader = ({
     lockClassHandler,
     unlockClassHandler,
 }) => {
-
-    console.log("Rendering ClassHeader with classData:", classData);
     return (
         <div className="mb-8">
             <div className="flex items-center gap-4">
