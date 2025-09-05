@@ -1,4 +1,4 @@
-import { StrictMode } from "react";
+import { StrictMode, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
@@ -70,6 +70,14 @@ const queryClient = new QueryClient({
 const AppWrapper = () => {
     const { modalState, closeModal } = useVersionCheck();
     const isMaintenance = false;
+
+    useEffect(() => {
+        if (screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock("portrait").catch((err) => {
+                console.warn("Orientation lock failed:", err);
+            });
+        }
+    }, []);
 
     return (
         <StrictMode>
