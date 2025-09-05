@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Trash, LockOpen, Lock } from "lucide-react";
+import { Trash, LockOpen, Lock, Pencil } from "lucide-react";
 import { formatAcademicYear } from "../utilities/academicUtils";
 
 const BranchYearCard = ({
@@ -113,7 +113,7 @@ const BranchYearCard = ({
                                         year._id
                                     );
                                 }}
-                                className="p-3 rounded-full text-gray-400 hover:bg-gray-200 hover:text-red-500 transition"
+                                className="btn-icon-danger ml-2"
                             >
                                 <Trash size={20} />
                             </button>
@@ -155,7 +155,7 @@ const BranchYearCard = ({
                                 (teachingGroup) => (
                                     <li
                                         key={teachingGroup._id}
-                                        className="flex justify-start"
+                                        className="flex justify-start items-center"
                                     >
                                         <Link
                                             to={`/dashboard/teaching-groups/${teachingGroup.id}`}
@@ -186,18 +186,32 @@ const BranchYearCard = ({
                                         {auth.userRole === "branchAdmin" &&
                                             year.academicYearId.isActive &&
                                             !year.isActive && (
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        deleteTeachingGroupHandler(
-                                                            teachingGroup.name,
-                                                            teachingGroup.id
-                                                        )(e);
-                                                    }}
-                                                    className="border-t px-4 italic text-gray-500 hover:underline hover:text-red-500 hover:cursor-pointer"
-                                                >
-                                                    Hapus KBM
-                                                </button>
+                                                <div className="flex gap-1 mx-1">
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            deleteTeachingGroupHandler(
+                                                                teachingGroup.name,
+                                                                teachingGroup.id
+                                                            )(e);
+                                                        }}
+                                                        className="btn-icon-danger"
+                                                    >
+                                                        <Trash size={20} />
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            editTeachingGroupHandler(
+                                                                teachingGroup.name,
+                                                                teachingGroup.id
+                                                            )(e);
+                                                        }}
+                                                        className="btn-icon-primary"
+                                                    >
+                                                        <Pencil size={20} />
+                                                    </button>
+                                                </div>
                                             )}
                                     </li>
                                 )
