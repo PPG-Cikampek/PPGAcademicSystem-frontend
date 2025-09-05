@@ -67,3 +67,35 @@ export const useClassData = (classId, options = {}) => {
         ...options,
     });
 };
+
+// Fetch attendances by class
+export const useAttendancesByClass = (classId, options = {}) => {
+    return useQuery({
+        queryKey: ["attendancesByClass", classId],
+        queryFn: async () => {
+            const response = await api.get(`/attendances/class/${classId}`);
+            return response.data;
+        },
+        enabled: !!classId,
+        ...options,
+    });
+};
+
+// Mutation hook for deleting attendance
+export const useDeleteAttendanceMutation = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ attendanceId, studentName }) => {
+            const response = await api.delete(`/attendances/${attendanceId}`, {
+                data: { studentName },
+            });
+            return response.data;
+        },
+        onSuccess: (data, variables) => {
+            queryClient.invalidateQueries({
+                queryKey: ["attendancesByClass", variables.classId],
+            });
+        },
+    });
+};

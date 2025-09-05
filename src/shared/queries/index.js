@@ -17,6 +17,8 @@ export {
     useAttendanceData,
     useClassData,
     useCreateAttendanceMutation,
+    useAttendancesByClass,
+    useDeleteAttendanceMutation,
 } from "./useAttendance";
 
 export { useMaterialProgress } from "./useMaterialProgress";

@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import useHttp from "../../../../shared/hooks/http-hook";
+import { useAttendancesByClass, useDeleteAttendanceMutation } from "../../../../shared/queries";
 
 import { ChevronDown, ChevronUp, Pencil, Trash, Edit2, X } from "lucide-react";
 import LoadingCircle from "../../../../shared/Components/UIElements/LoadingCircle";
@@ -10,28 +10,13 @@ import NewModal from "../../../../shared/Components/Modal/NewModal";
 import useNewModal from "../../../../shared/hooks/useNewModal";
 
 const AttendanceHistoryViewByClass = () => {
-    const [loadedData, setLoadedData] = useState();
     const [expandedDates, setExpandedDates] = useState([]);
-    const { isLoading, error, sendRequest } = useHttp();
     const classId = useParams().classId;
     const { modalState, openModal, closeModal } = useNewModal();
-
     const navigate = useNavigate();
 
-    useEffect(() => {
-        const loadAttendances = async () => {
-            const url = `${
-                import.meta.env.VITE_BACKEND_URL
-            }/attendances/class/${classId}`;
-            try {
-                const responseData = await sendRequest(url);
-                setLoadedData(responseData);
-            } catch (err) {}
-        };
-        if (classId) {
-            loadAttendances();
-        }
-    }, [classId, sendRequest]);
+    const { data: loadedData, isLoading, error } = useAttendancesByClass(classId);
+    const deleteAttendanceMutation = useDeleteAttendanceMutation();
 
     const toggleExpand = (date) => {
         setExpandedDates((prev) =>
@@ -48,23 +33,13 @@ const AttendanceHistoryViewByClass = () => {
 
     const deleteAttendanceHandler = (studentName, attendanceId) => {
         const confirmDelete = async () => {
-            const url = `${
-                import.meta.env.VITE_BACKEND_URL
-            }/attendances/${attendanceId}`;
-            const body = JSON.stringify({ studentName });
-            let responseData;
             try {
-                responseData = await sendRequest(url, "DELETE", body, {
-                    "Content-Type": "application/json",
+                const response = await deleteAttendanceMutation.mutateAsync({
+                    attendanceId,
+                    studentName,
+                    classId,
                 });
-                openModal(responseData.message, "success", null, "Berhasil!");
-
-                const updatedData = await sendRequest(
-                    `${
-                        import.meta.env.VITE_BACKEND_URL
-                    }/attendances/class/${classId}`
-                );
-                setLoadedData(updatedData);
+                openModal(response.message, "success", null, "Berhasil!");
             } catch (err) {
                 openModal(err.message, "error", null, "Gagal!");
             }
@@ -113,9 +88,7 @@ const AttendanceHistoryViewByClass = () => {
                 isLoading={isLoading}
             />
 
-            {error && (
-                <ErrorCard error={error} onClear={() => setError(null)} />
-            )}
+            {error && <ErrorCard error={error} />}
 
             {expandedDates.length > 1 && dateCount > 1 && (
                 <motion.button
@@ -194,7 +167,7 @@ const AttendanceHistoryViewByClass = () => {
                                                         <tr
                                                             onClick={() =>
                                                                 navigate(
-                                                                    `/attendance/history/class/${loadedData[0].classId}/${attendance._id}`
+                                                                    `/attendance/history/class/${classId}/${attendance._id}`
                                                                 )
                                                             }
                                                             key={attendance._id}
