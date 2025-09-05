@@ -42,12 +42,12 @@ const MaintenanceView = ({ targetDate }) => {
 
                 {/* Title */}
                 <h1 className="text-2xl md:text-3xl font-bold text-center animate-slide-up">
-                    Pemutakhiran dan Pembaharuan Website
+                    Pemutakhiran dan Pembaharuan Aplikasi
                 </h1>
 
                 {/* Message */}
                 <p className="md:text-lg text-base text-center text-gray-600 animate-slide-up">
-                    Sistem Akademik PPG Cikampek sedang dalam proses pemeliharan sistem untuk peningkatan pelayanan. Mohon maaf atas ketidaknyamanannya.
+                    Tim ICT sedang berusaha keras meningkatkan aplikasi ini. Mohon ditunggu 🙏
                 </p>
 
                 <p className="md:text-2xl text-xl text-center text-gray-600 animate-slide-up font-lpmq">
