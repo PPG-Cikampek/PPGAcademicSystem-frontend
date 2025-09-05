@@ -6,19 +6,15 @@ import { ChevronDown, ChevronUp, Pencil, Trash, Edit2, X } from "lucide-react";
 import LoadingCircle from "../../../../shared/Components/UIElements/LoadingCircle";
 import { motion, AnimatePresence } from "framer-motion";
 import ErrorCard from "../../../../shared/Components/UIElements/ErrorCard";
-import Modal from "../../../../shared/Components/UIElements/ModalBottomClose";
+import NewModal from "../../../../shared/Components/Modal/NewModal";
+import useNewModal from "../../../../shared/hooks/useNewModal";
 
 const AttendanceHistoryViewByClass = () => {
-    const [modal, setModal] = useState({
-        title: "",
-        message: "",
-        onConfirm: null,
-    });
-    const [modalIsOpen, setModalIsOpen] = useState(false);
     const [loadedData, setLoadedData] = useState();
     const [expandedDates, setExpandedDates] = useState([]);
     const { isLoading, error, sendRequest } = useHttp();
     const classId = useParams().classId;
+    const { modalState, openModal, closeModal } = useNewModal();
 
     const navigate = useNavigate();
 
@@ -61,11 +57,7 @@ const AttendanceHistoryViewByClass = () => {
                 responseData = await sendRequest(url, "DELETE", body, {
                     "Content-Type": "application/json",
                 });
-                setModal({
-                    title: "Berhasil!",
-                    message: responseData.message,
-                    onConfirm: null,
-                });
+                openModal(responseData.message, "success", null, "Berhasil!");
 
                 const updatedData = await sendRequest(
                     `${
@@ -74,19 +66,16 @@ const AttendanceHistoryViewByClass = () => {
                 );
                 setLoadedData(updatedData);
             } catch (err) {
-                setModal({
-                    title: "Gagal!",
-                    message: err.message,
-                    onConfirm: null,
-                });
+                openModal(err.message, "error", null, "Gagal!");
             }
         };
-        setModal({
-            title: `Konfirmasi Penghapusan`,
-            message: `Hapus absen siswa: ${studentName}?`,
-            onConfirm: confirmDelete,
-        });
-        setModalIsOpen(true);
+        openModal(
+            `Hapus absen siswa: ${studentName}?`,
+            "confirmation",
+            confirmDelete,
+            "Konfirmasi Penghapusan",
+            true
+        );
     };
 
     const collapseAll = () => {
@@ -110,40 +99,6 @@ const AttendanceHistoryViewByClass = () => {
 
     const dateCount = groupedData ? Object.keys(groupedData).length : 0;
 
-    const ModalFooter = () => (
-        <div className="flex gap-2 items-center">
-            <button
-                onClick={() => {
-                    setModalIsOpen(false);
-                }}
-                className={`${
-                    modal.onConfirm
-                        ? "btn-danger-outline"
-                        : "button-primary mt-0 "
-                } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
-                disabled={isLoading}
-            >
-                {isLoading ? (
-                    <LoadingCircle />
-                ) : modal.onConfirm ? (
-                    "Batal"
-                ) : (
-                    "Tutup"
-                )}
-            </button>
-            {modal.onConfirm && (
-                <button
-                    onClick={modal.onConfirm}
-                    className={`button-primary mt-0 ${
-                        isLoading ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
-                >
-                    {isLoading ? <LoadingCircle /> : "Ya"}
-                </button>
-            )}
-        </div>
-    );
-
     return (
         <div className="p-4 space-y-4 mb-24">
             {isLoading && !loadedData && (
@@ -152,19 +107,11 @@ const AttendanceHistoryViewByClass = () => {
                 </div>
             )}
 
-            <Modal
-                isOpen={modalIsOpen}
-                onClose={() => setModalIsOpen(false)}
-                title={modal.title}
-                footer={<ModalFooter />}
-            >
-                {isLoading && (
-                    <div className="flex justify-center mt-16">
-                        <LoadingCircle size={32} />
-                    </div>
-                )}
-                {!isLoading && modal.message}
-            </Modal>
+            <NewModal
+                modalState={modalState}
+                onClose={closeModal}
+                isLoading={isLoading}
+            />
 
             {error && (
                 <ErrorCard error={error} onClear={() => setError(null)} />
