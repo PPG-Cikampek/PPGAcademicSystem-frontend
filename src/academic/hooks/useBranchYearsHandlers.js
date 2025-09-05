@@ -140,11 +140,19 @@ const useBranchYearsHandlers = (openModal, closeModal) => {
         );
     };
 
+    const editTeachingGroupHandler = (teachingGroupName, teachingGroupId) => (e) => {
+        e.stopPropagation();
+        navigate(`/academic/teachingGroups/edit`, {
+            state: { teachingGroupId },
+        });
+    };
+
     return {
         activateYearHandler,
         deactivateYearHandler,
         deleteBranchYearHandler,
         deleteTeachingGroupHandler,
+        editTeachingGroupHandler,
     };
 };
 

@@ -10,6 +10,7 @@ const BranchYearCard = ({
     deactivateYearHandler,
     deleteBranchYearHandler,
     deleteTeachingGroupHandler,
+    editTeachingGroupHandler,
     auth,
 }) => {
     // if auth.userRole === "subBranchAdmin", filter year.teachingGroups where subBranches includes auth.userSubBranchId

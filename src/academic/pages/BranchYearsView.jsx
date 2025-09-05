@@ -37,6 +37,7 @@ const BranchYearsView = () => {
         deactivateYearHandler,
         deleteBranchYearHandler,
         deleteTeachingGroupHandler,
+        editTeachingGroupHandler,
     } = useBranchYearsHandlers(openModal, closeModal);
 
     return (
@@ -104,6 +105,9 @@ const BranchYearsView = () => {
                                             }
                                             deleteTeachingGroupHandler={
                                                 deleteTeachingGroupHandler
+                                            }
+                                            editTeachingGroupHandler={
+                                                editTeachingGroupHandler
                                             }
                                             auth={auth}
                                         />

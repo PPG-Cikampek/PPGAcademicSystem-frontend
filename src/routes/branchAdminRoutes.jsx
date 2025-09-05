@@ -9,6 +9,7 @@ import TeachingGroupDetailView from "../teaching-group/page/TeachingGroupDetailV
 import AddSubBranchToTeachingGroupView from "../teaching-group/page/AddSubBranchToTeachingGroupView";
 import BranchAdminMunaqasyahDetailView from "../munaqasyah/pages/BranchAdminMunaqasyahDetailView";
 import UpdateClassView from "../class/pages/UpdateClassView";
+import UpdateTeachingGroupView from "../teaching-group/page/UpdateTeachingGroupView";
 
 const DashboardNav = lazy(() =>
     import("../shared/Components/Navigation/DashboardNav/DashboardNav")
@@ -87,6 +88,7 @@ export const branchAdminRoutes = [
     { path: "/academic", element: <BranchYearsView /> },
     { path: "/academic/new", element: <NewBranchYearsView /> },
     { path: "/academic/teachingGroups/new", element: <NewTeachingGroupView /> },
+    { path: "/academic/teachingGroups/edit", element: <UpdateTeachingGroupView /> },
     { path: "/performance", element: <BranchPerformanceView /> },
     { path: "/settings/requestAccount", element: <RequestAccountView /> },
     {
