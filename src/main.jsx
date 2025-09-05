@@ -10,6 +10,7 @@ import { useVersionCheck } from "./shared/hooks/useVersionCheck.js";
 import NewModal from "./shared/Components/Modal/NewModal.jsx";
 import PWAInstallPrompt from "./shared/Components/PWA/PWAInstallPrompt.jsx";
 import { useMaintenanceFlag } from "./shared/hooks/useMaintenanceFlag.js";
+import { useTestingFlag } from "./shared/hooks/useTestingFlag.js";
 
 // Register service worker
 if ("serviceWorker" in navigator) {
@@ -91,6 +92,7 @@ const AppWrapper = () => {
     const { maintenance: isMaintenance, targetDate, loading } = useMaintenanceFlag({
         defaultValue: false,
     });
+    const { testing = false, loading: loadingTesting } = useTestingFlag({ defaultValue: false });
 
     console.log("Maintenance mode:", isMaintenance, "targetDate:", targetDate);
 
@@ -102,17 +104,21 @@ const AppWrapper = () => {
         }
     }, []);
 
-    // Optionally, you can render nothing or a lightweight splash while we read the flag
-    if (loading) return null;
+    // Optionally, you can render nothing or a lightweight splash while we read the flags
+    if (loading || loadingTesting) return null;
 
     return (
         <StrictMode>
             <QueryClientProvider client={queryClient}>
-
+                {/* Show testing banner when testing flag is true */}
+                {testing && (
+                    <div className="app-testing-banner" role="status" aria-live="polite">
+                        Aplikasi dalam mode uji coba — Segala perubahan data bersifat tidak permanen
+                    </div>
+                )}
 
                 {/* {isMaintenance ? <MaintenanceView targetDate={targetDate} /> : <App />} */}
                 <App />
-                
                 <ReactQueryDevtools initialIsOpen={false} />
                 <PWAInstallPrompt />
                 <NewModal

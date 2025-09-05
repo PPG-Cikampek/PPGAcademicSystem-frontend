@@ -261,3 +261,13 @@ h4 {
 @utility modal-exit {
     animation: modalZoomOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
+
+/* Testing banner shown at top of app when testing flag is enabled */
+@utility app-testing-banner {
+    @apply fixed top-0 left-0 right-0 z-50 bg-yellow-100 text-yellow-900 text-center text-sm py-2 border-b border-yellow-300 shadow-sm
+}
+
+/* Small offset to avoid overlapping app root content when banner is present */
+.app-testing-banner + #root {
+    @apply pt-10;
+}
