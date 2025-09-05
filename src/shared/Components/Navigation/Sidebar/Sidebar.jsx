@@ -47,6 +47,48 @@ const Sidebar = ({ linksList, children }) => {
         }
     };
 
+    // Animate submenu height using measured scrollHeight
+    useEffect(() => {
+        if (!linksList) return;
+        linksList.forEach((link, idx) => {
+            if (!link.subOptions) return;
+            const el = document.getElementById(`submenu-${idx}`);
+            if (!el) return;
+            // Ensure measurement uses current content
+            if (expandedMenu === link.label && sidebar.isSidebarOpen) {
+                const target = el.scrollHeight;
+                el.style.maxHeight = `${target}px`;
+            } else {
+                el.style.maxHeight = "0px";
+            }
+        });
+        // Recalculate on window resize for robustness
+        const onResize = () => {
+            linksList.forEach((link, idx) => {
+                if (!link.subOptions) return;
+                const el = document.getElementById(`submenu-${idx}`);
+                if (!el) return;
+                if (expandedMenu === link.label && sidebar.isSidebarOpen) {
+                    el.style.maxHeight = `${el.scrollHeight}px`;
+                }
+            });
+        };
+        window.addEventListener("resize", onResize);
+        return () => window.removeEventListener("resize", onResize);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [expandedMenu, sidebar.isSidebarOpen, linksList]);
+
+    // Close sidebar on Escape (mobile only)
+    useEffect(() => {
+        const onKey = (e) => {
+            if (e.key === "Escape" && sidebar.isSidebarOpen && !window.matchMedia("(min-width: 768px)").matches) {
+                sidebar.toggle();
+            }
+        };
+        window.addEventListener("keydown", onKey);
+        return () => window.removeEventListener("keydown", onKey);
+    }, [sidebar]);
+
     return (
         <div className="relative h-full md:flex">
             {/* Overlay for mobile when sidebar is open */}
@@ -179,16 +221,8 @@ const Sidebar = ({ linksList, children }) => {
                                 {link.subOptions && (
                                     <ul
                                         id={`submenu-${index}`}
-                                        className={` ml-4 space-y-1 overflow-hidden transition-all duration-300 ease-in-out `}
-                                        style={{
-                                            maxHeight:
-                                                expandedMenu === link.label
-                                                    ? `${
-                                                          link.subOptions
-                                                              .length * 48
-                                                      }px`
-                                                    : "0px", // Adjust height based on item count
-                                        }}
+                                        className={` ml-4 space-y-1 overflow-hidden transition-[max-height] duration-300 ease-in-out `}
+                                        style={{ maxHeight: "0px" }}
                                     >
                                         {link.subOptions.map(
                                             (subOption, subIndex) => (
