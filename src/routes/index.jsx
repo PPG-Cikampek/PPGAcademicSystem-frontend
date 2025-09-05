@@ -18,7 +18,7 @@ import { studentRoutes, StudentRouteWrapper } from "./studentRoutes.jsx";
 import AuthView from "../users/pages/AuthView.jsx";
 import PasswordResetView from "../users/pages/PasswordResetView.jsx";
 import EmailVerifyView from "../users/pages/EmailVerifyView.jsx";
-import StudentIDCard from "../shared/demo/StudentIDCard.jsx";
+import StudentIDCard from "../students/id-card/StudentIDCard.jsx";
 
 const getRouteConfig = (userRole) => {
     switch (userRole) {
