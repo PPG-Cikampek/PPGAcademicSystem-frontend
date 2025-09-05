@@ -11,6 +11,7 @@ import NewModal from "../../shared/Components/Modal/NewModal";
 import useBranchYearsHandlers from "../hooks/useBranchYearsHandlers";
 import BranchYearCard from "../components/BranchYearCard";
 import { useBranchYears } from "../../shared/queries";
+import { useTeachingGroupHandlers } from "../../teaching-group/hooks/useTeachingGroupHandlers";
 
 const BranchYearsView = () => {
     const { modalState, openModal, closeModal, handleConfirm } = useModal();
@@ -39,6 +40,8 @@ const BranchYearsView = () => {
         deleteTeachingGroupHandler,
         editTeachingGroupHandler,
     } = useBranchYearsHandlers(openModal, closeModal);
+
+    
 
     return (
         <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">
@@ -109,6 +112,7 @@ const BranchYearsView = () => {
                                             editTeachingGroupHandler={
                                                 editTeachingGroupHandler
                                             }
+                                            openModal={openModal}
                                             auth={auth}
                                         />
                                     ))}

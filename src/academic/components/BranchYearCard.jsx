@@ -1,6 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Trash, LockOpen, Lock, Pencil } from "lucide-react";
+import { Trash, LockOpen, Lock, Pencil, KeyRound } from "lucide-react";
 import { formatAcademicYear } from "../utilities/academicUtils";
+import { useLockTeachingGroupMutation } from "../../shared/queries";
+import { useQueryClient } from "@tanstack/react-query";
 
 const BranchYearCard = ({
     year,
@@ -11,6 +13,7 @@ const BranchYearCard = ({
     deleteBranchYearHandler,
     deleteTeachingGroupHandler,
     editTeachingGroupHandler,
+    openModal,
     auth,
 }) => {
     // if auth.userRole === "subBranchAdmin", filter year.teachingGroups where subBranches includes auth.userSubBranchId
@@ -28,8 +31,70 @@ const BranchYearCard = ({
     console.log(filteredYear.teachingGroups);
     console.log(year);
 
+    const lockTeachingGroupMutation = useLockTeachingGroupMutation();
+    const queryClient = useQueryClient();
+
     const handleCardClick = (id) => {
         setExpandedId(expandedId === id ? null : id);
+    };
+
+    const lockTeachingGroupHandler = (name, id, isLocked) => (e) => {
+        e.stopPropagation();
+        const actionType = isLocked ? "unlock" : "lock";
+        const confirmLock = async () => {
+            try {
+                const response = await lockTeachingGroupMutation.mutateAsync({
+                    teachingGroupId: id,
+                    actionType,
+                });
+
+                // Invalidate branchYears query to refresh the UI
+                queryClient.invalidateQueries({
+                    queryKey: ["branchYears", auth.userBranchId],
+                });
+
+                openModal(
+                    response.message,
+                    "success",
+                    null,
+                    "Berhasil!",
+                    false,
+                    "md"
+                );
+            } catch (err) {
+                openModal(
+                    err.response?.data?.message ||
+                        err.message ||
+                        "Failed to lock/unlock teaching group",
+                    "error",
+                    null,
+                    "Gagal!",
+                    false,
+                    "md"
+                );
+            }
+            // Keep modal open and replace content with success/error
+            return false;
+        };
+        if (actionType === "lock") {
+            openModal(
+                `KBM tidak akan bisa di-edit lagi!`,
+                "confirmation",
+                confirmLock,
+                `Kunci KBM: ${name}?`,
+                true,
+                "md"
+            );
+        } else {
+            openModal(
+                `KBM akan bisa di-edit lagi`,
+                "confirmation",
+                confirmLock,
+                `Buka Kunci KBM: ${name}?`,
+                true,
+                "md"
+            );
+        }
     };
 
     return (
@@ -156,13 +221,13 @@ const BranchYearCard = ({
                                 (teachingGroup) => (
                                     <li
                                         key={teachingGroup._id}
-                                        className="flex justify-start items-center"
+                                        className="flex justify-start items-center border-t"
                                     >
                                         <Link
                                             to={`/dashboard/teaching-groups/${teachingGroup.id}`}
                                             className="grow"
                                         >
-                                            <div className="flex justify-start items-center gap-2 p-4 border-t text-gray-700 border-gray-200 bg-white hover:bg-gray-100 hover:cursor-pointer">
+                                            <div className="flex justify-start items-center gap-2 p-4 text-gray-700 border-gray-200 bg-white hover:bg-gray-100 hover:cursor-pointer">
                                                 <div>{teachingGroup.name}</div>
                                                 {year.academicYearId
                                                     .isActive && (
@@ -188,6 +253,19 @@ const BranchYearCard = ({
                                             year.academicYearId.isActive &&
                                             !year.isActive && (
                                                 <div className="flex gap-1 mx-1">
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            lockTeachingGroupHandler(
+                                                                teachingGroup.name,
+                                                                teachingGroup.id,
+                                                                teachingGroup.isLocked
+                                                            )(e);
+                                                        }}
+                                                        className="btn-icon-secondary"
+                                                    >
+                                                        <KeyRound size={20} />
+                                                    </button>
                                                     <button
                                                         onClick={(e) => {
                                                             e.stopPropagation();
