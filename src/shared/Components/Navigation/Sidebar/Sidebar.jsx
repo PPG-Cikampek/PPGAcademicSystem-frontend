@@ -105,18 +105,19 @@ const Sidebar = ({ linksList, children }) => {
                 </div>
                 <nav
                     className={`mt-4 ${
-                        sidebar.isSidebarOpen ? "min-w-64" : ""
+                        sidebar.isSidebarOpen ? "min-w-[16rem]" : ""
                     }`}
                 >
-                    <ul className="mt-4 space-}y-2">
+                    <ul className="mt-4 space-y-2">
                         {linksList.map((link, index) => (
                             <li key={index} className="relative">
                                 <NavLink
-                                    to={link.link ? link.link : null}
+                                    to={link.link ? link.link : "#"}
                                     end={link.end}
-                                    onClick={() => {
-                                        handleNavigation();
+                                    onClick={(e) => {
+                                        handleNavigation(e);
                                         if (link.subOptions) {
+                                            e.preventDefault();
                                             toggleSubMenu(link.label);
                                         } else if (
                                             sidebar.isSidebarOpen &&
@@ -130,7 +131,7 @@ const Sidebar = ({ linksList, children }) => {
                                     className={({ isActive }) => `
                                         flex items-center px-4 py-3 
                                         hover:bg-gray-100
-                                        focus:outline-hidden focus:ring-primary-subtle
+                                        focus:outline-none focus:ring-primary-subtle
                                         ${
                                             isActive && link.link
                                                 ? "bg-gray-100 text-primary font-medium"
@@ -165,7 +166,7 @@ const Sidebar = ({ linksList, children }) => {
                                                 expandedMenu !== link.label &&
                                                 window.matchMedia(
                                                     "(min-width: 768px)"
-                                                ) &&
+                                                ).matches &&
                                                 sidebar.isSidebarOpen && (
                                                     <ChevronDown />
                                                 )}
@@ -173,7 +174,7 @@ const Sidebar = ({ linksList, children }) => {
                                                 expandedMenu === link.label &&
                                                 window.matchMedia(
                                                     "(min-width: 768px)"
-                                                ) &&
+                                                ).matches &&
                                                 sidebar.isSidebarOpen && (
                                                     <ChevronUp />
                                                 )}
@@ -204,14 +205,14 @@ const Sidebar = ({ linksList, children }) => {
                                                         className={({
                                                             isActive,
                                                         }) =>
-                                                            ` flex items-center px-4 py-2 text-sm hover:bg-gray-100 focus:outline-hidden focus:ring-primary-subtle ${
+                                                            ` flex items-center px-4 py-2 text-sm hover:bg-gray-100 focus:outline-none focus:ring-primary-subtle ${
                                                                 isActive
                                                                     ? "bg-gray-100 text-primary font-medium"
                                                                     : "text-gray-800"
                                                             } `
                                                         }
-                                                        onClick={() => {
-                                                            handleNavigation();
+                                                        onClick={(e) => {
+                                                            handleNavigation(e);
                                                             if (
                                                                 sidebar.isSidebarOpen &&
                                                                 !window.matchMedia(
