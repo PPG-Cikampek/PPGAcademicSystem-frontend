@@ -5,7 +5,7 @@ import { AuthContext } from "../../Context/auth-context";
 import { LogOut } from "lucide-react";
 import logo from "../../../../assets/logos/ppgcikampek.webp";
 
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { GeneralContext } from "../../Context/general-context";
 import { formatDate } from "../../../Utilities/formatDateToLocal";
 
@@ -63,7 +63,7 @@ const Sidebar = ({ linksList, children }) => {
                     fixed md:sticky md:top-0
                     h-full md:h-screen
                     bg-white text-gray-800 border-gray-200 
-                    transition-all duration-300 ease-in-out
+                    transition duration-300 ease-in-out will-change-[transform]
                     z-30 opacity-0 md:opacity-100
                     ${
                         sidebar.isSidebarOpen
@@ -128,6 +128,8 @@ const Sidebar = ({ linksList, children }) => {
                                             sidebar.toggle();
                                         }
                                     }}
+                                    aria-expanded={link.subOptions ? expandedMenu === link.label : undefined}
+                                    aria-controls={link.subOptions ? `submenu-${index}` : undefined}
                                     className={({ isActive }) => `
                                         flex items-center px-4 py-3 
                                         hover:bg-gray-100
@@ -161,23 +163,14 @@ const Sidebar = ({ linksList, children }) => {
                                                 {link.label}
                                             </span>
                                         </div>
-                                        <div>
-                                            {link.subOptions &&
-                                                expandedMenu !== link.label &&
-                                                window.matchMedia(
-                                                    "(min-width: 768px)"
-                                                ).matches &&
-                                                sidebar.isSidebarOpen && (
-                                                    <ChevronDown />
-                                                )}
-                                            {link.subOptions &&
-                                                expandedMenu === link.label &&
-                                                window.matchMedia(
-                                                    "(min-width: 768px)"
-                                                ).matches &&
-                                                sidebar.isSidebarOpen && (
-                                                    <ChevronUp />
-                                                )}
+                                        <div className="hidden md:block">
+                                            {link.subOptions && sidebar.isSidebarOpen && (
+                                                <ChevronDown
+                                                    className={`transition-transform duration-200 ${
+                                                        expandedMenu === link.label ? "rotate-180" : ""
+                                                    }`}
+                                                />
+                                            )}
                                         </div>
                                     </div>
                                 </NavLink>
@@ -185,6 +178,7 @@ const Sidebar = ({ linksList, children }) => {
                                 {/* Sub-menu */}
                                 {link.subOptions && (
                                     <ul
+                                        id={`submenu-${index}`}
                                         className={` ml-4 space-y-1 overflow-hidden transition-all duration-300 ease-in-out `}
                                         style={{
                                             maxHeight:
