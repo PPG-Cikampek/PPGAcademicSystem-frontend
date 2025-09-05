@@ -1,6 +1,6 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { Edit2 } from "lucide-react";
+import { Edit2, Pencil } from "lucide-react";
 import DataTable from "../../../../shared/Components/UIElements/DataTable";
 
 const AttendanceTable = ({
@@ -68,9 +68,9 @@ const AttendanceTable = ({
                             e.stopPropagation();
                             onEditAttendance(item._id);
                         }}
-                        className="p-1 rounded-full active:bg-gray-200 text-blue-500 active:text-blue-700 transition duration-300"
+                        className="btn-icon-primary"
                     >
-                        <Edit2 size={16} />
+                        <Pencil size={16} />
                     </button>
                 );
             },
