@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import useHttp from "../../shared/hooks/http-hook";
+import { useBranches, useDeleteBranchMutation, useDeleteSubBranchMutation } from "../../shared/queries/useLevels";
 
 import NewModal from "../../shared/Components/Modal/NewModal";
 import useNewModal from "../../shared/hooks/useNewModal";
@@ -21,32 +21,14 @@ import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 import SkeletonLoader from "../../shared/Components/UIElements/SkeletonLoader";
 
 const LevelsView = () => {
-    const [data, setData] = useState();
     const [expandedBranches, setExpandedBranches] = useState({});
-    const { isLoading, error, sendRequest, setError } = useHttp();
+    const { data, isLoading, error } = useBranches();
+    const deleteBranchMutation = useDeleteBranchMutation();
+    const deleteSubBranchMutation = useDeleteSubBranchMutation();
 
     const { modalState, openModal, closeModal } = useNewModal();
 
     const navigate = useNavigate();
-
-    useEffect(() => {
-        const loadLevels = async () => {
-            try {
-                console.log("Fetching Levels...");
-                const responseData = await sendRequest(
-                    `${
-                        import.meta.env.VITE_BACKEND_URL
-                    }/levels/branches/?populate=true`
-                );
-                setData(responseData);
-                console.log(responseData);
-                console.log("Fetching Levels completed");
-            } catch (err) {
-                // Error is already handled by useHttp
-            }
-        };
-        loadLevels();
-    }, [sendRequest]);
 
     const toggleBranch = (branchId) => {
         setExpandedBranches((prev) => ({
@@ -58,23 +40,11 @@ const LevelsView = () => {
     const deleteBranchHandler = (branchName, branchId) => {
         console.log(branchId);
         const confirmDelete = async () => {
-            const url = `${import.meta.env.VITE_BACKEND_URL}/levels/branches/`;
-
-            console.log(url);
-
-            const body = JSON.stringify({
-                branchId,
-            });
-
-            let responseData;
             try {
-                responseData = await sendRequest(url, "DELETE", body, {
-                    "Content-Type": "application/json",
-                });
-
-                openModal(responseData.message, "success", null, "Berhasil!", false);
+                const response = await deleteBranchMutation.mutateAsync({ branchId });
+                openModal(response.message, "success", null, "Berhasil!", false);
             } catch (err) {
-                // Error is already handled by useHttp
+                // Error is handled by React Query
             }
         };
         openModal(`Hapus Desa: ${branchName}?`, "confirmation", confirmDelete, `Konfirmasi Penghapusan`, true);
@@ -84,23 +54,12 @@ const LevelsView = () => {
         e.stopPropagation();
         console.log(subBranchId);
         const confirmDelete = async () => {
-            const url = `${
-                import.meta.env.VITE_BACKEND_URL
-            }/levels/branches/sub-branches`;
-
-            console.log(url);
-
-            const body = JSON.stringify({
-                subBranchId,
-            });
-
-            let responseData;
             try {
-                responseData = await sendRequest(url, "DELETE", body, {
-                    "Content-Type": "application/json",
-                });
-                openModal(responseData.message, "success", null, "Berhasil!", false);
-            } catch (err) {}
+                const response = await deleteSubBranchMutation.mutateAsync({ subBranchId });
+                openModal(response.message, "success", null, "Berhasil!", false);
+            } catch (err) {
+                // Error is handled by React Query
+            }
         };
         openModal(`Hapus Desa: ${subBranchName}?`, "confirmation", confirmDelete, `Konfirmasi Penghapusan`, true);
     };
@@ -121,13 +80,13 @@ const LevelsView = () => {
                 </div>
 
                 {error && (
-                    <ErrorCard error={error} onClear={() => setError(null)} />
+                    <ErrorCard error={error} />
                 )}
 
                 <NewModal
                     modalState={modalState}
                     onClose={closeModal}
-                    isLoading={isLoading}
+                    isLoading={isLoading || deleteBranchMutation.isPending || deleteSubBranchMutation.isPending}
                 />
 
                 {!data && isLoading && (

@@ -40,3 +40,9 @@ export { useClass, useUpdateClassMutation, useRegisterTeacherToClassMutation, us
 export { useTeachers } from "./useTeachers";
 
 export { useStudents } from "./useStudents";
+
+export {
+    useBranches,
+    useDeleteBranchMutation,
+    useDeleteSubBranchMutation,
+} from "./useLevels";
