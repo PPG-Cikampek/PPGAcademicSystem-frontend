@@ -6,11 +6,15 @@ import { pdf } from "@react-pdf/renderer";
 import IDCardDocument from "../id-card/IDCardDocument";
 
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
+import useNewModal from "../../shared/hooks/useNewModal";
+import NewModal from "../../shared/Components/Modal/NewModal";
 
 const StudentProfileCard = ({ studentInfo, studentData, studentDetails }) => {
     const [showQRCode, setShowQRCode] = useState(false);
     const [isDownloading, setIsDownloading] = useState(false);
     const auth = useContext(AuthContext);
+
+    const { modalState, openModal, closeModal } = useNewModal();
 
     const downloadQRCode = async () => {
         setIsDownloading(true);
@@ -48,6 +52,12 @@ const StudentProfileCard = ({ studentInfo, studentData, studentDetails }) => {
             link.click();
             link.remove();
             URL.revokeObjectURL(url);
+            openModal(
+                "ID Card berhasil diunduh!\nCek folder unduhan Anda.",
+                "success",
+                null,
+                "Berhasil!"
+            );
         } catch (err) {
             // Fallback: if PDF generation fails, try to download QR image only
             if (qrDataUrl) {
@@ -55,10 +65,20 @@ const StudentProfileCard = ({ studentInfo, studentData, studentDetails }) => {
                 link.href = qrDataUrl;
                 link.download = `${fileName}_QRCode.png`;
                 link.click();
+                openModal(
+                    "ID Card berhasil diunduh!\nCek folder unduhan Anda.",
+                    "success",
+                    null,
+                    "Berhasil!"
+                );
             } else {
                 // Nothing to download
-                // eslint-disable-next-line no-console
-                console.error("No QR canvas or PDF generation failed.", err);
+                openModal(
+                    "Gagal mengunduh ID Card. Silakan coba lagi.",
+                    "error",
+                    null,
+                    "Gagal"
+                );
             }
         } finally {
             setIsDownloading(false);
@@ -134,6 +154,7 @@ const StudentProfileCard = ({ studentInfo, studentData, studentDetails }) => {
                 <span className="badge-primary">{studentInfo.branch}</span>
                 <span className="badge-primary">{studentInfo.subBranch}</span>
             </div>
+            <NewModal modalState={modalState} onClose={closeModal} />
         </div>
     );
 };

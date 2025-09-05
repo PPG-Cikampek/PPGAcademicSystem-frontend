@@ -139,7 +139,7 @@ const IDCardDocument = ({ student }) => {
                                 { top: nisTop, width, fontSize: idFontSize },
                             ]}
                             wrap={false}
-                        >{`NIS: ${student.nis}`}</Text>
+                        >{student.nis}</Text>
                     </View>
                 </View>
             </Page>
