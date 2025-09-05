@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
-import useHttp from "../../shared/hooks/http-hook";
 import useModal from "../../shared/hooks/useNewModal";
 import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
 
@@ -9,10 +8,9 @@ import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import NewModal from "../../shared/Components/Modal/NewModal";
 import { useTeachingGroup } from "../../shared/queries";
+import { useUpdateTeachingGroupMutation } from "../../shared/queries/useTeachingGroups";
 
 const UpdateTeachingGroupView = () => {
-    const { isLoading, error, sendRequest, setError } = useHttp();
-
     const { modalState, openModal, closeModal, handleConfirm } = useModal();
 
     const navigate = useNavigate();
@@ -23,6 +21,8 @@ const UpdateTeachingGroupView = () => {
 
     const { data: teachingGroupData, isLoading: isFetching } =
         useTeachingGroup(teachingGroupId);
+
+    const updateTeachingGroupMutation = useUpdateTeachingGroupMutation();
 
     const teachingGroupFields = [
         {
@@ -42,22 +42,14 @@ const UpdateTeachingGroupView = () => {
     ];
 
     const handleFormSubmit = async (data) => {
-        const url = `${
-            import.meta.env.VITE_BACKEND_URL
-        }/teachingGroups/${teachingGroupId}`;
-
-        const body = JSON.stringify({
-            name: data.teachingGroupName,
-            address: data.address,
-        });
-
-        let responseData;
         try {
-            responseData = await sendRequest(url, "PATCH", body, {
-                "Content-Type": "application/json",
+            await updateTeachingGroupMutation.mutateAsync({
+                teachingGroupId,
+                name: data.teachingGroupName,
+                address: data.address,
             });
             openModal(
-                responseData.message,
+                `Berhasil memperbarui KBM ${data.teachingGroupName}`,
                 "success",
                 null,
                 "Berhasil!",
@@ -77,11 +69,11 @@ const UpdateTeachingGroupView = () => {
                     closeModal();
                     navigate(-1);
                 }}
-                isLoading={isLoading}
+                isLoading={updateTeachingGroupMutation.isPending}
             />
 
-            {error && (
-                <ErrorCard error={error} onClear={() => setError(null)} />
+            {updateTeachingGroupMutation.isError && (
+                <ErrorCard error={updateTeachingGroupMutation.error} onClear={() => updateTeachingGroupMutation.reset()} />
             )}
 
             <div className={`pb-24 transition-opacity duration-300 `}>
@@ -93,7 +85,7 @@ const UpdateTeachingGroupView = () => {
                         subtitle={"Sistem Akademik Digital"}
                         fields={teachingGroupFields}
                         onSubmit={handleFormSubmit}
-                        disabled={isLoading}
+                        disabled={updateTeachingGroupMutation.isPending}
                         reset={false}
                         footer={false}
                         button={
@@ -101,13 +93,13 @@ const UpdateTeachingGroupView = () => {
                                 <button
                                     type="submit"
                                     className={`button-primary ${
-                                        isLoading
+                                        updateTeachingGroupMutation.isPending
                                             ? "opacity-50 cursor-not-allowed"
                                             : ""
                                     }`}
-                                    disabled={isLoading}
+                                    disabled={updateTeachingGroupMutation.isPending}
                                 >
-                                    {isLoading ? (
+                                    {updateTeachingGroupMutation.isPending ? (
                                         <LoadingCircle>
                                             Processing...
                                         </LoadingCircle>

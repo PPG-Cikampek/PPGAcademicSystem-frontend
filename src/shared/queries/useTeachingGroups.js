@@ -181,3 +181,42 @@ export const useRegisterSubBranchToTeachingGroupMutation = () => {
         },
     });
 };
+
+// Mutation for creating a new teaching group
+export const useCreateTeachingGroupMutation = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ name, address, branchYearId }) => {
+            const response = await api.post(`/teachingGroups/`, {
+                name,
+                address,
+                branchYearId,
+            });
+            return response.data;
+        },
+        onSuccess: () => {
+            // Invalidate relevant queries if needed
+        },
+    });
+};
+
+// Mutation for updating a teaching group
+export const useUpdateTeachingGroupMutation = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async ({ teachingGroupId, name, address }) => {
+            const response = await api.patch(`/teachingGroups/${teachingGroupId}`, {
+                name,
+                address,
+            });
+            return response.data;
+        },
+        onSuccess: (data, variables) => {
+            queryClient.invalidateQueries({
+                queryKey: ["teachingGroup", variables.teachingGroupId],
+            });
+        },
+    });
+};

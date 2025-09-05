@@ -1,19 +1,18 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
-import useHttp from "../../shared/hooks/http-hook";
 import useModal from "../../shared/hooks/useNewModal";
 import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
 
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import NewModal from "../../shared/Components/Modal/NewModal";
+import { useCreateTeachingGroupMutation } from "../../shared/queries/useTeachingGroups";
 
 const NewTeachingGroupView = () => {
-    const [isTransitioning, setIsTransitioning] = useState(false);
-    const { isLoading, error, sendRequest, setError } = useHttp();
-
     const { modalState, openModal, closeModal, handleConfirm } = useModal();
+
+    const createTeachingGroupMutation = useCreateTeachingGroupMutation();
 
     // const auth = useContext(AuthContext);
     const navigate = useNavigate();
@@ -36,21 +35,14 @@ const NewTeachingGroupView = () => {
     ];
 
     const handleFormSubmit = async (data) => {
-        const url = `${import.meta.env.VITE_BACKEND_URL}/teachingGroups/`;
-
-        const body = JSON.stringify({
-            name: data.teachingGroupName,
-            address: data.address,
-            branchYearId: state,
-        });
-
-        let responseData;
         try {
-            responseData = await sendRequest(url, "POST", body, {
-                "Content-Type": "application/json",
+            await createTeachingGroupMutation.mutateAsync({
+                name: data.teachingGroupName,
+                address: data.address,
+                branchYearId: state,
             });
             openModal(
-                responseData.message,
+                `Berhasil membuat KBM ${data.teachingGroupName}`,
                 "success",
                 null,
                 "Berhasil!",
@@ -70,24 +62,23 @@ const NewTeachingGroupView = () => {
                     closeModal();
                     navigate(-1);
                 }}
-                isLoading={isLoading}
+                isLoading={createTeachingGroupMutation.isPending}
             />
 
-            {error && (
-                <ErrorCard error={error} onClear={() => setError(null)} />
+            {createTeachingGroupMutation.isError && (
+                <ErrorCard
+                    error={createTeachingGroupMutation.error}
+                    onClear={() => createTeachingGroupMutation.reset()}
+                />
             )}
 
-            <div
-                className={`pb-24 transition-opacity duration-300 ${
-                    isTransitioning ? "opacity-0" : "opacity-100"
-                }`}
-            >
+            <div className={`pb-24 transition-opacity duration-300`}>
                 <DynamicForm
                     title="Tambah KBM"
                     subtitle={"Sistem Akademik Digital"}
                     fields={teachingGroupFields}
                     onSubmit={handleFormSubmit}
-                    disabled={isLoading}
+                    disabled={createTeachingGroupMutation.isPending}
                     reset={false}
                     footer={false}
                     button={
@@ -95,13 +86,13 @@ const NewTeachingGroupView = () => {
                             <button
                                 type="submit"
                                 className={`button-primary ${
-                                    isLoading
+                                    createTeachingGroupMutation.isPending
                                         ? "opacity-50 cursor-not-allowed"
                                         : ""
                                 }`}
-                                disabled={isLoading}
+                                disabled={createTeachingGroupMutation.isPending}
                             >
-                                {isLoading ? (
+                                {createTeachingGroupMutation.isPending ? (
                                     <LoadingCircle>Processing...</LoadingCircle>
                                 ) : (
                                     "Tambah"
