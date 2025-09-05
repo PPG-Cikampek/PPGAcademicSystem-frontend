@@ -40,32 +40,24 @@ const styles = StyleSheet.create({
         top: 0,
         // width/height will be provided inline in points to match the page size
     },
-    profilePic: {
-        borderRadius: 5,
+    pic: {
         position: "absolute",
-        top: "20%",
-    },
-    qrPic: {
-        position: "absolute",
-        top: "65%",
+        overflow: "hidden",
     },
     text: {
-        fontSize: 12,
-        // textAlign: "center",
+        fontSize: 14,
     },
     name: {
         position: "absolute",
         // top will be provided dynamically in the component (in points)
-        // left: 0,
-        // textAlign: "center",
-        fontSize: 12,
+        textAlign: "center",
+        left: 0,
     },
-    id: {
+    nis: {
         position: "absolute",
         // top will be provided dynamically in the component (in points)
-        // left: 0,
-        // textAlign: "center",
-        fontSize: 10,
+        textAlign: "center",
+        left: 0,
     },
 });
 
@@ -73,10 +65,17 @@ const IDCardDocument = ({ student }) => {
     const width = mmToPt(53.98);
     const height = mmToPt(85.6);
     // compute absolute top positions in points instead of using percentages
-    const nameTop = height * 0.25; // equivalent to 25%
-    const idTop = height * 0.75; // equivalent to 75%
-    const profileImageTop = height * 0.2; // equivalent to 20%
+    const nameTop = height * 0.2; // equivalent to 20%
+    const nisTop = height * 0.85; // equivalent to 90%
     const qrCodeTop = height * 0.65; // equivalent to 65%
+    // Enforce a fixed square profile size in points and numeric left/top coordinates
+    const profileSize = Math.round(width * 0.65); // 65% of card width
+    const profileLeft = Math.round((width - profileSize) / 2);
+    const profileTop = height * 0.35; // equivalent to 35%
+    const qrTop = height * 0.3; // equivalent to 30%
+    // small dynamic font sizing with sensible clamps
+    const nameFontSize = Math.min(14, Math.max(8, Math.round(width * 0.06)));
+    const idFontSize = Math.min(14, Math.max(6, Math.round(width * 0.06)));
     return (
         <Document>
             <Page size={{ width, height }} style={styles.page}>
@@ -95,23 +94,52 @@ const IDCardDocument = ({ student }) => {
                         />
 
                         <Text
-                            style={[styles.name, { top: nameTop, width }]}
-                            wrap={false}
-                        >
-                            {student.name}
-                        </Text>
-                        <PDFImage
-                            src={student.image}
                             style={[
-                                styles.profilePic,
-                                { left: "5%", width: "30%", height: "auto" },
+                                styles.name,
+                                { top: nameTop, width, fontSize: nameFontSize },
                             ]}
                             wrap={false}
-                        />
+                        >
+                            {student.name.toUpperCase()}
+                        </Text>
+                        {student.image ? (
+                            <PDFImage
+                                src={student.image}
+                                style={[
+                                    styles.pic,
+                                    {
+                                        left: profileLeft,
+                                        top: profileTop,
+                                        width: profileSize,
+                                        height: profileSize,
+                                        borderRadius: 3,
+                                    },
+                                ]}
+                                resizeMode="cover"
+                                wrap={false}
+                            />
+                        ) : (
+                            <View
+                                style={[
+                                    styles.pic,
+                                    {
+                                        left: profileLeft,
+                                        top: profileTop,
+                                        width: profileSize,
+                                        height: profileSize,
+                                        backgroundColor: "#e0e0e0",
+                                    },
+                                ]}
+                                wrap={false}
+                            />
+                        )}
                         <Text
-                            style={[styles.id, { top: idTop, width }]}
+                            style={[
+                                styles.nis,
+                                { top: nisTop, width, fontSize: idFontSize },
+                            ]}
                             wrap={false}
-                        >{`ID: ${student.id}`}</Text>
+                        >{`NIS: ${student.nis}`}</Text>
                     </View>
                 </View>
             </Page>
@@ -125,6 +153,20 @@ const IDCardDocument = ({ student }) => {
                     <PDFImage
                         src={idCardBGBack}
                         style={[styles.bg, { width, height }]}
+                        resizeMode="cover"
+                        wrap={false}
+                    />
+                    <PDFImage
+                        src={student.qrCode}
+                        style={[
+                            styles.pic,
+                            {
+                                left: profileLeft,
+                                top: qrTop,
+                                width: profileSize,
+                                height: profileSize,
+                            },
+                        ]}
                         resizeMode="cover"
                         wrap={false}
                     />
