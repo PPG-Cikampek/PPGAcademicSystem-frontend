@@ -73,20 +73,20 @@ const Sidebar = ({ linksList, children }) => {
                 `}
             >
                 <div
-                    className={`m-2 mb-6 flex flex-col items-center justify-start gap-2 border-gray-200`}
+                    className={`m-2 mb-6 flex flex-col items-start justify-start gap-2 border-gray-200`}
                 >
                     <div className="flex items-center gap-2">
                         <img src={logo} className={`font-normal size-12`} />
                         <div className="flex flex-col gap-0">
                             <span
-                                className={`shrink-0 whitespace-nowrap text-2xl font-semibold text-primary overflow-clip ${
+                                className={`whitespace-nowrap text-2xl font-semibold text-primary overflow-clip ${
                                     sidebar.isSidebarOpen ? "block" : "hidden"
                                 }`}
                             >
                                 PPG Cikampek
                             </span>
                             {version && sidebar.isSidebarOpen && (
-                                <span className="text-sm shrink-0 whitespace-nowrap">
+                                <span className="text-xs shrink-0 whitespace-nowrap">
                                     v{version.version} -{" "}
                                     {formatDate(
                                         new Date(version.timestamp * 1000),
