@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import useHttp from "../../shared/hooks/http-hook";
+import { useBranch, useUpdateBranchMutation } from "../../shared/queries/useLevels";
 import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
 
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
@@ -11,54 +11,27 @@ import useNewModal from "../../shared/hooks/useNewModal";
 
 const UpdateBranchView = () => {
     const { modalState, openModal, closeModal } = useNewModal();
-    const { isLoading, error, sendRequest, setError } = useHttp();
     const [isTransitioning, setIsTransitioning] = useState(false);
-    const [loadedLevel, setLoadedLevel] = useState();
 
     const branchId = useParams().branchId;
     const navigate = useNavigate();
-
-    useEffect(() => {
-        const fetchBranch = async () => {
-            try {
-                const responseData = await sendRequest(
-                    `${
-                        import.meta.env.VITE_BACKEND_URL
-                    }/levels/branches/${branchId}`
-                );
-                setLoadedLevel(responseData.branch);
-                console.log(responseData);
-                console.log(responseData.branch);
-            } catch (err) {}
-        };
-        fetchBranch();
-    }, [sendRequest]);
+    const { data: branchData, isLoading: branchLoading } = useBranch(branchId);
+    const updateBranchMutation = useUpdateBranchMutation();
 
     const handleFormSubmit = async (data) => {
-        const url = `${
-            import.meta.env.VITE_BACKEND_URL
-        }/levels/branches/${branchId}`;
-
-        const body = JSON.stringify({ name: data.name, address: data.address });
-
-        console.log(body);
-
-        let responseData;
         try {
-            responseData = await sendRequest(url, "PATCH", body, {
-                "Content-Type": "application/json",
-            });
+            const response = await updateBranchMutation.mutateAsync({ branchId, data: { name: data.name, address: data.address } });
+            openModal(response.message, "success", () => navigate(-1), "Berhasil!");
         } catch (err) {
-            // Error is already handled by useHttp
+            // Error is handled by React Query
         }
-        openModal(responseData.message, "success", () => navigate(-1), "Berhasil!");
     };
 
     return (
         <div className="m-auto max-w-md mt-14 md:mt-8">
             <NewModal modalState={modalState} onClose={closeModal} />
 
-            {!loadedLevel && isLoading && (
+            {!branchData?.branch && branchLoading && (
                 <div className="flex justify-center mt-16">
                     <LoadingCircle size={32} />
                 </div>
@@ -69,8 +42,8 @@ const UpdateBranchView = () => {
                     isTransitioning ? "opacity-0" : "opacity-100"
                 }`}
             >
-                {error && (
-                    <ErrorCard error={error} onClear={() => setError(null)} />
+                {updateBranchMutation.error && (
+                    <ErrorCard error={updateBranchMutation.error} />
                 )}
                 <DynamicForm
                     title="Update Data Desa"
@@ -82,18 +55,18 @@ const UpdateBranchView = () => {
                             placeholder: "Nama Desa",
                             type: "text",
                             required: true,
-                            value: loadedLevel?.name || "",
+                            value: branchData?.branch?.name || "",
                         },
                         {
                             name: "address",
                             label: "Alamat",
                             type: "textarea",
                             required: true,
-                            value: loadedLevel?.address || "",
+                            value: branchData?.branch?.address || "",
                         },
                     ]}
                     onSubmit={handleFormSubmit}
-                    disabled={isLoading}
+                    disabled={branchLoading || updateBranchMutation.isPending}
                     reset={false}
                     footer={false}
                     button={
@@ -101,13 +74,13 @@ const UpdateBranchView = () => {
                             <button
                                 type="submit"
                                 className={`button-primary ${
-                                    isLoading
+                                    branchLoading || updateBranchMutation.isPending
                                         ? "opacity-50 cursor-not-allowed"
                                         : ""
                                 }`}
-                                disabled={isLoading}
+                                disabled={branchLoading || updateBranchMutation.isPending}
                             >
-                                {isLoading ? (
+                                {branchLoading || updateBranchMutation.isPending ? (
                                     <LoadingCircle>Processing...</LoadingCircle>
                                 ) : (
                                     "Update"

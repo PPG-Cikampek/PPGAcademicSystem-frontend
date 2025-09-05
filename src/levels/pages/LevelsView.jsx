@@ -44,7 +44,7 @@ const LevelsView = () => {
                 const response = await deleteBranchMutation.mutateAsync({ branchId });
                 openModal(response.message, "success", null, "Berhasil!", false);
             } catch (err) {
-                // Error is handled by React Query
+                openModal(err.message || "Terjadi kesalahan tak terduga.", "error", null, "Gagal!", false);
             }
             return false;
 
@@ -60,11 +60,11 @@ const LevelsView = () => {
                 const response = await deleteSubBranchMutation.mutateAsync({ subBranchId });
                 openModal(response.message, "success", null, "Berhasil!", false);
             } catch (err) {
-                // Error is handled by React Query
+                openModal(err.message || "Terjadi kesalahan tak terduga.", "error", null, "Gagal!", false);
             }
             return false;
         };
-        openModal(`Hapus Desa: ${subBranchName}?`, "confirmation", confirmDelete, `Konfirmasi Penghapusan`, true);
+        openModal(`Hapus Kelompok: ${subBranchName}?`, "confirmation", confirmDelete, `Konfirmasi Penghapusan`, true);
     };
 
     return (

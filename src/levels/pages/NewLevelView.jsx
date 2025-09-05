@@ -1,7 +1,7 @@
 import { useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-import useHttp from "../../shared/hooks/http-hook";
+import { useBranches, useCreateBranchMutation, useCreateSubBranchMutation } from "../../shared/queries/useLevels";
 import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
 
@@ -16,7 +16,9 @@ import { div } from "framer-motion/client";
 const NewLevelView = () => {
     const [isBranch, setIsBranch] = useState(true);
     const [isTransitioning, setIsTransitioning] = useState(false);
-    const { isLoading, error, sendRequest, setError } = useHttp();
+    const { data: branchesData, isLoading: branchesLoading } = useBranches();
+    const createBranchMutation = useCreateBranchMutation();
+    const createSubBranchMutation = useCreateSubBranchMutation();
     const [loadedBranch, setLoadedBranch] = useState([]);
     const [subBranchFields, setSubBranchFields] = useState();
 
@@ -42,16 +44,10 @@ const NewLevelView = () => {
     ];
 
     useEffect(() => {
-        const fetchBranch = async () => {
-            try {
-                const responseData = await sendRequest(
-                    `${import.meta.env.VITE_BACKEND_URL}/levels/branches/`
-                );
-                setLoadedBranch(responseData.branches);
-            } catch (err) {}
-        };
-        fetchBranch();
-    }, [sendRequest]);
+        if (branchesData?.branches) {
+            setLoadedBranch(branchesData.branches);
+        }
+    }, [branchesData]);
 
     useEffect(() => {
         if (loadedBranch) {
@@ -85,31 +81,20 @@ const NewLevelView = () => {
     }, [loadedBranch]);
 
     const handleFormSubmit = async (data) => {
-        const url = isBranch
-            ? `${import.meta.env.VITE_BACKEND_URL}/levels/branches`
-            : `${
-                  import.meta.env.VITE_BACKEND_URL
-              }/levels/branches/sub-branches`;
+        const mutation = isBranch ? createBranchMutation : createSubBranchMutation;
+        const payload = isBranch
+            ? { name: data.name, address: data.address }
+            : {
+                  name: data.name,
+                  address: data.address,
+                  branchName: data.branch,
+              };
 
-        const body = JSON.stringify(
-            isBranch
-                ? { name: data.name, address: data.address }
-                : {
-                      name: data.name,
-                      address: data.address,
-                      branchName: data.branch,
-                  }
-        );
-
-        // console.log(body)
-        let responseData;
         try {
-            responseData = await sendRequest(url, "POST", body, {
-                "Content-Type": "application/json",
-            });
-            openModal(responseData.message, "success", () => navigate("/settings/levels/"), "Berhasil!", false);
+            const response = await mutation.mutateAsync(payload);
+            openModal(response.message, "success", () => navigate("/settings/levels/"), "Berhasil!", false);
         } catch (err) {
-            // Error is already handled by useHttp
+            // Error is handled by React Query
         }
     };
 
@@ -126,7 +111,7 @@ const NewLevelView = () => {
             <NewModal
                 modalState={modalState}
                 onClose={closeModal}
-                isLoading={isLoading}
+                isLoading={branchesLoading || createBranchMutation.isPending || createSubBranchMutation.isPending}
             />
 
             <div
@@ -134,11 +119,17 @@ const NewLevelView = () => {
                     isTransitioning ? "opacity-0" : "opacity-100"
                 }`}
             >
-                {error && (
+                {createBranchMutation.error && (
                     <div className="mx-2">
                         <ErrorCard
-                            error={error}
-                            onClear={() => setError(null)}
+                            error={createBranchMutation.error}
+                        />
+                    </div>
+                )}
+                {createSubBranchMutation.error && (
+                    <div className="mx-2">
+                        <ErrorCard
+                            error={createSubBranchMutation.error}
                         />
                     </div>
                 )}
@@ -147,7 +138,7 @@ const NewLevelView = () => {
                     subtitle={"Sistem Akademik Digital"}
                     fields={isBranch ? branchFields : subBranchFields}
                     onSubmit={handleFormSubmit}
-                    disabled={isLoading}
+                    disabled={branchesLoading || createBranchMutation.isPending || createSubBranchMutation.isPending}
                     reset={false}
                     footer={false}
                     button={
@@ -155,13 +146,13 @@ const NewLevelView = () => {
                             <button
                                 type="submit"
                                 className={`button-primary ${
-                                    isLoading
+                                    branchesLoading || createBranchMutation.isPending || createSubBranchMutation.isPending
                                         ? "opacity-50 cursor-not-allowed"
                                         : ""
                                 }`}
-                                disabled={isLoading}
+                                disabled={branchesLoading || createBranchMutation.isPending || createSubBranchMutation.isPending}
                             >
-                                {isLoading ? (
+                                {branchesLoading || createBranchMutation.isPending || createSubBranchMutation.isPending ? (
                                     <LoadingCircle>Processing...</LoadingCircle>
                                 ) : (
                                     "Tambah"
@@ -171,13 +162,13 @@ const NewLevelView = () => {
                                 type="button"
                                 onClick={handleToggle}
                                 className={`button-secondary ${
-                                    isLoading
+                                    branchesLoading || createBranchMutation.isPending || createSubBranchMutation.isPending
                                         ? "opacity-50 cursor-not-allowed"
                                         : ""
                                 }`}
-                                disabled={isLoading}
+                                disabled={branchesLoading || createBranchMutation.isPending || createSubBranchMutation.isPending}
                             >
-                                {isLoading ? (
+                                {branchesLoading || createBranchMutation.isPending || createSubBranchMutation.isPending ? (
                                     <LoadingCircle>Processing...</LoadingCircle>
                                 ) : isBranch ? (
                                     "Tambah Kelompok"

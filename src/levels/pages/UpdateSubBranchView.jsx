@@ -1,62 +1,34 @@
 import { useContext, useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import useHttp from "../../shared/hooks/http-hook";
+import { useSubBranch, useUpdateSubBranchMutation } from "../../shared/queries/useLevels";
 import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
 
-import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import NewModal from "../../shared/Components/Modal/NewModal";
 import useNewModal from "../../shared/hooks/useNewModal";
 
 const UpdateSubBranchView = () => {
-    const { isLoading, error, sendRequest, setError } = useHttp();
     const [isTransitioning, setIsTransitioning] = useState(false);
-    const [loadedLevel, setLoadedLevel] = useState();
 
     const subBranchId = useParams().subBranchId;
     const navigate = useNavigate();
     const { modalState, openModal, closeModal } = useNewModal();
-
-    useEffect(() => {
-        const fetchSubBranch = async () => {
-            try {
-                const responseData = await sendRequest(
-                    `${
-                        import.meta.env.VITE_BACKEND_URL
-                    }/levels/branches/sub-branches/${subBranchId}`
-                );
-                setLoadedLevel(responseData.subBranch);
-                console.log(responseData);
-                console.log(responseData.subBranch);
-            } catch (err) {}
-        };
-        fetchSubBranch();
-    }, [sendRequest]);
+    const { data: subBranchData, isLoading: subBranchLoading } = useSubBranch(subBranchId);
+    const updateSubBranchMutation = useUpdateSubBranchMutation();
 
     const handleFormSubmit = async (data) => {
-        const url = `${
-            import.meta.env.VITE_BACKEND_URL
-        }/levels/branches/sub-branches/${subBranchId}`;
-
-        const body = JSON.stringify({ name: data.name, address: data.address });
-
-        console.log(body);
-
-        let responseData;
         try {
-            responseData = await sendRequest(url, "PATCH", body, {
-                "Content-Type": "application/json",
-            });
+            const response = await updateSubBranchMutation.mutateAsync({ subBranchId, data: { name: data.name, address: data.address } });
+            openModal(response.message, "success", () => navigate(-1), "Berhasil!", false);
         } catch (err) {
-            // Error is already handled by useHttp
+            // Error is handled by React Query
         }
-        openModal(responseData.message, "success", () => navigate(-1), "Berhasil!", false);
     };
 
     return (
         <div className="m-auto max-w-md mt-14 md:mt-8">
-            {!loadedLevel && isLoading && (
+            {!subBranchData?.subBranch && subBranchLoading && (
                 <div className="flex justify-center mt-16">
                     <LoadingCircle size={32} />
                 </div>
@@ -65,7 +37,7 @@ const UpdateSubBranchView = () => {
             <NewModal
                 modalState={modalState}
                 onClose={closeModal}
-                isLoading={isLoading}
+                isLoading={subBranchLoading || updateSubBranchMutation.isPending}
             />
 
             <div
@@ -73,9 +45,6 @@ const UpdateSubBranchView = () => {
                     isTransitioning ? "opacity-0" : "opacity-100"
                 }`}
             >
-                {error && (
-                    <ErrorCard error={error} onClear={() => setError(null)} />
-                )}
                 <DynamicForm
                     title="Update Data Kelompok"
                     subtitle={"Sistem Akademik Digital"}
@@ -86,14 +55,14 @@ const UpdateSubBranchView = () => {
                             placeholder: "Nama Kelompok",
                             type: "text",
                             required: true,
-                            value: loadedLevel?.name || "",
+                            value: subBranchData?.subBranch?.name || "",
                         },
                         {
                             name: "address",
                             label: "Alamat",
                             type: "textarea",
                             required: true,
-                            value: loadedLevel?.address || "",
+                            value: subBranchData?.subBranch?.address || "",
                         },
                         {
                             name: "branch",
@@ -101,11 +70,11 @@ const UpdateSubBranchView = () => {
                             type: "text",
                             required: false,
                             disabled: true,
-                            value: loadedLevel?.branchId?.name || "",
+                            value: subBranchData?.subBranch?.branchId?.name || "",
                         },
                     ]}
                     onSubmit={handleFormSubmit}
-                    disabled={isLoading}
+                    disabled={subBranchLoading || updateSubBranchMutation.isPending}
                     reset={false}
                     footer={false}
                     button={
@@ -113,13 +82,13 @@ const UpdateSubBranchView = () => {
                             <button
                                 type="submit"
                                 className={`button-primary ${
-                                    isLoading
+                                    subBranchLoading || updateSubBranchMutation.isPending
                                         ? "opacity-50 cursor-not-allowed"
                                         : ""
                                 }`}
-                                disabled={isLoading}
+                                disabled={subBranchLoading || updateSubBranchMutation.isPending}
                             >
-                                {isLoading ? (
+                                {subBranchLoading || updateSubBranchMutation.isPending ? (
                                     <LoadingCircle>Processing...</LoadingCircle>
                                 ) : (
                                     "Update"
