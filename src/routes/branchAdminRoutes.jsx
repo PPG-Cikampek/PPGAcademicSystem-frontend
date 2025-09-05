@@ -5,7 +5,7 @@ import BranchYearsView from "../academic/pages/BranchYearsView";
 import NewBranchYearsView from "../academic/pages/NewBranchYearView";
 import NewTeachingGroupView from "../teaching-group/page/NewTeachingGroupView";
 import BranchAdminMunaqasyahView from "../munaqasyah/pages/BranchAdminMunaqasyahView";
-import TeachingGroupsView from "../teaching-group/page/TeachingGroupsView";
+import TeachingGroupDetailView from "../teaching-group/page/TeachingGroupDetailView";
 import AddSubBranchToTeachingGroupView from "../teaching-group/page/AddSubBranchToTeachingGroupView";
 import BranchAdminMunaqasyahDetailView from "../munaqasyah/pages/BranchAdminMunaqasyahDetailView";
 import UpdateClassView from "../class/pages/UpdateClassView";
@@ -73,7 +73,7 @@ export const branchAdminRoutes = [
     { path: "/dashboard/teachers/:id/update", element: <UpdateTeacherView /> },
     {
         path: "/dashboard/teaching-groups/:teachingGroupId",
-        element: <TeachingGroupsView />,
+        element: <TeachingGroupDetailView />,
     },
     {
         path: "/dashboard/teaching-groups/:teachingGroupId/add-class",

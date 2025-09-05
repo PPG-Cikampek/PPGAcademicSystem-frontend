@@ -11,7 +11,7 @@ import TeachingGroupHeader from "../components/TeachingGroupHeader";
 import SubBranchesSection from "../components/SubBranchesSection";
 import ClassesSection from "../components/ClassesSection";
 
-const TeachingGroupsView = () => {
+const TeachingGroupDetailView = () => {
     const [error, setError] = useState(null);
 
     const auth = useContext(AuthContext);
@@ -121,4 +121,4 @@ const TeachingGroupsView = () => {
     );
 };
 
-export default TeachingGroupsView;
+export default TeachingGroupDetailView;
