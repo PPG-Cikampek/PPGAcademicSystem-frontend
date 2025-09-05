@@ -235,7 +235,11 @@ const DataTable = ({
 
     return (
         <>
-            <div className="flex flex-col md:flex-row md:justify-between mb-2 flex-wrap gap-2">
+            <div
+                className={`flex flex-col md:flex-row md:justify-between flex-wrap gap-2 ${
+                    config.showTopEntries ? "mb-2" : ""
+                }`}
+            >
                 {isLoading ? (
                     <>
                         <div className="flex items-center gap-2">
@@ -296,7 +300,11 @@ const DataTable = ({
                 )}
             </div>
             {config.showFilter && filterOptions.length > 0 && <FilterCard />}
-            <div className="bg-white shadow-xs rounded-md overflow-auto text-nowrap mb-4">
+            <div
+                className={`bg-white shadow-xs rounded-md overflow-auto text-nowrap ${
+                    config.showBottomEntries ? "mb-4" : ""
+                }  `}
+            >
                 <table className="w-full rounded-md">
                     <thead className="border-b">
                         {isLoading ? (
@@ -342,55 +350,65 @@ const DataTable = ({
                                 .map((_, index) => <SkeletonRow key={index} />)
                         ) : (
                             <>
-                                {currentItems.map((item, index) => (
-                                    console.log(item),
-                                    <tr
-                                        key={item.id || index}
-                                        onClick={() =>
-                                            onRowClick && onRowClick(item)
-                                        }
-                                        className={`${
-                                            config.clickableRows === true
-                                                ? "hover:bg-gray-50 hover:cursor-pointer"
-                                                : ""
-                                        } transition-all duration-300 ease-in-out`}
-                                    >
-                                        {columns.map(
-                                            ({
-                                                key,
-                                                render,
-                                                cellStyle,
-                                                cellAlign,
-                                            }) => (
-                                                <td
-                                                    key={key}
-                                                    className={`${
-                                                        key === "actions"
-                                                            ? "p-1"
-                                                            : "p-2 md:p-4"
-                                                    } ${
-                                                        cellAlign === "center"
-                                                            ? "text-center"
-                                                            : cellAlign ===
-                                                              "right"
-                                                            ? "text-right"
-                                                            : "text-left"
-                                                    }`}
-                                                >
-                                                    <span
-                                                        className={cellStyle?.(
-                                                            item
-                                                        )}
-                                                    >
-                                                        {render
-                                                            ? render(item)
-                                                            : item[key]}
-                                                    </span>
-                                                </td>
-                                            )
-                                        )}
-                                    </tr>
-                                ))}
+                                {currentItems.map(
+                                    (item, index) => (
+                                        console.log(item),
+                                        (
+                                            <tr
+                                                key={item.id || index}
+                                                onClick={() =>
+                                                    onRowClick &&
+                                                    onRowClick(item)
+                                                }
+                                                className={`${
+                                                    config.clickableRows ===
+                                                    true
+                                                        ? "hover:bg-gray-50 hover:cursor-pointer"
+                                                        : ""
+                                                } transition-all duration-300 ease-in-out`}
+                                            >
+                                                {columns.map(
+                                                    ({
+                                                        key,
+                                                        render,
+                                                        cellStyle,
+                                                        cellAlign,
+                                                    }) => (
+                                                        <td
+                                                            key={key}
+                                                            className={`${
+                                                                key ===
+                                                                "actions"
+                                                                    ? "p-1"
+                                                                    : "p-2 md:p-4"
+                                                            } ${
+                                                                cellAlign ===
+                                                                "center"
+                                                                    ? "text-center"
+                                                                    : cellAlign ===
+                                                                      "right"
+                                                                    ? "text-right"
+                                                                    : "text-left"
+                                                            }`}
+                                                        >
+                                                            <span
+                                                                className={cellStyle?.(
+                                                                    item
+                                                                )}
+                                                            >
+                                                                {render
+                                                                    ? render(
+                                                                          item
+                                                                      )
+                                                                    : item[key]}
+                                                            </span>
+                                                        </td>
+                                                    )
+                                                )}
+                                            </tr>
+                                        )
+                                    )
+                                )}
                                 {currentItems.length === 0 && (
                                     <tr>
                                         <td
