@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useState, useEffect, useRef } from "react";
 import { NavLink } from "react-router-dom";
 import { SidebarContext } from "../../Context/sidebar-context";
 import { AuthContext } from "../../Context/auth-context";
@@ -27,6 +27,44 @@ const Sidebar = ({ linksList, children }) => {
     const sidebar = useContext(SidebarContext);
     const auth = useContext(AuthContext);
     const general = useContext(GeneralContext);
+
+    // Prevent background scrolling / interaction on mobile when sidebar is open
+    const scrollPositionRef = useRef(0);
+    useEffect(() => {
+        const isMobile = !window.matchMedia("(min-width: 768px)").matches;
+
+        const lock = () => {
+            scrollPositionRef.current = window.scrollY || window.pageYOffset || 0;
+            // lock scroll by fixing body and offsetting to retain scroll position
+            document.body.style.position = "fixed";
+            document.body.style.top = `-${scrollPositionRef.current}px`;
+            document.body.style.left = "0";
+            document.body.style.right = "0";
+            document.body.style.width = "100%";
+        };
+
+        const unlock = () => {
+            // restore body styles and scroll to previous position
+            document.body.style.position = "";
+            document.body.style.top = "";
+            document.body.style.left = "";
+            document.body.style.right = "";
+            document.body.style.width = "";
+            window.scrollTo(0, scrollPositionRef.current || 0);
+        };
+
+        if (sidebar.isSidebarOpen && isMobile) {
+            lock();
+        } else {
+            // only unlock if previously locked
+            if (document.body.style.position === "fixed") unlock();
+        }
+
+        return () => {
+            // cleanup in case component unmounts while locked
+            if (document.body.style.position === "fixed") unlock();
+        };
+    }, [sidebar.isSidebarOpen]);
 
     // console.log(auth.userRole)
 
