@@ -47,48 +47,6 @@ const Sidebar = ({ linksList, children }) => {
         }
     };
 
-    // Animate submenu height using measured scrollHeight
-    useEffect(() => {
-        if (!linksList) return;
-        linksList.forEach((link, idx) => {
-            if (!link.subOptions) return;
-            const el = document.getElementById(`submenu-${idx}`);
-            if (!el) return;
-            // Ensure measurement uses current content
-            if (expandedMenu === link.label && sidebar.isSidebarOpen) {
-                const target = el.scrollHeight;
-                el.style.maxHeight = `${target}px`;
-            } else {
-                el.style.maxHeight = "0px";
-            }
-        });
-        // Recalculate on window resize for robustness
-        const onResize = () => {
-            linksList.forEach((link, idx) => {
-                if (!link.subOptions) return;
-                const el = document.getElementById(`submenu-${idx}`);
-                if (!el) return;
-                if (expandedMenu === link.label && sidebar.isSidebarOpen) {
-                    el.style.maxHeight = `${el.scrollHeight}px`;
-                }
-            });
-        };
-        window.addEventListener("resize", onResize);
-        return () => window.removeEventListener("resize", onResize);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [expandedMenu, sidebar.isSidebarOpen, linksList]);
-
-    // Close sidebar on Escape (mobile only)
-    useEffect(() => {
-        const onKey = (e) => {
-            if (e.key === "Escape" && sidebar.isSidebarOpen && !window.matchMedia("(min-width: 768px)").matches) {
-                sidebar.toggle();
-            }
-        };
-        window.addEventListener("keydown", onKey);
-        return () => window.removeEventListener("keydown", onKey);
-    }, [sidebar]);
-
     return (
         <div className="relative h-full md:flex">
             {/* Overlay for mobile when sidebar is open */}
@@ -105,7 +63,7 @@ const Sidebar = ({ linksList, children }) => {
                     fixed md:sticky md:top-0
                     h-full md:h-screen
                     bg-white text-gray-800 border-gray-200 
-                    transition duration-300 ease-in-out will-change-[transform]
+                    transition-all duration-300 ease-in-out will-change-[transform]
                     z-30 opacity-0 md:opacity-100
                     ${
                         sidebar.isSidebarOpen
@@ -121,14 +79,14 @@ const Sidebar = ({ linksList, children }) => {
                         <img src={logo} className={`font-normal size-12`} />
                         <div className="flex flex-col gap-0">
                             <span
-                                className={`shrink-0 text-2xl font-semibold text-primary overflow-clip ${
+                                className={`shrink-0 whitespace-nowrap text-2xl font-semibold text-primary overflow-clip ${
                                     sidebar.isSidebarOpen ? "block" : "hidden"
                                 }`}
                             >
                                 PPG Cikampek
                             </span>
                             {version && sidebar.isSidebarOpen && (
-                                <span className="text-sm">
+                                <span className="text-sm shrink-0 whitespace-nowrap">
                                     v{version.version} -{" "}
                                     {formatDate(
                                         new Date(version.timestamp * 1000),
@@ -150,7 +108,7 @@ const Sidebar = ({ linksList, children }) => {
                         sidebar.isSidebarOpen ? "min-w-[16rem]" : ""
                     }`}
                 >
-                    <ul className="mt-4 space-y-2">
+                    <ul className="mt-4">
                         {linksList.map((link, index) => (
                             <li key={index} className="relative">
                                 <NavLink
@@ -221,8 +179,16 @@ const Sidebar = ({ linksList, children }) => {
                                 {link.subOptions && (
                                     <ul
                                         id={`submenu-${index}`}
-                                        className={` ml-4 space-y-1 overflow-hidden transition-[max-height] duration-300 ease-in-out `}
-                                        style={{ maxHeight: "0px" }}
+                                        className={` ml-4 space-y-1 overflow-hidden transition-all duration-300 ease-in-out `}
+                                        style={{
+                                            maxHeight:
+                                                expandedMenu === link.label
+                                                    ? `${
+                                                          link.subOptions
+                                                              .length * 48
+                                                      }px`
+                                                    : "0px", // Adjust height based on item count
+                                        }}
                                     >
                                         {link.subOptions.map(
                                             (subOption, subIndex) => (

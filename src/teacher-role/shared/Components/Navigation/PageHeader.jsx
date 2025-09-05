@@ -16,7 +16,7 @@ const PageHeader = ({ page = "PPG Cikampek", children }) => {
         <div className="w-full h-auto">
             <div className="px-3 py-2 flex bg-white items-center gap-2 shadow-xs">
                 <button
-                    className="p-2 rounded-full focus:bg-gray-200 hover:outline-hidden hover:ring-1 hover:ring-offset-1 hover:ring-gray-400"
+                    className="btn-icon-white text-gray-800 active:ring-2 ring-gray-400 ring-offset-1"
                     onClick={sidebarHandler}
                 >
                     {sidebar.isSidebarOpen ? (

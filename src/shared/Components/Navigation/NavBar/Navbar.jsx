@@ -228,7 +228,7 @@ const Navbar = () => {
                     <div className="flex gap-2 md:gap-6 items-center">
                         <div className="flex shrink-0">
                             <button
-                                className="p-2 rounded-full focus:bg-gray-200 hover:outline-hidden hover:ring-1 hover:ring-offset-1 hover:ring-gray-400"
+                                className="btn-icon-white text-gray-800 active:ring-2 ring-gray-400 ring-offset-1"
                                 onClick={sidebarHandler}
                             >
                                 {sidebar.isSidebarOpen ? (
