@@ -4,7 +4,6 @@ import { QrCode, Undo2, ArrowDownToLine } from "lucide-react";
 import { QRCodeCanvas } from "qrcode.react";
 import { pdf } from "@react-pdf/renderer";
 import IDCardDocument from "../id-card/IDCardDocument";
-import api, { getImageDataUrl } from "../../shared/queries/api";
 
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import useNewModal from "../../shared/hooks/useNewModal";
@@ -26,75 +25,41 @@ const StudentProfileCard = ({ studentInfo, studentData, studentDetails }) => {
             "_" +
             studentInfo.subBranch.replace(/\s+/g, "");
 
-        // Try to read the existing rendered QR canvas (only present when showQRCode is true)
         const canvas = document.querySelector("canvas");
         const qrDataUrl = canvas ? canvas.toDataURL("image/png") : null;
 
-        // Build the student object expected by IDCardDocument
-        // Try to read the already-rendered <img /> first (via ref) and convert it
-        // to a data URL. This avoids duplicate network requests and helps with
-        // auth/CORS when the browser already has access to the image.
-        // If that fails, fall back to the existing fetch helper (getImageDataUrl).
-        const buildImageDataUrl = async (imagePath) => {
-            if (!imagePath) return null;
-
-            // Prefer the DOM image's resolved src if available
-            const imgSrc = imgRef?.current?.src || imagePath;
-
-            // If it's already a data URL, we're done
-            if (/^data:/i.test(imgSrc)) return imgSrc;
-
-            // Try to fetch the image (include auth header if present) and convert to data URL
-            try {
-                const headers = auth?.token ? { Authorization: `Bearer ${auth.token}` } : {};
-                const resp = await fetch(imgSrc, { headers });
-                if (resp.ok) {
-                    const blob = await resp.blob();
-                    const dataUrl = await new Promise((resolve, reject) => {
-                        const reader = new FileReader();
-                        reader.onloadend = () => resolve(reader.result);
-                        reader.onerror = reject;
-                        reader.readAsDataURL(blob);
-                    });
-                    return dataUrl;
-                }
-            } catch (err) {
-                // ignore and try canvas fallback
+        // Convert student image to base64 data URL for PDF compatibility
+        let imageDataUrl = null;
+        try {
+            if (studentInfo?.image) {
+                const imageUrl = `${import.meta.env.VITE_BACKEND_URL}/${studentInfo.image}`;
+                const response = await fetch(imageUrl);
+                const blob = await response.blob();
+                imageDataUrl = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.readAsDataURL(blob);
+                });
+            } else {
+                // For placeholder image, also convert to base64
+                const placeholderUrl = "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541";
+                const response = await fetch(placeholderUrl);
+                const blob = await response.blob();
+                imageDataUrl = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.readAsDataURL(blob);
+                });
             }
-
-            // Canvas fallback: draw the existing img element into a canvas and read data URL
-            try {
-                const imgEl = imgRef?.current;
-                if (imgEl && imgEl.naturalWidth && imgEl.naturalHeight) {
-                    const canvas = document.createElement("canvas");
-                    canvas.width = imgEl.naturalWidth;
-                    canvas.height = imgEl.naturalHeight;
-                    const ctx = canvas.getContext("2d");
-                    ctx.drawImage(imgEl, 0, 0);
-                    return canvas.toDataURL("image/png");
-                }
-            } catch (err) {
-                // drawing may fail due to cross-origin tainting; fall back below
-            }
-
-            // Final fallback: try the original helper which uses axios and the configured baseURL
-            const isAbsolute = /^https?:\/\//i.test(imagePath);
-            const base = (import.meta.env.VITE_BACKEND_URL || "").replace(/\/+$/, "");
-            const normalized = isAbsolute ? imagePath : `${base}/${imagePath.replace(/^\/+/, "")}`;
-            try {
-                const headers = auth?.token ? { Authorization: `Bearer ${auth.token}` } : undefined;
-                return await getImageDataUrl(normalized, { headers });
-            } catch (err) {
-                return isAbsolute ? normalized : null;
-            }
-        };
-
-        const embeddedImage = await buildImageDataUrl(studentInfo?.image);
+        } catch (error) {
+            console.warn("Failed to convert image to base64:", error);
+            // Fallback: leave imageDataUrl as null, the PDF component will handle this
+        }
 
         const studentForPdf = {
             name: studentInfo.name || "",
             nis: studentInfo.nis || "",
-            image: embeddedImage,
+            image: imageDataUrl,
             qrCode: qrDataUrl,
         };
 
@@ -196,12 +161,16 @@ const StudentProfileCard = ({ studentInfo, studentData, studentDetails }) => {
                                 {isDownloading ? (
                                     <>
                                         <LoadingCircle size={18} />
-                                        <span className="ml-1">Memproses...</span>
+                                        <span className="ml-1">
+                                            Memproses...
+                                        </span>
                                     </>
                                 ) : (
                                     <>
                                         <ArrowDownToLine size={18} />
-                                        <span className="ml-1">Unduh ID Card</span>
+                                        <span className="ml-1">
+                                            Unduh ID Card
+                                        </span>
                                     </>
                                 )}
                             </button>

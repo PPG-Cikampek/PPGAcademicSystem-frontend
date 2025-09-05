@@ -35,21 +35,3 @@ api.interceptors.request.use(
 );
 
 export default api;
-
-// Helper: fetch an image (relative or absolute URL) and return a data URL (base64) for embedding
-export async function getImageDataUrl(path, options = {}) {
-    try {
-        const res = await api.get(path, { responseType: "blob", withCredentials: true, ...options });
-        const blob = res.data;
-
-        return await new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(blob);
-        });
-    } catch (err) {
-        // Let the caller decide how to handle failures (they may want to fall back to absolute URL etc.)
-        throw err;
-    }
-}
