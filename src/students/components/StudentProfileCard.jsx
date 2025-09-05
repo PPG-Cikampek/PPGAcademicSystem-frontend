@@ -1,9 +1,10 @@
-import { useState, useContext } from "react";
+import { useState, useContext, useRef } from "react";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
 import { QrCode, Undo2, ArrowDownToLine } from "lucide-react";
 import { QRCodeCanvas } from "qrcode.react";
 import { pdf } from "@react-pdf/renderer";
 import IDCardDocument from "../id-card/IDCardDocument";
+import api, { getImageDataUrl } from "../../shared/queries/api";
 
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import useNewModal from "../../shared/hooks/useNewModal";
@@ -15,6 +16,7 @@ const StudentProfileCard = ({ studentInfo, studentData, studentDetails }) => {
     const auth = useContext(AuthContext);
 
     const { modalState, openModal, closeModal } = useNewModal();
+    const imgRef = useRef(null);
 
     const downloadQRCode = async () => {
         setIsDownloading(true);
@@ -29,12 +31,70 @@ const StudentProfileCard = ({ studentInfo, studentData, studentDetails }) => {
         const qrDataUrl = canvas ? canvas.toDataURL("image/png") : null;
 
         // Build the student object expected by IDCardDocument
+        // Try to read the already-rendered <img /> first (via ref) and convert it
+        // to a data URL. This avoids duplicate network requests and helps with
+        // auth/CORS when the browser already has access to the image.
+        // If that fails, fall back to the existing fetch helper (getImageDataUrl).
+        const buildImageDataUrl = async (imagePath) => {
+            if (!imagePath) return null;
+
+            // Prefer the DOM image's resolved src if available
+            const imgSrc = imgRef?.current?.src || imagePath;
+
+            // If it's already a data URL, we're done
+            if (/^data:/i.test(imgSrc)) return imgSrc;
+
+            // Try to fetch the image (include auth header if present) and convert to data URL
+            try {
+                const headers = auth?.token ? { Authorization: `Bearer ${auth.token}` } : {};
+                const resp = await fetch(imgSrc, { headers });
+                if (resp.ok) {
+                    const blob = await resp.blob();
+                    const dataUrl = await new Promise((resolve, reject) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => resolve(reader.result);
+                        reader.onerror = reject;
+                        reader.readAsDataURL(blob);
+                    });
+                    return dataUrl;
+                }
+            } catch (err) {
+                // ignore and try canvas fallback
+            }
+
+            // Canvas fallback: draw the existing img element into a canvas and read data URL
+            try {
+                const imgEl = imgRef?.current;
+                if (imgEl && imgEl.naturalWidth && imgEl.naturalHeight) {
+                    const canvas = document.createElement("canvas");
+                    canvas.width = imgEl.naturalWidth;
+                    canvas.height = imgEl.naturalHeight;
+                    const ctx = canvas.getContext("2d");
+                    ctx.drawImage(imgEl, 0, 0);
+                    return canvas.toDataURL("image/png");
+                }
+            } catch (err) {
+                // drawing may fail due to cross-origin tainting; fall back below
+            }
+
+            // Final fallback: try the original helper which uses axios and the configured baseURL
+            const isAbsolute = /^https?:\/\//i.test(imagePath);
+            const base = (import.meta.env.VITE_BACKEND_URL || "").replace(/\/+$/, "");
+            const normalized = isAbsolute ? imagePath : `${base}/${imagePath.replace(/^\/+/, "")}`;
+            try {
+                const headers = auth?.token ? { Authorization: `Bearer ${auth.token}` } : undefined;
+                return await getImageDataUrl(normalized, { headers });
+            } catch (err) {
+                return isAbsolute ? normalized : null;
+            }
+        };
+
+        const embeddedImage = await buildImageDataUrl(studentInfo?.image);
+
         const studentForPdf = {
             name: studentInfo.name || "",
             nis: studentInfo.nis || "",
-            image: studentInfo?.image
-                ? `${import.meta.env.VITE_BACKEND_URL}/${studentInfo.image}`
-                : null,
+            image: embeddedImage,
             qrCode: qrDataUrl,
         };
 

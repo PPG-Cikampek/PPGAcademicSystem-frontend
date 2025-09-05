@@ -62,6 +62,8 @@ const styles = StyleSheet.create({
 });
 
 const IDCardDocument = ({ student }) => {
+    console.log("Rendering IDCardDocument for student:", student);
+    
     const width = mmToPt(53.98) * 1.5;
     const height = mmToPt(85.6) * 1.5;
     // compute absolute top positions in points instead of using percentages
