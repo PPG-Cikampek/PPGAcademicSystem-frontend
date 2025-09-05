@@ -7,15 +7,13 @@ import { AuthContext } from "../../shared/Components/Context/auth-context";
 
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
-import Modal from "../../shared/Components/UIElements/ModalBottomClose";
+import NewModal from "../../shared/Components/Modal/NewModal";
+import useNewModal from "../../shared/hooks/useNewModal";
 
 import logo from "../../assets/logos/ppgcikampek.webp";
 import { div } from "framer-motion/client";
 
 const NewLevelView = () => {
-    const [modalIsOpen, setModalIsOpen] = useState(false);
-    const [modalMessage, setModalMessage] = useState("");
-
     const [isBranch, setIsBranch] = useState(true);
     const [isTransitioning, setIsTransitioning] = useState(false);
     const { isLoading, error, sendRequest, setError } = useHttp();
@@ -24,6 +22,7 @@ const NewLevelView = () => {
 
     const auth = useContext(AuthContext);
     const navigate = useNavigate();
+    const { modalState, openModal, closeModal } = useNewModal();
 
     const branchFields = [
         {
@@ -108,8 +107,7 @@ const NewLevelView = () => {
             responseData = await sendRequest(url, "POST", body, {
                 "Content-Type": "application/json",
             });
-            setModalMessage(responseData.message);
-            setModalIsOpen(true);
+            openModal(responseData.message, "success", () => navigate("/settings/levels/"), "Berhasil!", false);
         } catch (err) {
             // Error is already handled by useHttp
         }
@@ -125,26 +123,11 @@ const NewLevelView = () => {
 
     return (
         <div className="m-auto max-w-md mt-14 md:mt-8">
-            <Modal
-                isOpen={modalIsOpen}
-                onClose={() => setModalIsOpen(false)}
-                title="Berhasil!"
-                footer={
-                    <>
-                        <button
-                            onClick={() => {
-                                setModalIsOpen(false);
-                                navigate("/settings/levels/");
-                            }}
-                            className="btn-danger-outline"
-                        >
-                            Tutup
-                        </button>
-                    </>
-                }
-            >
-                {modalMessage}
-            </Modal>
+            <NewModal
+                modalState={modalState}
+                onClose={closeModal}
+                isLoading={isLoading}
+            />
 
             <div
                 className={`pb-24 transition-opacity duration-300 ${

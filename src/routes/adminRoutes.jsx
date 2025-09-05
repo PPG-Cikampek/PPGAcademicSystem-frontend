@@ -25,7 +25,7 @@ const UpdateStudentView = lazy(() => import("../students/pages/UpdateStudentView
 const UpdateTeacherView = lazy(() => import("../teachers/pages/UpdateTeacherView"));
 const StudentReportView = lazy(() => import("../students/pages/StudentReportView"));
 const UpdateSubBranchView = lazy(() => import("../levels/pages/UpdateSubBranchView"));
-const UpdateBranchView = lazy(() => import("../teachers/pages/UpdateBranchView"));
+const UpdateBranchView = lazy(() => import("../levels/pages/UpdateBranchView"));
 const UpdateAcademicYearView = lazy(() => import("../academic/pages/UpdateAcademicYearView"));
 const ProfileView = lazy(() => import("../users/pages/ProfileView"));
 const EmailVerifyView = lazy(() => import("../users/pages/EmailVerifyView"));

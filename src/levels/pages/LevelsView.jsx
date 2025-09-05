@@ -46,6 +46,8 @@ const LevelsView = () => {
             } catch (err) {
                 // Error is handled by React Query
             }
+            return false;
+
         };
         openModal(`Hapus Desa: ${branchName}?`, "confirmation", confirmDelete, `Konfirmasi Penghapusan`, true);
     };
@@ -60,6 +62,7 @@ const LevelsView = () => {
             } catch (err) {
                 // Error is handled by React Query
             }
+            return false;
         };
         openModal(`Hapus Desa: ${subBranchName}?`, "confirmation", confirmDelete, `Konfirmasi Penghapusan`, true);
     };
