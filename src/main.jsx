@@ -112,8 +112,12 @@ const AppWrapper = () => {
             <QueryClientProvider client={queryClient}>
                 {/* Show testing banner when testing flag is true */}
                 {testing && (
-                    <div className="app-testing-banner" role="status" aria-live="polite">
-                        Aplikasi dalam mode uji coba — Segala perubahan data bersifat tidak permanen
+                    <div className="app-testing-banner md:justify-center" role="status" aria-live="polite">
+                        <div className="max-md:app-testing-banner__inner" aria-hidden="false">
+                            <span className="max-md:app-testing-banner__text">
+                                Aplikasi sedang dalam mode uji coba — Segala perubahan data bersifat tidak permanen dan akan dihapus setelah uji coba selesai.
+                            </span>
+                        </div>
                     </div>
                 )}
 
