@@ -62,8 +62,8 @@ const styles = StyleSheet.create({
 });
 
 const IDCardDocument = ({ student }) => {
-    const width = mmToPt(53.98);
-    const height = mmToPt(85.6);
+    const width = mmToPt(53.98) * 1.5;
+    const height = mmToPt(85.6) * 1.5;
     // compute absolute top positions in points instead of using percentages
     const nameTop = height * 0.2; // equivalent to 20%
     const nisTop = height * 0.85; // equivalent to 90%
