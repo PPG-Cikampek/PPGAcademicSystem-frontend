@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { LockOpen, Lock, KeyRound, Building } from "lucide-react";
+import { academicYearFormatter } from "../../shared/Utilities/academicYearFormatter";
 
 const ClassHeader = ({
     classData,
@@ -7,6 +8,8 @@ const ClassHeader = ({
     lockClassHandler,
     unlockClassHandler,
 }) => {
+
+    console.log("Rendering ClassHeader with classData:", classData);
     return (
         <div className="mb-8">
             <div className="flex items-center gap-4">
@@ -69,7 +72,7 @@ const ClassHeader = ({
             </div>
             <div className="mt-2 flex items-center text-gray-500">
                 <Building className="mr-2 h-4 w-4" />
-                {/* <span>{classData.class.subBranchYearId.subBranchId.name} - {classData.class.subbranchYearId.academicYearId.name}</span> */}
+                <span>{classData.class.teachingGroupId.name} - {academicYearFormatter(classData.class.teachingGroupId.branchYearId.name)}</span>
             </div>
         </div>
     );

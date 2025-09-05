@@ -40,7 +40,14 @@ const UserCard = ({
                         </div>
                     )}
                     <div className="flex flex-col gap-1">
-                        <p className="text-lg font-semibold">{user.name}</p>
+                        <p className="text-lg font-semibold whitespace-nowrap">
+                            {user.name
+                                .split(" ")
+                                .map((word, index) =>
+                                    index < 2 ? word : `${word.charAt(0)}.`
+                                )
+                                .join(" ")}
+                        </p>
                         <p className="text-base font-normal">
                             {user[identifier]}
                         </p>

@@ -51,7 +51,7 @@ const AddStudentToClassView = () => {
                 </h1>
                 {!isLoading && cls && (
                     <h3 className="text-base font-normal mb-4">
-                        Daftarkan Peserta Didik ke KBM {cls.name}
+                        {cls.name}
                     </h3>
                 )}
 
