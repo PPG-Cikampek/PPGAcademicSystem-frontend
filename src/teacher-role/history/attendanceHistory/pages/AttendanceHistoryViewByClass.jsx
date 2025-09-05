@@ -1,13 +1,15 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useAttendancesByClass, useDeleteAttendanceMutation } from "../../../../shared/queries";
+import {
+    useAttendancesByClass,
+    useDeleteAttendanceMutation,
+} from "../../../../shared/queries";
 
 import LoadingCircle from "../../../../shared/Components/UIElements/LoadingCircle";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import ErrorCard from "../../../../shared/Components/UIElements/ErrorCard";
 import NewModal from "../../../../shared/Components/Modal/NewModal";
 import useNewModal from "../../../../shared/hooks/useNewModal";
 
-import { groupAttendancesByDate } from "../utilities/attendanceGrouping";
 import { useExpandedDates } from "../hooks/useExpandedDates";
 import CollapseAllButton from "../components/CollapseAllButton";
 import DateGroup from "../components/DateGroup";
@@ -18,7 +20,11 @@ const AttendanceHistoryViewByClass = () => {
     const navigate = useNavigate();
     const { expandedDates, toggleExpand, collapseAll } = useExpandedDates();
 
-    const { data: loadedData, isLoading, error } = useAttendancesByClass(classId);
+    const {
+        data: loadedData,
+        isLoading,
+        error,
+    } = useAttendancesByClass(classId);
     const deleteAttendanceMutation = useDeleteAttendanceMutation();
 
     const editAttendanceHandler = (attendanceId) => {
@@ -48,12 +54,7 @@ const AttendanceHistoryViewByClass = () => {
         );
     };
 
-    const groupedData = groupAttendancesByDate(loadedData);
-
-    console.log(loadedData);
-    console.log(groupedData);
-
-    const dateCount = groupedData ? Object.keys(groupedData).length : 0;
+    const dateCount = loadedData ? Object.keys(loadedData).length : 0;
 
     return (
         <div className="p-4 space-y-4 mb-24">
@@ -77,8 +78,8 @@ const AttendanceHistoryViewByClass = () => {
             />
 
             <AnimatePresence>
-                {groupedData &&
-                    Object.entries(groupedData).map(([date, attendances]) => (
+                {loadedData &&
+                    Object.entries(loadedData).map(([date, attendances]) => (
                         <DateGroup
                             key={date}
                             date={date}
