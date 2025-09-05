@@ -1,7 +1,7 @@
 import { lazy } from "react";
 import PreviewReport from "../munaqasyah/pages/PreviewReport";
 import SubBranchAdminClassesView from "../class/pages/SubBranchAdminClassesView";
-import TeachingGroupsView from "../teaching-group/page/TeachingGroupsView";
+import TeachingGroupDetailView from "../teaching-group/page/TeachingGroupDetailView";
 import BranchYearsView from "../academic/pages/BranchYearsView";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -95,7 +95,7 @@ export const subBranchAdminRoutes = [
     { path: "/dashboard/teaching-groups", element: <BranchYearsView /> },
     {
         path: "/dashboard/teaching-groups/:teachingGroupId",
-        element: <TeachingGroupsView />,
+        element: <TeachingGroupDetailView />,
     },
     {
         path: "/dashboard/classes/:classId/add-students",
