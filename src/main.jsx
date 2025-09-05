@@ -12,39 +12,6 @@ import PWAInstallPrompt from "./shared/Components/PWA/PWAInstallPrompt.jsx";
 import { useMaintenanceFlag } from "./shared/hooks/useMaintenanceFlag.js";
 import { useTestingFlag } from "./shared/hooks/useTestingFlag.js";
 
-// Register service worker
-if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-        navigator.serviceWorker
-            .register("/sw.js", {
-                scope: "/",
-                updateViaCache: "none",
-            })
-            .then((registration) => {
-                console.log("SW registered: ", registration);
-
-                // Check for updates
-                registration.addEventListener("updatefound", () => {
-                    const newWorker = registration.installing;
-                    newWorker.addEventListener("statechange", () => {
-                        if (
-                            newWorker.state === "installed" &&
-                            navigator.serviceWorker.controller
-                        ) {
-                            // New content is available
-                            console.log(
-                                "New content is available; please refresh."
-                            );
-                        }
-                    });
-                });
-            })
-            .catch((registrationError) => {
-                console.log("SW registration failed: ", registrationError);
-            });
-    });
-}
-
 // PWA Install Detection
 let deferredPrompt;
 window.addEventListener("beforeinstallprompt", (e) => {
@@ -115,8 +82,8 @@ const AppWrapper = () => {
                     <></>
                 )}
 
-                {/* {isMaintenance ? <MaintenanceView targetDate={targetDate} /> : <App />} */}
-                <App />
+                {isMaintenance ? <MaintenanceView targetDate={targetDate} /> : <App />}
+                {/* <App /> */}
                 <ReactQueryDevtools initialIsOpen={false} />
                 <PWAInstallPrompt />
                 <NewModal

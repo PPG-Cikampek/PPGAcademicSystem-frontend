@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { registerSW } from "virtual:pwa-register";
 import useModal from "./useNewModal";
 
 const CHECK_INTERVAL = 1000 * 60; // Check every minute
@@ -63,30 +64,27 @@ export function useVersionCheck() {
             }
         };
 
-        // Listen for service worker messages
-        const handleSWMessage = (event) => {
-            if (event.data && event.data.type === "UPDATE_AVAILABLE") {
-                console.log("SW detected update:", event.data.newVersion);
-                // Optionally, show update prompt or auto-update
+        // Hook up vite-plugin-pwa update flow to show a prompt
+        const updateSW = registerSW({
+            immediate: true,
+            onNeedRefresh() {
                 openModal(
-                    "Versi baru aplikasi tersedia. Apakah Anda ingin memperbarui sekarang?",
+                    "Versi baru aplikasi tersedia. Muat ulang untuk memperbarui?",
                     "confirmation",
                     async () => {
-                        await clearCacheAndReload();
+                        updateSW(true);
                     },
                     "Versi Baru Tersedia",
                     true,
                     "md"
                 );
-            }
-        };
+            },
+            onOfflineReady() {
+                // Optional: notify offline ready
+            },
+        });
 
-        if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.addEventListener(
-                "message",
-                handleSWMessage
-            );
-        }
+        // We also keep polling version.json for explicit checks.
 
         // Initial check
         checkVersion();
@@ -96,12 +94,7 @@ export function useVersionCheck() {
 
         return () => {
             clearInterval(interval);
-            if ("serviceWorker" in navigator) {
-                navigator.serviceWorker.removeEventListener(
-                    "message",
-                    handleSWMessage
-                );
-            }
+            // no-op
         };
     }, [openModal]);
 
