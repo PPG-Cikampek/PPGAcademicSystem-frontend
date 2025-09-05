@@ -3,7 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 
 import useHttp from "../../shared/hooks/http-hook";
 
-import Modal from "../../shared/Components/UIElements/ModalBottomClose";
+import NewModal from "../../shared/Components/Modal/NewModal";
+import useNewModal from "../../shared/hooks/useNewModal";
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 
 import {
@@ -20,15 +21,11 @@ import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 import SkeletonLoader from "../../shared/Components/UIElements/SkeletonLoader";
 
 const LevelsView = () => {
-    const [modal, setModal] = useState({
-        title: "",
-        message: "",
-        onConfirm: null,
-    });
-    const [modalIsOpen, setModalIsOpen] = useState(false);
     const [data, setData] = useState();
     const [expandedBranches, setExpandedBranches] = useState({});
     const { isLoading, error, sendRequest, setError } = useHttp();
+
+    const { modalState, openModal, closeModal } = useNewModal();
 
     const navigate = useNavigate();
 
@@ -49,7 +46,7 @@ const LevelsView = () => {
             }
         };
         loadLevels();
-    }, [sendRequest, modal]);
+    }, [sendRequest]);
 
     const toggleBranch = (branchId) => {
         setExpandedBranches((prev) => ({
@@ -61,8 +58,6 @@ const LevelsView = () => {
     const deleteBranchHandler = (branchName, branchId) => {
         console.log(branchId);
         const confirmDelete = async () => {
-            setModalIsOpen(false);
-
             const url = `${import.meta.env.VITE_BACKEND_URL}/levels/branches/`;
 
             console.log(url);
@@ -77,36 +72,18 @@ const LevelsView = () => {
                     "Content-Type": "application/json",
                 });
 
-                setModalIsOpen(true);
-                setModal({
-                    title: "Berhasil!",
-                    message: responseData.message,
-                    onConfirm: null,
-                });
-
-                const updatedData = await sendRequest(
-                    `${
-                        import.meta.env.VITE_BACKEND_URL
-                    }/levels/branches/?populate=true`
-                );
-                setData(updatedData);
+                openModal(responseData.message, "success", null, "Berhasil!", false);
             } catch (err) {
                 // Error is already handled by useHttp
             }
         };
-        setModal({
-            title: `Konfirmasi Penghapusan`,
-            message: `Hapus Desa: ${branchName}?`,
-            onConfirm: confirmDelete,
-        });
-        setModalIsOpen(true);
+        openModal(`Hapus Desa: ${branchName}?`, "confirmation", confirmDelete, `Konfirmasi Penghapusan`, true);
     };
 
     const deleteSubBranchHandler = (e, subBranchName, subBranchId) => {
         e.stopPropagation();
         console.log(subBranchId);
         const confirmDelete = async () => {
-            setModalIsOpen(false);
             const url = `${
                 import.meta.env.VITE_BACKEND_URL
             }/levels/branches/sub-branches`;
@@ -122,62 +99,11 @@ const LevelsView = () => {
                 responseData = await sendRequest(url, "DELETE", body, {
                     "Content-Type": "application/json",
                 });
-                setModalIsOpen(true);
-                setModal({
-                    title: "Berhasil!",
-                    message: responseData.message,
-                    onConfirm: null,
-                });
-
-                const updatedData = await sendRequest(
-                    `${
-                        import.meta.env.VITE_BACKEND_URL
-                    }/levels/branches/?populate=true`
-                );
-                setData(updatedData);
+                openModal(responseData.message, "success", null, "Berhasil!", false);
             } catch (err) {}
         };
-        setModal({
-            title: `Konfirmasi Penghapusan`,
-            message: `Hapus Desa: ${subBranchName}?`,
-            onConfirm: confirmDelete,
-        });
-        setModalIsOpen(true);
+        openModal(`Hapus Desa: ${subBranchName}?`, "confirmation", confirmDelete, `Konfirmasi Penghapusan`, true);
     };
-
-    const ModalFooter = () => (
-        <div className="flex gap-2 items-center">
-            <button
-                onClick={() => {
-                    setModalIsOpen(false);
-                }}
-                className={`${
-                    modal.onConfirm
-                        ? "btn-danger-outline"
-                        : "button-primary mt-0 "
-                } ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
-                disabled={isLoading}
-            >
-                {isLoading ? (
-                    <LoadingCircle />
-                ) : modal.onConfirm ? (
-                    "Batal"
-                ) : (
-                    "Tutup"
-                )}
-            </button>
-            {modal.onConfirm && (
-                <button
-                    onClick={modal.onConfirm}
-                    className={`button-primary mt-0 ${
-                        isLoading ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
-                >
-                    {isLoading ? <LoadingCircle /> : "Ya"}
-                </button>
-            )}
-        </div>
-    );
 
     return (
         <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">
@@ -198,19 +124,11 @@ const LevelsView = () => {
                     <ErrorCard error={error} onClear={() => setError(null)} />
                 )}
 
-                <Modal
-                    isOpen={modalIsOpen}
-                    onClose={() => setModalIsOpen(false)}
-                    title={modal.title}
-                    footer={<ModalFooter />}
-                >
-                    {isLoading && (
-                        <div className="flex justify-center mt-16">
-                            <LoadingCircle size={32} />
-                        </div>
-                    )}
-                    {!isLoading && modal.message}
-                </Modal>
+                <NewModal
+                    modalState={modalState}
+                    onClose={closeModal}
+                    isLoading={isLoading}
+                />
 
                 {!data && isLoading && (
                     <div className="flex flex-col gap-4 mt-16 px-4">
