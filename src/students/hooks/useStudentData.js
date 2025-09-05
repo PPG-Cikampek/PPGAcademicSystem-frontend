@@ -1,7 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import useHttp from "../../shared/hooks/http-hook";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
-import { Icon } from "@iconify-icon/react";
 import { formatDate } from "../utilities/studentUtils";
 
 const useStudentData = (studentId) => {
@@ -31,24 +30,12 @@ const useStudentData = (studentId) => {
                     {
                         label: "NIS",
                         value: responseData.student.nis,
-                        icon: (
-                            <Icon
-                                icon="icon-park-outline:id-card-h"
-                                width="24"
-                                height="24"
-                            />
-                        ),
+                        iconName: "icon-park-outline:id-card-h",
                     },
                     {
                         label: "Tanggal Lahir",
                         value: formatDate(responseData.student.dateOfBirth),
-                        icon: (
-                            <Icon
-                                icon="material-symbols:date-range-outline"
-                                width="24"
-                                height="24"
-                            />
-                        ),
+                        iconName: "material-symbols:date-range-outline",
                     },
                     {
                         label: "Jenis Kelamin",
@@ -56,44 +43,24 @@ const useStudentData = (studentId) => {
                             responseData.student.gender === "male"
                                 ? "Laki-laki"
                                 : "Perempuan",
-                        icon: (
-                            <Icon
-                                icon="tabler:gender-bigender"
-                                width="24"
-                                height="24"
-                            />
-                        ),
+                        iconName: "tabler:gender-bigender",
                     },
                     {
                         label: "Nama Orang Tua/Wali",
                         value: responseData.student.parentName,
-                        icon: (
-                            <Icon
-                                icon="ri:parent-line"
-                                width="24"
-                                height="24"
-                            />
-                        ),
+                        iconName: "ri:parent-line",
                     },
                     {
                         label: "Nomor WA Orang Tua/Wali",
                         value: responseData.student.parentPhone
                             ? "0" + responseData.student.parentPhone
                             : "kosong",
-                        icon: (
-                            <Icon icon="lucide:phone" width="24" height="24" />
-                        ),
+                        iconName: "lucide:phone",
                     },
                     {
                         label: "Alamat",
                         value: responseData.student.address,
-                        icon: (
-                            <Icon
-                                icon="ph:map-pin-bold"
-                                width="24"
-                                height="24"
-                            />
-                        ),
+                        iconName: "ph:map-pin-bold",
                     },
                 ]);
 

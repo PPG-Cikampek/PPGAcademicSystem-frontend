@@ -1,6 +1,7 @@
 import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
+import { Icon } from "@iconify-icon/react";
 import { Pencil } from "lucide-react";
 
 const StudentDetailsList = ({ studentDetails, studentData }) => {
@@ -15,8 +16,14 @@ const StudentDetailsList = ({ studentDetails, studentData }) => {
                         key={index}
                         className="flex items-center gap-2 mb-2"
                     >
-                        {item.icon && (
-                            <div className="text-primary">{item.icon}</div>
+                        {item.iconName && (
+                            <div className="text-primary">
+                                <Icon
+                                    icon={item.iconName}
+                                    width="24"
+                                    height="24"
+                                />
+                            </div>
                         )}
                         <span className="font-semibold">
                             {item.label}:
