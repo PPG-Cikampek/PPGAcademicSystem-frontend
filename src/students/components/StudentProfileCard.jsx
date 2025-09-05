@@ -2,22 +2,61 @@ import { useState, useContext } from "react";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
 import { QrCode, Undo2, ArrowDownToLine } from "lucide-react";
 import { QRCodeCanvas } from "qrcode.react";
+import { pdf } from "@react-pdf/renderer";
+import IDCardDocument from "../id-card/IDCardDocument";
 
 const StudentProfileCard = ({ studentInfo, studentData, studentDetails }) => {
     const [showQRCode, setShowQRCode] = useState(false);
     const auth = useContext(AuthContext);
 
-    const downloadQRCode = () => {
-        const canvas = document.querySelector("canvas");
-        const url = canvas.toDataURL("image/png");
-        const link = document.createElement("a");
+    const downloadQRCode = async () => {
+        // Build filename
         const fileName =
             studentInfo.name.replace(/\s+/g, "") +
             "_" +
             studentInfo.subBranch.replace(/\s+/g, "");
-        link.href = url;
-        link.download = `${fileName}_QRCode.png`;
-        link.click();
+
+        // Try to read the existing rendered QR canvas (only present when showQRCode is true)
+        const canvas = document.querySelector("canvas");
+        const qrDataUrl = canvas ? canvas.toDataURL("image/png") : null;
+
+        // Build the student object expected by IDCardDocument
+        const studentForPdf = {
+            name: studentInfo.name || "",
+            nis: studentInfo.nis || "",
+            image: studentInfo?.image
+                ? `${import.meta.env.VITE_BACKEND_URL}/${studentInfo.image}`
+                : null,
+            qrCode: qrDataUrl,
+        };
+
+        try {
+            // Render the PDF document to a blob and trigger download
+            const doc = <IDCardDocument student={studentForPdf} />;
+            const asPdf = pdf([]);
+            asPdf.updateContainer(doc);
+            const blob = await asPdf.toBlob();
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `${fileName}_IDCard.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            URL.revokeObjectURL(url);
+        } catch (err) {
+            // Fallback: if PDF generation fails, try to download QR image only
+            if (qrDataUrl) {
+                const link = document.createElement("a");
+                link.href = qrDataUrl;
+                link.download = `${fileName}_QRCode.png`;
+                link.click();
+            } else {
+                // Nothing to download
+                // eslint-disable-next-line no-console
+                console.error("No QR canvas or PDF generation failed.", err);
+            }
+        }
     };
 
 
