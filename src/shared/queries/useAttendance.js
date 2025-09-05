@@ -99,3 +99,34 @@ export const useDeleteAttendanceMutation = () => {
         },
     });
 };
+
+// Fetch a single attendance by ID
+export const useAttendance = (attendanceId, options = {}) => {
+    return useQuery({
+        queryKey: ["attendance", attendanceId],
+        queryFn: async () => {
+            const response = await api.get(`/attendances/${attendanceId}`);
+            return response.data.attendance;
+        },
+        enabled: !!attendanceId,
+        ...options,
+    });
+};
+
+// Mutation hook for updating attendance
+export const useUpdateAttendanceMutation = () => {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: async (updates) => {
+            const response = await api.patch("/attendances/", { updates });
+            return response.data;
+        },
+        onSuccess: (data, variables) => {
+            // Invalidate the specific attendance query
+            queryClient.invalidateQueries({
+                queryKey: ["attendance", variables.attendanceId],
+            });
+        },
+    });
+};

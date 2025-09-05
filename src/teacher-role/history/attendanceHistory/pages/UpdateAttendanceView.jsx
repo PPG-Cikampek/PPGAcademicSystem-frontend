@@ -1,7 +1,10 @@
-import { useContext, useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import useHttp from "../../../../shared/hooks/http-hook";
+import {
+    useAttendance,
+    useUpdateAttendanceMutation,
+} from "../../../../shared/queries";
 import DynamicForm from "../../../../shared/Components/UIElements/DynamicForm";
 
 import ErrorCard from "../../../../shared/Components/UIElements/ErrorCard";
@@ -11,80 +14,57 @@ import NewModal from "../../../../shared/Components/Modal/NewModal";
 import useModal from "../../../../shared/hooks/useNewModal";
 
 const UpdateAttendanceView = () => {
-    const { isLoading, error, sendRequest, setError } = useHttp();
     const [isTransitioning, setIsTransitioning] = useState(false);
-    const [loadedAttendance, setLoadedAttendance] = useState();
 
     const attendanceId = useParams().attendanceId;
     const navigate = useNavigate();
 
     const { modalState, openModal, closeModal } = useModal();
 
-    useEffect(() => {
-        const fetchAttendance = async () => {
-            try {
-                const responseData = await sendRequest(
-                    `${
-                        import.meta.env.VITE_BACKEND_URL
-                    }/attendances/${attendanceId}`
-                );
-                setLoadedAttendance(responseData.attendance);
-                console.log(responseData.attendance);
-            } catch (err) {}
-        };
-        fetchAttendance();
-    }, [sendRequest]);
+    const {
+        data: loadedAttendance,
+        isLoading: fetchLoading,
+        error: fetchError,
+    } = useAttendance(attendanceId);
+    const updateMutation = useUpdateAttendanceMutation();
 
     const handleFormSubmit = async (data) => {
         console.log("Updating ... ");
-        const url = `${import.meta.env.VITE_BACKEND_URL}/attendances/`;
 
-        const body = JSON.stringify({
-            updates: [
-                {
-                    attendanceId: loadedAttendance.id,
-                    status: data.status,
-                    attributes: data.attributes,
-                    updateReason: data.updateReason,
-                    timestamp: Date.now(),
-                },
-            ],
+        const updates = [
+            {
+                attendanceId: loadedAttendance.id,
+                status: data.status,
+                attributes: data.attributes,
+                updateReason: data.updateReason,
+                timestamp: Date.now(),
+            },
+        ];
+
+        console.log(updates);
+
+        updateMutation.mutate(updates, {
+            onSuccess: (responseData) => {
+                openModal(
+                    responseData.message,
+                    "success",
+                    () => navigate(-1),
+                    "Berhasil!",
+                    false
+                );
+            },
         });
-
-        console.log(body);
-
-        let responseData;
-        try {
-            responseData = await sendRequest(url, "PATCH", body, {
-                "Content-Type": "application/json",
-            });
-        } catch (err) {}
-
-        openModal(
-            responseData.message,
-            "success",
-            () => navigate(-1),
-            "Berhasil!",
-            false
-        );
     };
 
     return (
         <div className="m-auto max-w-md mt-14 md:mt-8">
-            <NewModal
-                modalState={modalState}
-                onClose={closeModal}
-            >
-                {isLoading && (
-                    <div className="flex justify-center mt-16">
-                        <LoadingCircle size={32} />
-                    </div>
-                )}
-                {!isLoading && modalState.message}
-            </NewModal>
+            <NewModal modalState={modalState} onClose={closeModal} />
 
-            {error && (
-                <ErrorCard error={error} onClear={() => setError(null)} />
+            {(fetchError || updateMutation.error) && (
+                <ErrorCard
+                    error={fetchError || updateMutation.error}
+                    onClear={() => {}}
+                />
             )}
 
             <div
@@ -129,7 +109,7 @@ const UpdateAttendanceView = () => {
                         },
                     ]}
                     onSubmit={handleFormSubmit}
-                    disabled={isLoading}
+                    disabled={fetchLoading || updateMutation.isPending}
                     reset={false}
                     footer={false}
                     button={
@@ -137,13 +117,15 @@ const UpdateAttendanceView = () => {
                             <button
                                 type="submit"
                                 className={`button-primary ${
-                                    isLoading
+                                    fetchLoading || updateMutation.isPending
                                         ? "opacity-50 cursor-not-allowed"
                                         : ""
                                 }`}
-                                disabled={isLoading}
+                                disabled={
+                                    fetchLoading || updateMutation.isPending
+                                }
                             >
-                                {isLoading ? (
+                                {fetchLoading || updateMutation.isPending ? (
                                     <LoadingCircle>Processing...</LoadingCircle>
                                 ) : (
                                     "Update"
