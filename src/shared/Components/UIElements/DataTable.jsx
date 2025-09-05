@@ -343,8 +343,9 @@ const DataTable = ({
                         ) : (
                             <>
                                 {currentItems.map((item, index) => (
+                                    console.log(item),
                                     <tr
-                                        key={index}
+                                        key={item.id || index}
                                         onClick={() =>
                                             onRowClick && onRowClick(item)
                                         }
@@ -352,7 +353,7 @@ const DataTable = ({
                                             config.clickableRows === true
                                                 ? "hover:bg-gray-50 hover:cursor-pointer"
                                                 : ""
-                                        }  transition`}
+                                        } transition-all duration-300 ease-in-out`}
                                     >
                                         {columns.map(
                                             ({
