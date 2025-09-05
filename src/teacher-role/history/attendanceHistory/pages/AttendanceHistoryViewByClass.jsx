@@ -1,30 +1,25 @@
-import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAttendancesByClass, useDeleteAttendanceMutation } from "../../../../shared/queries";
 
-import { ChevronDown, ChevronUp, Pencil, Trash, Edit2, X } from "lucide-react";
 import LoadingCircle from "../../../../shared/Components/UIElements/LoadingCircle";
 import { motion, AnimatePresence } from "framer-motion";
 import ErrorCard from "../../../../shared/Components/UIElements/ErrorCard";
 import NewModal from "../../../../shared/Components/Modal/NewModal";
 import useNewModal from "../../../../shared/hooks/useNewModal";
 
+import { groupAttendancesByDate } from "../utilities/attendanceGrouping";
+import { useExpandedDates } from "../hooks/useExpandedDates";
+import CollapseAllButton from "../components/CollapseAllButton";
+import DateGroup from "../components/DateGroup";
+
 const AttendanceHistoryViewByClass = () => {
-    const [expandedDates, setExpandedDates] = useState([]);
     const classId = useParams().classId;
     const { modalState, openModal, closeModal } = useNewModal();
     const navigate = useNavigate();
+    const { expandedDates, toggleExpand, collapseAll } = useExpandedDates();
 
     const { data: loadedData, isLoading, error } = useAttendancesByClass(classId);
     const deleteAttendanceMutation = useDeleteAttendanceMutation();
-
-    const toggleExpand = (date) => {
-        setExpandedDates((prev) =>
-            prev.includes(date)
-                ? prev.filter((d) => d !== date)
-                : [...prev, date]
-        );
-    };
 
     const editAttendanceHandler = (attendanceId) => {
         console.log("edit attendance", attendanceId);
@@ -53,21 +48,7 @@ const AttendanceHistoryViewByClass = () => {
         );
     };
 
-    const collapseAll = () => {
-        setExpandedDates([]);
-    };
-
-    const groupedData = loadedData?.reduce((acc, curr) => {
-        const date = new Date(curr.forDate).toLocaleDateString("id-ID", {
-            weekday: "long",
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-        });
-        acc[date] = acc[date] || [];
-        acc[date].push(curr);
-        return acc;
-    }, {});
+    const groupedData = groupAttendancesByDate(loadedData);
 
     console.log(loadedData);
     console.log(groupedData);
@@ -90,167 +71,23 @@ const AttendanceHistoryViewByClass = () => {
 
             {error && <ErrorCard error={error} />}
 
-            {expandedDates.length > 1 && dateCount > 1 && (
-                <motion.button
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    className="flex items-center gap-2 px-4 py-2 border border-gray-300 bg-gray-100 hover:bg-gray-200 rounded-full text-sm font-medium transition-colors"
-                    onClick={collapseAll}
-                >
-                    <X size={16} />
-                    Collapse All
-                </motion.button>
-            )}
+            <CollapseAllButton
+                onClick={collapseAll}
+                isVisible={expandedDates.length > 1 && dateCount > 1}
+            />
 
             <AnimatePresence>
                 {groupedData &&
                     Object.entries(groupedData).map(([date, attendances]) => (
-                        <motion.div
+                        <DateGroup
                             key={date}
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            exit={{ opacity: 0, y: -20 }}
-                            className="border shadow-xs rounded-full"
-                        >
-                            <motion.button
-                                onClick={() => toggleExpand(date)}
-                                className={`w-full px-3 py-2 flex justify-between items-center bg-blue-100 hover:bg-blue-200 transition-colors ${
-                                    expandedDates.includes(date)
-                                        ? "rounded-t-md"
-                                        : "rounded-full"
-                                }`}
-                            >
-                                <span className="font-medium">{date}</span>
-                                <div className="flex items-center gap-2">
-                                    {expandedDates.includes(date) ? (
-                                        <ChevronUp size={16} />
-                                    ) : (
-                                        <ChevronDown size={16} />
-                                    )}
-                                </div>
-                            </motion.button>
-
-                            <AnimatePresence>
-                                {expandedDates.includes(date) && (
-                                    <motion.div
-                                        initial={{ height: 0, opacity: 0 }}
-                                        animate={{ height: "auto", opacity: 1 }}
-                                        exit={{ height: 0, opacity: 0 }}
-                                        transition={{
-                                            duration: 0.3,
-                                            ease: "easeInOut",
-                                        }}
-                                        className="overflow-hidden bg-white"
-                                    >
-                                        <table className="w-full table-auto border-collapse border border-gray-300">
-                                            <thead>
-                                                <tr className="bg-white">
-                                                    <th className="border-t border-gray-300 p-2 text-left text-xs text-gray-500">
-                                                        Nama
-                                                    </th>
-                                                    <th className="border-t border-gray-300 p-2 text-left text-xs text-gray-500">
-                                                        Status
-                                                    </th>
-                                                    <th className="border-t border-gray-300 p-2 text-left text-xs text-gray-500">
-                                                        Waktu
-                                                    </th>
-                                                    <th className="border-t border-gray-300 p-2 text-left text-xs text-gray-500">
-                                                        Temuan
-                                                    </th>
-                                                    <th className="border-t border-gray-300 text-left text-xs text-gray-500"></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {attendances.map(
-                                                    (attendance) => (
-                                                        <tr
-                                                            onClick={() =>
-                                                                navigate(
-                                                                    `/attendance/history/class/${classId}/${attendance._id}`
-                                                                )
-                                                            }
-                                                            key={attendance._id}
-                                                            className="bg-white hover:bg-gray-100"
-                                                        >
-                                                            <td className="border-t border-gray-300 p-2 text-xs">
-                                                                {
-                                                                    attendance
-                                                                        .studentId
-                                                                        .name
-                                                                }
-                                                            </td>
-                                                            <td className="border-t border-gray-300 p-2 text-xs">
-                                                                {
-                                                                    attendance.status
-                                                                }
-                                                            </td>
-                                                            <td className="border-t border-gray-300 p-2 text-xs">
-                                                                {new Date(
-                                                                    attendance.timestamp
-                                                                ).toLocaleTimeString(
-                                                                    "id-ID",
-                                                                    {
-                                                                        hour: "2-digit",
-                                                                        minute: "2-digit",
-                                                                    }
-                                                                )}
-                                                            </td>
-                                                            <td className="border-t border-gray-300 p-2 text-xs">
-                                                                {Object.values(
-                                                                    attendance?.violations
-                                                                ).filter(
-                                                                    (value) =>
-                                                                        value ===
-                                                                        true
-                                                                ).length || "0"}
-                                                            </td>
-                                                            {new Date().toLocaleDateString(
-                                                                "en-CA"
-                                                            ) !==
-                                                                new Date(
-                                                                    attendance.forDate
-                                                                ).toLocaleDateString(
-                                                                    "en-CA"
-                                                                ) && (
-                                                                <td className="border-t border-gray-300 text-xs flex">
-                                                                    <button
-                                                                        onClick={(
-                                                                            e
-                                                                        ) => {
-                                                                            e.stopPropagation();
-                                                                            editAttendanceHandler(
-                                                                                attendance._id
-                                                                            );
-                                                                        }}
-                                                                        className="p-1 rounded-full active:bg-gray-200 text-blue-500 active:text-blue-700 transition duration-300"
-                                                                    >
-                                                                        <Edit2
-                                                                            size={
-                                                                                16
-                                                                            }
-                                                                        />
-                                                                    </button>
-                                                                    {/* <button
-                                                                    onClick={(e) => {
-                                                                        e.stopPropagation();
-                                                                        deleteAttendanceHandler(attendance.studentId.name, attendance._id);
-                                                                    }}
-                                                                    className="p-1 rounded-full active:bg-gray-200 text-red-500 active:text-red-700 transition duration-300"
-                                                                >
-                                                                    <Trash size={16} />
-                                                                </button> */}
-                                                                </td>
-                                                            )}
-                                                        </tr>
-                                                    )
-                                                )}
-                                            </tbody>
-                                        </table>
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
-                        </motion.div>
+                            date={date}
+                            attendances={attendances}
+                            isExpanded={expandedDates.includes(date)}
+                            onToggle={toggleExpand}
+                            classId={classId}
+                            onEditAttendance={editAttendanceHandler}
+                        />
                     ))}
             </AnimatePresence>
         </div>
