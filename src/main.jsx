@@ -9,6 +9,7 @@ import MaintenanceView from "./maintenance/pages/MaintenanceView.jsx";
 import { useVersionCheck } from "./shared/hooks/useVersionCheck.js";
 import NewModal from "./shared/Components/Modal/NewModal.jsx";
 import PWAInstallPrompt from "./shared/Components/PWA/PWAInstallPrompt.jsx";
+import { useMaintenanceFlag } from "./shared/hooks/useMaintenanceFlag.js";
 
 // Register service worker
 if ("serviceWorker" in navigator) {
@@ -69,7 +70,11 @@ const queryClient = new QueryClient({
 
 const AppWrapper = () => {
     const { modalState, closeModal } = useVersionCheck();
-    const isMaintenance = false;
+    const { maintenance: isMaintenance, loading } = useMaintenanceFlag({
+        defaultValue: false,
+    });
+
+    console.log("Maintenance mode:", isMaintenance);
 
     useEffect(() => {
         if (screen.orientation && screen.orientation.lock) {
@@ -78,6 +83,9 @@ const AppWrapper = () => {
             });
         }
     }, []);
+
+    // Optionally, you can render nothing or a lightweight splash while we read the flag
+    if (loading) return null;
 
     return (
         <StrictMode>
