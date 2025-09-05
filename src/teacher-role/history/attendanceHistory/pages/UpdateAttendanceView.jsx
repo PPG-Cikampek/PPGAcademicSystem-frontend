@@ -36,6 +36,7 @@ const UpdateAttendanceView = () => {
                 attendanceId: loadedAttendance.id,
                 status: data.status,
                 attributes: data.attributes,
+                teachersNotes: data.teachersNotes,
                 updateReason: data.updateReason,
                 timestamp: Date.now(),
             },
@@ -99,6 +100,16 @@ const UpdateAttendanceView = () => {
                                     value: "Tanpa Keterangan",
                                 },
                             ],
+                        },
+                        {
+                            name: "teachersNotes",
+                            label: "Catatan",
+                            type: "textarea",
+                            value: loadedAttendance?.teachersNotes
+                                ? loadedAttendance.teachersNotes
+                                : "",
+                            required: false,
+                            textAreaRows: 2,
                         },
                         {
                             name: "updateReason",
