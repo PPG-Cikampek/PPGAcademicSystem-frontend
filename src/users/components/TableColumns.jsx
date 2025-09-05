@@ -43,16 +43,26 @@ export const TableColumns = (role, navigate, handleDeleteUserModal) => [
         render: (user) => user.subBranchId?.name,
     },
     {
+        key: "isEmailVerified",
+        label: "Terverifikasi",
+        sortable: true,
+        cellAlign: "center",
+        headerAlign: "center",
+        render: (user) => (user.isEmailVerified ? "✅" : "❌"),
+    },
+    {
         key: "actions",
         label: "Aksi",
+        cellAlign: "center",
+        headerAlign: "center",
         render: (user) => (
-            <div className="flex gap-2">
+            <div className="">
                 <button
                     onClick={(e) => {
                         e.stopPropagation();
                         navigate(`/settings/users/${user._id}`);
                     }}
-                    className="p-1 hover:bg-gray-100 rounded-sm"
+                    className="btn-icon-primary"
                 >
                     <Pencil className="w-4 h-4" />
                 </button>
@@ -61,7 +71,7 @@ export const TableColumns = (role, navigate, handleDeleteUserModal) => [
                         e.stopPropagation();
                         handleDeleteUserModal(user._id);
                     }}
-                    className="p-1 hover:bg-gray-100 rounded-sm text-red-500"
+                    className="btn-icon-danger"
                 >
                     <Trash className="w-4 h-4" />
                 </button>
