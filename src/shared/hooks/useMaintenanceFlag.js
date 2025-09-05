@@ -3,9 +3,10 @@ import { db } from "../firebase/firebase";
 import { doc, onSnapshot } from "firebase/firestore";
 
 // Reads a Firestore document at settings/flags and listens for changes.
-// Document shape example: { maintenance: true, updatedAt: <serverTimestamp> }
+// Document shape example: { maintenance: true, targetDate: <serverTimestamp>, updatedAt: <serverTimestamp> }
 export function useMaintenanceFlag({ defaultValue = false } = {}) {
     const [maintenance, setMaintenance] = useState(defaultValue);
+    const [targetDate, setTargetDate] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
@@ -34,8 +35,20 @@ export function useMaintenanceFlag({ defaultValue = false } = {}) {
                     }
 
                     setMaintenance(Boolean(maintenanceValue));
+
+                    // Fetch targetDate
+                    let targetDateValue = null;
+                    if (data && data.targetDate) {
+                        if (data.targetDate.toDate) {
+                            targetDateValue = data.targetDate.toDate();
+                        } else {
+                            targetDateValue = new Date(data.targetDate);
+                        }
+                    }
+                    setTargetDate(targetDateValue);
+
                     setLoading(false);
-                    console.log("Maintenance flag updated:", data, "normalized maintenance:", maintenanceValue);
+                    console.log("Maintenance flag updated:", data, "normalized maintenance:", maintenanceValue, "targetDate:", targetDateValue);
                 },
                 (err) => {
                     setError(err);
@@ -50,5 +63,5 @@ export function useMaintenanceFlag({ defaultValue = false } = {}) {
         }
     }, []);
 
-    return { maintenance, loading, error };
+    return { maintenance, targetDate, loading, error };
 }

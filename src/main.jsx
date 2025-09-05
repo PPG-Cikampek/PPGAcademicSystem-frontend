@@ -70,11 +70,11 @@ const queryClient = new QueryClient({
 
 const AppWrapper = () => {
     const { modalState, closeModal } = useVersionCheck();
-    const { maintenance: isMaintenance, loading } = useMaintenanceFlag({
+    const { maintenance: isMaintenance, targetDate, loading } = useMaintenanceFlag({
         defaultValue: false,
     });
 
-    console.log("Maintenance mode:", isMaintenance);
+    console.log("Maintenance mode:", isMaintenance, "targetDate:", targetDate);
 
     useEffect(() => {
         if (screen.orientation && screen.orientation.lock) {
@@ -90,7 +90,7 @@ const AppWrapper = () => {
     return (
         <StrictMode>
             <QueryClientProvider client={queryClient}>
-                {isMaintenance ? <MaintenanceView /> : <App />}
+                {isMaintenance ? <MaintenanceView targetDate={targetDate} /> : <App />}
                 <ReactQueryDevtools initialIsOpen={false} />
                 <PWAInstallPrompt />
                 <NewModal
