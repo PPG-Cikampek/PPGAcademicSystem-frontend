@@ -119,9 +119,9 @@ const LevelsView = () => {
                                     </div> */}
                                     <div className="flex-1 h-fit">
                                         <div className="flex items-center gap-2">
-                                            <h2 className="text-sm font-semibold text-gray-900">
+                                            <h4 className="text-sm font-semibold text-gray-900">
                                                 Desa {branch.name}
-                                            </h2>
+                                            </h4>
                                             <div className="text-xs text-gray-500 border border-gray-500 rounded-sm p-1">
                                                 {branch.subBranches.length}{" "}
                                                 Kelompok
