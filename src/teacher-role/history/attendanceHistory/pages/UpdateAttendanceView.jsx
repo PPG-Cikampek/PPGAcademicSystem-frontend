@@ -7,21 +7,18 @@ import DynamicForm from "../../../../shared/Components/UIElements/DynamicForm";
 import ErrorCard from "../../../../shared/Components/UIElements/ErrorCard";
 import LoadingCircle from "../../../../shared/Components/UIElements/LoadingCircle";
 
-import Modal from "../../../../shared/Components/UIElements/ModalBottomClose";
+import NewModal from "../../../../shared/Components/Modal/NewModal";
+import useModal from "../../../../shared/hooks/useNewModal";
 
 const UpdateAttendanceView = () => {
-    const [modal, setModal] = useState({
-        title: "",
-        message: "",
-        onConfirm: null,
-    });
-    const [modalIsOpen, setModalIsOpen] = useState(false);
     const { isLoading, error, sendRequest, setError } = useHttp();
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [loadedAttendance, setLoadedAttendance] = useState();
 
     const attendanceId = useParams().attendanceId;
     const navigate = useNavigate();
+
+    const { modalState, openModal, closeModal } = useModal();
 
     useEffect(() => {
         const fetchAttendance = async () => {
@@ -63,42 +60,28 @@ const UpdateAttendanceView = () => {
             });
         } catch (err) {}
 
-        setModal({
-            title: "Berhasil!",
-            message: responseData.message,
-            onConfirm: () => navigate(-1),
-        });
-        setModalIsOpen(true);
+        openModal(
+            responseData.message,
+            "success",
+            () => navigate(-1),
+            "Berhasil!",
+            false
+        );
     };
-
-    const ModalFooter = () => (
-        <div className="flex gap-2 items-center">
-            {modal.onConfirm && (
-                <button
-                    onClick={modal.onConfirm}
-                    className="button-primary mt-0 "
-                >
-                    Ok
-                </button>
-            )}
-        </div>
-    );
 
     return (
         <div className="m-auto max-w-md mt-14 md:mt-8">
-            <Modal
-                isOpen={modalIsOpen}
-                onClose={() => setModalIsOpen(false)}
-                title={modal.title}
-                footer={<ModalFooter />}
+            <NewModal
+                modalState={modalState}
+                onClose={closeModal}
             >
                 {isLoading && (
                     <div className="flex justify-center mt-16">
                         <LoadingCircle size={32} />
                     </div>
                 )}
-                {!isLoading && modal.message}
-            </Modal>
+                {!isLoading && modalState.message}
+            </NewModal>
 
             {error && (
                 <ErrorCard error={error} onClear={() => setError(null)} />
