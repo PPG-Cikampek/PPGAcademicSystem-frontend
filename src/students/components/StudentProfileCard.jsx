@@ -5,11 +5,15 @@ import { QRCodeCanvas } from "qrcode.react";
 import { pdf } from "@react-pdf/renderer";
 import IDCardDocument from "../id-card/IDCardDocument";
 
+import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
+
 const StudentProfileCard = ({ studentInfo, studentData, studentDetails }) => {
     const [showQRCode, setShowQRCode] = useState(false);
+    const [isDownloading, setIsDownloading] = useState(false);
     const auth = useContext(AuthContext);
 
     const downloadQRCode = async () => {
+        setIsDownloading(true);
         // Build filename
         const fileName =
             studentInfo.name.replace(/\s+/g, "") +
@@ -56,10 +60,10 @@ const StudentProfileCard = ({ studentInfo, studentData, studentDetails }) => {
                 // eslint-disable-next-line no-console
                 console.error("No QR canvas or PDF generation failed.", err);
             }
+        } finally {
+            setIsDownloading(false);
         }
     };
-
-
 
     return (
         <div className="card-basic rounded-md border mx-0 py-12 flex flex-col items-center flex-1 h-full basis-96 min-w-80 md:max-w-96">
@@ -79,9 +83,9 @@ const StudentProfileCard = ({ studentInfo, studentData, studentDetails }) => {
                     <img
                         src={
                             studentInfo?.image
-                                ? `${
-                                      import.meta.env.VITE_BACKEND_URL
-                                  }/${studentInfo.image}`
+                                ? `${import.meta.env.VITE_BACKEND_URL}/${
+                                      studentInfo.image
+                                  }`
                                 : "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"
                         }
                         alt="Profile"
@@ -91,12 +95,11 @@ const StudentProfileCard = ({ studentInfo, studentData, studentDetails }) => {
                 {auth.userRole !== "teacher" &&
                     auth.userRole !== "student" &&
                     studentData.isProfileComplete === true && (
-                        <>
+                        <div className="p-2">
                             <button
-                                className="absolute bottom-1 right-1 bg-white p-2 rounded-full border border-gray-300"
-                                onClick={() =>
-                                    setShowQRCode((prev) => !prev)
-                                }
+                                className="absolute -bottom-12 right-1 btn-icon-white text-gray-800 border"
+                                onClick={() => setShowQRCode((prev) => !prev)}
+                                disabled={isDownloading}
                             >
                                 {showQRCode ? (
                                     <Undo2 className="w-6 h-6" />
@@ -105,18 +108,27 @@ const StudentProfileCard = ({ studentInfo, studentData, studentDetails }) => {
                                 )}
                             </button>
                             <button
-                                className="absolute bottom-1 right-14 bg-white p-2 rounded-full border border-gray-300"
+                                className="absolute -bottom-12 right-14 btn-round-primary flex items-center m-0 mr-2 p-2 pr-3"
                                 hidden={!showQRCode}
                                 onClick={downloadQRCode}
+                                disabled={isDownloading}
                             >
-                                <ArrowDownToLine className="w-6 h-6" />
+                                {isDownloading ? (
+                                    <>
+                                        <LoadingCircle size={18} />
+                                        <span className="ml-1">Memproses...</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <ArrowDownToLine size={18} />
+                                        <span className="ml-1">Unduh ID Card</span>
+                                    </>
+                                )}
                             </button>
-                        </>
+                        </div>
                     )}
             </div>
-            <h2 className="mt-4 text-lg font-normal">
-                {studentInfo.name}
-            </h2>
+            <p className="mt-16 text-lg font-normal">{studentInfo.name}</p>
             <p className="mt-2 text-gray-600">{studentInfo.nis}</p>
             <div className="mt-4 flex flex-col md:flex-row gap-2 text-center">
                 <span className="badge-primary">{studentInfo.branch}</span>
