@@ -5,10 +5,15 @@ import {
 
 import IDCardDocument from "./IDCardDocument";
 
+import sampleProfilePic from "../../assets/images/sample-profile.jpg";
+import sampleQRCode from "../../assets/images/sample-qr.jpg";
+
 const StudentIDCard = () => {
     const studentData = {
         name: "John Doe",
         id: "123456789",
+        image: sampleProfilePic,
+        qrCode: sampleQRCode,
     };
 
     return (

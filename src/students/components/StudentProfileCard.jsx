@@ -1,7 +1,5 @@
 import { useState, useContext } from "react";
-import { Link } from "react-router-dom";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
-import { Icon } from "@iconify-icon/react";
 import { QrCode, Undo2, ArrowDownToLine } from "lucide-react";
 import { QRCodeCanvas } from "qrcode.react";
 
@@ -21,6 +19,8 @@ const StudentProfileCard = ({ studentInfo, studentData, studentDetails }) => {
         link.download = `${fileName}_QRCode.png`;
         link.click();
     };
+
+
 
     return (
         <div className="card-basic rounded-md border mx-0 py-12 flex flex-col items-center flex-1 h-full basis-96 min-w-80 md:max-w-96">
