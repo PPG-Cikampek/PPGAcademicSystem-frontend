@@ -170,7 +170,7 @@ const BranchYearCard = ({
                                 </button>
                             </div>
 
-                            <button
+                            {/* <button
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     deleteBranchYearHandler(
@@ -182,7 +182,7 @@ const BranchYearCard = ({
                                 className="btn-icon-danger ml-2"
                             >
                                 <Trash size={20} />
-                            </button>
+                            </button> */}
                         </div>
                     ) : (
                         auth.userRole === "branchAdmin" &&
@@ -266,30 +266,42 @@ const BranchYearCard = ({
                                                     >
                                                         <KeyRound size={20} />
                                                     </button>
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            deleteTeachingGroupHandler(
-                                                                teachingGroup.name,
-                                                                teachingGroup.id
-                                                            )(e);
-                                                        }}
-                                                        className="btn-icon-danger"
-                                                    >
-                                                        <Trash size={20} />
-                                                    </button>
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            editTeachingGroupHandler(
-                                                                teachingGroup.name,
-                                                                teachingGroup.id
-                                                            )(e);
-                                                        }}
-                                                        className="btn-icon-primary"
-                                                    >
-                                                        <Pencil size={20} />
-                                                    </button>
+                                                    {!teachingGroup.isLocked && (
+                                                        <>
+                                                            <button
+                                                                onClick={(
+                                                                    e
+                                                                ) => {
+                                                                    e.stopPropagation();
+                                                                    deleteTeachingGroupHandler(
+                                                                        teachingGroup.name,
+                                                                        teachingGroup.id
+                                                                    )(e);
+                                                                }}
+                                                                className="btn-icon-danger"
+                                                            >
+                                                                <Trash
+                                                                    size={20}
+                                                                />
+                                                            </button>
+                                                            <button
+                                                                onClick={(
+                                                                    e
+                                                                ) => {
+                                                                    e.stopPropagation();
+                                                                    editTeachingGroupHandler(
+                                                                        teachingGroup.name,
+                                                                        teachingGroup.id
+                                                                    )(e);
+                                                                }}
+                                                                className="btn-icon-primary"
+                                                            >
+                                                                <Pencil
+                                                                    size={20}
+                                                                />
+                                                            </button>
+                                                        </>
+                                                    )}
                                                 </div>
                                             )}
                                     </li>

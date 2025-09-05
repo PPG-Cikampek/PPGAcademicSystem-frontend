@@ -58,7 +58,8 @@ export const subBranchColumns = (
                     </button>
                 </Link>
                 {teachingGroupData?.branchYearId?.academicYearId.isActive &&
-                    teachingGroupData?.isLocked === false && userRole === "branchAdmin" && (
+                    teachingGroupData?.isLocked === false &&
+                    userRole === "branchAdmin" && (
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
@@ -178,24 +179,34 @@ export const classColumns = (
                             >
                                 <KeyRound size={20} />
                             </button>
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    editClassHandler(item.name, item._id);
-                                }}
-                                className="btn-icon-primary"
-                            >
-                                <Pencil size={18} />
-                            </button>
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    removeClassHandler(item.name, item._id);
-                                }}
-                                className="btn-icon-danger"
-                            >
-                                <Trash size={20} />
-                            </button>
+                            {!item.isLocked && (
+                                <>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            editClassHandler(
+                                                item.name,
+                                                item._id
+                                            );
+                                        }}
+                                        className="btn-icon-primary"
+                                    >
+                                        <Pencil size={18} />
+                                    </button>
+                                    <button
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            removeClassHandler(
+                                                item.name,
+                                                item._id
+                                            );
+                                        }}
+                                        className="btn-icon-danger"
+                                    >
+                                        <Trash size={20} />
+                                    </button>
+                                </>
+                            )}
                         </>
                     )}
             </>
