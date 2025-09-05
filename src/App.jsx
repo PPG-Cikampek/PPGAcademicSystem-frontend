@@ -37,7 +37,7 @@ const SmartRouteHandler = ({ children }) => {
 
     // For logged-out users, only allow auth-related routes
     if (!isLoggedIn) {
-        const guestRoutes = ["/", "/reset-password", "/verify-email"];
+        const guestRoutes = ["/", "/reset-password", "/verify-email", "/demo"];
         const isGuestRoute = guestRoutes.some(
             (route) =>
                 currentPath === route || currentPath.startsWith(route + "/")

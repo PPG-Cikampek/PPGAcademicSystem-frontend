@@ -2,6 +2,7 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { visualizer } from "rollup-plugin-visualizer";
+import path from "path";
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -15,8 +16,15 @@ export default defineConfig({
         }),
     ],
     resolve: {
+        alias: {
+            // ensure Vite resolves `buffer` to the browser polyfill package
+            buffer: "buffer/",
+        },
         // Uncomment and customize if you use custom conditions
         // conditions: ['custom', ...defaultClientConditions],
+    },
+    optimizeDeps: {
+        include: ["buffer"],
     },
     json: {
         stringify: "auto", // Only stringify large JSON files
@@ -71,5 +79,7 @@ export default defineConfig({
             // Uncomment and customize if you use custom SSR conditions
             // conditions: ['custom', ...defaultServerConditions],
         },
+    // prevent Vite from externalizing buffer during SSR builds
+    noExternal: ["buffer"],
     },
 });

@@ -18,7 +18,7 @@ import { studentRoutes, StudentRouteWrapper } from "./studentRoutes.jsx";
 import AuthView from "../users/pages/AuthView.jsx";
 import PasswordResetView from "../users/pages/PasswordResetView.jsx";
 import EmailVerifyView from "../users/pages/EmailVerifyView.jsx";
-import { Navigate } from "react-router-dom";
+import StudentIDCard from "../shared/demo/StudentIDCard.jsx";
 
 const getRouteConfig = (userRole) => {
     switch (userRole) {
@@ -68,6 +68,10 @@ const getRouteConfig = (userRole) => {
                     {
                         path: "/verify-email/:token",
                         element: <EmailVerifyView />,
+                    },
+                    {
+                        path: "/demo",
+                        element: <StudentIDCard />,
                     },
                 ],
                 Wrapper: ({ children }) => <>{children}</>,
