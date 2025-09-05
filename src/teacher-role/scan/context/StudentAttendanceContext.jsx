@@ -1,10 +1,12 @@
 // StudentAttendanceContext.jsx
 // Performance Optimization: Uses Map for O(1) student lookups instead of O(n) array operations
 // This significantly improves performance for QR code scanning and student state updates
-import { createContext, useReducer, useEffect, useMemo } from "react";
+import { createContext, useReducer, useEffect, useMemo, useRef, useCallback } from "react";
 import { useAttendanceData, useClassData } from "../../../shared/queries";
 
 const StudentAttendanceContext = createContext();
+// Slim context specifically for read-only lookup + status marking (to isolate frequent mutations)
+const StudentAttendanceLookupContext = createContext();
 
 // Helper function to convert array to Map
 const arrayToMap = (studentArray) => {
@@ -299,11 +301,34 @@ const StudentAttendanceProvider = ({ children }) => {
         [state.studentMap]
     );
 
-    // Helper function to get a specific student by NIS
-    const getStudent = (nis) => state.studentMap.get(nis);
+    // Maintain a ref to studentMap so stable callbacks can always access latest data without changing identity
+    const studentMapRef = useRef(state.studentMap);
+    useEffect(() => {
+        studentMapRef.current = state.studentMap;
+    }, [state.studentMap]);
 
-    // Helper function to check if a student exists
-    const hasStudent = (nis) => state.studentMap.has(nis);
+    // Stable lookup helpers (do not change identity on each state mutation)
+    const getStudent = useCallback((nis) => studentMapRef.current.get(nis), []);
+    const hasStudent = useCallback((nis) => studentMapRef.current.has(nis), []);
+
+    // Stable status updater to avoid exposing raw dispatch directly to scanner (optional abstraction)
+    const markStatus = useCallback((id, newStatus) => {
+        dispatch({
+            type: "SET_STATUS",
+            payload: { id, newStatus, timestamp: Date.now() },
+        });
+    }, [dispatch]);
+
+    // Memoized lookup context value – only changes when classStartTime changes (or stable callbacks remount)
+    const lookupValue = useMemo(
+        () => ({
+            classStartTime: state.classStartTime,
+            hasStudent,
+            getStudent,
+            markStatus,
+        }),
+        [state.classStartTime, hasStudent, getStudent, markStatus]
+    );
 
     return (
         <StudentAttendanceContext.Provider
@@ -314,14 +339,16 @@ const StudentAttendanceProvider = ({ children }) => {
                 },
                 dispatch,
                 getStudentList,
-                getStudent,
+                getStudent, // provide stable callbacks too (backwards compatible)
                 hasStudent,
-                refetchAttendance, // Expose refetch function for manual refetch if needed
+                refetchAttendance,
             }}
         >
-            {children}
+            <StudentAttendanceLookupContext.Provider value={lookupValue}>
+                {children}
+            </StudentAttendanceLookupContext.Provider>
         </StudentAttendanceContext.Provider>
     );
 };
 
-export { StudentAttendanceContext, StudentAttendanceProvider };
+export { StudentAttendanceContext, StudentAttendanceProvider, StudentAttendanceLookupContext };

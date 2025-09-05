@@ -1,32 +1,15 @@
-import { useState, useContext, memo, useMemo, useCallback } from "react";
-import { StudentAttendanceContext } from "../context/StudentAttendanceContext";
+import { useState, useContext, memo, useCallback } from "react";
+import { StudentAttendanceLookupContext } from "../context/StudentAttendanceContext";
 import { QRScanner } from "../../../shared/Components/Scanner";
 import SequentialAnimation from "../../shared/Components/Animation/SequentialAnimation";
 
 const QRCodeScanner = memo(() => {
     const [scannedData, setScannedData] = useState(null);
     const [scanSuccess, setScanSuccess] = useState(false);
-    const { state, dispatch, getStudent, hasStudent } = useContext(
-        StudentAttendanceContext
-    );
 
-    // Memoize only the specific context values we need for QR scanning
-    // This prevents re-renders when unrelated state like dirtyIds, selectedCount, etc. change
-    const memoizedContextValues = useMemo(
-        () => ({
-            classStartTime: state.classStartTime,
-            studentMap: state.studentMap, // For student lookups
-            dispatch,
-            getStudent,
-            hasStudent,
-        }),
-        [
-            state.classStartTime,
-            state.studentMap,
-            dispatch,
-            getStudent,
-            hasStudent,
-        ]
+    // Slim lookup + status marking context (stable identity unless classStartTime changes)
+    const { classStartTime, getStudent, hasStudent, markStatus } = useContext(
+        StudentAttendanceLookupContext
     );
 
     const getPresenceStatus = (timeString) => {
@@ -69,54 +52,50 @@ const QRCodeScanner = memo(() => {
         return "Hadir"; // Times are equal
     };
 
-    const dataHandler = (data) => {
-        memoizedContextValues.dispatch({
-            type: "SET_STATUS",
-            payload: data,
-        });
-    };
+    const dataHandler = useCallback(
+        (data) => {
+            // Delegate to stable markStatus (keeps scanner independent of full context churn)
+            markStatus(data.id, data.newStatus);
+        },
+        [markStatus]
+    );
 
     const handleScan = useCallback(
         async (data) => {
-            // Guard against scanning when classStartTime is not available
-            if (!memoizedContextValues.classStartTime) {
+            if (!classStartTime) {
                 console.warn("Class start time not available, skipping scan");
                 return;
             }
 
             setScanSuccess(true);
 
-            const isFound = memoizedContextValues.hasStudent(data);
+            const isFound = hasStudent(data);
             if (!isFound) {
                 setScannedData("Kode QR tidak dikenali!");
             } else {
-                const student = memoizedContextValues.getStudent(data);
+                const student = getStudent(data);
+                const status = getPresenceStatus(classStartTime);
                 setScannedData({
                     nis: data,
-                    status: getPresenceStatus(
-                        memoizedContextValues.classStartTime
-                    ),
+                    status,
                     name: student.studentId.name,
                 });
+
+                const attendanceData = {
+                    id: data,
+                    newStatus: status,
+                    timestamp: Date.now(),
+                };
+                dataHandler(attendanceData);
+                console.log(attendanceData);
             }
 
-            // LOGIC TO PROCESS DATA HERE
-            const attendanceData = {
-                id: data,
-                newStatus: getPresenceStatus(
-                    memoizedContextValues.classStartTime
-                ),
-                timestamp: Date.now(),
-            };
-            dataHandler(attendanceData);
-            console.log(attendanceData);
-
-            // Set a short delay to show the result before enabling scanning again
+            // Delay to show result then allow new scan
             setTimeout(() => {
                 setScanSuccess(false);
             }, 1000);
         },
-        [memoizedContextValues, getPresenceStatus, dataHandler]
+        [classStartTime, hasStudent, getStudent, getPresenceStatus, dataHandler]
     );
 
     const handleError = useCallback((error, instruction) => {
