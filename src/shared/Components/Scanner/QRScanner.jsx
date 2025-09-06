@@ -14,7 +14,6 @@ const isIOS = () => {
  * @param {Function} props.onError - Optional callback function called when an error occurs
  * @param {string} props.errorMessage - Optional error message to display
  * @param {number} props.cooldownDuration - Cooldown duration in milliseconds (default: 1000)
- * @param {boolean} props.enableBeep - Whether to play beep sound on scan (default: true)
  * @param {Object} props.scannerOptions - QR scanner configuration options
  * @param {string} props.className - Additional CSS classes for the container
  * @param {Object} props.style - Inline styles for the container
@@ -27,13 +26,13 @@ const isIOS = () => {
  * @param {string} props.initialMessage - Initial status message (default: "Initializing...")
  * @param {string} props.accessingCameraMessage - Message while accessing camera (default: "Sedang mengakses kamera...")
  * @param {string} props.scanningMessage - Message while scanning (default: "Membaca kode QR...")
+ * @param {boolean} props.enableBeep - Whether to play beep sound on successful scan (default: true)
  */
 const QRScanner = ({
     onScan,
     onError,
     errorMessage,
     cooldownDuration = 1000,
-    enableBeep = true,
     scannerOptions = {
         returnDetailedScanResult: true,
         highlightScanRegion: true,
@@ -56,43 +55,17 @@ const QRScanner = ({
     initialMessage = "Initializing...",
     accessingCameraMessage = "Sedang mengakses kamera...",
     scanningMessage = "Membaca kode QR...",
+    enableBeep = true,
 }) => {
     const videoRef = useRef(null);
-    const beepRef = useRef(null);
     const [scanning, setScanning] = useState(false);
     const [cooldown, setCooldown] = useState(false);
+    const cooldownRef = useRef(false); // keeps latest cooldown without re-binding scanner callback
     const [status, setStatus] = useState(initialMessage);
     const [error, setError] = useState(false);
     const [instruction, setInstruction] = useState("");
     const [retryCount, setRetryCount] = useState(0);
     const [currentError, setCurrentError] = useState(errorMessage || "");
-    const [audioUnlocked, setAudioUnlocked] = useState(false);
-
-    // Unlock audio on user gesture (for iOS/Safari)
-    useEffect(() => {
-        if (!enableBeep) return;
-
-        const unlockAudio = () => {
-            if (beepRef.current && !audioUnlocked) {
-                beepRef.current
-                    .play()
-                    .then(() => {
-                        beepRef.current.pause();
-                        beepRef.current.currentTime = 0;
-                        setAudioUnlocked(true);
-                    })
-                    .catch(() => {});
-            }
-        };
-
-        window.addEventListener("touchstart", unlockAudio, { once: true });
-        window.addEventListener("click", unlockAudio, { once: true });
-
-        return () => {
-            window.removeEventListener("touchstart", unlockAudio);
-            window.removeEventListener("click", unlockAudio);
-        };
-    }, [audioUnlocked, enableBeep]);
 
     useEffect(() => {
         let qrScanner;
@@ -121,7 +94,10 @@ const QRScanner = ({
                 qrScanner = new QrScanner(
                     videoRef.current,
                     async (result) => {
-                        if (!cooldown && onScan) {
+                        // Early throttle: set cooldown flag immediately to avoid race between rapid successive decode callbacks
+                        if (cooldownRef.current) return;
+                        cooldownRef.current = true;
+                        if (onScan) {
                             await handleScan(result.data);
                         }
                     },
@@ -204,7 +180,7 @@ const QRScanner = ({
             qrScanner?.destroy();
         };
     }, [
-        cooldown,
+        // Removed cooldown from deps to avoid re-initializing scanner every scan
         retryCount,
         onError,
         maxRetries,
@@ -216,22 +192,29 @@ const QRScanner = ({
 
     const handleScan = async (data) => {
         if (!data) return;
-
+        // cooldownRef.current is now set in the scanner callback to avoid race conditions.
+        // Fallback: if somehow not set (e.g., future direct invocation), set it here.
+        if (!cooldownRef.current) {
+            cooldownRef.current = true;
+        }
         setCooldown(true);
 
+        console.log("QR Code detected:", data);
+
         // Play beep sound if enabled
-        if (enableBeep && beepRef.current) {
+        if (enableBeep) {
             try {
-                await beepRef.current.play();
-            } catch (e) {
-                // iOS/Safari: fallback, audio will play on next user gesture
-                console.warn("Audio playback failed:", e);
+                const audio = new Audio(beep);
+                audio.play().catch(error => {
+                    console.warn("Could not play beep sound:", error);
+                });
+            } catch (error) {
+                console.warn("Error creating audio:", error);
             }
         }
 
         setCurrentError("");
 
-        // Call the onScan callback
         if (onScan) {
             try {
                 await onScan(data);
@@ -243,8 +226,8 @@ const QRScanner = ({
             }
         }
 
-        // Add cooldown to prevent multiple scans
         setTimeout(() => {
+            cooldownRef.current = false;
             setCooldown(false);
         }, cooldownDuration);
     };
@@ -305,7 +288,6 @@ const QRScanner = ({
                 </div>
             )}
 
-            {enableBeep && <audio ref={beepRef} src={beep} preload="auto" />}
         </div>
     );
 };
