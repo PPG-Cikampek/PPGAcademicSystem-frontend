@@ -37,7 +37,7 @@ export {
 
 export { useClass, useUpdateClassMutation, useRegisterTeacherToClassMutation, useRemoveTeacherFromClassMutation, useRemoveStudentFromClassMutation, useRegisterStudentToClassMutation } from "./useClasses";
 
-export { useTeachers } from "./useTeachers";
+export { useTeachers, useTeacher, useUpdateTeacherMutation } from "./useTeachers";
 
 export { useStudents } from "./useStudents";
 

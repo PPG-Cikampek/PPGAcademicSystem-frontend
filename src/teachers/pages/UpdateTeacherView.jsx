@@ -9,7 +9,7 @@ import {
 import { useNavigate, useParams } from "react-router-dom";
 
 import { AuthContext } from "../../shared/Components/Context/auth-context";
-import useHttp from "../../shared/hooks/http-hook";
+import { useTeacher, useUpdateTeacherMutation } from "../../shared/queries";
 import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
 
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
@@ -27,11 +27,10 @@ const UpdateTeacherView = () => {
         onConfirm: null,
     });
     const [modalIsOpen, setModalIsOpen] = useState(false);
-    const { isLoading, error, sendRequest, setError } = useHttp();
     const [isTransitioning, setIsTransitioning] = useState(false);
-    const [loadedTeacher, setLoadedTeacher] = useState();
     const [loadedDate, setLoadedDate] = useState();
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [error, setError] = useState(null);
 
     // Use refs for large binary data to avoid re-renders
     const croppedImageRef = useRef(null);
@@ -43,44 +42,61 @@ const UpdateTeacherView = () => {
     const id = useParams().id;
     const navigate = useNavigate();
 
+    // Use React Query for fetching teacher data
+    const { data: loadedTeacher, isLoading: isLoadingTeacher, error: teacherError } = useTeacher(
+        id,
+        auth.userRole,
+        auth.userId
+    );
+
+    // Use React Query mutation for updating teacher
+    const updateTeacherMutation = useUpdateTeacherMutation({
+        onSuccess: (data) => {
+            setModal({
+                title: "Berhasil!",
+                message: data.message,
+                onConfirm: null,
+            });
+            setModalIsOpen(true);
+        },
+        onError: (error) => {
+            setError(error.message || "Terjadi kesalahan saat memperbarui data.");
+        },
+    });
+
+    // Effect to set loadedDate and originalData when teacher data is loaded
     useEffect(() => {
-        const fetchTeacher = async () => {
-            const url =
-                auth.userRole !== "teacher"
-                    ? `${import.meta.env.VITE_BACKEND_URL}/teachers/${id}`
-                    : `${import.meta.env.VITE_BACKEND_URL}/teachers/user/${
-                          auth.userId
-                      }`;
+        if (loadedTeacher) {
+            // Store original data for comparison to detect changes
+            originalDataRef.current = {
+                name: loadedTeacher.name,
+                phone: loadedTeacher.phone,
+                position: loadedTeacher.position,
+                gender: loadedTeacher.gender,
+                address: loadedTeacher.address,
+                dateOfBirth: loadedTeacher.dateOfBirth,
+            };
 
-            try {
-                const responseData = await sendRequest(url);
-                setLoadedTeacher(responseData.teacher);
-
-                // Store original data for comparison to detect changes
-                originalDataRef.current = {
-                    name: responseData.teacher.name,
-                    phone: responseData.teacher.phone,
-                    position: responseData.teacher.position,
-                    gender: responseData.teacher.gender,
-                    address: responseData.teacher.address,
-                    dateOfBirth: responseData.teacher.dateOfBirth,
-                };
-
-                // Safe date parsing with validation - store as ISO string to reduce memory
-                if (responseData.teacher.dateOfBirth) {
-                    const date = new Date(responseData.teacher.dateOfBirth);
-                    if (!isNaN(date.getTime())) {
-                        setLoadedDate(date.toISOString().split("T")[0]);
-                    } else {
-                        setLoadedDate(null);
-                    }
+            // Safe date parsing with validation - store as ISO string to reduce memory
+            if (loadedTeacher.dateOfBirth) {
+                const date = new Date(loadedTeacher.dateOfBirth);
+                if (!isNaN(date.getTime())) {
+                    setLoadedDate(date.toISOString().split("T")[0]);
                 } else {
                     setLoadedDate(null);
                 }
-            } catch (err) {}
-        };
-        fetchTeacher();
-    }, [sendRequest, id, auth.userRole, auth.userId]);
+            } else {
+                setLoadedDate(null);
+            }
+        }
+    }, [loadedTeacher]);
+
+    // Effect to handle teacher fetch error
+    useEffect(() => {
+        if (teacherError) {
+            setError(teacherError.message || "Gagal memuat data guru.");
+        }
+    }, [teacherError]);
 
     // Memoized function to handle cropped image
     const handleImageCropped = useCallback((croppedImage) => {
@@ -125,9 +141,9 @@ const UpdateTeacherView = () => {
         }
 
         setIsSubmitting(true);
+        setError(null);
 
         try {
-            const url = `${import.meta.env.VITE_BACKEND_URL}/teachers/`;
             const formData = new FormData();
 
             // Only append changed fields to reduce payload size
@@ -172,18 +188,8 @@ const UpdateTeacherView = () => {
                 }
             }
 
-            let responseData;
-            try {
-                responseData = await sendRequest(url, "PATCH", formData);
-            } catch (err) {
-                throw err;
-            }
-            setModal({
-                title: "Berhasil!",
-                message: responseData.message,
-                onConfirm: null,
-            });
-            setModalIsOpen(true);
+            // Use React Query mutation
+            await updateTeacherMutation.mutateAsync(formData);
         } finally {
             setIsSubmitting(false);
         }
@@ -228,12 +234,12 @@ const UpdateTeacherView = () => {
                 title={modal.title}
                 footer={<ModalFooter />}
             >
-                {isLoading && (
+                {(isLoadingTeacher || updateTeacherMutation.isPending) && (
                     <div className="flex justify-center mt-16">
                         <LoadingCircle size={32} />
                     </div>
                 )}
-                {!isLoading && modal.message}
+                {!isLoadingTeacher && !updateTeacherMutation.isPending && modal.message}
             </Modal>
 
             <div
@@ -256,10 +262,10 @@ const UpdateTeacherView = () => {
                                         />
                                     }
                                     buttonClassName={`${
-                                        isLoading && "hidden"
+                                        isLoadingTeacher && "hidden"
                                     } border border-gray-600 bg-gray-50 size-9 rounded-full absolute offset bottom-2 right-2 translate-x-1/2 translate-y-1/2`}
                                     imgClassName={`${
-                                        isLoading && "animate-pulse"
+                                        isLoadingTeacher && "animate-pulse"
                                     } mt-2 rounded-md size-32 md:size-48 shrink-0`}
                                     defaultImageSrc={
                                         loadedTeacher?.image
@@ -282,7 +288,7 @@ const UpdateTeacherView = () => {
                             placeholder: "Nama Lengkap",
                             type: "text",
                             required: true,
-                            disabled: isLoading,
+                            disabled: isLoadingTeacher,
                             value: loadedTeacher?.name || "",
                         },
                         {
@@ -291,7 +297,7 @@ const UpdateTeacherView = () => {
                             placeholder: "8123456789",
                             type: "phone",
                             required: true,
-                            disabled: isLoading,
+                            disabled: isLoadingTeacher,
                             value: loadedTeacher?.phone || "",
                         },
                         {
@@ -300,7 +306,7 @@ const UpdateTeacherView = () => {
                             placeholder: "Guru",
                             type: "select",
                             required: true,
-                            disabled: isLoading,
+                            disabled: isLoadingTeacher,
                             value: loadedTeacher?.position || "",
                             options: [
                                 { label: "MT Desa", value: "branchTeacher" },
@@ -318,7 +324,7 @@ const UpdateTeacherView = () => {
                             placeholder: "Desa",
                             type: "date",
                             required: true,
-                            disabled: isLoading,
+                            disabled: isLoadingTeacher,
                             value: loadedDate || null,
                         },
                         {
@@ -326,7 +332,7 @@ const UpdateTeacherView = () => {
                             label: "Jenis Kelamin",
                             type: "select",
                             required: true,
-                            disabled: isLoading,
+                            disabled: isLoadingTeacher,
                             value: loadedTeacher?.gender || "",
                             options: [
                                 { label: "Laki-Laki", value: "male" },
@@ -338,12 +344,12 @@ const UpdateTeacherView = () => {
                             label: "Alamat",
                             type: "textarea",
                             required: true,
-                            disabled: isLoading,
+                            disabled: isLoadingTeacher,
                             value: loadedTeacher?.address || "",
                         },
                     ]}
                     onSubmit={handleFormSubmit}
-                    disabled={isLoading}
+                    disabled={isLoadingTeacher}
                     reset={false}
                     footer={false}
                     button={
@@ -351,15 +357,15 @@ const UpdateTeacherView = () => {
                             <button
                                 type="submit"
                                 className={`button-primary ${
-                                    isLoading || !loadedTeacher || isSubmitting
+                                    isLoadingTeacher || !loadedTeacher || isSubmitting || updateTeacherMutation.isPending
                                         ? "opacity-50 cursor-not-allowed"
                                         : ""
                                 }`}
                                 disabled={
-                                    isLoading || !loadedTeacher || isSubmitting
+                                    isLoadingTeacher || !loadedTeacher || isSubmitting || updateTeacherMutation.isPending
                                 }
                             >
-                                {isLoading || isSubmitting ? (
+                                {isLoadingTeacher || isSubmitting || updateTeacherMutation.isPending ? (
                                     <LoadingCircle>Processing...</LoadingCircle>
                                 ) : (
                                     "Update"
