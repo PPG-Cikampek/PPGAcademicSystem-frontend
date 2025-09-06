@@ -8,7 +8,7 @@ import {
 } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import useHttp from "../../shared/hooks/http-hook";
+import { useStudent, useUpdateStudentMutation } from "../../shared/queries";
 import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
 
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
@@ -26,9 +26,7 @@ const UpdateStudentView = () => {
         onConfirm: null,
     });
     const [modalIsOpen, setModalIsOpen] = useState(false);
-    const { isLoading, error, sendRequest, setError } = useHttp();
-    const [isTransitioning, setIsTransitioning] = useState(false);
-    const [loadedStudent, setLoadedStudent] = useState();
+    const [localError, setLocalError] = useState(null);
     const [loadedDate, setLoadedDate] = useState();
     const [fields, setFields] = useState([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -43,40 +41,52 @@ const UpdateStudentView = () => {
     const studentId = useParams().studentId;
     const navigate = useNavigate();
 
+    // React Query hooks
+    const { data: studentData, isLoading: isLoadingStudent, error: studentError } = useStudent(studentId);
+    const updateStudentMutation = useUpdateStudentMutation({
+        onSuccess: (data) => {
+            setModal({
+                title: "Berhasil!",
+                message: data.message,
+                onConfirm: null,
+            });
+            setModalIsOpen(true);
+            setIsSubmitting(false);
+            setLocalError(null);
+        },
+        onError: (error) => {
+            setIsSubmitting(false);
+            setLocalError(error.message || "An error occurred while updating student");
+        },
+    });
+
+    // Handle student data loading and original data setup
     useEffect(() => {
-        const fetchStudent = async () => {
-            try {
-                const responseData = await sendRequest(
-                    `${import.meta.env.VITE_BACKEND_URL}/students/${studentId}`
-                );
-                setLoadedStudent(responseData.student);
+        if (studentData) {
+            // Store original data for comparison to detect changes
+            originalDataRef.current = {
+                nis: studentData.nis,
+                name: studentData.name,
+                dateOfBirth: studentData.dateOfBirth,
+                gender: studentData.gender,
+                parentName: studentData.parentName,
+                parentPhone: studentData.parentPhone,
+                address: studentData.address,
+            };
 
-                // Store original data for comparison to detect changes
-                originalDataRef.current = {
-                    nis: responseData.student.nis,
-                    name: responseData.student.name,
-                    dateOfBirth: responseData.student.dateOfBirth,
-                    gender: responseData.student.gender,
-                    parentName: responseData.student.parentName,
-                    parentPhone: responseData.student.parentPhone,
-                    address: responseData.student.address,
-                };
-
-                // Safe date parsing with validation - store as ISO string to reduce memory
-                if (responseData.student.dateOfBirth) {
-                    const date = new Date(responseData.student.dateOfBirth);
-                    if (!isNaN(date.getTime())) {
-                        setLoadedDate(date.toISOString().split("T")[0]);
-                    } else {
-                        setLoadedDate(null);
-                    }
+            // Safe date parsing with validation - store as ISO string to reduce memory
+            if (studentData.dateOfBirth) {
+                const date = new Date(studentData.dateOfBirth);
+                if (!isNaN(date.getTime())) {
+                    setLoadedDate(date.toISOString().split("T")[0]);
                 } else {
                     setLoadedDate(null);
                 }
-            } catch (err) {}
-        };
-        fetchStudent();
-    }, [sendRequest, studentId]);
+            } else {
+                setLoadedDate(null);
+            }
+        }
+    }, [studentData]);
 
     useEffect(() => {
         if (auth.userRole === "admin") {
@@ -87,8 +97,8 @@ const UpdateStudentView = () => {
                     placeholder: "20100010",
                     type: "text",
                     required: false,
-                    disabled: isLoading,
-                    value: loadedStudent?.nis || "",
+                    disabled: isLoadingStudent,
+                    value: studentData?.nis || "",
                 },
                 {
                     name: "name",
@@ -96,8 +106,8 @@ const UpdateStudentView = () => {
                     placeholder: "Nama Lengkap",
                     type: "text",
                     required: auth.userRole !== "admin" ? true : false,
-                    disabled: isLoading,
-                    value: loadedStudent?.name || "",
+                    disabled: isLoadingStudent,
+                    value: studentData?.name || "",
                 },
                 {
                     name: "dateOfBirth",
@@ -105,7 +115,7 @@ const UpdateStudentView = () => {
                     placeholder: "Desa",
                     type: "date",
                     required: auth.userRole !== "admin" ? true : false,
-                    disabled: isLoading,
+                    disabled: isLoadingStudent,
                     value: loadedDate || null,
                 },
                 {
@@ -113,8 +123,8 @@ const UpdateStudentView = () => {
                     label: "Jenis Kelamin",
                     type: "select",
                     required: auth.userRole !== "admin" ? true : false,
-                    disabled: isLoading,
-                    value: loadedStudent?.gender || "",
+                    disabled: isLoadingStudent,
+                    value: studentData?.gender || "",
                     options: [
                         { label: "Laki-Laki", value: "male" },
                         { label: "Perempuan", value: "female" },
@@ -125,24 +135,24 @@ const UpdateStudentView = () => {
                     label: "Nama Orang Tua/Wali",
                     type: "text",
                     required: auth.userRole !== "admin" ? true : false,
-                    disabled: isLoading,
-                    value: loadedStudent?.parentName || "",
+                    disabled: isLoadingStudent,
+                    value: studentData?.parentName || "",
                 },
                 {
                     name: "parentPhone",
                     label: "Nomor WA Orang Tua/Wali",
                     type: "phone",
                     required: auth.userRole !== "admin" ? true : false,
-                    disabled: isLoading,
-                    value: loadedStudent?.parentPhone || "",
+                    disabled: isLoadingStudent,
+                    value: studentData?.parentPhone || "",
                 },
                 {
                     name: "address",
                     label: "Alamat",
                     type: "textarea",
                     required: auth.userRole !== "admin" ? true : false,
-                    disabled: isLoading,
-                    value: loadedStudent?.address || "",
+                    disabled: isLoadingStudent,
+                    value: studentData?.address || "",
                 },
             ]);
         } else {
@@ -153,8 +163,8 @@ const UpdateStudentView = () => {
                     placeholder: "Nama Lengkap",
                     type: "text",
                     required: auth.userRole !== "admin" ? true : false,
-                    disabled: isLoading,
-                    value: loadedStudent?.name || "",
+                    disabled: isLoadingStudent,
+                    value: studentData?.name || "",
                 },
                 {
                     name: "dateOfBirth",
@@ -162,7 +172,7 @@ const UpdateStudentView = () => {
                     placeholder: "Desa",
                     type: "date",
                     required: auth.userRole !== "admin" ? true : false,
-                    disabled: isLoading,
+                    disabled: isLoadingStudent,
                     value: loadedDate || null,
                 },
                 {
@@ -170,8 +180,8 @@ const UpdateStudentView = () => {
                     label: "Jenis Kelamin",
                     type: "select",
                     required: auth.userRole !== "admin" ? true : false,
-                    disabled: isLoading,
-                    value: loadedStudent?.gender || "",
+                    disabled: isLoadingStudent,
+                    value: studentData?.gender || "",
                     options: [
                         { label: "Laki-Laki", value: "male" },
                         { label: "Perempuan", value: "female" },
@@ -182,8 +192,8 @@ const UpdateStudentView = () => {
                     label: "Nama Orang Tua/Wali",
                     type: "text",
                     required: auth.userRole !== "admin" ? true : false,
-                    disabled: isLoading,
-                    value: loadedStudent?.parentName || "",
+                    disabled: isLoadingStudent,
+                    value: studentData?.parentName || "",
                 },
                 {
                     name: "parentPhone",
@@ -191,20 +201,20 @@ const UpdateStudentView = () => {
                     type: "phone",
                     placeholder: "8123456789",
                     required: auth.userRole !== "admin" ? true : false,
-                    disabled: isLoading,
-                    value: loadedStudent?.parentPhone || "",
+                    disabled: isLoadingStudent,
+                    value: studentData?.parentPhone || "",
                 },
                 {
                     name: "address",
                     label: "Alamat",
                     type: "textarea",
                     required: auth.userRole !== "admin" ? true : false,
-                    disabled: isLoading,
-                    value: loadedStudent?.address || "",
+                    disabled: isLoadingStudent,
+                    value: studentData?.address || "",
                 },
             ]);
         }
-    }, [loadedStudent]);
+    }, [studentData, loadedDate, auth.userRole, isLoadingStudent]);
 
     // Memoized function to handle cropped image
     const handleImageCropped = useCallback((croppedImage) => {
@@ -249,23 +259,21 @@ const UpdateStudentView = () => {
         }
 
         // Prevent submission if student data isn't loaded
-        if (!loadedStudent || !loadedStudent.id) {
-            setError("Data siswa belum dimuat. Silakan tunggu...");
+        if (!studentData || !studentData.id) {
+            // Handle error - student data not loaded
             return;
         }
 
         // Check if any data has actually changed
         if (!hasDataChanged(data)) {
-            setError("Tidak ada perubahan data untuk disimpan.");
+            setLocalError("Tidak ada perubahan data untuk disimpan.");
+            setIsSubmitting(false);
             return;
         }
 
         setIsSubmitting(true);
 
         try {
-            const url = `${
-                import.meta.env.VITE_BACKEND_URL
-            }/students/${studentId}`;
             const formData = new FormData();
 
             // Only append changed fields to reduce payload size
@@ -273,7 +281,8 @@ const UpdateStudentView = () => {
             const formattedName = data.name.replace(
                 /\w\S*/g,
                 (txt) =>
-                    txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+                    txt.charAt(0).toUpperCase() +
+                    txt.substr(1).toLowerCase()
             );
             const formattedDate =
                 data.dateOfBirth instanceof Date
@@ -307,26 +316,21 @@ const UpdateStudentView = () => {
             if (croppedImageRef.current) {
                 formData.append("image", croppedImageRef.current);
             } else {
-                if (!loadedStudent?.image && auth.userRole !== "admin") {
-                    setError("Tidak ada foto yang dipilih!");
-                    throw new Error("Tidak ada foto yang dipilih!");
+                if (!studentData?.image && auth.userRole !== "admin") {
+                    setLocalError("Tidak ada foto yang dipilih!");
+                    setIsSubmitting(false);
+                    return;
                 }
             }
 
-            let responseData;
-            try {
-                responseData = await sendRequest(url, "PATCH", formData);
-            } catch (err) {
-                throw err;
-            }
-            setModal({
-                title: "Berhasil!",
-                message: responseData.message,
-                onConfirm: null,
+            // Use the mutation
+            await updateStudentMutation.mutateAsync({
+                studentId,
+                formData,
             });
-            setModalIsOpen(true);
-        } finally {
+        } catch (err) {
             setIsSubmitting(false);
+            // Error is handled by the mutation's onError
         }
     };
 
@@ -338,7 +342,7 @@ const UpdateStudentView = () => {
                     <button
                         onClick={() => {
                             setModalIsOpen(false);
-                            !error && navigate(-1);
+                            navigate(-1);
                         }}
                         className={`${
                             modal.onConfirm
@@ -358,7 +362,7 @@ const UpdateStudentView = () => {
                     )}
                 </div>
             ),
-        [modal.onConfirm, error, navigate]
+        [modal.onConfirm, navigate]
     );
 
     return (
@@ -369,19 +373,26 @@ const UpdateStudentView = () => {
                 title={modal.title}
                 footer={<ModalFooter />}
             >
-                {isLoading && (
+                {isLoadingStudent && (
                     <div className="flex justify-center mt-16">
                         <LoadingCircle size={32} />
                     </div>
                 )}
-                {!isLoading && modal.message}
+                {!isLoadingStudent && modal.message}
             </Modal>
 
-            {!isLoading && fields && (
+            {studentError && (
+                <ErrorCard
+                    error={studentError.message || "Failed to load student data"}
+                    onClear={() => {
+                        // Optionally reset the query
+                    }}
+                />
+            )}
+
+            {!isLoadingStudent && !studentError && fields && (
                 <div
-                    className={`pb-24 transition-opacity duration-300 ${
-                        isTransitioning ? "opacity-0" : "opacity-100"
-                    }`}
+                    className={`pb-24 transition-opacity duration-300`}
                 >
                     <DynamicForm
                         customDescription={
@@ -398,17 +409,17 @@ const UpdateStudentView = () => {
                                             />
                                         }
                                         buttonClassName={`${
-                                            isLoading && "hidden"
+                                            isLoadingStudent && "hidden"
                                         } border border-gray-600 bg-gray-50 size-9 rounded-full absolute offset bottom-2 right-2 translate-x-1/2 translate-y-1/2`}
                                         imgClassName={`${
-                                            isLoading && "animate-pulse"
+                                            isLoadingStudent && "animate-pulse"
                                         } mt-2 rounded-md size-32 md:size-48 shrink-0`}
                                         defaultImageSrc={
-                                            loadedStudent?.image
+                                            studentData?.image
                                                 ? `${
                                                       import.meta.env
                                                           .VITE_BACKEND_URL
-                                                  }/${loadedStudent.image}`
+                                                  }/${studentData.image}`
                                                 : "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"
                                         }
                                         onImageCropped={handleImageCropped}
@@ -428,8 +439,8 @@ const UpdateStudentView = () => {
                                         auth.userRole !== "admin"
                                             ? true
                                             : false,
-                                    disabled: isLoading,
-                                    value: loadedStudent?.name || "",
+                                    disabled: isLoadingStudent,
+                                    value: studentData?.name || "",
                                 },
                                 {
                                     name: "dateOfBirth",
@@ -440,7 +451,7 @@ const UpdateStudentView = () => {
                                         auth.userRole !== "admin"
                                             ? true
                                             : false,
-                                    disabled: isLoading,
+                                    disabled: isLoadingStudent,
                                     value: loadedDate || null,
                                 },
                                 {
@@ -451,8 +462,8 @@ const UpdateStudentView = () => {
                                         auth.userRole !== "admin"
                                             ? true
                                             : false,
-                                    disabled: isLoading,
-                                    value: loadedStudent?.gender || "",
+                                    disabled: isLoadingStudent,
+                                    value: studentData?.gender || "",
                                     options: [
                                         { label: "Laki-Laki", value: "male" },
                                         { label: "Perempuan", value: "female" },
@@ -466,8 +477,8 @@ const UpdateStudentView = () => {
                                         auth.userRole !== "admin"
                                             ? true
                                             : false,
-                                    disabled: isLoading,
-                                    value: loadedStudent?.parentName || "",
+                                    disabled: isLoadingStudent,
+                                    value: studentData?.parentName || "",
                                 },
                                 {
                                     name: "address",
@@ -477,13 +488,13 @@ const UpdateStudentView = () => {
                                         auth.userRole !== "admin"
                                             ? true
                                             : false,
-                                    disabled: isLoading,
-                                    value: loadedStudent?.address || "",
+                                    disabled: isLoadingStudent,
+                                    value: studentData?.address || "",
                                 },
                             ]
                         }
                         onSubmit={handleFormSubmit}
-                        disabled={isLoading}
+                        disabled={isLoadingStudent}
                         reset={false}
                         footer={false}
                         button={
@@ -491,19 +502,21 @@ const UpdateStudentView = () => {
                                 <button
                                     type="submit"
                                     className={`button-primary ${
-                                        isLoading ||
-                                        !loadedStudent ||
-                                        isSubmitting
+                                        isLoadingStudent ||
+                                        !studentData ||
+                                        isSubmitting ||
+                                        updateStudentMutation.isPending
                                             ? "opacity-50 cursor-not-allowed"
                                             : ""
                                     }`}
                                     disabled={
-                                        isLoading ||
-                                        !loadedStudent ||
-                                        isSubmitting
+                                        isLoadingStudent ||
+                                        !studentData ||
+                                        isSubmitting ||
+                                        updateStudentMutation.isPending
                                     }
                                 >
-                                    {isLoading || isSubmitting ? (
+                                    {isLoadingStudent || isSubmitting || updateStudentMutation.isPending ? (
                                         <LoadingCircle>
                                             Processing...
                                         </LoadingCircle>
@@ -511,10 +524,10 @@ const UpdateStudentView = () => {
                                         "Update"
                                     )}
                                 </button>
-                                {error && (
+                                {localError && (
                                     <ErrorCard
-                                        error={error}
-                                        onClear={() => setError(null)}
+                                        error={localError}
+                                        onClear={() => setLocalError(null)}
                                     />
                                 )}
                             </div>
