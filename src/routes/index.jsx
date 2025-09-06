@@ -1,60 +1,80 @@
-import { adminRoutes, AdminRouteWrapper } from './adminRoutes.jsx';
-import { curriculumRoutes, CurriculumRouteWrapper } from './curriculumRoutes.jsx';
-import { branchAdminRoutes, BranchAdminRouteWrapper } from './branchAdminRoutes.jsx';
-import { subBranchAdminRoutes, SubBranchAdminRouteWrapper } from './subBranchAdminRoutes.jsx';
-import { teacherRoutes, TeacherRouteWrapper } from './teacherRoutes.jsx';
-import { munaqisyRoutes, MunaqisyRouteWrapper } from './munaqisyRoutes.jsx';
-import { studentRoutes, StudentRouteWrapper } from './studentRoutes.jsx';
+import { adminRoutes, AdminRouteWrapper } from "./adminRoutes.jsx";
+import {
+    curriculumRoutes,
+    CurriculumRouteWrapper,
+} from "./curriculumRoutes.jsx";
+import {
+    branchAdminRoutes,
+    BranchAdminRouteWrapper,
+} from "./branchAdminRoutes.jsx";
+import {
+    subBranchAdminRoutes,
+    SubBranchAdminRouteWrapper,
+} from "./subBranchAdminRoutes.jsx";
+import { teacherRoutes, TeacherRouteWrapper } from "./teacherRoutes.jsx";
+import { munaqisyRoutes, MunaqisyRouteWrapper } from "./munaqisyRoutes.jsx";
+import { studentRoutes, StudentRouteWrapper } from "./studentRoutes.jsx";
 
-import AuthView from '../users/pages/AuthView.jsx';
-import PasswordResetView from '../users/pages/PasswordResetView.jsx';
-import EmailVerifyView from '../users/pages/EmailVerifyView.jsx';
+import AuthView from "../users/pages/AuthView.jsx";
+import PasswordResetView from "../users/pages/PasswordResetView.jsx";
+import EmailVerifyView from "../users/pages/EmailVerifyView.jsx";
+import StudentIDCard from "../students/id-card/StudentIDCard.jsx";
 
 const getRouteConfig = (userRole) => {
     switch (userRole) {
-        case 'teacher':
+        case "teacher":
             return {
                 routes: teacherRoutes,
-                Wrapper: TeacherRouteWrapper
+                Wrapper: TeacherRouteWrapper,
             };
-        case 'branchAdmin':
+        case "branchAdmin":
             return {
                 routes: branchAdminRoutes,
-                Wrapper: BranchAdminRouteWrapper
+                Wrapper: BranchAdminRouteWrapper,
             };
-        case 'munaqisy':
+        case "munaqisy":
             return {
                 routes: munaqisyRoutes,
-                Wrapper: MunaqisyRouteWrapper
+                Wrapper: MunaqisyRouteWrapper,
             };
-        case 'student':
+        case "student":
             return {
                 routes: studentRoutes,
-                Wrapper: StudentRouteWrapper
+                Wrapper: StudentRouteWrapper,
             };
-        case 'subBranchAdmin':
+        case "subBranchAdmin":
             return {
                 routes: subBranchAdminRoutes,
-                Wrapper: SubBranchAdminRouteWrapper
+                Wrapper: SubBranchAdminRouteWrapper,
             };
-        case 'admin':
+        case "admin":
             return {
                 routes: adminRoutes,
-                Wrapper: AdminRouteWrapper
+                Wrapper: AdminRouteWrapper,
             };
-        case 'curriculum':
+        case "curriculum":
             return {
                 routes: curriculumRoutes,
-                Wrapper: CurriculumRouteWrapper
+                Wrapper: CurriculumRouteWrapper,
             };
         default:
             return {
                 routes: [
-                    { path: '/', element: <AuthView /> },
-                    { path: '/reset-password/:token', element: <PasswordResetView /> },
-                    { path: '/verify-email/:token', element: <EmailVerifyView /> }
+                    { path: "/", element: <AuthView /> },
+                    {
+                        path: "/reset-password/:token",
+                        element: <PasswordResetView />,
+                    },
+                    {
+                        path: "/verify-email/:token",
+                        element: <EmailVerifyView />,
+                    },
+                    {
+                        path: "/demo",
+                        element: <StudentIDCard />,
+                    },
                 ],
-                Wrapper: ({ children }) => <>{children}</>
+                Wrapper: ({ children }) => <>{children}</>,
             };
     }
 };

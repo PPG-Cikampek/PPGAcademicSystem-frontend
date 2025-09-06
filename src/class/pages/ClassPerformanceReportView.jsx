@@ -1,110 +1,124 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, lazy } from "react";
 
-import { Document, Page, Text, View, pdf, PDFViewer, Image } from '@react-pdf/renderer';
-import { saveAs } from 'file-saver';
+import {
+    Document,
+    Page,
+    Text,
+    View,
+    pdf,
+    PDFViewer,
+    Image,
+} from "@react-pdf/renderer";
 
-import logo from '../../assets/logos/ppgcikampek.webp';
-import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
+import { saveAs } from "file-saver";
 
-import { ArrowDownToLine } from 'lucide-react';
+import logo from "../../assets/logos/ppgcikampek.webp";
+import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
+
+import { ArrowDownToLine } from "lucide-react";
 
 const styles = {
     page: {
         fontSize: 12,
-        fontFamily: 'Times-Roman',
+        fontFamily: "Times-Roman",
         paddingTop: 40,
         paddingLeft: 75,
         paddingRight: 75,
     },
     header: {
-        fontFamily: 'Times-Bold',
-        flexDirection: 'row',
-        justifyContent: 'start',
-        alignItems: 'center',
+        fontFamily: "Times-Bold",
+        flexDirection: "row",
+        justifyContent: "start",
+        alignItems: "center",
         marginBottom: 20,
         paddingBottom: 10,
-        gap: '68px',
-        width: '100%',
-        borderBottom: '1px solid #000'
+        gap: "68px",
+        width: "100%",
+        borderBottom: "1px solid #000",
     },
     subHeader: {
-        fontFamily: 'Times-Bold',
-        flexDirection: 'col',
-        justifyContent: 'start',
-        alignItems: 'center',
+        fontFamily: "Times-Bold",
+        flexDirection: "col",
+        justifyContent: "start",
+        alignItems: "center",
         marginBottom: 10,
         paddingBottom: 5,
         gap: 2,
-        width: '100%',
+        width: "100%",
     },
     logo: {
         width: 64,
-        height: 64
+        height: 64,
     },
     companyInfo: {
         fontSize: 9,
         marginTop: 50,
-        color: '#222',
+        color: "#222",
     },
     title: {
         fontSize: 16,
-        textAlign: 'center',
+        textAlign: "center",
     },
     subTitle: {
         fontSize: 16,
-        fontWeight: '600',
-        textAlign: 'center',
+        fontWeight: "600",
+        textAlign: "center",
     },
     studentDetails: {
-        flexDirection: 'col',
-        justifyContent: 'space-between',
-        alignItems: 'start',
+        flexDirection: "col",
+        justifyContent: "space-between",
+        alignItems: "start",
         gap: 4,
-        marginBottom: 20
+        marginBottom: 20,
     },
     studentDetailLists: {
-        flexDirection: 'row',
-        gap: 10
+        flexDirection: "row",
+        gap: 10,
     },
     body: {
-        flexDirection: 'row',
-        gap: 20
+        flexDirection: "row",
+        gap: 20,
     },
     table: {
-        display: 'table',
-        width: '70%',
+        display: "table",
+        width: "70%",
         marginBottom: 20,
     },
     tableRow: {
-        flexDirection: 'row',
-        borderBottom: '1px solid #e0e0e0',
+        flexDirection: "row",
+        borderBottom: "1px solid #e0e0e0",
     },
     tableHeader: {
-        backgroundColor: '#f0f0f0',
-        fontWeight: 'bold',
+        backgroundColor: "#f0f0f0",
+        fontWeight: "bold",
     },
     tableCell: {
         padding: 5,
         flex: 1,
     },
     tableCellNumber: {
-        textAlign: 'center',
+        textAlign: "center",
     },
     signature: {
-        flexDirection: 'col',
-        justifyContent: 'start',
-        alignItems: 'center',
+        flexDirection: "col",
+        justifyContent: "start",
+        alignItems: "center",
         gap: 5,
         marginTop: 80,
-        borderTop: '1px solid #000',
+        borderTop: "1px solid #000",
         paddingTop: 5,
         width: 200,
     },
     signatureName: {
-        textDecoration: 'underline',
-        fontFamily: 'Times-Bold',
+        textDecoration: "underline",
+        fontFamily: "Times-Bold",
     },
-    svgContainer: { display: 'flex', justifyContent: 'center', alignItems: 'center', margin: 20 }
+    svgContainer: {
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        margin: 20,
+    },
 };
 
 const ClassPerformanceReportView = ({ studentData, noCard = false }) => {
@@ -112,10 +126,10 @@ const ClassPerformanceReportView = ({ studentData, noCard = false }) => {
     const [reportData, setReportData] = useState();
     const [showPreview, setShowPreview] = useState(false);
 
-    console.log(studentData)
+    console.log(studentData);
 
     useEffect(() => {
-        setIsLoading(true)
+        setIsLoading(true);
         const transformAttendance = (data) => {
             const totalAttendances = data.attendances.length;
 
@@ -127,7 +141,10 @@ const ClassPerformanceReportView = ({ studentData, noCard = false }) => {
             return Object.keys(statusCounts).map((status) => ({
                 status,
                 count: statusCounts[status],
-                percentage: ((statusCounts[status] / totalAttendances) * 100).toFixed(0),
+                percentage: (
+                    (statusCounts[status] / totalAttendances) *
+                    100
+                ).toFixed(0),
             }));
         };
 
@@ -135,25 +152,26 @@ const ClassPerformanceReportView = ({ studentData, noCard = false }) => {
 
         const documentData = {
             companyInfo: {
-                name: 'Acme Corporation',
-                address: '123 Business Lane, Corporate City, ST 12345',
-                contact: 'Phone: (555) 123-4567 | Email: info@acmecorp.com',
+                name: "Acme Corporation",
+                address: "123 Business Lane, Corporate City, ST 12345",
+                contact: "Phone: (555) 123-4567 | Email: info@acmecorp.com",
             },
             content: {
                 date: new Date().toLocaleDateString(),
-                subject: 'Lembar Performa Peserta Didik',
-                body: 'Kegiatan Belajar Mengajar',
+                subject: "Lembar Performa Peserta Didik",
+                body: "Kegiatan Belajar Mengajar",
             },
             data: transformedAttendance,
         };
 
         setReportData(documentData);
-        setIsLoading(false)
+        setIsLoading(false);
     }, [studentData]);
 
-    const getLocalizedMonthName = (monthNumber, locale = 'id-ID') => {
-        return new Date(2000, monthNumber - 1, 1)
-            .toLocaleString(locale, { month: 'long' });
+    const getLocalizedMonthName = (monthNumber, locale = "id-ID") => {
+        return new Date(2000, monthNumber - 1, 1).toLocaleString(locale, {
+            month: "long",
+        });
     };
 
     const PdfDocument = () => (
@@ -166,15 +184,14 @@ const ClassPerformanceReportView = ({ studentData, noCard = false }) => {
                     </Text>
                     <Text style={styles.title}>
                         {`Penggerak Pembina Generus (PPG)`}
-                        {'\n'}
+                        {"\n"}
                         Cikampek
-                        {'\n'}
+                        {"\n"}
                         <Text style={styles.companyInfo}>
                             {`Jl. Ciherang, Wadas, Telukjambe Timur, Cikampek, Jawa Barat 41361`}
-                            {'\n'}
+                            {"\n"}
                         </Text>
                     </Text>
-
                 </View>
 
                 <View style={styles.subHeader}>
@@ -182,7 +199,6 @@ const ClassPerformanceReportView = ({ studentData, noCard = false }) => {
                     <Text>{reportData.content.subject}</Text>
                     <Text>{reportData.content.body}</Text>
                 </View>
-
 
                 <View style={styles.studentDetails}>
                     {/* Title */}
@@ -204,7 +220,9 @@ const ClassPerformanceReportView = ({ studentData, noCard = false }) => {
                     </View>
                     <View style={styles.studentDetailLists}>
                         <Text>Periode</Text>
-                        <Text>: {studentData.month ? studentData.month : 'Semua'}</Text>
+                        <Text>
+                            : {studentData.month ? studentData.month : "Semua"}
+                        </Text>
                     </View>
                 </View>
 
@@ -214,28 +232,63 @@ const ClassPerformanceReportView = ({ studentData, noCard = false }) => {
                         {/* Table Header */}
                         <View style={[styles.tableRow, styles.tableHeader]}>
                             <Text style={styles.tableCell}>Keterangan</Text>
-                            <Text style={[styles.tableCell, styles.tableCellNumber]}>Jumlah</Text>
-                            <Text style={[styles.tableCell, styles.tableCellNumber]}>Persentase</Text>
+                            <Text
+                                style={[
+                                    styles.tableCell,
+                                    styles.tableCellNumber,
+                                ]}
+                            >
+                                Jumlah
+                            </Text>
+                            <Text
+                                style={[
+                                    styles.tableCell,
+                                    styles.tableCellNumber,
+                                ]}
+                            >
+                                Persentase
+                            </Text>
                         </View>
 
                         {/* Table Rows */}
                         {reportData.data.map((row, index) => (
                             <View key={index} style={styles.tableRow}>
-                                <Text style={styles.tableCell}>{row.status}</Text>
-                                <Text style={[styles.tableCell, styles.tableCellNumber]}>{row.count}</Text>
-                                <Text style={[styles.tableCell, styles.tableCellNumber]}>{row.percentage}%</Text>
+                                <Text style={styles.tableCell}>
+                                    {row.status}
+                                </Text>
+                                <Text
+                                    style={[
+                                        styles.tableCell,
+                                        styles.tableCellNumber,
+                                    ]}
+                                >
+                                    {row.count}
+                                </Text>
+                                <Text
+                                    style={[
+                                        styles.tableCell,
+                                        styles.tableCellNumber,
+                                    ]}
+                                >
+                                    {row.percentage}%
+                                </Text>
                             </View>
                         ))}
                     </View>
-
                 </View>
 
                 {/* Performance Chart */}
                 {/* <Image style={styles.image} src={chartImage} /> */}
 
-
                 {/* Signature Placeholder */}
-                <View style={{ marginTop: 20, flexDirection: 'col', justifyContent: 'space-between', alignItems: 'start' }}>
+                <View
+                    style={{
+                        marginTop: 20,
+                        flexDirection: "col",
+                        justifyContent: "space-between",
+                        alignItems: "start",
+                    }}
+                >
                     <Text>Hormat Kami,</Text>
                     {/* <Text>Guru</Text> */}
                     {/* {studentData.teachers.map(teacher => (
@@ -244,8 +297,13 @@ const ClassPerformanceReportView = ({ studentData, noCard = false }) => {
                             <Text>NIG: {teacher.nig}</Text>
                         </View>
                     ))} */}
-                    <View style={styles.signature} key={studentData.teachers[0]._id}>
-                        <Text style={styles.signatureName}>{studentData.teachers[0].name}</Text>
+                    <View
+                        style={styles.signature}
+                        key={studentData.teachers[0]._id}
+                    >
+                        <Text style={styles.signatureName}>
+                            {studentData.teachers[0].name}
+                        </Text>
                         <Text>NIG: {studentData.teachers[0].nig}</Text>
                     </View>
                 </View>
@@ -256,7 +314,7 @@ const ClassPerformanceReportView = ({ studentData, noCard = false }) => {
     const generatePDF = async () => {
         const blob = await pdf(<PdfDocument />).toBlob();
         const date = new Date().toLocaleDateString();
-        console.log(date)
+        console.log(date);
         saveAs(blob, `Laporan_Kehadiran_${studentData.name}_${date}.pdf`);
     };
 
@@ -265,11 +323,17 @@ const ClassPerformanceReportView = ({ studentData, noCard = false }) => {
     };
 
     return (
-        <div className={`${noCard === false && "container mx-auto p-6 max-w-6xl"}`}>
-            <div className={`${noCard === false && "bg-white shadow-md rounded-lg p-6"}`}>
-                {isLoading && (
-                    <LoadingCircle size={32} />
-                )}
+        <div
+            className={`${
+                noCard === false && "container mx-auto p-6 max-w-6xl"
+            }`}
+        >
+            <div
+                className={`${
+                    noCard === false && "bg-white shadow-md rounded-lg p-6"
+                }`}
+            >
+                {isLoading && <LoadingCircle size={32} />}
                 {!isLoading && (
                     <div className="space-y-4">
                         <div className="md:flex flex-row justify-start gap-2 hidden">
@@ -277,7 +341,7 @@ const ClassPerformanceReportView = ({ studentData, noCard = false }) => {
                                 onClick={togglePreview}
                                 className="btn-primary-outline"
                             >
-                                {showPreview ? 'Tutup PDF' : 'Lihat PDF'}
+                                {showPreview ? "Tutup PDF" : "Lihat PDF"}
                             </button>
                             <button
                                 onClick={generatePDF}
@@ -292,13 +356,18 @@ const ClassPerformanceReportView = ({ studentData, noCard = false }) => {
                                 className="btn-primary-outline flex items-center m-0 p-2"
                             >
                                 <ArrowDownToLine size={24} />
-                                <span className='ml-2'>Unduh Laporan</span>
+                                <span className="ml-2">Unduh Laporan</span>
                             </button>
                         </div>
 
                         {/* PDF Preview */}
                         {showPreview && (
-                            <div className={`${noCard === false && "mt-6 border-2 border-gray-200 rounded-lg overflow-hidden"}`}>
+                            <div
+                                className={`${
+                                    noCard === false &&
+                                    "mt-6 border-2 border-gray-200 rounded-lg overflow-hidden"
+                                }`}
+                            >
                                 <PDFViewer width="100%" height="600">
                                     <PdfDocument />
                                 </PDFViewer>

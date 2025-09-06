@@ -139,3 +139,6 @@ deploy.sh
 .firebase
 .firebaserc
 .firebase/
+*.csv
+*.sh
+stats.html

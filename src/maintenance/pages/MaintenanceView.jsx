@@ -3,9 +3,9 @@ import { Clock, Construction, ArrowRight } from 'lucide-react';
 import { formatDate } from '../../shared/Utilities/formatDateToLocal';
 import logo from '../../assets/logos/ppgcikampek.webp';
 
-const MaintenanceView = () => {
-    // Set your target date here
-    const targetDate = new Date('2025-06-09T08:00:00');
+const MaintenanceView = ({ targetDate }) => {
+    // Use targetDate from props, or fallback to a default if not provided
+    const effectiveTargetDate = targetDate || new Date('2025-06-09T08:00:00');
     const [timeLeft, setTimeLeft] = useState({
         days: 0,
         hours: 0,
@@ -16,7 +16,7 @@ const MaintenanceView = () => {
     useEffect(() => {
         const timer = setInterval(() => {
             const now = new Date();
-            const difference = targetDate.getTime() - now.getTime();
+            const difference = effectiveTargetDate.getTime() - now.getTime();
 
             if (difference > 0) {
                 setTimeLeft({
@@ -29,7 +29,7 @@ const MaintenanceView = () => {
         }, 1000);
 
         return () => clearInterval(timer);
-    }, []);
+    }, [effectiveTargetDate]);
 
     return (
         <div className="min-h-screen bg-linear-to-b from-blue-50 to-blue-100 flex flex-col items-center justify-center p-4 text-gray-800">
@@ -42,12 +42,12 @@ const MaintenanceView = () => {
 
                 {/* Title */}
                 <h1 className="text-2xl md:text-3xl font-bold text-center animate-slide-up">
-                    Pemutakhiran dan Pembaharuan Website
+                    Pemutakhiran dan Pembaharuan Aplikasi
                 </h1>
 
                 {/* Message */}
                 <p className="md:text-lg text-base text-center text-gray-600 animate-slide-up">
-                    Sistem Akademik PPG Cikampek sedang dalam proses pemeliharan sistem untuk peningkatan pelayanan. Mohon maaf atas ketidaknyamanannya.
+                    Tim ICT sedang berusaha keras meningkatkan aplikasi ini. Mohon ditunggu 🙏
                 </p>
 
                 <p className="md:text-2xl text-xl text-center text-gray-600 animate-slide-up font-lpmq">
@@ -74,7 +74,7 @@ const MaintenanceView = () => {
                 {/* Expected Return Time */}
                 <div className="flex items-center justify-center space-x-2 text-gray-600">
                     <Clock className="w-5 h-5" />
-                    <span>Estimasi selesai: {formatDate(targetDate, true)} WIB</span>
+                    <span>Estimasi selesai: {formatDate(effectiveTargetDate, true)} WIB</span>
                 </div>
             </div>
         </div>

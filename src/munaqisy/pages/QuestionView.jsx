@@ -1,23 +1,29 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import useHttp from '../../shared/hooks/http-hook';
-import { MunaqasyahScoreContext } from '../context/MunaqasyahScoreContext';
-import Modal from '../../shared/Components/UIElements/ModalBottomClose';
-import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
-import getMunaqasyahQuestionTypeName from '../../munaqasyah/utilities/getMunaqasyahQuestionTypeName';
-import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
+import { useContext, useEffect, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import useHttp from "../../shared/hooks/http-hook";
+import { MunaqasyahScoreContext } from "../context/MunaqasyahScoreContext";
+import Modal from "../../shared/Components/UIElements/ModalBottomClose";
+import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
+import getMunaqasyahQuestionTypeName from "../../munaqasyah/utilities/getMunaqasyahQuestionTypeName";
+import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 
 const QuestionView = () => {
-    const [examQuestions, setExamQuestions] = useState()
+    const [examQuestions, setExamQuestions] = useState();
     const [selectedScores, setSelectedScores] = useState({});
-    const [totalScore, setTotalScore] = useState()
-    const [modal, setModal] = useState({ title: '', message: '', onConfirm: null });
+    const [totalScore, setTotalScore] = useState();
+    const [modal, setModal] = useState({
+        title: "",
+        message: "",
+        onConfirm: null,
+    });
     const [modalIsOpen, setModalIsOpen] = useState(false);
 
     const { isLoading, error, sendRequest, setError, setIsLoading } = useHttp();
 
-    const { state, dispatch, patchScoreData } = useContext(MunaqasyahScoreContext);
+    const { state, dispatch, patchScoreData } = useContext(
+        MunaqasyahScoreContext
+    );
 
     const navigate = useNavigate();
     const location = useLocation();
@@ -26,30 +32,38 @@ const QuestionView = () => {
     // console.log(data);
 
     useEffect(() => {
-
-        const url = `${import.meta.env.VITE_BACKEND_URL}/munaqasyahs/examination/questions?semester=${data.semester}&classGrade=${data.classGrade}&category=${data.categoryData.key}`
+        const url = `${
+            import.meta.env.VITE_BACKEND_URL
+        }/munaqasyahs/examination/questions?semester=${
+            data.semester
+        }&classGrade=${data.classGrade}&category=${data.categoryData.key}`;
 
         const fetchExamQuestions = async () => {
             try {
-                const responseData = await sendRequest(url, 'GET', null, { 'Content-Type': 'application/json' });
-                setExamQuestions(responseData)
-                console.log(responseData)
+                const responseData = await sendRequest(url, "GET", null, {
+                    "Content-Type": "application/json",
+                });
+                setExamQuestions(responseData);
+                console.log(responseData);
             } catch (err) {
-                console.log(err)
+                console.log(err);
             }
-        }
+        };
         fetchExamQuestions();
     }, [sendRequest, data]);
 
     const handleScoreSelect = (questionId, score) => {
         const newScores = {
             ...selectedScores,
-            [questionId]: score
+            [questionId]: score,
         };
         setSelectedScores(newScores);
 
         // Calculate total score only from valid scores
-        const scoreSum = Object.values(newScores).reduce((sum, score) => sum + score, 0);
+        const scoreSum = Object.values(newScores).reduce(
+            (sum, score) => sum + score,
+            0
+        );
         setTotalScore(scoreSum);
 
         // Only update if we have a valid category key
@@ -57,46 +71,50 @@ const QuestionView = () => {
             const newScoreData = {
                 [data.categoryData.key]: {
                     score: scoreSum,
-                    examinerUserId: JSON.parse(localStorage.getItem('userData'))?.userId,
-                    timestamp: new Date().toISOString()
-                }
+                    examinerUserId: JSON.parse(localStorage.getItem("userData"))
+                        ?.userId,
+                    timestamp: new Date().toISOString(),
+                },
             };
 
-            dispatch({ type: 'UPDATE_SCORE_DATA', payload: newScoreData });
+            dispatch({ type: "UPDATE_SCORE_DATA", payload: newScoreData });
         }
     };
 
     const handleFinish = async () => {
         if (!totalScore && totalScore !== 0) {
-            dispatch({ type: 'SET_ERROR', payload: 'Berikan nilai untuk semua pertanyaan!' });
+            dispatch({
+                type: "SET_ERROR",
+                payload: "Berikan nilai untuk semua pertanyaan!",
+            });
             setModal({
-                title: 'Gagal!',
-                message: 'Berikan nilai untuk semua pertanyaan!',
-                onConfirm: null
+                title: "Gagal!",
+                message: "Berikan nilai untuk semua pertanyaan!",
+                onConfirm: null,
             });
             setModalIsOpen(true);
             return;
         }
 
         try {
-            console.log('Saving total score:', totalScore);
-            console.log('Current state:', state.studentScore);
+            console.log("Saving total score:", totalScore);
+            console.log("Current state:", state.studentScore);
         } catch (err) {
-            setError(err.message || 'Failed to save scores');
+            setError(err.message || "Failed to save scores");
         }
 
         setModal({
-            title: 'Konfirmasi',
-            message: 'Simpan Nilai?',
+            title: "Konfirmasi",
+            message: "Simpan Nilai?",
             onConfirm: async () => {
                 setIsLoading(true);
                 await patchScoreData(state.studentScore, dispatch);
                 setIsLoading(false);
                 if (!state.error) {
                     setModal({
-                        title: 'Berhasil!',
-                        message: 'Berhasil menyimpan nilai!',
-                        onConfirm: null
+                        title: "Berhasil!",
+                        message: "Berhasil menyimpan nilai!",
+                        onConfirm: null,
                     });
                 }
             },
@@ -113,12 +131,19 @@ const QuestionView = () => {
                     !state.error && navigate(-1);
                     state.error && navigate(-2);
                 }}
-                className={`${modal.onConfirm ? 'btn-danger-outline' : 'button-primary mt-0 '}`}
+                className={`${
+                    modal.onConfirm
+                        ? "btn-danger-outline"
+                        : "button-primary mt-0 "
+                }`}
             >
-                {modal.onConfirm ? 'Batal' : 'Tutup'}
+                {modal.onConfirm ? "Batal" : "Tutup"}
             </button>
             {modal.onConfirm && (
-                <button onClick={modal.onConfirm} className="button-primary mt-0 ">
+                <button
+                    onClick={modal.onConfirm}
+                    className="button-primary mt-0 "
+                >
                     Ya
                 </button>
             )}
@@ -127,13 +152,11 @@ const QuestionView = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 ">
-            {!isLoading && state.error && (
-                <ErrorCard error={state.error} />
-            )}
+            {!isLoading && state.error && <ErrorCard error={state.error} />}
             <Modal
                 isOpen={modalIsOpen}
                 onClose={() => setModalIsOpen(false)}
-                title={state.error ? 'Gagal!' : modal.title}
+                title={state.error ? "Gagal!" : modal.title}
                 footer={<ModalFooter />}
             >
                 {isLoading && (
@@ -141,39 +164,66 @@ const QuestionView = () => {
                         <LoadingCircle size={32} />
                     </div>
                 )}
-                {!isLoading && (
-                    state.error ? state.error : modal.message
-                )}
+                {!isLoading && (state.error ? state.error : modal.message)}
             </Modal>
 
-            <div className='flex flex-col pb-24 my-6'>
+            <div className="flex flex-col pb-24 my-6">
                 <div className="card-basic flex-col justify-between mt-0 mx-4 pr-8 box-border">
-                    <div className="text-lg uppercase font-semibold">{data.categoryData.label}</div>
-                    <div className="text-base font-medium text-gray-500">Nilai: {totalScore || 0}/{examQuestions?.totalScore}</div>
+                    <div className="text-lg uppercase font-semibold">
+                        {data.categoryData.label}
+                    </div>
+                    <div className="text-base font-medium text-gray-500">
+                        Nilai: {totalScore || 0}/{examQuestions?.totalScore}
+                    </div>
                 </div>
 
                 <div className="mt-6 mx-4 space-y-4">
                     {examQuestions?.questions.map((question, index) => (
-                        <div key={question.id} className="card-basic flex-col mt-0 gap-2 mx-0">
+                        <div
+                            key={question.id}
+                            className="card-basic flex-col mt-0 gap-2 mx-0"
+                        >
                             <div className="flex justify-between items-center">
-                                <div className="text-lg font-semibold">Pertanyaan {index + 1}</div>
+                                <div className="text-lg font-semibold">
+                                    Pertanyaan {index + 1}
+                                </div>
                                 <div className="flex flex-col">
-                                    <div className="text-blue-600 font-medium">Nilai Maksimal: {question.maxScore}</div>
-                                    <div className="text-sm text-gray-500 whitespace-pre-line"> Tipe Soal: {getMunaqasyahQuestionTypeName(question.type)} </div>
+                                    <div className="text-blue-600 font-medium">
+                                        Nilai Maksimal: {question.maxScore}
+                                    </div>
+                                    <div className="text-sm text-gray-500 whitespace-pre-line">
+                                        {" "}
+                                        Tipe Soal:{" "}
+                                        {getMunaqasyahQuestionTypeName(
+                                            question.type
+                                        )}{" "}
+                                    </div>
                                 </div>
                             </div>
                             <div className="mt-2">
-                                <div className="font-semibold text-gray-700">Petunjuk:</div>
-                                <div className="mt-1 text-gray-600 whitespace-pre-line">{question.instruction}</div>
+                                <div className="font-semibold text-gray-700">
+                                    Petunjuk:
+                                </div>
+                                <div className="mt-1 text-gray-600 whitespace-pre-line">
+                                    {question.instruction}
+                                </div>
                             </div>
                             <div className="mt-2">
-                                <div className="font-semibold text-gray-700">Pertanyaan:</div>
-                                <div className="mt-1 text-gray-600 whitespace-pre-line font-lpmq text-base">{question.question}</div>
+                                <div className="font-semibold text-gray-700">
+                                    Pertanyaan:
+                                </div>
+                                <div className="mt-1 text-gray-600 whitespace-pre-line font-lpmq text-base">
+                                    {question.question}
+                                </div>
                             </div>
 
                             <div className="mt-2">
-                                <div className="font-semibold text-gray-700">Jawaban yang Benar:</div>
-                                <div className='whitespace-pre-line font-lpmq text-base'>{question.answers}</div>
+                                <div className="font-semibold text-gray-700">
+                                    Jawaban yang Benar:
+                                </div>
+                                <div className="whitespace-pre-line font-lpmq text-base">
+                                    {question.answers}
+                                </div>
                             </div>
 
                             {/* {question.type !== 'multipleChoices' && question.answers[0] !== '' && (
@@ -193,22 +243,35 @@ const QuestionView = () => {
                                 </div>
                             )} */}
                             <div className="mt-4">
-                                <div className="font-semibold text-gray-700 mb-2">Nilai:</div>
+                                <div className="font-semibold text-gray-700 mb-2">
+                                    Nilai:
+                                </div>
                                 <div className="flex flex-wrap gap-3">
                                     {question.scoreOptions.map((score, idx) => (
                                         <motion.div
                                             key={idx}
                                             whileTap={{ scale: 0.95 }}
-                                            onClick={() => handleScoreSelect(question.id, score)}
+                                            onClick={() =>
+                                                handleScoreSelect(
+                                                    question.id,
+                                                    score
+                                                )
+                                            }
                                             className={`
                                                 w-10 h-10 rounded-md flex items-center justify-center cursor-pointer
                                                 border-2 transition-colors duration-200
-                                                ${selectedScores[question.id] === score
-                                                    ? 'bg-blue-500 text-white border-blue-500'
-                                                    : 'bg-white text-gray-700 border-gray-300 hover:border-blue-400'}
+                                                ${
+                                                    selectedScores[
+                                                        question.id
+                                                    ] === score
+                                                        ? "bg-blue-500 text-white border-blue-500"
+                                                        : "bg-white text-gray-700 border-gray-300 hover:border-blue-400"
+                                                }
                                             `}
                                         >
-                                            <span className="font-medium">{score}</span>
+                                            <span className="font-medium">
+                                                {score}
+                                            </span>
                                         </motion.div>
                                     ))}
                                 </div>
@@ -227,7 +290,7 @@ const QuestionView = () => {
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default QuestionView
+export default QuestionView;

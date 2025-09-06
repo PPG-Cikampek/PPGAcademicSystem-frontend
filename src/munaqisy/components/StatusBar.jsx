@@ -1,10 +1,10 @@
-import React, { useContext } from 'react'
-import CurrentDate from './CurrentDate'
-import { academicYearFormatter } from '../../shared/Utilities/academicYearFormatter'
+import { useContext } from "react";
+import CurrentDate from "./CurrentDate";
+import { academicYearFormatter } from "../../shared/Utilities/academicYearFormatter";
 
 const StatusBar = ({ academicYear, children }) => {
     return (
-        <div className='card-basic flex-col mx-4 mb-0 justify-between items-start'>
+        <div className="card-basic flex-col mx-4 mb-0 justify-between items-start">
             {children ? children : <CurrentDate />}
 
             {!children && academicYear && (
@@ -13,7 +13,7 @@ const StatusBar = ({ academicYear, children }) => {
                 </div>
             )}
         </div>
-    )
-}
+    );
+};
 
-export default StatusBar
+export default StatusBar;

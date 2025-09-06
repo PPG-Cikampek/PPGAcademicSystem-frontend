@@ -1,17 +1,21 @@
-import React, { useContext, useState, useEffect, useRef } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useContext, useState, useEffect, useRef } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
-import { AuthContext } from '../../shared/Components/Context/auth-context';
-import useHttp from '../../shared/hooks/http-hook';
-import DynamicForm from '../../shared/Components/UIElements/DynamicForm';
+import { AuthContext } from "../../shared/Components/Context/auth-context";
+import useHttp from "../../shared/hooks/http-hook";
+import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
 
-import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
-import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
+import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
+import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 
 import Modal from "../../shared/Components/UIElements/ModalBottomClose";
 
 const UpdateQuestionView = () => {
-    const [modal, setModal] = useState({ title: '', message: '', onConfirm: null });
+    const [modal, setModal] = useState({
+        title: "",
+        message: "",
+        onConfirm: null,
+    });
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const { isLoading, error, sendRequest, setError } = useHttp();
     const [loadedQuestion, setLoadedQuestion] = useState();
@@ -23,98 +27,138 @@ const UpdateQuestionView = () => {
 
     useEffect(() => {
         const fetchQuestion = async () => {
-            const url = `${import.meta.env.VITE_BACKEND_URL}/munaqasyahs/questions/${questionId}`
+            const url = `${
+                import.meta.env.VITE_BACKEND_URL
+            }/munaqasyahs/questions/${questionId}`;
 
             try {
                 const responseData = await sendRequest(url);
                 setLoadedQuestion(responseData.question);
-            } catch (err) { }
+            } catch (err) {}
         };
         fetchQuestion();
     }, [sendRequest]);
 
     const questionCategory = [
-        { label: "Membaca Al-Qur'an/Tilawati", value: 'reciting' },
-        { label: "Menulis Arab", value: 'writing' },
-        { label: "Tafsir Al-Qur'an", value: 'quranTafsir' },
-        { label: "Tafsir Hadits", value: 'hadithTafsir' },
-        { label: "Praktek Ibadah", value: 'practice' },
-        { label: "Akhlak dan Tata Krama", value: 'moralManner' },
-        { label: 'Hafalan Surat-surat Al-Quran', value: 'memorizingSurah' },
-        { label: 'Hafalan Hadits', value: 'memorizingHadith' },
-        { label: "Hafalan Do'a", value: 'memorizingDua' },
-        { label: 'Hafalan Asmaul Husna', value: 'memorizingBeautifulName' },
-        { label: "Keilmuan dan Kefahaman Agama", value: 'knowledge' },
-        { label: "Kemandirian", value: 'independence' },
-    ]
+        { label: "Membaca Al-Qur'an/Tilawati", value: "reciting" },
+        { label: "Menulis Arab", value: "writing" },
+        { label: "Tafsir Al-Qur'an", value: "quranTafsir" },
+        { label: "Tafsir Hadits", value: "hadithTafsir" },
+        { label: "Praktek Ibadah", value: "practice" },
+        { label: "Akhlak dan Tata Krama", value: "moralManner" },
+        { label: "Hafalan Surat-surat Al-Quran", value: "memorizingSurah" },
+        { label: "Hafalan Hadits", value: "memorizingHadith" },
+        { label: "Hafalan Do'a", value: "memorizingDua" },
+        { label: "Hafalan Asmaul Husna", value: "memorizingBeautifulName" },
+        { label: "Keilmuan dan Kefahaman Agama", value: "knowledge" },
+        { label: "Kemandirian", value: "independence" },
+    ];
 
     const questionFields = [
         {
-            name: 'type',
-            label: 'Tipe Soal',
-            type: 'select',
+            name: "type",
+            label: "Tipe Soal",
+            type: "select",
             required: false,
-            options:
-                [
-                    { label: 'Pilihan Ganda', value: 'multipleChoices' },
-                    { label: 'Jawab Cermat', value: 'shortAnswer' },
-                    { label: 'Praktik', value: 'practice' },
-                ],
-            value: loadedQuestion?.type || ''
+            options: [
+                { label: "Pilihan Ganda", value: "multipleChoices" },
+                { label: "Jawab Cermat", value: "shortAnswer" },
+                { label: "Praktik", value: "practice" },
+            ],
+            value: loadedQuestion?.type || "",
         },
         {
-            name: 'category',
-            label: 'Kategori Materi',
-            type: 'select',
+            name: "category",
+            label: "Kategori Materi",
+            type: "select",
             required: false,
-            options: questionCategory.map(({ label, value }) => ({ label, value })),
-            value: loadedQuestion?.category || ''
+            options: questionCategory.map(({ label, value }) => ({
+                label,
+                value,
+            })),
+            value: loadedQuestion?.category || "",
         },
         {
-            name: 'semester',
-            label: 'Semester',
-            type: 'radio',
+            name: "semester",
+            label: "Semester",
+            type: "radio",
             required: false,
-            options:
-                [
-                    { label: 'Ganjil', value: '1' },
-                    { label: 'Genap', value: '2' },
-                ],
-            value: loadedQuestion?.semester || ''
+            options: [
+                { label: "Ganjil", value: "1" },
+                { label: "Genap", value: "2" },
+            ],
+            value: loadedQuestion?.semester || "",
         },
         {
-            name: 'curriculumMonth',
-            label: 'Materi Bulan',
-            type: 'select',
+            name: "curriculumMonth",
+            label: "Materi Bulan",
+            type: "select",
             required: true,
-            options:
-                [
-                    { label: 'Januari', value: '1' },
-                    { label: 'Februari', value: '2' },
-                    { label: 'Maret', value: '3' },
-                    { label: 'April', value: '4' },
-                    { label: 'Mei', value: '5' },
-                    { label: 'Juni', value: '6' },
-                    { label: 'Juli', value: '7' },
-                    { label: 'Agustus', value: '8' },
-                    { label: 'September', value: '9' },
-                    { label: 'Oktober', value: '10' },
-                    { label: 'November', value: '11' },
-                    { label: 'Desember', value: '12' },
-                ],
-            value: loadedQuestion?.curriculumMonth || ''
-
+            options: [
+                { label: "Januari", value: "1" },
+                { label: "Februari", value: "2" },
+                { label: "Maret", value: "3" },
+                { label: "April", value: "4" },
+                { label: "Mei", value: "5" },
+                { label: "Juni", value: "6" },
+                { label: "Juli", value: "7" },
+                { label: "Agustus", value: "8" },
+                { label: "September", value: "9" },
+                { label: "Oktober", value: "10" },
+                { label: "November", value: "11" },
+                { label: "Desember", value: "12" },
+            ],
+            value: loadedQuestion?.curriculumMonth || "",
         },
-        { name: 'question', label: 'Pertanyaan', placeholder: '', type: 'textarea', textAreaRows: 4, required: false, value: loadedQuestion?.question || '' },
-        { name: 'answers', label: 'Jawaban (tambah utk pilihan ganda)', placeholder: '', type: 'multi-input', inputType: 'textarea', textAreaRows: 3, required: false, value: loadedQuestion?.answers || '' },
-        { name: 'maxScore', label: 'Skor Maksimal', type: 'number', required: false, value: loadedQuestion?.maxScore || '' },
-        { name: 'scoreOptions', label: 'Opsi Skor', type: 'multi-input', required: false, inputType: 'number', value: loadedQuestion?.scoreOptions || '' },
-        { name: 'instruction', label: 'Petunjuk Penilaian', placeholder: '', type: 'textarea', textAreaRows: 5, required: false, value: loadedQuestion?.instruction || '' },
-    ]
-
+        {
+            name: "question",
+            label: "Pertanyaan",
+            placeholder: "",
+            type: "textarea",
+            textAreaRows: 4,
+            required: false,
+            value: loadedQuestion?.question || "",
+        },
+        {
+            name: "answers",
+            label: "Jawaban (tambah utk pilihan ganda)",
+            placeholder: "",
+            type: "multi-input",
+            inputType: "textarea",
+            textAreaRows: 3,
+            required: false,
+            value: loadedQuestion?.answers || "",
+        },
+        {
+            name: "maxScore",
+            label: "Skor Maksimal",
+            type: "number",
+            required: false,
+            value: loadedQuestion?.maxScore || "",
+        },
+        {
+            name: "scoreOptions",
+            label: "Opsi Skor",
+            type: "multi-input",
+            required: false,
+            inputType: "number",
+            value: loadedQuestion?.scoreOptions || "",
+        },
+        {
+            name: "instruction",
+            label: "Petunjuk Penilaian",
+            placeholder: "",
+            type: "textarea",
+            textAreaRows: 5,
+            required: false,
+            value: loadedQuestion?.instruction || "",
+        },
+    ];
 
     const handleFormSubmit = async (data) => {
-        const url = `${import.meta.env.VITE_BACKEND_URL}/munaqasyahs/questions/${questionId}`;
+        const url = `${
+            import.meta.env.VITE_BACKEND_URL
+        }/munaqasyahs/questions/${questionId}`;
 
         const body = JSON.stringify({
             type: data.type,
@@ -125,18 +169,22 @@ const UpdateQuestionView = () => {
             scoreOptions: data.scoreOptions,
             instruction: data.instruction,
             question: data.question,
-            answers: data.answers
+            answers: data.answers,
         });
 
         let responseData;
         try {
-            responseData = await sendRequest(url, 'PATCH', body, {
-                'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + auth.token
+            responseData = await sendRequest(url, "PATCH", body, {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + auth.token,
             });
             console.log(responseData);
-        } catch (err) { }
-        setModal({ title: 'Berhasil!', message: responseData.message, onConfirm: null });
+        } catch (err) {}
+        setModal({
+            title: "Berhasil!",
+            message: responseData.message,
+            onConfirm: null,
+        });
         setModalIsOpen(true);
     };
 
@@ -147,12 +195,19 @@ const UpdateQuestionView = () => {
                     setModalIsOpen(false);
                     !error && navigate(-1);
                 }}
-                className={`${modal.onConfirm ? 'btn-danger-outline' : 'button-primary mt-0 '}`}
+                className={`${
+                    modal.onConfirm
+                        ? "btn-danger-outline"
+                        : "button-primary mt-0 "
+                }`}
             >
-                {modal.onConfirm ? 'Batal' : 'Tutup'}
+                {modal.onConfirm ? "Batal" : "Tutup"}
             </button>
             {modal.onConfirm && (
-                <button onClick={modal.onConfirm} className="button-primary mt-0 ">
+                <button
+                    onClick={modal.onConfirm}
+                    className="button-primary mt-0 "
+                >
                     Ya
                 </button>
             )}
@@ -172,14 +227,12 @@ const UpdateQuestionView = () => {
                         <LoadingCircle size={32} />
                     </div>
                 )}
-                {!isLoading && (
-                    modal.message
-                )}
+                {!isLoading && modal.message}
             </Modal>
 
             <div className={`pb-24 transition-opacity duration-300`}>
                 <DynamicForm
-                    subtitle={'Update Soal Munaqosah'}
+                    subtitle={"Update Soal Munaqosah"}
                     fields={questionFields}
                     onSubmit={handleFormSubmit}
                     disabled={isLoading}
@@ -189,12 +242,25 @@ const UpdateQuestionView = () => {
                         <div className="flex flex-col justify-stretch mt-4">
                             <button
                                 type="submit"
-                                className={`button-primary ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                                className={`button-primary ${
+                                    isLoading
+                                        ? "opacity-50 cursor-not-allowed"
+                                        : ""
+                                }`}
                                 disabled={isLoading}
                             >
-                                {isLoading ? (<LoadingCircle>Processing...</LoadingCircle>) : ('Update')}
+                                {isLoading ? (
+                                    <LoadingCircle>Processing...</LoadingCircle>
+                                ) : (
+                                    "Update"
+                                )}
                             </button>
-                            {error && <ErrorCard error={error} onClear={() => setError(null)} />}
+                            {error && (
+                                <ErrorCard
+                                    error={error}
+                                    onClear={() => setError(null)}
+                                />
+                            )}
                         </div>
                     }
                 />

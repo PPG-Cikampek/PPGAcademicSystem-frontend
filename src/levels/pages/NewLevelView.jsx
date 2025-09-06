@@ -1,158 +1,186 @@
-import React, { useContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useContext, useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
-import useHttp from '../../shared/hooks/http-hook';
-import DynamicForm from '../../shared/Components/UIElements/DynamicForm';
-import { AuthContext } from '../../shared/Components/Context/auth-context';
+import { useBranches, useCreateBranchMutation, useCreateSubBranchMutation } from "../../shared/queries/useLevels";
+import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
+import { AuthContext } from "../../shared/Components/Context/auth-context";
 
-import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
-import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
-import Modal from '../../shared/Components/UIElements/ModalBottomClose'
+import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
+import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
+import NewModal from "../../shared/Components/Modal/NewModal";
+import useNewModal from "../../shared/hooks/useNewModal";
 
-import logo from '../../assets/logos/ppgcikampek.webp';
-import { div } from 'framer-motion/client';
-
-
+import logo from "../../assets/logos/ppgcikampek.webp";
+import { div } from "framer-motion/client";
 
 const NewLevelView = () => {
-    const [modalIsOpen, setModalIsOpen] = useState(false);
-    const [modalMessage, setModalMessage] = useState('');
-
     const [isBranch, setIsBranch] = useState(true);
     const [isTransitioning, setIsTransitioning] = useState(false);
-    const { isLoading, error, sendRequest, setError } = useHttp();
+    const { data: branchesData, isLoading: branchesLoading } = useBranches();
+    const createBranchMutation = useCreateBranchMutation();
+    const createSubBranchMutation = useCreateSubBranchMutation();
     const [loadedBranch, setLoadedBranch] = useState([]);
     const [subBranchFields, setSubBranchFields] = useState();
 
-
     const auth = useContext(AuthContext);
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+    const { modalState, openModal, closeModal } = useNewModal();
 
     const branchFields = [
-        { name: 'name', label: 'Nama Desa', placeholder: 'Nama Desa', type: 'text', required: true },
-        { name: 'address', label: 'Alamat Desa', placeholder: 'Alamat Lengkap', type: 'text', required: true },
+        {
+            name: "name",
+            label: "Nama Desa",
+            placeholder: "Nama Desa",
+            type: "text",
+            required: true,
+        },
+        {
+            name: "address",
+            label: "Alamat Desa",
+            placeholder: "Alamat Lengkap",
+            type: "text",
+            required: true,
+        },
     ];
 
     useEffect(() => {
-        const fetchBranch = async () => {
-            try {
-                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/levels/branches/`);
-                setLoadedBranch(responseData.branches);
-            } catch (err) { }
-        };
-        fetchBranch();
-    }, [sendRequest]);
+        if (branchesData?.branches) {
+            setLoadedBranch(branchesData.branches);
+        }
+    }, [branchesData]);
 
     useEffect(() => {
         if (loadedBranch) {
             setSubBranchFields([
-                { name: 'name', label: 'Nama Kelompok', placeholder: 'Nama Kelompok', type: 'text', required: true },
-                { name: 'address', label: 'Alamat Kelompok', placeholder: 'Alamat Lengkap', type: 'text', required: true },
                 {
-                    name: 'branch',
-                    label: 'Desa',
-                    type: 'select',
+                    name: "name",
+                    label: "Nama Kelompok",
+                    placeholder: "Nama Kelompok",
+                    type: "text",
                     required: true,
-                    options: loadedBranch.map(({ name }) => ({ label: name, value: name }))
+                },
+                {
+                    name: "address",
+                    label: "Alamat Kelompok",
+                    placeholder: "Alamat Lengkap",
+                    type: "text",
+                    required: true,
+                },
+                {
+                    name: "branch",
+                    label: "Desa",
+                    type: "select",
+                    required: true,
+                    options: loadedBranch.map(({ name }) => ({
+                        label: name,
+                        value: name,
+                    })),
                 },
             ]);
         }
     }, [loadedBranch]);
 
-
-
     const handleFormSubmit = async (data) => {
-        const url = isBranch
-            ? `${import.meta.env.VITE_BACKEND_URL}/levels/branches`
-            : `${import.meta.env.VITE_BACKEND_URL}/levels/branches/sub-branches`
-
-        const body = JSON.stringify(isBranch
+        const mutation = isBranch ? createBranchMutation : createSubBranchMutation;
+        const payload = isBranch
             ? { name: data.name, address: data.address }
-            : { name: data.name, address: data.address, branchName: data.branch }
-        );
+            : {
+                  name: data.name,
+                  address: data.address,
+                  branchName: data.branch,
+              };
 
-        // console.log(body)
-        let responseData;
         try {
-            responseData = await sendRequest(url, 'POST', body, {
-                'Content-Type': 'application/json'
-            });
-            setModalMessage(responseData.message)
-            setModalIsOpen(true)
-
+            const response = await mutation.mutateAsync(payload);
+            openModal(response.message, "success", () => navigate("/settings/levels/"), "Berhasil!", false);
         } catch (err) {
-            // Error is already handled by useHttp
+            // Error is handled by React Query
         }
     };
 
     const handleToggle = () => {
         setIsTransitioning(true);
         setTimeout(() => {
-            setIsBranch((prev) => !prev)
+            setIsBranch((prev) => !prev);
             setIsTransitioning(false);
         }, 200);
     };
 
     return (
         <div className="m-auto max-w-md mt-14 md:mt-8">
-            <Modal
-                isOpen={modalIsOpen}
-                onClose={() => setModalIsOpen(false)}
-                title='Berhasil!'
-                footer={
-                    <>
-                        <button
-                            onClick={() => {
-                                setModalIsOpen(false)
-                                navigate('/settings/levels/')
-                            }}
-                            className='btn-danger-outline'
-                        >
-                            Tutup
-                        </button>
-                    </>
-                }
+            <NewModal
+                modalState={modalState}
+                onClose={closeModal}
+                isLoading={branchesLoading || createBranchMutation.isPending || createSubBranchMutation.isPending}
+            />
+
+            <div
+                className={`pb-24 transition-opacity duration-300 ${
+                    isTransitioning ? "opacity-0" : "opacity-100"
+                }`}
             >
-                {modalMessage}
-            </Modal>
-
-
-            <div className={`pb-24 transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
-                {error && (
-                    <div className='mx-2'>
-                        <ErrorCard error={error} onClear={() => setError(null)} />
+                {createBranchMutation.error && (
+                    <div className="mx-2">
+                        <ErrorCard
+                            error={createBranchMutation.error}
+                        />
+                    </div>
+                )}
+                {createSubBranchMutation.error && (
+                    <div className="mx-2">
+                        <ErrorCard
+                            error={createSubBranchMutation.error}
+                        />
                     </div>
                 )}
                 <DynamicForm
-                    title={isBranch ? 'Tambah Desa' : 'Tambah Kelompok'}
-                    subtitle={'Sistem Akademik Digital'}
+                    title={isBranch ? "Tambah Desa" : "Tambah Kelompok"}
+                    subtitle={"Sistem Akademik Digital"}
                     fields={isBranch ? branchFields : subBranchFields}
                     onSubmit={handleFormSubmit}
-                    disabled={isLoading}
+                    disabled={branchesLoading || createBranchMutation.isPending || createSubBranchMutation.isPending}
                     reset={false}
                     footer={false}
                     button={
                         <div className="flex flex-col justify-stretch mt-4">
                             <button
                                 type="submit"
-                                className={`button-primary ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                disabled={isLoading}
+                                className={`button-primary ${
+                                    branchesLoading || createBranchMutation.isPending || createSubBranchMutation.isPending
+                                        ? "opacity-50 cursor-not-allowed"
+                                        : ""
+                                }`}
+                                disabled={branchesLoading || createBranchMutation.isPending || createSubBranchMutation.isPending}
                             >
-                                {isLoading ? (<LoadingCircle>Processing...</LoadingCircle>) : ('Tambah')}
+                                {branchesLoading || createBranchMutation.isPending || createSubBranchMutation.isPending ? (
+                                    <LoadingCircle>Processing...</LoadingCircle>
+                                ) : (
+                                    "Tambah"
+                                )}
                             </button>
                             <button
                                 type="button"
                                 onClick={handleToggle}
-                                className={`button-secondary ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                disabled={isLoading}
+                                className={`button-secondary ${
+                                    branchesLoading || createBranchMutation.isPending || createSubBranchMutation.isPending
+                                        ? "opacity-50 cursor-not-allowed"
+                                        : ""
+                                }`}
+                                disabled={branchesLoading || createBranchMutation.isPending || createSubBranchMutation.isPending}
                             >
-                                {isLoading ? (<LoadingCircle>Processing...</LoadingCircle>) : isBranch ? 'Tambah Kelompok' : 'Tambah Desa'}
+                                {branchesLoading || createBranchMutation.isPending || createSubBranchMutation.isPending ? (
+                                    <LoadingCircle>Processing...</LoadingCircle>
+                                ) : isBranch ? (
+                                    "Tambah Kelompok"
+                                ) : (
+                                    "Tambah Desa"
+                                )}
                             </button>
                         </div>
                     }
                 />
             </div>
-        </div >
+        </div>
     );
 };
 

@@ -1,56 +1,72 @@
-import React, { useContext, useEffect, useState } from 'react'
-import { Link } from 'react-router-dom';
+import { useContext, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
-import useHttp from '../../shared/hooks/http-hook';
-import { AuthContext } from '../../shared/Components/Context/auth-context';
-import SkeletonLoader from '../../shared/Components/UIElements/SkeletonLoader';
-import Modal from '../../shared/Components/UIElements/ModalBottomClose';
+import useHttp from "../../shared/hooks/http-hook";
+import { AuthContext } from "../../shared/Components/Context/auth-context";
+import SkeletonLoader from "../../shared/Components/UIElements/SkeletonLoader";
+import Modal from "../../shared/Components/UIElements/ModalBottomClose";
 
-import { CircleAlert } from 'lucide-react';
-import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
-import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
-import { academicYearFormatter } from '../../shared/Utilities/academicYearFormatter';
+import { CircleAlert } from "lucide-react";
+import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
+import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
+import { academicYearFormatter } from "../../shared/Utilities/academicYearFormatter";
 
 const SubBranchMunaqasyahView = () => {
-    const [subBranchYears, setSubBranchYears] = useState()
-    const [modal, setModal] = useState({ title: '', message: '', onConfirm: null });
+    const [subBranchYears, setSubBranchYears] = useState();
+    const [modal, setModal] = useState({
+        title: "",
+        message: "",
+        onConfirm: null,
+    });
     const [modalIsOpen, setModalIsOpen] = useState(false);
-    const { isLoading, error, sendRequest, setError } = useHttp()
+    const { isLoading, error, sendRequest, setError } = useHttp();
 
-    const auth = useContext(AuthContext)
+    const auth = useContext(AuthContext);
 
     useEffect(() => {
         const fetchSubBranchYears = async () => {
             try {
-                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/branchYears/branch/${auth.userBranchId}/sub-branch/${auth.userSubBranchId}`);
+                const responseData = await sendRequest(
+                    `${import.meta.env.VITE_BACKEND_URL}/branchYears/branch/${
+                        auth.userBranchId
+                    }/sub-branch/${auth.userSubBranchId}`
+                );
                 setSubBranchYears(responseData.subBranchYears);
-                console.log(responseData.subBranchYears)
-            } catch (err) { }
+                console.log(responseData.subBranchYears);
+            } catch (err) {}
         };
         fetchSubBranchYears();
 
         SubBranchMunaqasyahView.fetchSubBranchYears = fetchSubBranchYears; // Expose for use elsewhere
     }, [sendRequest]);
 
-    const munaqasyahStatusHandler = (actionType, subBranchYearName, subBranchId) => {
+    const munaqasyahStatusHandler = (
+        actionType,
+        subBranchYearName,
+        subBranchId
+    ) => {
         const confirmStart = async (action) => {
             const body = JSON.stringify({
                 subBranchId,
-                munaqasyahStatus: action
+                munaqasyahStatus: action,
             });
             try {
                 const responseData = await sendRequest(
-                    `${import.meta.env.VITE_BACKEND_URL}/branchYears/munaqasyah/${auth.currentBranchYearId}/sub-branch/`,
-                    'PATCH',
+                    `${
+                        import.meta.env.VITE_BACKEND_URL
+                    }/branchYears/munaqasyah/${
+                        auth.currentBranchYearId
+                    }/sub-branch/`,
+                    "PATCH",
                     body,
-                    { 'Content-Type': 'application/json' }
+                    { "Content-Type": "application/json" }
                 );
                 setModal({
-                    title: 'Berhasil!',
+                    title: "Berhasil!",
                     message: responseData.message,
-                    onConfirm: null
+                    onConfirm: null,
                 });
-                SubBranchMunaqasyahView.fetchSubBranchYears()
+                SubBranchMunaqasyahView.fetchSubBranchYears();
             } catch (err) {
                 setModalIsOpen(false);
             }
@@ -60,15 +76,15 @@ const SubBranchMunaqasyahView = () => {
             setModal({
                 title: `Konfirmasi`,
                 message: `Mulai munaqosah untuk tahun ajaran ${subBranchYearName}?`,
-                onConfirm: () => confirmStart("inProgress")
-            })
+                onConfirm: () => confirmStart("inProgress"),
+            });
             setModalIsOpen(true);
         } else if (actionType === "finish") {
             setModal({
                 title: `Konfirmasi`,
                 message: `Mulai munaqosah untuk tahun ajaran ${subBranchYearName}?`,
-                onConfirm: () => confirmStart("completed")
-            })
+                onConfirm: () => confirmStart("completed"),
+            });
             setModalIsOpen(true);
         }
     };
@@ -77,15 +93,22 @@ const SubBranchMunaqasyahView = () => {
         <div className="flex gap-2 items-center">
             <button
                 onClick={() => {
-                    setModalIsOpen(false)
+                    setModalIsOpen(false);
                     // !error && navigate(-1);
                 }}
-                className={`${modal.onConfirm ? 'btn-danger-outline' : 'button-primary mt-0 '}`}
+                className={`${
+                    modal.onConfirm
+                        ? "btn-danger-outline"
+                        : "button-primary mt-0 "
+                }`}
             >
-                {modal.onConfirm ? 'Batal' : 'Tutup'}
+                {modal.onConfirm ? "Batal" : "Tutup"}
             </button>
             {modal.onConfirm && (
-                <button onClick={modal.onConfirm} className="button-primary mt-0 ">
+                <button
+                    onClick={modal.onConfirm}
+                    className="button-primary mt-0 "
+                >
                     Ya
                 </button>
             )}
@@ -106,32 +129,44 @@ const SubBranchMunaqasyahView = () => {
                             <LoadingCircle size={32} />
                         </div>
                     )}
-                    {!isLoading && (
-                        modal.message
-                    )}
+                    {!isLoading && modal.message}
                 </Modal>
 
                 <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-semibold text-gray-900">Munaqosah</h1>
+                    <h1 className="text-2xl font-semibold text-gray-900">
+                        Munaqosah
+                    </h1>
                 </div>
 
                 {(!subBranchYears || isLoading) && (
                     <div className="space-y-4">
-                        <SkeletonLoader variant="rectangular" width="100%" height={140} count={3} />
+                        <SkeletonLoader
+                            variant="rectangular"
+                            width="100%"
+                            height={140}
+                            count={3}
+                        />
                     </div>
                 )}
 
                 {error && <ErrorCard error={error} />}
 
-                {subBranchYears && !isLoading && (
+                {subBranchYears &&
+                    !isLoading &&
                     subBranchYears.map((year, idx) => {
                         const key = year._id || `year-${idx}`;
                         const content = (
-                            <div className={`card-basic hover:bg-gray-100 active:bg-gray-100 hover:cursor-pointer rounded-md justify-start m-0 transition-all duration-200 my-4`} >
+                            <div
+                                className={`card-basic hover:bg-gray-100 active:bg-gray-100 hover:cursor-pointer rounded-md justify-start m-0 transition-all duration-200 my-4`}
+                            >
                                 <div className="flex items-center space-x-4 ">
-                                    <div className="flex-1 h-fit"  >
-                                        <div className='flex items-center gap-2'>
-                                            <h2 className="text-xl text-gray-900">{academicYearFormatter(year.branchYear.name)}</h2>
+                                    <div className="flex-1 h-fit">
+                                        <div className="flex items-center gap-2">
+                                            <h2 className="text-xl text-gray-900">
+                                                {academicYearFormatter(
+                                                    year.branchYear.name
+                                                )}
+                                            </h2>
                                         </div>
                                         <div className="flex items-center text-gray-500 mt-1">
                                             Jumlah Kelas: {year.classes.length}
@@ -139,71 +174,118 @@ const SubBranchMunaqasyahView = () => {
                                         <div className="flex items-center mt-4 md:mt-5 md:mb-1">
                                             Status Munaqosah:
                                         </div>
-                                        <div className='text-gray-500'>
-                                            {year.branchYear.isActive === true && (
-                                                year.subBranch.munaqasyahStatus === "inProgress" && (
-                                                    <div className='text-green-500'>
-                                                        Munaqosah Kelompok berjalan!
+                                        <div className="text-gray-500">
+                                            {year.branchYear.isActive ===
+                                                true &&
+                                                year.subBranch
+                                                    ?.munaqasyahStatus ===
+                                                    "inProgress" && (
+                                                    <div className="text-green-500">
+                                                        Munaqosah Kelompok
+                                                        berjalan!
                                                     </div>
-                                                )
-                                            )}
-                                            {year.branchYear.isActive === true && year.branchYear.academicYearId.munaqasyahStatus === "inProgress" && (
-                                                year.branchYear.munaqasyahStatus === "notStarted" ? (
-                                                    <div className='inline-flex items-center text-yellow-600 gap-1'>
+                                                )}
+                                            {year.branchYear.isActive ===
+                                                true &&
+                                                year.branchYear.academicYearId
+                                                    ?.munaqasyahStatus ===
+                                                    "inProgress" &&
+                                                (year.branchYear
+                                                    ?.munaqasyahStatus ===
+                                                "notStarted" ? (
+                                                    <div className="inline-flex items-center text-yellow-600 gap-1">
                                                         <CircleAlert />
-                                                        Desa belum memulai munaqosah.
+                                                        Desa belum memulai
+                                                        munaqosah.
                                                     </div>
-                                                ) : year.branchYear.munaqasyahStatus === "inProgress" ? (
-                                                    <div className='inline-flex items-center text-blue-500 gap-1'>
+                                                ) : year.branchYear
+                                                      ?.munaqasyahStatus ===
+                                                  "inProgress" ? (
+                                                    <div className="inline-flex items-center text-blue-500 gap-1">
                                                         <CircleAlert />
-                                                        Desa sudah memulai munaqosah.
+                                                        Desa sudah memulai
+                                                        munaqosah.
                                                     </div>
-                                                ) : (<div className='inline-flex items-center text-green-500 gap-1'>
-                                                    <CircleAlert />
-                                                    Munaqosah Desa telah selesai.
-                                                </div>)
-                                            )}
+                                                ) : (
+                                                    <div className="inline-flex items-center text-green-500 gap-1">
+                                                        <CircleAlert />
+                                                        Munaqosah Desa telah
+                                                        selesai.
+                                                    </div>
+                                                ))}
 
-                                            {year.branchYear.isActive === true && year.branchYear.academicYearId.munaqasyahStatus !== "inProgress" && (
-                                                <div className='inline-flex items-center text-gray-600 gap-1'>
-                                                    <CircleAlert />
-                                                    Munaqosah Daerah belum dimulai.
-                                                </div>
-                                            )}
+                                            {year.branchYear.isActive ===
+                                                true &&
+                                                year.branchYear.academicYearId
+                                                    ?.munaqasyahStatus !==
+                                                    "inProgress" && (
+                                                    <div className="inline-flex items-center text-gray-600 gap-1">
+                                                        <CircleAlert />
+                                                        Munaqosah Daerah belum
+                                                        dimulai.
+                                                    </div>
+                                                )}
                                         </div>
 
                                         <div>
-                                            {year.branchYear.munaqasyahStatus === "inProgress"
-                                                && year.branchYear.isActive === true
-                                                && year.subBranch.munaqasyahStatus !== "inProgress"
-                                                && (
+                                            {year.branchYear
+                                                ?.munaqasyahStatus ===
+                                                "inProgress" &&
+                                                year.branchYear.isActive ===
+                                                    true &&
+                                                year.subBranch
+                                                    ?.munaqasyahStatus !==
+                                                    "inProgress" && (
                                                     <button
-                                                        className='btn-primary-outline mt-2'
+                                                        className="btn-primary-outline mt-2"
                                                         onClick={(e) => {
                                                             e.preventDefault();
                                                             e.stopPropagation();
-                                                            munaqasyahStatusHandler("start", year.branchYear.name, year.subBranch._id);
-                                                        }}>
-                                                        {year.subBranch.munaqasyahStatus === "notStarted" ? "Mulai Munaqosah" : "Mulai Munaqosah Susulan"}
+                                                            munaqasyahStatusHandler(
+                                                                "start",
+                                                                year.branchYear
+                                                                    .name,
+                                                                year.subBranch
+                                                                    ._id
+                                                            );
+                                                        }}
+                                                    >
+                                                        {year.subBranch
+                                                            ?.munaqasyahStatus ===
+                                                        "notStarted"
+                                                            ? "Mulai Munaqosah"
+                                                            : "Mulai Munaqosah Susulan"}
                                                     </button>
                                                 )}
-                                            {year.branchYear.munaqasyahStatus === "inProgress"
-                                                && year.branchYear.isActive === true
-                                                && year.subBranch.munaqasyahStatus === "inProgress"
-                                                && (
+                                            {year.branchYear
+                                                ?.munaqasyahStatus ===
+                                                "inProgress" &&
+                                                year.branchYear.isActive ===
+                                                    true &&
+                                                year.subBranch
+                                                    ?.munaqasyahStatus ===
+                                                    "inProgress" && (
                                                     <button
-                                                        className='btn-primary-outline mt-2'
+                                                        className="btn-primary-outline mt-2"
                                                         onClick={(e) => {
                                                             e.preventDefault();
                                                             e.stopPropagation();
-                                                            munaqasyahStatusHandler("finish", year.branchYear.name, year.subBranch._id);
-                                                        }}>
+                                                            munaqasyahStatusHandler(
+                                                                "finish",
+                                                                year.branchYear
+                                                                    .name,
+                                                                year.subBranch
+                                                                    ._id
+                                                            );
+                                                        }}
+                                                    >
                                                         Selesaikan Munaqosah
                                                     </button>
                                                 )}
 
-                                            {year.branchYear.isActive !== true && (
-                                                <div className='inline-flex italic items-center text-gray-500 gap-1'>
+                                            {year.branchYear.isActive !==
+                                                true && (
+                                                <div className="inline-flex italic items-center text-gray-500 gap-1">
                                                     {/* <CircleAlert /> */}
                                                     Tahun ajaran tidak aktif.
                                                 </div>
@@ -216,29 +298,31 @@ const SubBranchMunaqasyahView = () => {
 
                         console.log("Branch Year ID:", year.branchYear._id);
 
-                        return (
-                            year.branchYear.munaqasyahStatus !== "notStarted" &&
-                            year.subBranch.munaqasyahStatus !== "notStarted"
-                        ) ? (
-                            <Link key={key} to={`/munaqasyah/${year.branchYear._id}`}>
+                        return year.branchYear?.munaqasyahStatus !==
+                            "notStarted" &&
+                            year.subBranch?.munaqasyahStatus !==
+                                "notStarted" ? (
+                            <Link
+                                key={key}
+                                to={`/munaqasyah/${year.branchYear._id}`}
+                            >
                                 {content}
                             </Link>
                         ) : (
-                            <div key={key}>
-                                {content}
-                            </div>
+                            <div key={key}>{content}</div>
                         );
-                    })
-                )}
+                    })}
 
                 {subBranchYears && subBranchYears.length === 0 && (
                     <div className="bg-white rounded-md shadow-md p-6 border border-gray-200">
-                        <p className="text-gray-700 text-center">Belum ada tahun ajaran terdaftar.</p>
+                        <p className="text-gray-700 text-center">
+                            Belum ada tahun ajaran terdaftar.
+                        </p>
                     </div>
                 )}
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default SubBranchMunaqasyahView
+export default SubBranchMunaqasyahView;

@@ -1,6 +1,6 @@
-import React, { createContext } from 'react';
+import { createContext } from "react";
 
 export const GeneralContext = createContext({
     navigateBlockMessage: false,
-    setMessage: () => { },
+    setMessage: () => {},
 });

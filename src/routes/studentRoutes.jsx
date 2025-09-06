@@ -1,49 +1,57 @@
-import React, { lazy } from 'react';
+import { lazy } from "react";
 
-const PageHeader = lazy(() => import('../teacher-role/shared/Components/Navigation/PageHeader'));
-const HomeNavigation = lazy(() => import('../teacher-role/shared/Components/Navigation/HomeNavigation'));
-const StudentDashboardView = lazy(() => import('../students/pages/StudentDashboardView'));
-const StudentDetailView = lazy(() => import('../students/pages/StudentDetailView'));
-const UpdateStudentView = lazy(() => import('../students/pages/UpdateStudentView'));
-const ProfileView = lazy(() => import('../users/pages/ProfileView'));
+const PageHeader = lazy(() =>
+    import("../teacher-role/shared/Components/Navigation/PageHeader")
+);
+const HomeNavigation = lazy(() =>
+    import("../teacher-role/shared/Components/Navigation/HomeNavigation")
+);
+const StudentDashboardView = lazy(() =>
+    import("../students/pages/StudentDashboardView")
+);
+const StudentDetailView = lazy(() =>
+    import("../students/pages/StudentDetailView")
+);
+const UpdateStudentView = lazy(() =>
+    import("../students/pages/UpdateStudentView")
+);
+const ProfileView = lazy(() => import("../users/pages/ProfileView"));
 
 export const studentRoutes = [
     {
-        path: '/',
+        path: "/",
         element: (
             <PageHeader>
                 <StudentDashboardView />
             </PageHeader>
-        )
+        ),
     },
     {
-        path: '/dashboard/students/:studentId',
+        path: "/dashboard/students/:studentId",
         element: (
             <PageHeader>
                 <StudentDetailView />
-            </PageHeader >
-        )
+            </PageHeader>
+        ),
     },
     {
-        path: '/dashboard/students/:studentId/update',
+        path: "/dashboard/students/:studentId/update",
         element: (
-            < PageHeader >
+            <PageHeader>
                 <UpdateStudentView />
-            </PageHeader >
-        )
+            </PageHeader>
+        ),
     },
     {
-        path: '/settings/profile/:userId',
+        path: "/settings/profile/:userId",
         element: (
-            < PageHeader >
-                <ProfileView/>
-            </PageHeader >
-        )
+            <PageHeader>
+                <ProfileView />
+            </PageHeader>
+        ),
     },
-]
+];
 
 export const StudentRouteWrapper = ({ children }) => (
-    <HomeNavigation>
-        {children}
-    </HomeNavigation>
+    <HomeNavigation>{children}</HomeNavigation>
 );

@@ -1,25 +1,27 @@
-import React from 'react'
-import { attendanceCount } from '../../../shared/Utilities/attendanceCount';
+import React from "react";
+import { attendanceCount } from "../../../shared/Utilities/attendanceCount";
 
 const Dashboard = ({ data }) => {
     // console.log(JSON.stringify(data))
+    console.log(data);
 
     return (
-        <div className='flex-col pb-0 my-6'>
-            <h2 className='text-lg font-medium mb-2 '>{data.name}</h2>
+        <div className="flex-col pb-0 my-6">
+            <h2 className="text-lg font-medium mb-2 ">{data.name}</h2>
             <div className="grid grid-cols-2 gap-4 mb-4">
                 <div className="card-basic py-4 rounded-md flex-col my-0 active:ring-1 ">
-                    <h3 className="text-gray-500 text-sm">Peserta Didik</h3>
-                    <p className="text-xl font-bold">{data.students?.length || 'No Data'}</p>
+                    <p className="text-gray-500 text-sm">Peserta Didik</p>
+                    <p className="text-xl font-bold">
+                        {data.students?.length || "No Data"}
+                    </p>
                 </div>
                 <div className="card-basic py-4 rounded-md flex-col my-0 active:ring-1 ">
-                    <h3 className="text-gray-500 text-sm">Total Pertemuan</h3>
+                    <p className="text-gray-500 text-sm">Total Pertemuan</p>
                     <p className="text-xl font-bold">
-                        {data.attendances && data.subBranchYearId?.semesterTarget ?
-                            // `${(data.attendances.length / data.subBranchYearId.semesterTarget / data.students.length * 100).toFixed(2)}%`
-                            `${attendanceCount(data)}`
-                            : 'No Data'
-                        }
+                        {data.attendanceCount
+                            ? // `${(data.attendances.length / data.subBranchYearId.semesterTarget / data.students.length * 100).toFixed(2)}%`
+                              `${data.attendanceCount}`
+                            : "No Data"}
                     </p>
                 </div>
             </div>
@@ -38,7 +40,7 @@ const Dashboard = ({ data }) => {
                 </div>
             </div> */}
         </div>
-    )
-}
+    );
+};
 
 export default Dashboard;

@@ -1,31 +1,35 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import useHttp from '../../shared/hooks/http-hook';
-import DynamicForm from '../../shared/Components/UIElements/DynamicForm';
+import useHttp from "../../shared/hooks/http-hook";
+import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
 
-import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
-import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
-import Modal from '../../shared/Components/UIElements/ModalBottomClose'
+import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
+import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
+import Modal from "../../shared/Components/UIElements/ModalBottomClose";
 
-import { AuthContext } from '../../shared/Components/Context/auth-context';
+import { AuthContext } from "../../shared/Components/Context/auth-context";
 
 const BulkNewUsersAndStudentsView = () => {
     const [loadedSubBranches, setLoadedSubBranches] = useState([]);
     const { isLoading, error, sendRequest, setError } = useHttp();
-    const [bulkCreateFields, setBulkCreateFields] = useState()
+    const [bulkCreateFields, setBulkCreateFields] = useState();
     const [modalIsOpen, setModalIsOpen] = useState(false);
     const [modalMessage, setModalMessage] = useState(false);
 
-    const navigate = useNavigate()
-    const auth = useContext(AuthContext)
+    const navigate = useNavigate();
+    const auth = useContext(AuthContext);
 
     useEffect(() => {
         const fetchSubBranches = async () => {
             try {
-                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/levels/branches/sub-branches?populate=branchId`);
+                const responseData = await sendRequest(
+                    `${
+                        import.meta.env.VITE_BACKEND_URL
+                    }/levels/branches/sub-branches?populate=branchId`
+                );
                 setLoadedSubBranches(responseData.subBranches);
-            } catch (err) { }
+            } catch (err) {}
         };
         fetchSubBranches();
     }, [sendRequest]);
@@ -33,28 +37,41 @@ const BulkNewUsersAndStudentsView = () => {
     useEffect(() => {
         if (loadedSubBranches) {
             setBulkCreateFields([
-                { name: 'count', label: 'Jumlah Siswa', placeholder: '0', type: 'number', required: true },
-                { name: 'year', type: 'year', label: 'Tahun', value: new Date().getFullYear(), required: true },
                 {
-                    name: 'subBranchId',
-                    label: 'Kelompok',
-                    type: 'select',
+                    name: "count",
+                    label: "Jumlah Siswa",
+                    placeholder: "0",
+                    type: "number",
+                    required: true,
+                },
+                {
+                    name: "year",
+                    type: "year",
+                    label: "Tahun",
+                    value: new Date().getFullYear(),
+                    required: true,
+                },
+                {
+                    name: "subBranchId",
+                    label: "Kelompok",
+                    type: "select",
                     required: true,
                     options: loadedSubBranches
-                        .map(group => ({
-                            label: `${group.branchId?.name || 'Unknown Branch'} - ${group.name}`,
-                            value: group.id
+                        .map((group) => ({
+                            label: `${
+                                group.branchId?.name || "Unknown Branch"
+                            } - ${group.name}`,
+                            value: group.id,
                         }))
-                        .sort((a, b) => a.label.localeCompare(b.label))
+                        .sort((a, b) => a.label.localeCompare(b.label)),
                 },
-
             ]);
         }
     }, [loadedSubBranches]);
 
     const handleBulkCreate = async (data) => {
         if (!data.count || data.count <= 0) {
-            setMessage('Please enter a valid count.');
+            setMessage("Please enter a valid count.");
             return;
         }
 
@@ -65,20 +82,18 @@ const BulkNewUsersAndStudentsView = () => {
             year: data.year,
             count: data.count,
             // subBranchName: data.subBranchName,
-            role: 'student',
+            role: "student",
         });
 
-        let response
+        let response;
         try {
-            response = await sendRequest(url, 'POST', body, {
-                'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + auth.token
+            response = await sendRequest(url, "POST", body, {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + auth.token,
             });
-            setModalMessage(response.message)
-            setModalIsOpen(true)
-
-        } catch (error) {
-        }
+            setModalMessage(response.message);
+            setModalIsOpen(true);
+        } catch (error) {}
     };
 
     return (
@@ -86,15 +101,15 @@ const BulkNewUsersAndStudentsView = () => {
             <Modal
                 isOpen={modalIsOpen}
                 onClose={() => setModalIsOpen(false)}
-                title='Berhasil!'
+                title="Berhasil!"
                 footer={
                     <>
                         <button
                             onClick={() => {
-                                setModalIsOpen(false)
-                                navigate('/settings/users/')
+                                setModalIsOpen(false);
+                                navigate("/settings/users/");
                             }}
-                            className='btn-danger-outline'
+                            className="btn-danger-outline"
                         >
                             Tutup
                         </button>
@@ -105,17 +120,39 @@ const BulkNewUsersAndStudentsView = () => {
             </Modal>
 
             <div className="px-2">
-                {error && <ErrorCard error={error} onClear={() => setError(null)} />}
+                {error && (
+                    <ErrorCard error={error} onClear={() => setError(null)} />
+                )}
             </div>
 
             <DynamicForm
-                title='Tambah Akun Peserta Didik'
-                subtitle={'Sistem Akademik Digital'}
-                fields={bulkCreateFields || [
-                    { name: 'count', label: 'Jumlah Akun', placeholder: '0', type: 'text', required: true },
-                    { name: 'subBranchName', label: 'Kelompok', placeholder: 'Kelompok', type: 'text', required: true },
-                    { name: 'role', label: 'Jenis Akun', placeholder: 'Peserta Didik', type: 'text', required: true },
-                ]}
+                title="Tambah Peserta Didik Baru"
+                subtitle={"Sistem Akademik Digital"}
+                fields={
+                    bulkCreateFields || [
+                        {
+                            name: "count",
+                            label: "Jumlah Akun",
+                            placeholder: "0",
+                            type: "text",
+                            required: true,
+                        },
+                        {
+                            name: "subBranchName",
+                            label: "Kelompok",
+                            placeholder: "Kelompok",
+                            type: "text",
+                            required: true,
+                        },
+                        {
+                            name: "role",
+                            label: "Jenis Akun",
+                            placeholder: "Peserta Didik",
+                            type: "text",
+                            required: true,
+                        },
+                    ]
+                }
                 onSubmit={handleBulkCreate}
                 disabled={isLoading}
                 reset={false}
@@ -124,10 +161,16 @@ const BulkNewUsersAndStudentsView = () => {
                     <div className="flex flex-col justify-stretch mt-4">
                         <button
                             type="submit"
-                            className={`button-primary ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`button-primary ${
+                                isLoading ? "opacity-50 cursor-not-allowed" : ""
+                            }`}
                             disabled={isLoading}
                         >
-                            {isLoading ? (<LoadingCircle>Processing...</LoadingCircle>) : ('Tambah')}
+                            {isLoading ? (
+                                <LoadingCircle>Processing...</LoadingCircle>
+                            ) : (
+                                "Tambah"
+                            )}
                         </button>
                     </div>
                 }

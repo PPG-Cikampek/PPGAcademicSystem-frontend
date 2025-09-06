@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState } from "react";
 
 export const AuthContext = createContext({
     isLoggedIn: false,
@@ -13,5 +13,5 @@ export const AuthContext = createContext({
     token: null,
     login: () => {},
     logout: () => {},
-    setAttributes: () => {}
+    setAttributes: () => {},
 });

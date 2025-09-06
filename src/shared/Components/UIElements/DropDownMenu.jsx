@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 const DropdownMenu = ({ buttonText = "Options", items = [] }) => {
     const [isOpen, setIsOpen] = useState(false);

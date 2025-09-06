@@ -1,10 +1,10 @@
-import React, { useContext } from 'react';
-import { motion } from 'framer-motion';
-import { AuthContext } from '../../shared/Components/Context/auth-context';
-import SkeletonLoader from '../../shared/Components/UIElements/SkeletonLoader';
+import { useContext } from "react";
+import { motion } from "framer-motion";
+import { AuthContext } from "../../shared/Components/Context/auth-context";
+import SkeletonLoader from "../../shared/Components/UIElements/SkeletonLoader";
 
 const ScoreCard = ({ category, score, onClick }) => {
-    const auth = useContext(AuthContext)
+    const auth = useContext(AuthContext);
 
     // Use SkeletonLoader for undefined score
     if (!score) {
@@ -27,13 +27,20 @@ const ScoreCard = ({ category, score, onClick }) => {
         <motion.div
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className={`card-basic mt-3 justify-between items-center transition-all ${score?.examinerUserId ? 'ring-green-100 bg-green-100' : ''} `}
+            className={`card-basic mt-3 justify-between items-center transition-all ${
+                score?.examinerUserId ? "ring-green-100 bg-green-100" : ""
+            } `}
         >
             <div className="flex flex-col ">
                 <h3 className="text-gray-700">{category.label}</h3>
                 {score.examinerUserId && (
                     <div className="font-medium text-gray-500">
-                        Telah dinilai oleh: {score.examinerUserId?.name && score.examinerUserId?.name.split(' ').slice(0, 2).join(' ')}
+                        Telah dinilai oleh:{" "}
+                        {score.examinerUserId?.name &&
+                            score.examinerUserId?.name
+                                .split(" ")
+                                .slice(0, 2)
+                                .join(" ")}
                     </div>
                 )}
             </div>
@@ -41,9 +48,9 @@ const ScoreCard = ({ category, score, onClick }) => {
                 <div className="flex gap-2 items-center">
                     {score.examinerUserId.id === auth.userId && (
                         <button
-                            className='btn-mobile-primary-round-gray bg-white'
+                            className="btn-round-gray bg-white"
                             onClick={(e) => {
-                                e.stopPropagation()
+                                e.stopPropagation();
                                 onClick();
                             }}
                         >
@@ -56,9 +63,9 @@ const ScoreCard = ({ category, score, onClick }) => {
                 </div>
             ) : (
                 <button
-                    className='btn-mobile-primary-round-gray'
+                    className="btn-round-gray"
                     onClick={(e) => {
-                        e.stopPropagation()
+                        e.stopPropagation();
                         onClick();
                     }}
                 >

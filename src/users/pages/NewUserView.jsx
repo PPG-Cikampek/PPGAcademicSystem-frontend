@@ -1,34 +1,37 @@
-import React, { useEffect, useState, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../../shared/Components/Context/auth-context';
+import { useEffect, useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from "../../shared/Components/Context/auth-context";
 
-import useHttp from '../../shared/hooks/http-hook';
-import DynamicForm from '../../shared/Components/UIElements/DynamicForm';
+import useHttp from "../../shared/hooks/http-hook";
+import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
 
-import ErrorCard from '../../shared/Components/UIElements/ErrorCard';
-import LoadingCircle from '../../shared/Components/UIElements/LoadingCircle';
-import Modal from '../../shared/Components/UIElements/ModalBottomClose'
+import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
+import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
+import NewModal from "../../shared/Components/Modal/NewModal";
+import useModal from "../../shared/hooks/useNewModal";
 
 const NewUserView = () => {
-    const [modalIsOpen, setModalIsOpen] = useState(false);
-    const [modalMessage, setModalMessage] = useState(false);
-
     const [isAccountForAdmin, setIsAccountForAdmin] = useState(true);
     const [isTransitioning, setIsTransitioning] = useState(false);
     const { isLoading, error, sendRequest, setError } = useHttp();
     const [loadedSubBranches, setLoadedSubBranches] = useState([]);
-    const [adminFields, setAdminFields] = useState()
+    const [adminFields, setAdminFields] = useState();
 
     const auth = useContext(AuthContext);
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+    const { modalState, openModal, closeModal } = useModal();
 
     useEffect(() => {
         const fetchSubBranches = async () => {
             try {
-                const responseData = await sendRequest(`${import.meta.env.VITE_BACKEND_URL}/levels/branches/sub-branches?populate=branchId`);
+                const responseData = await sendRequest(
+                    `${
+                        import.meta.env.VITE_BACKEND_URL
+                    }/levels/branches/sub-branches?populate=branchId`
+                );
                 setLoadedSubBranches(responseData.subBranches);
                 console.log(responseData.subBranches);
-            } catch (err) { }
+            } catch (err) {}
         };
         fetchSubBranches();
     }, [sendRequest]);
@@ -36,86 +39,123 @@ const NewUserView = () => {
     useEffect(() => {
         if (loadedSubBranches) {
             setAdminFields([
-                { name: 'name', label: 'Nama Lengkap', placeholder: 'Faisal Ahmad', type: 'text', required: true },
-                { name: 'email', label: 'Email', placeholder: 'contoh@email.com', type: 'email', required: true },
-                { name: 'password', label: 'Password', placeholder: 'min 8 karakter', type: 'password', required: true },
                 {
-                    name: 'subBranchId',
-                    label: 'Kelompok',
-                    type: 'select',
+                    name: "name",
+                    label: "Nama Lengkap",
+                    placeholder: "Faisal Ahmad",
+                    type: "text",
+                    required: true,
+                },
+                {
+                    name: "email",
+                    label: "Email",
+                    placeholder: "contoh@email.com",
+                    type: "email",
+                    required: true,
+                },
+                {
+                    name: "password",
+                    label: "Password",
+                    placeholder: "min 8 karakter",
+                    type: "password",
+                    required: true,
+                },
+                {
+                    name: "subBranchId",
+                    label: "Kelompok",
+                    type: "select",
                     required: true,
                     options: loadedSubBranches
-                        .map(group => ({
-                            label: `${group.branchId?.name || 'Unknown Branch'} - ${group.name}`,
-                            value: group.id
+                        .map((group) => ({
+                            label: `${
+                                group.branchId?.name || "Unknown Branch"
+                            } - ${group.name}`,
+                            value: group.id,
                         }))
-                        .sort((a, b) => a.label.localeCompare(b.label))
+                        .sort((a, b) => a.label.localeCompare(b.label)),
                 },
                 {
-                    name: 'role',
-                    label: 'Role Akun',
-                    type: 'select',
+                    name: "role",
+                    label: "Role Akun",
+                    type: "select",
                     required: true,
                     options: [
-                        { label: 'Admin Daerah', value: 'admin' },
-                        { label: 'PJP Desa', value: 'branchAdmin' },
-                        { label: 'PJP Kelompok', value: 'subBranchAdmin' },
-                        { label: 'Kurikulum', value: 'curriculum' },
-                    ]
+                        { label: "Admin Daerah", value: "admin" },
+                        { label: "PJP Desa", value: "branchAdmin" },
+                        { label: "PJP Kelompok", value: "subBranchAdmin" },
+                        { label: "Kurikulum", value: "curriculum" },
+                    ],
                 },
-
             ]);
         }
     }, [loadedSubBranches]);
 
     const handleFormSubmit = async (data) => {
-        const url = `${import.meta.env.VITE_BACKEND_URL}/users/createUser`
+        const url = `${import.meta.env.VITE_BACKEND_URL}/users/createUser`;
 
-        const body = JSON.stringify(isAccountForAdmin
-            ? {
-                name: data.name,
-                email: data.email,
-                password: data.password,
-                role: data.role,
-                subBranchId: data.subBranchId
-            }
-            : {
-                name: data.name,
-                email: data.email,
-                password: data.password,
-                role: data.position,
-                subBranchId: data.subBranchId,
-                teacherDetails: {
-                    nig: data.nig,
-                    position: data.position
-                }
-            });
+        const body = JSON.stringify(
+            isAccountForAdmin
+                ? {
+                      name: data.name,
+                      email: data.email,
+                      password: data.password,
+                      role: data.role,
+                      subBranchId: data.subBranchId,
+                  }
+                : {
+                      name: data.name,
+                      email: data.email,
+                      password: data.password,
+                      role: data.position,
+                      subBranchId: data.subBranchId,
+                      teacherDetails: {
+                          nig: data.nig,
+                          position: data.position,
+                      },
+                  }
+        );
 
         // console.log(body)
         let responseData;
         try {
-            responseData = await sendRequest(url, 'POST', body, {
-                'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + auth.token
+            responseData = await sendRequest(url, "POST", body, {
+                "Content-Type": "application/json",
+                Authorization: "Bearer " + auth.token,
             });
-            setModalMessage(responseData.message)
-            setModalIsOpen(true)
-
+            openModal(
+                responseData.message,
+                "success",
+                () => navigate("/settings/users/"),
+                "Berhasil!",
+                false
+            );
         } catch (err) {
             // Error is already handled by useHttp
         }
     };
 
     const teacherObject = () => {
-        const updatedList = adminFields.filter((item) => item.name !== 'nig' && item.name !== 'role'); // Removing the object
+        const updatedList = adminFields.filter(
+            (item) => item.name !== "nig" && item.name !== "role"
+        ); // Removing the object
 
-        const newObject = { name: 'nig', label: 'NIG Guru', placeholder: '00001234', type: 'text', required: true };
+        const newObject = {
+            name: "nig",
+            label: "NIG Guru",
+            placeholder: "00001234",
+            type: "text",
+            required: true,
+        };
         const newObject2 = {
-            name: 'position', label: 'Posisi', placeholder: 'Guru', type: 'select', required: true, options:
-                [
-                    { label: 'Guru', value: 'teacher' },
-                    { label: 'Munaqis', value: 'munaqisy' },
-                ]
+            name: "position",
+            label: "Posisi",
+            placeholder: "Guru",
+            type: "select",
+            required: true,
+            options: [
+                { label: "Guru", value: "teacher" },
+                { label: "Munaqis", value: "munaqisy" },
+            ],
         };
         // const newObject2 = { name: 'role', label: 'Jenis Akun', placeholder: 'Guru', value: 'teacher', type: 'text', disabled: true };
         setAdminFields([...updatedList, newObject, newObject2]); // Adding the new object to the list
@@ -123,19 +163,19 @@ const NewUserView = () => {
 
     // Function to remove an object by its `id`
     const adminObject = () => {
-        const updatedList = adminFields.filter((item) => item.name !== 'nig' && item.name !== 'role'); // Removing the object
+        const updatedList = adminFields.filter(
+            (item) => item.name !== "nig" && item.name !== "role"
+        ); // Removing the object
         const newObject2 = {
-            name: 'role',
-            label: 'Akun',
-            type: 'select',
+            name: "role",
+            label: "Akun",
+            type: "select",
             required: true,
-            options:
-                [
-                    { label: 'Admin', value: 'admin' },
-                    { label: 'PJP Desa', value: 'branchAdmin' },
-                    { label: 'PJP Kelompok', value: 'subBranchAdmin' },
-                ]
-
+            options: [
+                { label: "Admin", value: "admin" },
+                { label: "PJP Desa", value: "branchAdmin" },
+                { label: "PJP Kelompok", value: "subBranchAdmin" },
+            ],
         };
         updatedList.push(newObject2); // Adding the new object to the list
         setAdminFields(updatedList);
@@ -155,43 +195,56 @@ const NewUserView = () => {
         }, 200);
     };
 
-
     return (
         <div className="m-auto max-w-md mt-14 md:mt-8">
-            <Modal
-                isOpen={modalIsOpen}
-                onClose={() => setModalIsOpen(false)}
-                title='Berhasil!'
-                footer={
-                    <>
-                        <button
-                            onClick={() => {
-                                setModalIsOpen(false)
-                                navigate('/settings/users/')
-                            }}
-                            className='btn-danger-outline'
-                        >
-                            Tutup
-                        </button>
-                    </>
-                }
+            <NewModal
+                modalState={modalState}
+                onClose={closeModal}
+            />
+
+            <div
+                className={`pb-24 transition-opacity duration-300 ${
+                    isTransitioning ? "opacity-0" : "opacity-100"
+                }`}
             >
-                {modalMessage}
-            </Modal>
-
-
-            <div className={`pb-24 transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
                 <div className="px-2">
-                    {error && <ErrorCard error={error} onClear={() => setError(null)} />}
+                    {error && (
+                        <ErrorCard
+                            error={error}
+                            onClear={() => setError(null)}
+                        />
+                    )}
                 </div>
                 <DynamicForm
-                    title={isAccountForAdmin ? 'Tambah Akun' : 'Tambah Akun Guru'}
-                    subtitle={'Sistem Akademik Digital'}
-                    fields={adminFields || [
-                        { name: 'name', label: 'Name', placeholder: 'Nama Lengkap', type: 'text', required: true },
-                        { name: 'email', label: 'Email', placeholder: 'Email', type: 'email', required: true },
-                        { name: 'password', label: 'Password', placeholder: 'Password', type: 'password', required: true },
-                    ]}
+                    title={
+                        isAccountForAdmin ? "Tambah Akun" : "Tambah Akun Guru"
+                    }
+                    subtitle={"Sistem Akademik Digital"}
+                    fields={
+                        adminFields || [
+                            {
+                                name: "name",
+                                label: "Name",
+                                placeholder: "Nama Lengkap",
+                                type: "text",
+                                required: true,
+                            },
+                            {
+                                name: "email",
+                                label: "Email",
+                                placeholder: "Email",
+                                type: "email",
+                                required: true,
+                            },
+                            {
+                                name: "password",
+                                label: "Password",
+                                placeholder: "Password",
+                                type: "password",
+                                required: true,
+                            },
+                        ]
+                    }
                     onSubmit={handleFormSubmit}
                     disabled={isLoading}
                     reset={false}
@@ -200,10 +253,18 @@ const NewUserView = () => {
                         <div className="flex flex-col justify-stretch mt-4">
                             <button
                                 type="submit"
-                                className={`button-primary ${isLoading ? 'opacity-50 hover:cursor-not-allowed' : ''}`}
+                                className={`button-primary ${
+                                    isLoading
+                                        ? "opacity-50 hover:cursor-not-allowed"
+                                        : ""
+                                }`}
                                 disabled={isLoading}
                             >
-                                {isLoading ? (<LoadingCircle>Processing...</LoadingCircle>) : ('Tambah')}
+                                {isLoading ? (
+                                    <LoadingCircle>Processing...</LoadingCircle>
+                                ) : (
+                                    "Tambah"
+                                )}
                             </button>
                             <button
                                 type="button"
@@ -211,13 +272,15 @@ const NewUserView = () => {
                                 className="button-secondary"
                                 disabled={isLoading}
                             >
-                                {isAccountForAdmin ? 'Tambah Akun Guru' : 'Tambah Akun Admin'}
+                                {isAccountForAdmin
+                                    ? "Tambah Akun Guru"
+                                    : "Tambah Akun Admin"}
                             </button>
                         </div>
                     }
                 />
             </div>
-        </div >
+        </div>
     );
 };
 

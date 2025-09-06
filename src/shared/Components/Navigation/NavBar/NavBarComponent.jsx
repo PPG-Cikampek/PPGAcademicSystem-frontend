@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { NavLink } from "react-router-dom";
 
 const Navbar = ({ links, logo }) => {
@@ -14,7 +14,9 @@ const Navbar = ({ links, logo }) => {
                 {/* Logo */}
                 <div className="flex items-center">
                     <img src={logo} alt="Logo" className="h-8 w-auto" />
-                    <span className="text-xl font-semibold ml-2 text-gray-700">Brand</span>
+                    <span className="text-xl font-semibold ml-2 text-gray-700">
+                        Brand
+                    </span>
                 </div>
 
                 {/* Desktop Menu */}
@@ -24,7 +26,10 @@ const Navbar = ({ links, logo }) => {
                             key={index}
                             to={link.path}
                             className={({ isActive }) =>
-                                `text-gray-600 hover:text-blue-600 transition pb-3 ${isActive ? "border-b-2 border-blue-600" : "border-b-2 border-transparent"
+                                `text-gray-600 hover:text-blue-600 transition pb-3 ${
+                                    isActive
+                                        ? "border-b-2 border-blue-600"
+                                        : "border-b-2 border-transparent"
                                 }`
                             }
                         >
@@ -56,8 +61,11 @@ const Navbar = ({ links, logo }) => {
 
                 {/* Mobile Menu */}
                 <div
-                    className={`md:hidden absolute top-16 left-0 right-0 bg-white shadow-md z-20 transform transition-transform duration-300 ${isOpen ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
-                        }`}
+                    className={`md:hidden absolute top-16 left-0 right-0 bg-white shadow-md z-20 transform transition-transform duration-300 ${
+                        isOpen
+                            ? "translate-y-0 opacity-100"
+                            : "-translate-y-full opacity-0"
+                    }`}
                 >
                     <div className="px-4 py-3 space-y-2">
                         {links.map((link, index) => (
@@ -66,7 +74,10 @@ const Navbar = ({ links, logo }) => {
                                 to={link.path}
                                 onClick={() => setIsOpen(false)}
                                 className={({ isActive }) =>
-                                    `block text-gray-600 hover:text-blue-600 transition pb-3 ${isActive ? "border-b-2 border-blue-600" : "border-b-2 border-transparent"
+                                    `block text-gray-600 hover:text-blue-600 transition pb-3 ${
+                                        isActive
+                                            ? "border-b-2 border-blue-600"
+                                            : "border-b-2 border-transparent"
                                     }`
                                 }
                             >

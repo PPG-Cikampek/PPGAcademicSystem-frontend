@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 const CropperModal = ({ isOpen, onClose, children }) => {
     const [isVisible, setIsVisible] = useState(false);
@@ -6,14 +6,14 @@ const CropperModal = ({ isOpen, onClose, children }) => {
     useEffect(() => {
         if (isOpen) {
             setIsVisible(true);
-            document.body.style.overflow = 'hidden';
+            document.body.style.overflow = "hidden";
         } else {
             setIsVisible(false);
-            document.body.style.overflow = 'unset';
+            document.body.style.overflow = "unset";
         }
 
         return () => {
-            document.body.style.overflow = 'unset';
+            document.body.style.overflow = "unset";
         };
     }, [isOpen]);
 
@@ -33,7 +33,7 @@ const CropperModal = ({ isOpen, onClose, children }) => {
             <div
                 className={`
                     absolute inset-0 bg-black transition-opacity duration-300 ease-in-out
-                    ${isVisible ? 'opacity-50' : 'opacity-0'}
+                    ${isVisible ? "opacity-50" : "opacity-0"}
                 `}
             />
 
@@ -41,9 +41,13 @@ const CropperModal = ({ isOpen, onClose, children }) => {
             <div
                 className={`
                     relative flex justify-center items-center w-full mx-4 transform transition-all duration-300 ease-in-out
-                    ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'}
+                    ${
+                        isVisible
+                            ? "translate-y-0 opacity-100"
+                            : "translate-y-4 opacity-0"
+                    }
                 `}
-                onClick={e => e.stopPropagation()}
+                onClick={(e) => e.stopPropagation()}
             >
                 {children}
             </div>
