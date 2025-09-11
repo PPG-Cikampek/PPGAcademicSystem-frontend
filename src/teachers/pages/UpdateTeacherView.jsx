@@ -43,11 +43,11 @@ const UpdateTeacherView = () => {
     const navigate = useNavigate();
 
     // Use React Query for fetching teacher data
-    const { data: loadedTeacher, isLoading: isLoadingTeacher, error: teacherError } = useTeacher(
-        id,
-        auth.userRole,
-        auth.userId
-    );
+    const {
+        data: loadedTeacher,
+        isLoading: isLoadingTeacher,
+        error: teacherError,
+    } = useTeacher(id, auth.userRole, auth.userId);
 
     // Use React Query mutation for updating teacher
     const updateTeacherMutation = useUpdateTeacherMutation({
@@ -60,7 +60,9 @@ const UpdateTeacherView = () => {
             setModalIsOpen(true);
         },
         onError: (error) => {
-            setError(error.message || "Terjadi kesalahan saat memperbarui data.");
+            setError(
+                error.message || "Terjadi kesalahan saat memperbarui data."
+            );
         },
     });
 
@@ -239,7 +241,9 @@ const UpdateTeacherView = () => {
                         <LoadingCircle size={32} />
                     </div>
                 )}
-                {!isLoadingTeacher && !updateTeacherMutation.isPending && modal.message}
+                {!isLoadingTeacher &&
+                    !updateTeacherMutation.isPending &&
+                    modal.message}
             </Modal>
 
             <div
@@ -255,15 +259,22 @@ const UpdateTeacherView = () => {
                                     ref={fileInputRef}
                                     accept=".jpg,.jpeg,.png"
                                     buttonLabel={
-                                        <Icon
-                                            icon="jam:upload"
-                                            width="24"
-                                            height="24"
-                                        />
+                                        isLoadingTeacher ? (
+                                            <div className="flex items-center">
+                                                <LoadingCircle size={16} />
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center">
+                                                <Icon
+                                                    icon="jam:upload"
+                                                    width="24"
+                                                    height="24"
+                                                />
+                                                Pilih Foto
+                                            </div>
+                                        )
                                     }
-                                    buttonClassName={`${
-                                        isLoadingTeacher && "hidden"
-                                    } border border-gray-600 bg-gray-50 size-9 rounded-full absolute offset bottom-2 right-2 translate-x-1/2 translate-y-1/2`}
+                                    buttonClassName={`btn-round-primary text-xs m-0 m-2 ml-1 p-2 pr-3 `}
                                     imgClassName={`${
                                         isLoadingTeacher && "animate-pulse"
                                     } mt-2 rounded-md size-32 md:size-48 shrink-0`}
@@ -357,15 +368,23 @@ const UpdateTeacherView = () => {
                             <button
                                 type="submit"
                                 className={`button-primary ${
-                                    isLoadingTeacher || !loadedTeacher || isSubmitting || updateTeacherMutation.isPending
+                                    isLoadingTeacher ||
+                                    !loadedTeacher ||
+                                    isSubmitting ||
+                                    updateTeacherMutation.isPending
                                         ? "opacity-50 cursor-not-allowed"
                                         : ""
                                 }`}
                                 disabled={
-                                    isLoadingTeacher || !loadedTeacher || isSubmitting || updateTeacherMutation.isPending
+                                    isLoadingTeacher ||
+                                    !loadedTeacher ||
+                                    isSubmitting ||
+                                    updateTeacherMutation.isPending
                                 }
                             >
-                                {isLoadingTeacher || isSubmitting || updateTeacherMutation.isPending ? (
+                                {isLoadingTeacher ||
+                                isSubmitting ||
+                                updateTeacherMutation.isPending ? (
                                     <LoadingCircle>Processing...</LoadingCircle>
                                 ) : (
                                     "Update"

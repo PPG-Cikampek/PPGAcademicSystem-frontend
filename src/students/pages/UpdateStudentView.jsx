@@ -42,7 +42,11 @@ const UpdateStudentView = () => {
     const navigate = useNavigate();
 
     // React Query hooks
-    const { data: studentData, isLoading: isLoadingStudent, error: studentError } = useStudent(studentId);
+    const {
+        data: studentData,
+        isLoading: isLoadingStudent,
+        error: studentError,
+    } = useStudent(studentId);
     const updateStudentMutation = useUpdateStudentMutation({
         onSuccess: (data) => {
             setModal({
@@ -56,7 +60,9 @@ const UpdateStudentView = () => {
         },
         onError: (error) => {
             setIsSubmitting(false);
-            setLocalError(error.message || "An error occurred while updating student");
+            setLocalError(
+                error.message || "An error occurred while updating student"
+            );
         },
     });
 
@@ -281,8 +287,7 @@ const UpdateStudentView = () => {
             const formattedName = data.name.replace(
                 /\w\S*/g,
                 (txt) =>
-                    txt.charAt(0).toUpperCase() +
-                    txt.substr(1).toLowerCase()
+                    txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
             );
             const formattedDate =
                 data.dateOfBirth instanceof Date
@@ -383,7 +388,9 @@ const UpdateStudentView = () => {
 
             {studentError && (
                 <ErrorCard
-                    error={studentError.message || "Failed to load student data"}
+                    error={
+                        studentError.message || "Failed to load student data"
+                    }
                     onClear={() => {
                         // Optionally reset the query
                     }}
@@ -391,9 +398,7 @@ const UpdateStudentView = () => {
             )}
 
             {!isLoadingStudent && !studentError && fields && (
-                <div
-                    className={`pb-24 transition-opacity duration-300`}
-                >
+                <div className={`pb-24 transition-opacity duration-300`}>
                     <DynamicForm
                         customDescription={
                             <div className="relative">
@@ -402,15 +407,22 @@ const UpdateStudentView = () => {
                                         ref={fileInputRef}
                                         accept=".jpg,.jpeg,.png"
                                         buttonLabel={
-                                            <Icon
-                                                icon="jam:upload"
-                                                width="24"
-                                                height="24"
-                                            />
+                                            isLoadingStudent ? (
+                                                <div className="flex items-center">
+                                                    <LoadingCircle size={16} />
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center">
+                                                    <Icon
+                                                        icon="jam:upload"
+                                                        width="24"
+                                                        height="24"
+                                                    />
+                                                    Pilih Foto
+                                                </div>
+                                            )
                                         }
-                                        buttonClassName={`${
-                                            isLoadingStudent && "hidden"
-                                        } border border-gray-600 bg-gray-50 size-9 rounded-full absolute offset bottom-2 right-2 translate-x-1/2 translate-y-1/2`}
+                                        buttonClassName={`btn-round-primary text-xs m-0 m-2 ml-1 p-2 pr-3 `}
                                         imgClassName={`${
                                             isLoadingStudent && "animate-pulse"
                                         } mt-2 rounded-md size-32 md:size-48 shrink-0`}
@@ -516,7 +528,9 @@ const UpdateStudentView = () => {
                                         updateStudentMutation.isPending
                                     }
                                 >
-                                    {isLoadingStudent || isSubmitting || updateStudentMutation.isPending ? (
+                                    {isLoadingStudent ||
+                                    isSubmitting ||
+                                    updateStudentMutation.isPending ? (
                                         <LoadingCircle>
                                             Processing...
                                         </LoadingCircle>
