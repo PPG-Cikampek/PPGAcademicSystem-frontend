@@ -36,7 +36,7 @@ export default defineConfig({
                 ],
             },
             devOptions: {
-                enabled: true, // enable PWA in dev to test locally
+                enabled: false, // enable PWA in dev to test locally
             },
             manifest: {
                 name: "Sistem Akademik Digital PPG",
