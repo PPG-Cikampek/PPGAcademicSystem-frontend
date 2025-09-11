@@ -55,7 +55,7 @@ const QuestionPackageView = () => {
                             },
                         })
                     }
-                    className="button-primary  w-24 w-24"
+                    className="button-primary w-24"
                 >
                     Unduh
                 </button>
@@ -76,7 +76,7 @@ const QuestionPackageView = () => {
                             },
                         })
                     }
-                    className="button-primary  w-24 w-24"
+                    className="button-primaryw-24"
                 >
                     Unduh
                 </button>
