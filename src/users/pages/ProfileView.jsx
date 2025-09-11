@@ -137,6 +137,18 @@ const ProfileView = () => {
     }, []);
 
     const handleEmailVerification = useCallback(() => {
+        // Guard: ensure userData is loaded before attempting to read email
+        if (!userData || !userData.email) {
+            setModal({
+                title: "Gagal!",
+                message:
+                    "Data pengguna belum dimuat. Silakan coba lagi setelah halaman selesai dimuat.",
+                onConfirm: null,
+            });
+            setModalIsOpen(true);
+            return;
+        }
+
         const verifyEmail = async () => {
             try {
                 const responseData = await sendRequest(
@@ -161,6 +173,7 @@ const ProfileView = () => {
                 });
                 setModalIsOpen(true);
             } catch (err) {
+                console.log(err);
                 setModal({
                     title: "Gagal!",
                     message: err.message,
@@ -175,11 +188,22 @@ const ProfileView = () => {
             onConfirm: verifyEmail,
         });
         setModalIsOpen(true);
-    }, [auth.token, sendRequest]);
+    }, [auth.token, sendRequest, userData]);
 
     const handleEmailUpdate = useCallback(async () => {
         if (!newEmail) {
             setEmailError(" Email tidak boleh kosong!");
+            return;
+        }
+
+        if (!userData || !userData.email) {
+            setModal({
+                title: "Gagal!",
+                message:
+                    "Data pengguna belum dimuat. Silakan coba lagi setelah halaman selesai dimuat.",
+                onConfirm: null,
+            });
+            setModalIsOpen(true);
             return;
         }
 
@@ -222,11 +246,22 @@ const ProfileView = () => {
             onConfirm: updateEmail,
         });
         setModalIsOpen(true);
-    }, [auth.token, sendRequest, newEmail]);
+    }, [auth.token, sendRequest, newEmail, userData]);
 
     const handlePasswordUpdate = useCallback(async () => {
         if (password !== confirmPassword) {
             setPasswordError("Passwords tidak sama");
+            return;
+        }
+
+        if (!userData || !userData.email) {
+            setModal({
+                title: "Gagal!",
+                message:
+                    "Data pengguna belum dimuat. Silakan coba lagi setelah halaman selesai dimuat.",
+                onConfirm: null,
+            });
+            setModalIsOpen(true);
             return;
         }
 
@@ -265,7 +300,14 @@ const ProfileView = () => {
             onConfirm: updatePassword,
         });
         setModalIsOpen(true);
-    }, [auth.token, sendRequest, password, confirmPassword, oldPassword]);
+    }, [
+        auth.token,
+        sendRequest,
+        password,
+        confirmPassword,
+        oldPassword,
+        userData,
+    ]);
 
     const handleSaveName = useCallback(
         async (e) => {
