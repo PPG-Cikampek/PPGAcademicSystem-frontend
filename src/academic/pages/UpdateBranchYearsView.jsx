@@ -6,15 +6,11 @@ import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
 
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
-import Modal from "../../shared/Components/UIElements/ModalBottomClose";
+import NewModal from "../../shared/Components/Modal/NewModal";
+import useModal from "../../shared/hooks/useNewModal";
 
 const UpdateBranchYearsView = () => {
-    const [modal, setModal] = useState({
-        title: "",
-        message: "",
-        onConfirm: null,
-    });
-    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const { modalState, openModal, closeModal } = useModal();
     const { isLoading, error, sendRequest, setError } = useHttp();
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [loadedSubBranchYear, setLoadedSubBranchYear] = useState();
@@ -55,63 +51,35 @@ const UpdateBranchYearsView = () => {
                 "Content-Type": "application/json",
             });
         } catch (err) {
-            setModal({
-                title: "Gagal!",
-                message: err.message,
-                onConfirm: null,
-            });
-            setModalIsOpen(true);
+            openModal(
+                err.message,
+                "error",
+                null,
+                "Gagal!",
+                false
+            );
+            return;
         }
 
-        setModal({
-            title: "Berhasil!",
-            message: responseData.message,
-            onConfirm: null,
-        });
-        setModalIsOpen(true);
+        openModal(
+            responseData.message,
+            "success",
+            () => {
+                navigate(-1);
+                return false; // Prevent immediate redirect
+            },
+            "Berhasil!",
+            false
+        );
     };
-
-    const ModalFooter = () => (
-        <div className="flex gap-2 items-center">
-            <button
-                onClick={() => {
-                    setModalIsOpen(false);
-                    navigate(-1);
-                }}
-                className={`${
-                    modal.onConfirm
-                        ? "btn-danger-outline"
-                        : "button-primary mt-0 "
-                }`}
-            >
-                {modal.onConfirm ? "Batal" : "Tutup"}
-            </button>
-            {modal.onConfirm && (
-                <button
-                    onClick={modal.onConfirm}
-                    className="button-primary mt-0 "
-                >
-                    Ya
-                </button>
-            )}
-        </div>
-    );
 
     return (
         <div className="m-auto max-w-md mt-14 md:mt-8">
-            <Modal
-                isOpen={modalIsOpen}
-                onClose={() => setModalIsOpen(false)}
-                title={modal.title}
-                footer={<ModalFooter />}
-            >
-                {isLoading && (
-                    <div className="flex justify-center mt-16">
-                        <LoadingCircle size={32} />
-                    </div>
-                )}
-                {!isLoading && modal.message}
-            </Modal>
+            <NewModal
+                modalState={modalState}
+                onClose={closeModal}
+                isLoading={isLoading}
+            />
 
             <div
                 className={`pb-24 transition-opacity duration-300 ${

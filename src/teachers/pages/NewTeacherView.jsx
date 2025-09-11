@@ -7,11 +7,11 @@ import { AuthContext } from "../../shared/Components/Context/auth-context";
 
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
-import Modal from "../../shared/Components/UIElements/ModalBottomClose";
+import NewModal from "../../shared/Components/Modal/NewModal";
+import useModal from "../../shared/hooks/useNewModal";
 
 const NewTeacherView = () => {
-    const [modalIsOpen, setModalIsOpen] = useState(false);
-    const [modalMessage, setModalMessage] = useState(false);
+    const { modalState, openModal, closeModal } = useModal();
 
     const [isTransitioning, setIsTransitioning] = useState(false);
     const { isLoading, error, sendRequest, setError } = useHttp();
@@ -112,8 +112,16 @@ const NewTeacherView = () => {
             responseData = await sendRequest(url, "POST", body, {
                 "Content-Type": "application/json",
             });
-            setModalMessage(responseData.message);
-            setModalIsOpen(true);
+            openModal(
+                responseData.message,
+                "success",
+                () => {
+                    navigate("/settings/users/");
+                    return false; // Prevent immediate redirect
+                },
+                "Berhasil!",
+                false
+            );
         } catch (err) {
             // Error is already handled by useHttp
         }
@@ -129,26 +137,10 @@ const NewTeacherView = () => {
 
     return (
         <div className="m-auto max-w-md mt-14 md:my-8">
-            <Modal
-                isOpen={modalIsOpen}
-                onClose={() => setModalIsOpen(false)}
-                title="Berhasil!"
-                footer={
-                    <>
-                        <button
-                            onClick={() => {
-                                setModalIsOpen(false);
-                                navigate("/settings/users/");
-                            }}
-                            className="btn-danger-outline"
-                        >
-                            Tutup
-                        </button>
-                    </>
-                }
-            >
-                {modalMessage}
-            </Modal>
+            <NewModal
+                modalState={modalState}
+                onClose={closeModal}
+            />
 
             {error && (
                 <ErrorCard error={error} onClear={() => setError(null)} />

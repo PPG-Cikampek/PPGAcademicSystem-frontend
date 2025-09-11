@@ -6,15 +6,11 @@ import useHttp from "../../shared/hooks/http-hook";
 import { academicYearFormatter } from "../../shared/Utilities/academicYearFormatter";
 
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
-import Modal from "../../shared/Components/UIElements/ModalBottomClose";
+import NewModal from "../../shared/Components/Modal/NewModal";
+import useModal from "../../shared/hooks/useNewModal";
 
 const NewBranchYearsView = () => {
-    const [modal, setModal] = useState({
-        title: "",
-        message: "",
-        onConfirm: null,
-    });
-    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const { modalState, openModal, closeModal } = useModal();
     const [academicYears, setAcademicYears] = useState();
     const { isLoading, error, sendRequest, setError } = useHttp();
 
@@ -51,11 +47,13 @@ const NewBranchYearsView = () => {
                 responseData = await sendRequest(url, "POST", body, {
                     "Content-Type": "application/json",
                 });
-                setModal({
-                    title: "Berhasil!",
-                    message: responseData.message,
-                    onConfirm: null,
-                });
+                openModal(
+                    responseData.message,
+                    "success",
+                    null,
+                    "Berhasil!",
+                    false
+                );
 
                 const updatedData = await sendRequest(
                     `${
@@ -64,56 +62,25 @@ const NewBranchYearsView = () => {
                 );
                 setAcademicYears(updatedData.academicYears);
             } catch (err) {
-                setModal({
-                    title: `Gagal!`,
-                    message: err.message,
-                    onConfirm: null,
-                });
+                openModal(
+                    err.message,
+                    "error",
+                    null,
+                    "Gagal!",
+                    false
+                );
             }
         };
-        setModal({
-            title: `Konfirmasi Pendaftaran`,
-            message: `Daftarkan tahun ajaran ${academicYearFormatter(
+        openModal(
+            `Daftarkan tahun ajaran ${academicYearFormatter(
                 academicYearName
             )}?`,
-            onConfirm: confirmRegister,
-        });
-        setModalIsOpen(true);
+            "confirmation",
+            confirmRegister,
+            `Konfirmasi Pendaftaran`,
+            true
+        );
     };
-
-    const ModalFooter = () => (
-        <div className="flex gap-2 items-center">
-            <button
-                onClick={() => {
-                    setModalIsOpen(false);
-                }}
-                className={`${
-                    modal.onConfirm
-                        ? "btn-danger-outline"
-                        : "button-primary mt-0 "
-                } ${isLoading ? "opacity-50 hover:cursor-not-allowed" : ""}`}
-                disabled={isLoading}
-            >
-                {isLoading ? (
-                    <LoadingCircle />
-                ) : modal.onConfirm ? (
-                    "Batal"
-                ) : (
-                    "Tutup"
-                )}
-            </button>
-            {modal.onConfirm && (
-                <button
-                    onClick={modal.onConfirm}
-                    className={`button-primary mt-0 ${
-                        isLoading ? "opacity-50 hover:cursor-not-allowed" : ""
-                    }`}
-                >
-                    {isLoading ? <LoadingCircle /> : "Ya"}
-                </button>
-            )}
-        </div>
-    );
 
     return (
         <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">
@@ -121,19 +88,11 @@ const NewBranchYearsView = () => {
                 <h1 className="text-2xl font-bold mb-4">
                     Daftarkan Tahun Ajaran ke Kelompok
                 </h1>
-                <Modal
-                    isOpen={modalIsOpen}
-                    onClose={() => setModalIsOpen(false)}
-                    title={modal.title}
-                    footer={<ModalFooter />}
-                >
-                    {isLoading && (
-                        <div className="flex justify-center mt-16">
-                            <LoadingCircle size={32} />
-                        </div>
-                    )}
-                    {!isLoading && modal.message}
-                </Modal>
+                <NewModal
+                    modalState={modalState}
+                    onClose={closeModal}
+                    isLoading={isLoading}
+                />
 
                 {(!academicYears || isLoading) && (
                     <div className="flex justify-center mt-16">

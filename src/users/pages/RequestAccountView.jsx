@@ -6,20 +6,16 @@ import { AuthContext } from "../../shared/Components/Context/auth-context";
 import { Link, useNavigate } from "react-router-dom";
 import { formatDate } from "../../shared/Utilities/formatDateToLocal";
 import DataTable from "../../shared/Components/UIElements/DataTable";
-import Modal from "../../shared/Components/UIElements/ModalBottomClose";
+import NewModal from "../../shared/Components/Modal/NewModal";
+import useModal from "../../shared/hooks/useNewModal";
 import useToast from "../../shared/hooks/useToast";
 import ToastContainer from "../../shared/Components/UIElements/ToastContainer";
 
 const RequestAccountView = () => {
     const [tickets, setTickets] = useState();
-    const [modal, setModal] = useState({
-        title: "",
-        message: "",
-        onConfirm: null,
-    });
-    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const { modalState, openModal, closeModal } = useModal();
     const { isLoading, sendRequest } = useHttp();
-    const { toasts, showSuccess, showError, showWarning, removeToast } =
+    const { toasts, showSuccess, showError, removeToast } =
         useToast();
 
     const navigate = useNavigate();
@@ -77,7 +73,6 @@ const RequestAccountView = () => {
                     "Berhasil!",
                     responseData.message || "Tiket berhasil dibatalkan."
                 );
-                setModalIsOpen(false);
 
                 setTickets((prevTickets) => ({
                     ...prevTickets,
@@ -86,32 +81,22 @@ const RequestAccountView = () => {
                     ),
                 }));
             } catch (err) {
-                // Enhanced error handling with retry option
-                const retryCancel = () => {
-                    setModalIsOpen(false);
-                    setTimeout(
-                        () => handleCancelTicket(ticketId, respond),
-                        100
-                    );
-                };
-
                 showError(
                     "Gagal!",
                     `${
                         err.message || "Gagal membatalkan tiket"
                     }. Silakan coba lagi.`
                 );
-                setModalIsOpen(false);
             }
         };
 
-        setModal({
-            title: "Konfirmasi Pembatalan",
-            message:
-                "Apakah Anda yakin ingin membatalkan tiket ini? Tindakan ini tidak dapat dibatalkan.",
-            onConfirm: confirmCancel,
-        });
-        setModalIsOpen(true);
+        openModal(
+            "Apakah Anda yakin ingin membatalkan tiket ini? Tindakan ini tidak dapat dibatalkan.",
+            "confirmation",
+            confirmCancel,
+            "Konfirmasi Pembatalan",
+            true
+        );
     };
 
     const getStatusStyle = (type) =>
@@ -214,50 +199,15 @@ const RequestAccountView = () => {
         },
     ];
 
-    const ModalFooter = () => (
-        <div className="flex gap-2 items-center">
-            <button
-                onClick={() => {
-                    setModalIsOpen(false);
-                }}
-                className={`${
-                    modal.onConfirm
-                        ? "btn-danger-outline"
-                        : "button-primary mt-0 "
-                }`}
-            >
-                {modal.onConfirm ? "Batal" : "Tutup"}
-            </button>
-            {modal.onConfirm && (
-                <button
-                    onClick={modal.onConfirm}
-                    className="button-primary mt-0 "
-                >
-                    Ya
-                </button>
-            )}
-        </div>
-    );
-
     return (
         <div className="min-h-screen px-4 py-8 md:p-8">
             <ToastContainer toasts={toasts} onRemoveToast={removeToast} />
 
-            <Modal
-                isOpen={modalIsOpen}
-                onClose={() => setModalIsOpen(false)}
-                title={modal.title}
-                footer={<ModalFooter />}
-            >
-                {isLoading ? (
-                    <div className="flex justify-center py-4">
-                        <LoadingCircle size={24} />
-                        <span className="ml-3 text-gray-600">Memproses...</span>
-                    </div>
-                ) : (
-                    <div className="py-2">{modal.message}</div>
-                )}
-            </Modal>
+            <NewModal
+                modalState={modalState}
+                onClose={closeModal}
+                isLoading={isLoading}
+            />
 
             <div className="max-w-6xl mx-auto">
                 <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">

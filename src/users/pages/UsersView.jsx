@@ -1,22 +1,16 @@
-import { useState, useContext } from "react";
+import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
 
-import Modal from "../../shared/Components/UIElements/ModalBottomClose";
-import SkeletonLoader from "../../shared/Components/UIElements/SkeletonLoader";
+import NewModal from "../../shared/Components/Modal/NewModal";
+import useModal from "../../shared/hooks/useNewModal";
 import { Trash, PlusIcon, Users } from "lucide-react";
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 import { useUsers } from "../hooks/useUsers";
-import ModalFooter from "../components/ModalFooter";
 import RoleGroup from "../components/RoleGroup";
 
 const UsersView = () => {
-    const [modal, setModal] = useState({
-        title: "",
-        message: "",
-        onConfirm: null,
-    });
-    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const { modalState, openModal, closeModal } = useModal();
 
     const {
         users,
@@ -39,53 +33,48 @@ const UsersView = () => {
         const confirmDelete = async () => {
             try {
                 const message = await handleDeleteUser(userId);
-                setModal({
-                    title: "Berhasil!",
-                    message: message,
-                    onConfirm: null,
-                });
+                openModal(message, "success", null, "Berhasil!", false);
             } catch (err) {
                 // Error handled by useHttp
             }
         };
-        setModal({
-            title: "Peringatan!",
-            message: "Hapus Pengguna?",
-            onConfirm: confirmDelete,
-        });
-        setModalIsOpen(true);
+        openModal(
+            "Hapus Pengguna?",
+            "confirmation",
+            confirmDelete,
+            "Peringatan!",
+            true
+        );
     };
 
     const handleBulkDeleteModal = () => {
         if (selectedUserIds.length === 0) {
-            setModal({
-                title: "Error",
-                message: "Please select at least one user.",
-                onConfirm: null,
-            });
-            setModalIsOpen(true);
+            openModal(
+                "Please select at least one user.",
+                "error",
+                null,
+                "Error",
+                false
+            );
             return;
         }
 
         const confirmBulkDelete = async () => {
             try {
                 const message = await handleBulkDelete();
-                setModal({
-                    title: "Berhasil!",
-                    message: message,
-                    onConfirm: null,
-                });
+                openModal(message, "success", null, "Berhasil!", false);
             } catch (err) {
                 // Error handled by useHttp
             }
         };
 
-        setModal({
-            title: "Konfirmasi",
-            message: "Hapus semua user yang dipilih?",
-            onConfirm: confirmBulkDelete,
-        });
-        setModalIsOpen(true);
+        openModal(
+            "Hapus semua user yang dipilih?",
+            "confirmation",
+            confirmBulkDelete,
+            "Konfirmasi",
+            true
+        );
     };
 
     return (
@@ -95,19 +84,11 @@ const UsersView = () => {
                     <ErrorCard error={error} onClear={() => setError(null)} />
                 )}
 
-                <Modal
-                    isOpen={modalIsOpen}
-                    onClose={() => setModalIsOpen(false)}
-                    title={modal.title}
-                    footer={
-                        <ModalFooter
-                            modal={modal}
-                            setModalIsOpen={setModalIsOpen}
-                        />
-                    }
-                >
-                    {isLoading ? <SkeletonLoader /> : modal.message}
-                </Modal>
+                <NewModal
+                    modalState={modalState}
+                    onClose={closeModal}
+                    isLoading={isLoading}
+                />
 
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-2xl font-semibold text-gray-900">

@@ -6,18 +6,14 @@ import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 
 import getCategoryName from "../utilities/getCategoryName";
 import { Pencil, Trash } from "lucide-react";
-import Modal from "../../shared/Components/UIElements/ModalBottomClose";
+import NewModal from "../../shared/Components/Modal/NewModal";
+import useModal from "../../shared/hooks/useNewModal";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
 
 const QuestionDetailView = () => {
     const [question, setQuestion] = useState(null);
     const { isLoading, error, sendRequest } = useHttp();
-    const [modal, setModal] = useState({
-        title: "",
-        message: "",
-        onConfirm: null,
-    });
-    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const { modalState, openModal, closeModal } = useModal();
 
     const { questionId } = useParams();
     const navigate = useNavigate();
@@ -121,25 +117,31 @@ const QuestionDetailView = () => {
                         Authorization: "Bearer " + auth.token,
                     }
                 );
-                setModal({
-                    title: "Berhasil!",
-                    message: responseData.message,
-                    onConfirm: null,
-                });
+                openModal(
+                    responseData.message,
+                    "success",
+                    () => {
+                        navigate(-1);
+                        return false;
+                    },
+                    "Berhasil!",
+                    false
+                );
             } catch (err) {
                 // Error handled by useHttp
             }
         };
-        setModal({
-            title: "Peringatan!",
-            message: "Hapus Soal?",
-            onConfirm: confirmDelete,
-        });
-        setModalIsOpen(true);
+        openModal(
+            "Hapus Soal?",
+            "confirmation",
+            confirmDelete,
+            "Peringatan!",
+            true
+        );
     };
 
     const handleUpdateQuestionStatus = (questionId, status) => {
-        const confirmDelete = async () => {
+        const confirmUpdate = async () => {
             const body = JSON.stringify({ status: status });
             try {
                 const responseData = await sendRequest(
@@ -154,48 +156,25 @@ const QuestionDetailView = () => {
                     }
                 );
                 setQuestion({ ...question, status: status });
-                setModal({
-                    title: "Berhasil!",
-                    message: responseData.message,
-                    onConfirm: null,
-                });
+                openModal(
+                    responseData.message,
+                    "success",
+                    null,
+                    "Berhasil!",
+                    false
+                );
             } catch (err) {
                 // Error handled by useHttp
             }
         };
-        setModal({
-            title: "Peringatan!",
-            message: "Ubah Status Soal?",
-            onConfirm: confirmDelete,
-        });
-        setModalIsOpen(true);
+        openModal(
+            "Ubah Status Soal?",
+            "confirmation",
+            confirmUpdate,
+            "Peringatan!",
+            true
+        );
     };
-
-    const ModalFooter = () => (
-        <div className="flex gap-2 items-center">
-            <button
-                onClick={() => {
-                    setModalIsOpen(false);
-                    // !error && navigate(-1);
-                }}
-                className={`${
-                    modal.onConfirm
-                        ? "btn-danger-outline"
-                        : "button-primary mt-0 "
-                }`}
-            >
-                {modal.onConfirm ? "Batal" : "Tutup"}
-            </button>
-            {modal.onConfirm && (
-                <button
-                    onClick={modal.onConfirm}
-                    className="button-primary mt-0 "
-                >
-                    Ya
-                </button>
-            )}
-        </div>
-    );
 
     if (isLoading) {
         return (
@@ -216,19 +195,11 @@ const QuestionDetailView = () => {
     return (
         <div className="min-h-screen px-4 py-8 md:p-8">
             <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-xs p-6">
-                <Modal
-                    isOpen={modalIsOpen}
-                    onClose={() => setModalIsOpen(false)}
-                    title={modal.title}
-                    footer={<ModalFooter />}
-                >
-                    {isLoading && (
-                        <div className="flex justify-center mt-16">
-                            <LoadingCircle size={32} />
-                        </div>
-                    )}
-                    {!isLoading && modal.message}
-                </Modal>
+                <NewModal
+                    modalState={modalState}
+                    onClose={closeModal}
+                    isLoading={isLoading}
+                />
 
                 <div className="flex flex-col md:flex-row  gap-2 mb-6 md:items-center">
                     <h1 className="text-2xl font-semibold text-gray-900">

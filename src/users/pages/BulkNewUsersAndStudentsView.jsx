@@ -6,7 +6,8 @@ import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
 
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
-import Modal from "../../shared/Components/UIElements/ModalBottomClose";
+import NewModal from "../../shared/Components/Modal/NewModal";
+import useModal from "../../shared/hooks/useNewModal";
 
 import { AuthContext } from "../../shared/Components/Context/auth-context";
 
@@ -14,8 +15,7 @@ const BulkNewUsersAndStudentsView = () => {
     const [loadedSubBranches, setLoadedSubBranches] = useState([]);
     const { isLoading, error, sendRequest, setError } = useHttp();
     const [bulkCreateFields, setBulkCreateFields] = useState();
-    const [modalIsOpen, setModalIsOpen] = useState(false);
-    const [modalMessage, setModalMessage] = useState(false);
+    const { modalState, openModal, closeModal } = useModal();
 
     const navigate = useNavigate();
     const auth = useContext(AuthContext);
@@ -91,33 +91,27 @@ const BulkNewUsersAndStudentsView = () => {
                 "Content-Type": "application/json",
                 Authorization: "Bearer " + auth.token,
             });
-            setModalMessage(response.message);
-            setModalIsOpen(true);
-        } catch (error) {}
+            openModal(
+                response.message,
+                "success",
+                () => {
+                    navigate("/settings/users/");
+                    return false; // Prevent immediate redirect
+                },
+                "Berhasil!",
+                false
+            );
+            } catch (error) {
+                console.error('Bulk creation error:', error);
+            }
     };
 
     return (
         <div className="m-auto max-w-md mt-14 md:mt-8">
-            <Modal
-                isOpen={modalIsOpen}
-                onClose={() => setModalIsOpen(false)}
-                title="Berhasil!"
-                footer={
-                    <>
-                        <button
-                            onClick={() => {
-                                setModalIsOpen(false);
-                                navigate("/settings/users/");
-                            }}
-                            className="btn-danger-outline"
-                        >
-                            Tutup
-                        </button>
-                    </>
-                }
-            >
-                {modalMessage}
-            </Modal>
+            <NewModal
+                modalState={modalState}
+                onClose={closeModal}
+            />
 
             <div className="px-2">
                 {error && (

@@ -4,21 +4,16 @@ import { PlusIcon } from "lucide-react";
 
 import useHttp from "../../shared/hooks/http-hook";
 import SkeletonLoader from "../../shared/Components/UIElements/SkeletonLoader";
-import Modal from "../../shared/Components/UIElements/ModalBottomClose";
+import NewModal from "../../shared/Components/Modal/NewModal";
+import useModal from "../../shared/hooks/useNewModal";
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 import AcademicYearList from "../components/AcademicYearList";
-import ModalFooter from "../components/ModalFooter";
 
 import { academicYearFormatter } from "../../shared/Utilities/academicYearFormatter";
 
 const AcademicYearsView = () => {
     const [expandedCards, setExpandedCards] = useState({});
-    const [modal, setModal] = useState({
-        title: "",
-        message: "",
-        onConfirm: null,
-    });
-    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const { modalState, openModal, closeModal } = useModal();
     const [data, setData] = useState();
     const { isLoading, sendRequest, error } = useHttp();
 
@@ -57,11 +52,13 @@ const AcademicYearsView = () => {
                     { "Content-Type": "application/json" }
                 );
 
-                setModal({
-                    title: "Berhasil!",
-                    message: responseData.message,
-                    onConfirm: null,
-                });
+                openModal(
+                    responseData.message,
+                    "success",
+                    null,
+                    "Berhasil!",
+                    false
+                );
 
                 const updatedData = await sendRequest(
                     `${
@@ -72,14 +69,15 @@ const AcademicYearsView = () => {
             } catch (err) {}
         };
 
-        setModal({
-            title: `Konfirmasi Aktivasi`,
-            message: `Aktivasi tahun ajaran ${academicYearFormatter(
+        openModal(
+            `Aktivasi tahun ajaran ${academicYearFormatter(
                 academicYearName
             )}?`,
-            onConfirm: confirmRegister,
-        });
-        setModalIsOpen(true);
+            "confirmation",
+            confirmRegister,
+            `Konfirmasi Aktivasi`,
+            true
+        );
     };
 
     const munaqasyahStatusHandler = (
@@ -99,11 +97,13 @@ const AcademicYearsView = () => {
                     { "Content-Type": "application/json" }
                 );
 
-                setModal({
-                    title: "Berhasil!",
-                    message: responseData.message,
-                    onConfirm: null,
-                });
+                openModal(
+                    responseData.message,
+                    "success",
+                    null,
+                    "Berhasil!",
+                    false
+                );
 
                 const updatedData = await sendRequest(
                     `${
@@ -112,32 +112,36 @@ const AcademicYearsView = () => {
                 );
                 setData(updatedData);
             } catch (err) {
-                setModal({
-                    title: "Gagal!",
-                    message: err.message,
-                    onConfirm: null,
-                });
+                openModal(
+                    err.message,
+                    "error",
+                    null,
+                    "Gagal!",
+                    false
+                );
             }
         };
 
         if (actionType === "start") {
-            setModal({
-                title: `Konfirmasi`,
-                message: `Mulai munaqosah untuk tahun ajaran ${academicYearFormatter(
+            openModal(
+                `Mulai munaqosah untuk tahun ajaran ${academicYearFormatter(
                     academicYearName
                 )}?`,
-                onConfirm: () => confirmAction("inProgress"),
-            });
-            setModalIsOpen(true);
+                "confirmation",
+                () => confirmAction("inProgress"),
+                `Konfirmasi`,
+                true
+            );
         } else if (actionType === "complete") {
-            setModal({
-                title: `Konfirmasi`,
-                message: `Selesaikan munaqosah untuk tahun ajaran ${academicYearFormatter(
+            openModal(
+                `Selesaikan munaqosah untuk tahun ajaran ${academicYearFormatter(
                     academicYearName
                 )}?`,
-                onConfirm: () => confirmAction("completed"),
-            });
-            setModalIsOpen(true);
+                "confirmation",
+                () => confirmAction("completed"),
+                `Konfirmasi`,
+                true
+            );
         }
     };
 
@@ -153,11 +157,13 @@ const AcademicYearsView = () => {
                     { "Content-Type": "application/json" }
                 );
 
-                setModal({
-                    title: "Berhasil!",
-                    message: responseData.message,
-                    onConfirm: null,
-                });
+                openModal(
+                    responseData.message,
+                    "success",
+                    null,
+                    "Berhasil!",
+                    false
+                );
 
                 const updatedData = await sendRequest(
                     `${
@@ -166,50 +172,35 @@ const AcademicYearsView = () => {
                 );
                 setData(updatedData);
             } catch (err) {
-                setModal({
-                    title: "Gagal!",
-                    message: err.message,
-                    onConfirm: null,
-                });
+                openModal(
+                    err.message,
+                    "error",
+                    null,
+                    "Gagal!",
+                    false
+                );
             }
-            setModalIsOpen(true);
         };
 
-        setModal({
-            title: `Konfirmasi Penghapusan`,
-            message: `Hapus Tahun Ajaran: ${academicYearFormatter(
+        openModal(
+            `Hapus Tahun Ajaran: ${academicYearFormatter(
                 academicYearName
             )}?`,
-            onConfirm: confirmDelete,
-        });
-        setModalIsOpen(true);
+            "confirmation",
+            confirmDelete,
+            `Konfirmasi Penghapusan`,
+            true
+        );
     };
 
     return (
         <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">
             <div className="max-w-6xl mx-auto">
-                <Modal
-                    isOpen={modalIsOpen}
-                    onClose={() => setModalIsOpen(false)}
-                    title={modal.title}
-                    footer={
-                        <ModalFooter
-                            onClose={() => setModalIsOpen(false)}
-                            onConfirm={modal.onConfirm}
-                        />
-                    }
-                >
-                    {isLoading && (
-                        <div className="flex justify-center mt-16">
-                            <SkeletonLoader
-                                variant="rectangular"
-                                width="100%"
-                                height={100}
-                            />
-                        </div>
-                    )}
-                    {!isLoading && modal.message}
-                </Modal>
+                <NewModal
+                    modalState={modalState}
+                    onClose={closeModal}
+                    isLoading={isLoading}
+                />
 
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-2xl font-semibold text-gray-900">

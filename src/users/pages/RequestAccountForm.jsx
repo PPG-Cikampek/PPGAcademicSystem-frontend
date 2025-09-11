@@ -8,15 +8,11 @@ import { Trash } from "lucide-react";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import { formatDate } from "../../shared/Utilities/formatDateToLocal";
-import Modal from "../../shared/Components/UIElements/ModalBottomClose";
+import NewModal from "../../shared/Components/Modal/NewModal";
+import useModal from "../../shared/hooks/useNewModal";
 
 const RequestAccountForm = () => {
-    const [modal, setModal] = useState({
-        title: "",
-        message: "",
-        onConfirm: null,
-    });
-    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const { modalState, openModal, closeModal } = useModal();
     const [isStudent, setIsStudent] = useState(false);
     const [formData, setFormData] = useState({});
     const [dataList, setDataList] = useState([]);
@@ -141,57 +137,27 @@ const RequestAccountForm = () => {
             });
         } catch (err) {}
         console.log(responseData);
-        setModal({
-            title: "Berhasil!",
-            message: responseData.message,
-            onConfirm: null,
-        });
-        setModalIsOpen(true);
+        openModal(
+            responseData.message,
+            "success",
+            () => {
+                navigate(-1);
+                return false; // Prevent immediate redirect
+            },
+            "Berhasil!",
+            false
+        );
     };
 
     const fields = isStudent ? studentFields : teacherFields;
 
-    const ModalFooter = () => (
-        <div className="flex gap-2 items-center">
-            <button
-                onClick={() => {
-                    setModalIsOpen(false);
-                    !error && navigate(-1);
-                }}
-                className={`${
-                    modal.onConfirm
-                        ? "btn-danger-outline"
-                        : "button-primary mt-0 "
-                }`}
-            >
-                {modal.onConfirm ? "Batal" : "Tutup"}
-            </button>
-            {modal.onConfirm && (
-                <button
-                    onClick={modal.onConfirm}
-                    className="button-primary mt-0 "
-                >
-                    Ya
-                </button>
-            )}
-        </div>
-    );
-
     return (
         <>
-            <Modal
-                isOpen={modalIsOpen}
-                onClose={() => setModalIsOpen(false)}
-                title={modal.title}
-                footer={<ModalFooter />}
-            >
-                {isLoading && (
-                    <div className="flex justify-center mt-16">
-                        <LoadingCircle size={32} />
-                    </div>
-                )}
-                {!isLoading && modal.message}
-            </Modal>
+            <NewModal
+                modalState={modalState}
+                onClose={closeModal}
+                isLoading={isLoading}
+            />
             {error && (
                 <div className="mx-2 mt-12">
                     <ErrorCard error={error} onClear={() => setError(null)} />

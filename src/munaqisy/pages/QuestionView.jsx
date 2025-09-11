@@ -3,7 +3,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import useHttp from "../../shared/hooks/http-hook";
 import { MunaqasyahScoreContext } from "../context/MunaqasyahScoreContext";
-import Modal from "../../shared/Components/UIElements/ModalBottomClose";
+import NewModal from "../../shared/Components/Modal/NewModal";
+import useModal from "../../shared/hooks/useNewModal";
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import getMunaqasyahQuestionTypeName from "../../munaqasyah/utilities/getMunaqasyahQuestionTypeName";
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
@@ -12,12 +13,7 @@ const QuestionView = () => {
     const [examQuestions, setExamQuestions] = useState();
     const [selectedScores, setSelectedScores] = useState({});
     const [totalScore, setTotalScore] = useState();
-    const [modal, setModal] = useState({
-        title: "",
-        message: "",
-        onConfirm: null,
-    });
-    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const { modalState, openModal, closeModal } = useModal();
 
     const { isLoading, error, sendRequest, setError, setIsLoading } = useHttp();
 
@@ -87,12 +83,13 @@ const QuestionView = () => {
                 type: "SET_ERROR",
                 payload: "Berikan nilai untuk semua pertanyaan!",
             });
-            setModal({
-                title: "Gagal!",
-                message: "Berikan nilai untuk semua pertanyaan!",
-                onConfirm: null,
-            });
-            setModalIsOpen(true);
+            openModal(
+                "Berikan nilai untuk semua pertanyaan!",
+                "error",
+                null,
+                "Gagal!",
+                false
+            );
             return;
         }
 
@@ -103,69 +100,41 @@ const QuestionView = () => {
             setError(err.message || "Failed to save scores");
         }
 
-        setModal({
-            title: "Konfirmasi",
-            message: "Simpan Nilai?",
-            onConfirm: async () => {
-                setIsLoading(true);
-                await patchScoreData(state.studentScore, dispatch);
-                setIsLoading(false);
-                if (!state.error) {
-                    setModal({
-                        title: "Berhasil!",
-                        message: "Berhasil menyimpan nilai!",
-                        onConfirm: null,
-                    });
-                }
-            },
-        });
+        const confirmSave = async () => {
+            setIsLoading(true);
+            await patchScoreData(state.studentScore, dispatch);
+            setIsLoading(false);
+            if (!state.error) {
+                openModal(
+                    "Berhasil menyimpan nilai!",
+                    "success",
+                    () => {
+                        navigate(-1);
+                        return false;
+                    },
+                    "Berhasil!",
+                    false
+                );
+            }
+        };
 
-        setModalIsOpen(true);
+        openModal(
+            "Simpan Nilai?",
+            "confirmation",
+            confirmSave,
+            "Konfirmasi",
+            true
+        );
     };
-
-    const ModalFooter = () => (
-        <div className="flex gap-2 items-center">
-            <button
-                onClick={() => {
-                    setModalIsOpen(false);
-                    !state.error && navigate(-1);
-                    state.error && navigate(-2);
-                }}
-                className={`${
-                    modal.onConfirm
-                        ? "btn-danger-outline"
-                        : "button-primary mt-0 "
-                }`}
-            >
-                {modal.onConfirm ? "Batal" : "Tutup"}
-            </button>
-            {modal.onConfirm && (
-                <button
-                    onClick={modal.onConfirm}
-                    className="button-primary mt-0 "
-                >
-                    Ya
-                </button>
-            )}
-        </div>
-    );
 
     return (
         <div className="min-h-screen bg-gray-50 ">
             {!isLoading && state.error && <ErrorCard error={state.error} />}
-            <Modal
-                isOpen={modalIsOpen}
-                onClose={() => setModalIsOpen(false)}
-                title={state.error ? "Gagal!" : modal.title}
-                footer={<ModalFooter />}
-            >
-                {isLoading && (
-                    <div className="flex justify-center mt-16">
-                        <LoadingCircle size={32} />
-                    </div>
-                )}
-                {!isLoading && (state.error ? state.error : modal.message)}
-            </Modal>
+            <NewModal
+                modalState={modalState}
+                onClose={closeModal}
+                isLoading={isLoading}
+            />
 
             <div className="flex flex-col pb-24 my-6">
                 <div className="card-basic flex-col justify-between mt-0 mx-4 pr-8 box-border">

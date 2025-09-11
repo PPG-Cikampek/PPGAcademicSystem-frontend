@@ -1,21 +1,15 @@
 import { useContext, useEffect, useState } from "react";
-import { GraduationCap, Users } from "lucide-react";
-import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import useHttp from "../../shared/hooks/http-hook";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { formatDate } from "../../shared/Utilities/formatDateToLocal";
 import DataTable from "../../shared/Components/UIElements/DataTable";
-import Modal from "../../shared/Components/UIElements/ModalBottomClose";
+import NewModal from "../../shared/Components/Modal/NewModal";
+import useModal from "../../shared/hooks/useNewModal";
 
 const RequestedAccountView = () => {
     const [tickets, setTickets] = useState();
-    const [modal, setModal] = useState({
-        title: "",
-        message: "",
-        onConfirm: null,
-    });
-    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const { modalState, openModal, closeModal } = useModal();
     const { isLoading, sendRequest } = useHttp();
 
     const navigate = useNavigate();
@@ -52,27 +46,31 @@ const RequestedAccountView = () => {
                     "Content-Type": "application/json",
                     Authorization: "Bearer " + auth.token,
                 });
-                setModal({
-                    title: "Berhasil!",
-                    message: responseData.message,
-                    onConfirm: null,
-                });
                 setTickets((prevTickets) => ({
                     ...prevTickets,
                     tickets: prevTickets.tickets.filter(
                         (ticket) => ticket._id !== ticketId
                     ),
                 }));
+                openModal(
+                    responseData.message,
+                    "success",
+                    null,
+                    "Berhasil!",
+                    false
+                );
             } catch (err) {
                 // Error handled by useHttp
+                console.error('Request handling error:', err);
             }
         };
-        setModal({
-            title: "Peringatan!",
-            message: `${respond === "rejected" ? "Tolak" : "Setujui"} Tiket?`,
-            onConfirm: confirmCancel,
-        });
-        setModalIsOpen(true);
+        openModal(
+            `${respond === "rejected" ? "Tolak" : "Setujui"} Tiket?`,
+            "confirmation",
+            confirmCancel,
+            "Peringatan!",
+            true
+        );
     };
 
     const getStatusStyle = (type) =>
@@ -164,46 +162,13 @@ const RequestedAccountView = () => {
         },
     ];
 
-    const ModalFooter = () => (
-        <div className="flex gap-2 items-center">
-            <button
-                onClick={() => {
-                    setModalIsOpen(false);
-                }}
-                className={`${
-                    modal.onConfirm
-                        ? "btn-danger-outline"
-                        : "button-primary mt-0 "
-                }`}
-            >
-                {modal.onConfirm ? "Batal" : "Tutup"}
-            </button>
-            {modal.onConfirm && (
-                <button
-                    onClick={modal.onConfirm}
-                    className="button-primary mt-0 "
-                >
-                    Ya
-                </button>
-            )}
-        </div>
-    );
-
     return (
         <div className="min-h-screen px-4 py-8 md:p-8">
-            <Modal
-                isOpen={modalIsOpen}
-                onClose={() => setModalIsOpen(false)}
-                title={modal.title}
-                footer={<ModalFooter />}
-            >
-                {isLoading && (
-                    <div className="flex justify-center mt-16">
-                        <LoadingCircle size={32} />
-                    </div>
-                )}
-                {!isLoading && modal.message}
-            </Modal>
+            <NewModal
+                modalState={modalState}
+                onClose={closeModal}
+                isLoading={isLoading}
+            />
 
             <h2 className="text-xl font-bold mb-4">Daftar Pendaftaran Akun</h2>
             <div className="max-w-6xl mx-auto">
