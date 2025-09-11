@@ -15,18 +15,14 @@ import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 
-import Modal from "../../shared/Components/UIElements/ModalBottomClose";
+import NewModal from "../../shared/Components/Modal/NewModal";
+import useModal from "../../shared/hooks/useNewModal";
 import FileUpload from "../../shared/Components/FormElements/FileUpload";
 
 import { Icon } from "@iconify-icon/react";
 
 const UpdateTeacherView = () => {
-    const [modal, setModal] = useState({
-        title: "",
-        message: "",
-        onConfirm: null,
-    });
-    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const { modalState, openModal, closeModal } = useModal();
     const [isTransitioning, setIsTransitioning] = useState(false);
     const [loadedDate, setLoadedDate] = useState();
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -52,12 +48,16 @@ const UpdateTeacherView = () => {
     // Use React Query mutation for updating teacher
     const updateTeacherMutation = useUpdateTeacherMutation({
         onSuccess: (data) => {
-            setModal({
-                title: "Berhasil!",
-                message: data.message,
-                onConfirm: null,
-            });
-            setModalIsOpen(true);
+            openModal(
+                data.message,
+                "success",
+                () => {
+                    navigate(-1);
+                    return false; // Prevent immediate redirect
+                },
+                "Berhasil!",
+                false
+            );
         },
         onError: (error) => {
             setError(
@@ -197,54 +197,13 @@ const UpdateTeacherView = () => {
         }
     };
 
-    // Memoized ModalFooter component to prevent unnecessary re-renders
-    const ModalFooter = useMemo(
-        () => () =>
-            (
-                <div className="flex gap-2 items-center">
-                    <button
-                        onClick={() => {
-                            setModalIsOpen(false);
-                            !error && navigate(-1);
-                        }}
-                        className={`${
-                            modal.onConfirm
-                                ? "btn-danger-outline"
-                                : "button-primary mt-0 "
-                        }`}
-                    >
-                        {modal.onConfirm ? "Batal" : "Tutup"}
-                    </button>
-                    {modal.onConfirm && (
-                        <button
-                            onClick={modal.onConfirm}
-                            className="button-primary mt-0 "
-                        >
-                            Ya
-                        </button>
-                    )}
-                </div>
-            ),
-        [modal.onConfirm, error, navigate]
-    );
-
     return (
         <div className="m-auto max-w-md mt-14 md:mt-8">
-            <Modal
-                isOpen={modalIsOpen}
-                onClose={() => setModalIsOpen(false)}
-                title={modal.title}
-                footer={<ModalFooter />}
-            >
-                {(isLoadingTeacher || updateTeacherMutation.isPending) && (
-                    <div className="flex justify-center mt-16">
-                        <LoadingCircle size={32} />
-                    </div>
-                )}
-                {!isLoadingTeacher &&
-                    !updateTeacherMutation.isPending &&
-                    modal.message}
-            </Modal>
+            <NewModal
+                modalState={modalState}
+                onClose={closeModal}
+                isLoading={isLoadingTeacher || updateTeacherMutation.isPending}
+            />
 
             <div
                 className={`pb-24 transition-opacity duration-300 ${
