@@ -4,7 +4,8 @@ import { Link } from "react-router-dom";
 import useHttp from "../../shared/hooks/http-hook";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
 import SkeletonLoader from "../../shared/Components/UIElements/SkeletonLoader";
-import Modal from "../../shared/Components/UIElements/ModalBottomClose";
+import NewModal from "../../shared/Components/Modal/NewModal";
+import useModal from "../../shared/hooks/useNewModal";
 
 import { CircleAlert } from "lucide-react";
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
@@ -12,12 +13,7 @@ import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 
 const SubBranchMunaqasyahView = () => {
     const [subBranchYears, setSubBranchYears] = useState();
-    const [modal, setModal] = useState({
-        title: "",
-        message: "",
-        onConfirm: null,
-    });
-    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const { modalState, openModal, closeModal } = useModal();
     const { isLoading, error, sendRequest, setError } = useHttp();
 
     const auth = useContext(AuthContext);
@@ -56,66 +52,35 @@ const SubBranchMunaqasyahView = () => {
                             : year
                     )
                 );
-                setModal({
-                    title: "Berhasil!",
-                    message: responseData.message,
-                    onConfirm: null,
-                });
+                openModal(
+                    responseData.message,
+                    "success",
+                    null,
+                    "Berhasil!",
+                    false
+                );
             } catch (err) {
-                setModalIsOpen(false);
+                // Error handled by useHttp
             }
         };
 
-        setModal({
-            title: `Konfirmasi`,
-            message: `Mulai munaqosah untuk tahun ajaran ${subBranchYearName}?`,
-            onConfirm: confirmStart,
-        });
-        setModalIsOpen(true);
+        openModal(
+            `Mulai munaqosah untuk tahun ajaran ${subBranchYearName}?`,
+            "confirmation",
+            confirmStart,
+            "Konfirmasi",
+            true
+        );
     };
-
-    const ModalFooter = () => (
-        <div className="flex gap-2 items-center">
-            <button
-                onClick={() => {
-                    setModalIsOpen(false);
-                    // !error && navigate(-1);
-                }}
-                className={`${
-                    modal.onConfirm
-                        ? "btn-danger-outline"
-                        : "button-primary mt-0 "
-                }`}
-            >
-                {modal.onConfirm ? "Batal" : "Tutup"}
-            </button>
-            {modal.onConfirm && (
-                <button
-                    onClick={modal.onConfirm}
-                    className="button-primary mt-0 "
-                >
-                    Ya
-                </button>
-            )}
-        </div>
-    );
 
     return (
         <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">
             <div className="max-w-6xl mx-auto">
-                <Modal
-                    isOpen={modalIsOpen}
-                    onClose={() => setModalIsOpen(false)}
-                    title={modal.title}
-                    footer={<ModalFooter />}
-                >
-                    {isLoading && (
-                        <div className="flex justify-center mt-16">
-                            <LoadingCircle size={32} />
-                        </div>
-                    )}
-                    {!isLoading && modal.message}
-                </Modal>
+                <NewModal
+                    modalState={modalState}
+                    onClose={closeModal}
+                    isLoading={isLoading}
+                />
 
                 <div className="flex justify-between items-center mb-6">
                     <h1 className="text-2xl font-semibold text-gray-900">
