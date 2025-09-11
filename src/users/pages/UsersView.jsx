@@ -4,7 +4,7 @@ import { AuthContext } from "../../shared/Components/Context/auth-context";
 
 import NewModal from "../../shared/Components/Modal/NewModal";
 import useModal from "../../shared/hooks/useNewModal";
-import { Trash, PlusIcon } from "lucide-react";
+import { Trash, PlusIcon, Users } from "lucide-react";
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 import { useUsers } from "../hooks/useUsers";
 import RoleGroup from "../components/RoleGroup";
@@ -33,13 +33,7 @@ const UsersView = () => {
         const confirmDelete = async () => {
             try {
                 const message = await handleDeleteUser(userId);
-                openModal(
-                    message,
-                    "success",
-                    null,
-                    "Berhasil!",
-                    false
-                );
+                openModal(message, "success", null, "Berhasil!", false);
             } catch (err) {
                 // Error handled by useHttp
             }
@@ -68,13 +62,7 @@ const UsersView = () => {
         const confirmBulkDelete = async () => {
             try {
                 const message = await handleBulkDelete();
-                openModal(
-                    message,
-                    "success",
-                    null,
-                    "Berhasil!",
-                    false
-                );
+                openModal(message, "success", null, "Berhasil!", false);
             } catch (err) {
                 // Error handled by useHttp
             }
