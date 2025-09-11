@@ -42,7 +42,9 @@ const RequestedAccountView = () => {
         );
 
         const body = JSON.stringify({ ticketId, respond });
-        const url = `${import.meta.env.VITE_BACKEND_URL}/users/account-requests/ticket`;
+        const url = `${
+            import.meta.env.VITE_BACKEND_URL
+        }/users/account-requests/ticket`;
 
         const confirmAction = async () => {
             try {
@@ -54,9 +56,10 @@ const RequestedAccountView = () => {
 
                 setTickets((prevTickets) => ({
                     ...prevTickets,
-                    tickets: prevTickets?.tickets?.filter(
-                        (t) => t._id !== ticketId
-                    ) || [],
+                    tickets:
+                        prevTickets?.tickets?.filter(
+                            (t) => t._id !== ticketId
+                        ) || [],
                 }));
 
                 openModal(
@@ -132,12 +135,16 @@ const RequestedAccountView = () => {
             key: "accountList",
             label: "Jumlah Akun",
             sortable: true,
+            headerAlign: "center",
+            cellAlign: "center",
             render: (item) => item.accountList.length,
         },
         {
             key: "status",
             label: "Status",
             sortable: true,
+            headerAlign: "center",
+            cellAlign: "center",
             render: (item) => (
                 <span
                     className={`px-2 py-1 rounded-full text-sm ${getStatusStyle(
@@ -151,34 +158,65 @@ const RequestedAccountView = () => {
         {
             key: "actions",
             label: "Aksi",
-            render: (item) => (
-                <div className="flex gap-2">
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                handleRespondTicket(item.ticketId, "approved");
-                        }}
-            className="btn-primary-outline m-0"
-            disabled={isLoading || processingTicket === item.ticketId}
-            aria-disabled={isLoading || processingTicket === item.ticketId}
-            aria-label={`Setujui tiket ${item.ticketId}`}
-                    >
-                        Setujui
-                    </button>
-                    <button
-                        onClick={(e) => {
-                            e.stopPropagation();
-                handleRespondTicket(item.ticketId, "rejected");
-                        }}
-            className="btn-danger-outline m-0"
-            disabled={isLoading || processingTicket === item.ticketId}
-            aria-disabled={isLoading || processingTicket === item.ticketId}
-            aria-label={`Tolak tiket ${item.ticketId}`}
-                    >
-                        Tolak
-                    </button>
-                </div>
-            ),
+            headerAlign: "center",
+            cellAlign: "center",
+            render: (item) => {
+                if (item.status === "pending") {
+                    return (
+                        <div className="flex gap-2">
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleRespondTicket(
+                                        item.ticketId,
+                                        "approved"
+                                    );
+                                }}
+                                className="btn-primary-outline m-0"
+                                disabled={
+                                    isLoading ||
+                                    processingTicket === item.ticketId
+                                }
+                                aria-disabled={
+                                    isLoading ||
+                                    processingTicket === item.ticketId
+                                }
+                                aria-label={`Setujui tiket ${item.ticketId}`}
+                            >
+                                Setujui
+                            </button>
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleRespondTicket(
+                                        item.ticketId,
+                                        "rejected"
+                                    );
+                                }}
+                                className="btn-danger-outline m-0"
+                                disabled={
+                                    isLoading ||
+                                    processingTicket === item.ticketId
+                                }
+                                aria-disabled={
+                                    isLoading ||
+                                    processingTicket === item.ticketId
+                                }
+                                aria-label={`Tolak tiket ${item.ticketId}`}
+                            >
+                                Tolak
+                            </button>
+                        </div>
+                    );
+                } else if (
+                    item.status === "approved" ||
+                    item.status === "cancelled"
+                ) {
+                    return <span className="text-gray-500">Selesai</span>;
+                } else {
+                    return null;
+                }
+            },
         },
     ];
 
@@ -213,7 +251,10 @@ const RequestedAccountView = () => {
                         }
                         searchableColumns={["ticketId", "status"]}
                         isLoading={isLoading}
-                        initialSort={{ key: "createdTime", direction: "descending" }}
+                        initialSort={{
+                            key: "createdTime",
+                            direction: "descending",
+                        }}
                         tableId="requestAccount-table"
                     />
                 ) : (
