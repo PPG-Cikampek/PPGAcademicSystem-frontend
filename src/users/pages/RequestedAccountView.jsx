@@ -1,4 +1,5 @@
 import { useContext, useEffect, useState } from "react";
+import { useMemo } from "react";
 import useHttp from "../../shared/hooks/http-hook";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
 import { useNavigate } from "react-router-dom";
@@ -11,6 +12,7 @@ const RequestedAccountView = () => {
     const [tickets, setTickets] = useState();
     const { modalState, openModal, closeModal } = useModal();
     const { isLoading, sendRequest } = useHttp();
+    const [processingTicket, setProcessingTicket] = useState(null);
 
     const navigate = useNavigate();
     const auth = useContext(AuthContext);
@@ -34,24 +36,29 @@ const RequestedAccountView = () => {
     }, [sendRequest]);
 
     const handleRespondTicket = async (ticketId, respond) => {
+        // Find ticket details so we can show a clearer confirmation message
+        const ticket = tickets?.tickets?.find(
+            (t) => t.ticketId === ticketId || t._id === ticketId
+        );
+
         const body = JSON.stringify({ ticketId, respond });
-        const url = `${
-            import.meta.env.VITE_BACKEND_URL
-        }/users/account-requests/ticket`;
-        console.log(body);
-        console.log(url);
-        const confirmCancel = async () => {
+        const url = `${import.meta.env.VITE_BACKEND_URL}/users/account-requests/ticket`;
+
+        const confirmAction = async () => {
             try {
+                setProcessingTicket(ticketId);
                 const responseData = await sendRequest(url, "PATCH", body, {
                     "Content-Type": "application/json",
                     Authorization: "Bearer " + auth.token,
                 });
+
                 setTickets((prevTickets) => ({
                     ...prevTickets,
-                    tickets: prevTickets.tickets.filter(
-                        (ticket) => ticket._id !== ticketId
-                    ),
+                    tickets: prevTickets?.tickets?.filter(
+                        (t) => t._id !== ticketId
+                    ) || [],
                 }));
+
                 openModal(
                     responseData.message,
                     "success",
@@ -61,13 +68,20 @@ const RequestedAccountView = () => {
                 );
             } catch (err) {
                 // Error handled by useHttp
-                console.error('Request handling error:', err);
+                console.error("Request handling error:", err);
+            } finally {
+                setProcessingTicket(null);
             }
         };
+
+        const userName = ticket?.userId?.name || "Tidak Diketahui";
+        const accountCount = ticket?.accountList?.length ?? 0;
+        const actionWord = respond === "rejected" ? "Tolak" : "Setujui";
+
         openModal(
-            `${respond === "rejected" ? "Tolak" : "Setujui"} Tiket?`,
+            `${actionWord} tiket untuk ${userName} (${accountCount} akun)?`,
             "confirmation",
-            confirmCancel,
+            confirmAction,
             "Peringatan!",
             true
         );
@@ -142,18 +156,24 @@ const RequestedAccountView = () => {
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
-                            handleRespondTicket(item.ticketId, "approved");
+                handleRespondTicket(item.ticketId, "approved");
                         }}
-                        className="btn-primary-outline m-0"
+            className="btn-primary-outline m-0"
+            disabled={isLoading || processingTicket === item.ticketId}
+            aria-disabled={isLoading || processingTicket === item.ticketId}
+            aria-label={`Setujui tiket ${item.ticketId}`}
                     >
                         Setujui
                     </button>
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
-                            handleRespondTicket(item.ticketId, "rejected");
+                handleRespondTicket(item.ticketId, "rejected");
                         }}
-                        className="btn-danger-outline m-0"
+            className="btn-danger-outline m-0"
+            disabled={isLoading || processingTicket === item.ticketId}
+            aria-disabled={isLoading || processingTicket === item.ticketId}
+            aria-label={`Tolak tiket ${item.ticketId}`}
                     >
                         Tolak
                     </button>
@@ -172,7 +192,17 @@ const RequestedAccountView = () => {
 
             <h2 className="text-xl font-bold mb-4">Daftar Pendaftaran Akun</h2>
             <div className="max-w-6xl mx-auto">
-                {tickets && (
+                <p className="text-sm text-gray-600 mb-2">
+                    Total: {tickets?.tickets?.length ?? 0} permintaan
+                </p>
+
+                {isLoading && !tickets && (
+                    <div className="p-6 bg-white rounded shadow text-center">
+                        Memuat permintaan...
+                    </div>
+                )}
+
+                {tickets && tickets.tickets?.length > 0 ? (
                     <DataTable
                         data={tickets.tickets}
                         columns={columns}
@@ -183,12 +213,15 @@ const RequestedAccountView = () => {
                         }
                         searchableColumns={["ticketId", "status"]}
                         isLoading={isLoading}
-                        initialSort={{
-                            key: "createdTime",
-                            direction: "descending",
-                        }}
-                        tableId="requestAccount-table" // <-- Add unique tableId
+                        initialSort={{ key: "createdTime", direction: "descending" }}
+                        tableId="requestAccount-table"
                     />
+                ) : (
+                    !isLoading && (
+                        <div className="p-6 bg-white rounded shadow text-center">
+                            Tidak ada pendaftaran akun baru.
+                        </div>
+                    )
                 )}
             </div>
         </div>
