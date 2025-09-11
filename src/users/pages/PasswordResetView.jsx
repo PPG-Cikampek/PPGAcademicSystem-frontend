@@ -5,15 +5,11 @@ import useHttp from "../../shared/hooks/http-hook";
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
-import Modal from "../../shared/Components/UIElements/ModalBottomClose";
+import NewModal from "../../shared/Components/Modal/NewModal";
+import useModal from "../../shared/hooks/useNewModal";
 
 const PasswordResetView = () => {
-    const [modal, setModal] = useState({
-        title: "",
-        message: "",
-        onConfirm: null,
-    });
-    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const { modalState, openModal, closeModal } = useModal();
 
     const { isLoading, error, sendRequest, setError } = useHttp();
 
@@ -33,19 +29,24 @@ const PasswordResetView = () => {
                 }
             );
             console.log(responseData);
-            setModal({
-                title: "Berhasil!",
-                message: responseData.message,
-                onConfirm: null,
-            });
-            setModalIsOpen(true);
+            openModal(
+                responseData.message,
+                "success",
+                () => {
+                    navigate("/");
+                    return false; // Prevent immediate redirect
+                },
+                "Berhasil!",
+                false
+            );
         } catch (err) {
-            setModal({
-                title: "Gagal!",
-                message: err.message,
-                onConfirm: null,
-            });
-            setModalIsOpen(true);
+            openModal(
+                err.message,
+                "error",
+                null,
+                "Gagal!",
+                false
+            );
         }
     };
 
@@ -62,64 +63,35 @@ const PasswordResetView = () => {
                     "Content-Type": "application/json",
                 }
             );
-            setModal({
-                title: "Berhasil!",
-                message: responseData.message,
-                onConfirm: null,
-            });
-            setModalIsOpen(true);
+            openModal(
+                responseData.message,
+                "success",
+                () => {
+                    navigate("/");
+                    return false; // Prevent immediate redirect
+                },
+                "Berhasil!",
+                false
+            );
         } catch (err) {
-            setModal({
-                title: "Gagal!",
-                message: err.message,
-                onConfirm: null,
-            });
-            setModalIsOpen(true);
+            openModal(
+                err.message,
+                "error",
+                null,
+                "Gagal!",
+                false
+            );
         }
     };
-
-    const ModalFooter = () => (
-        <div className="flex gap-2 items-center">
-            <button
-                onClick={() => {
-                    setModalIsOpen(false);
-                    navigate(`/`);
-                }}
-                className={`${
-                    modal.onConfirm
-                        ? "btn-danger-outline"
-                        : "button-primary mt-0 "
-                }`}
-            >
-                {modal.onConfirm ? "Batal" : "Tutup"}
-            </button>
-            {modal.onConfirm && (
-                <button
-                    onClick={modal.onConfirm}
-                    className="button-primary mt-0 "
-                >
-                    Ya
-                </button>
-            )}
-        </div>
-    );
 
     return (
         <div className="m-auto max-w-md mt-16 md:mt-24">
             <div className={`pb-24 transition-opacity duration-300`}>
-                <Modal
-                    isOpen={modalIsOpen}
-                    onClose={() => setModalIsOpen(false)}
-                    title={modal.title}
-                    footer={<ModalFooter />}
-                >
-                    {isLoading && (
-                        <div className="flex justify-center mt-16">
-                            <LoadingCircle size={32} />
-                        </div>
-                    )}
-                    {!isLoading && modal.message}
-                </Modal>
+                <NewModal
+                    modalState={modalState}
+                    onClose={closeModal}
+                    isLoading={isLoading}
+                />
 
                 {error && (
                     <div className="px-2">
