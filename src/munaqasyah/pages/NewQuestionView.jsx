@@ -6,12 +6,12 @@ import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
 
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
-import Modal from "../../shared/Components/UIElements/ModalBottomClose";
+import NewModal from "../../shared/Components/Modal/NewModal";
+import useModal from "../../shared/hooks/useNewModal";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
 
 const NewQuestionView = () => {
-    const [modalIsOpen, setModalIsOpen] = useState(false);
-    const [modalMessage, setModalMessage] = useState(false);
+    const { modalState, openModal, closeModal } = useModal();
 
     const { isLoading, error, sendRequest, setError } = useHttp();
 
@@ -152,8 +152,16 @@ const NewQuestionView = () => {
                 "Content-Type": "application/json",
                 Authorization: "Bearer " + auth.token,
             });
-            setModalMessage(responseData.message);
-            setModalIsOpen(true);
+            openModal(
+                responseData.message,
+                "success",
+                () => {
+                    navigate(-1);
+                    return false; // Prevent immediate redirect
+                },
+                "Berhasil!",
+                false
+            );
         } catch (err) {
             // Error is already handled by useHttp
         }
@@ -161,26 +169,10 @@ const NewQuestionView = () => {
 
     return (
         <div className="m-auto max-w-md mt-14 md:mt-8">
-            <Modal
-                isOpen={modalIsOpen}
-                onClose={() => setModalIsOpen(false)}
-                title="Berhasil!"
-                footer={
-                    <>
-                        <button
-                            onClick={() => {
-                                setModalIsOpen(false);
-                                navigate(-1);
-                            }}
-                            className="btn-danger-outline"
-                        >
-                            Tutup
-                        </button>
-                    </>
-                }
-            >
-                {modalMessage}
-            </Modal>
+            <NewModal
+                modalState={modalState}
+                onClose={closeModal}
+            />
 
             <div className={`pb-24 transition-opacity duration-300`}>
                 {error && (

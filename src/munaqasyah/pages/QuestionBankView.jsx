@@ -4,19 +4,15 @@ import { AuthContext } from "../../shared/Components/Context/auth-context";
 import useHttp from "../../shared/hooks/http-hook";
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import DataTable from "../../shared/Components/UIElements/DataTable";
-import Modal from "../../shared/Components/UIElements/ModalBottomClose";
+import NewModal from "../../shared/Components/Modal/NewModal";
+import useModal from "../../shared/hooks/useNewModal";
 
 import getCategoryName from "../utilities/getCategoryName";
 import { Pencil, Trash, PlusIcon } from "lucide-react";
 
 const QuestionBankView = () => {
     const [questions, setQuestions] = useState([]);
-    const [modal, setModal] = useState({
-        title: "",
-        message: "",
-        onConfirm: null,
-    });
-    const [modalIsOpen, setModalIsOpen] = useState(false);
+    const { modalState, openModal, closeModal } = useModal();
 
     const { error, isLoading, sendRequest, setError } = useHttp();
 
@@ -267,69 +263,39 @@ const QuestionBankView = () => {
                     }
                 );
                 console.log(responseData);
-                setModal({
-                    title: "Berhasil!",
-                    message: responseData.message,
-                    onConfirm: null,
-                });
                 setQuestions((prevQuestions) =>
                     prevQuestions.filter(
                         (question) => question._id !== questionId
                     )
                 );
+                openModal(
+                    responseData.message,
+                    "success",
+                    null,
+                    "Berhasil!",
+                    false
+                );
             } catch (err) {
                 // Error handled by useHttp
             }
         };
-        setModal({
-            title: "Peringatan!",
-            message: "Hapus Soal?",
-            onConfirm: confirmDelete,
-        });
-        setModalIsOpen(true);
+        openModal(
+            "Hapus Soal?",
+            "confirmation",
+            confirmDelete,
+            "Peringatan!",
+            true
+        );
     };
-
-    const ModalFooter = () => (
-        <div className="flex gap-2 items-center">
-            <button
-                onClick={() => {
-                    setModalIsOpen(false);
-                }}
-                className={`${
-                    modal.onConfirm
-                        ? "btn-danger-outline"
-                        : "button-primary mt-0 "
-                }`}
-            >
-                {modal.onConfirm ? "Batal" : "Tutup"}
-            </button>
-            {modal.onConfirm && (
-                <button
-                    onClick={modal.onConfirm}
-                    className="button-primary mt-0 "
-                >
-                    Ya
-                </button>
-            )}
-        </div>
-    );
 
     return (
         <div className="min-h-screen px-4 py-8 md:p-8">
             <div className="max-w-6xl mx-auto">
-                <Modal
-                    isOpen={modalIsOpen}
-                    onClose={() => setModalIsOpen(false)}
-                    title={modal.title}
-                    footer={<ModalFooter />}
-                >
-                    {isLoading && (
-                        <div className="flex justify-center mt-16">
-                            <LoadingCircle size={32} />
-                        </div>
-                    )}
-                    {!isLoading && modal.message}
-                </Modal>
+                <NewModal
+                    modalState={modalState}
+                    onClose={closeModal}
+                    isLoading={isLoading}
+                />
 
                 <div className="flex flex-col justify-between items-stretch gap-2 mb-4">
                     <div className="flex items-center mb-6 gap-4">
