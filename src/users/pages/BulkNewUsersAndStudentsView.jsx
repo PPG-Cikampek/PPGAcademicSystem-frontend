@@ -101,7 +101,9 @@ const BulkNewUsersAndStudentsView = () => {
                 "Berhasil!",
                 false
             );
-        } catch (error) {}
+            } catch (error) {
+                console.error('Bulk creation error:', error);
+            }
     };
 
     return (

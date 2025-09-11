@@ -15,7 +15,7 @@ const RequestAccountView = () => {
     const [tickets, setTickets] = useState();
     const { modalState, openModal, closeModal } = useModal();
     const { isLoading, sendRequest } = useHttp();
-    const { toasts, showSuccess, showError, showWarning, removeToast } =
+    const { toasts, showSuccess, showError, removeToast } =
         useToast();
 
     const navigate = useNavigate();
@@ -81,14 +81,6 @@ const RequestAccountView = () => {
                     ),
                 }));
             } catch (err) {
-                // Enhanced error handling with retry option
-                const retryCancel = () => {
-                    setTimeout(
-                        () => handleCancelTicket(ticketId, respond),
-                        100
-                    );
-                };
-
                 showError(
                     "Gagal!",
                     `${

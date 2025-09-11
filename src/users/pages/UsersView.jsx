@@ -1,11 +1,10 @@
-import { useState, useContext } from "react";
+import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
 
 import NewModal from "../../shared/Components/Modal/NewModal";
 import useModal from "../../shared/hooks/useNewModal";
-import SkeletonLoader from "../../shared/Components/UIElements/SkeletonLoader";
-import { Trash, PlusIcon, Users } from "lucide-react";
+import { Trash, PlusIcon } from "lucide-react";
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 import { useUsers } from "../hooks/useUsers";
 import RoleGroup from "../components/RoleGroup";

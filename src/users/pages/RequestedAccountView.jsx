@@ -1,9 +1,7 @@
 import { useContext, useEffect, useState } from "react";
-import { GraduationCap, Users } from "lucide-react";
-import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import useHttp from "../../shared/hooks/http-hook";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { formatDate } from "../../shared/Utilities/formatDateToLocal";
 import DataTable from "../../shared/Components/UIElements/DataTable";
 import NewModal from "../../shared/Components/Modal/NewModal";
@@ -63,6 +61,7 @@ const RequestedAccountView = () => {
                 );
             } catch (err) {
                 // Error handled by useHttp
+                console.error('Request handling error:', err);
             }
         };
         openModal(

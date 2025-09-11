@@ -15,14 +15,18 @@ import { AuthContext } from "../../shared/Components/Context/auth-context";
 
 import FileUpload from "../../shared/Components/FormElements/FileUpload";
 import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
-import NewModal from "../../shared/Components/Modal/NewModal";
-import useModal from "../../shared/hooks/useNewModal";
+import Modal from "../../shared/Components/UIElements/ModalBottomClose";
 import WarningCard from "../../shared/Components/UIElements/WarningCard";
 import { Pencil, X, Check } from "lucide-react";
 import { Icon } from "@iconify-icon/react/dist/iconify.js";
 
 const ProfileView = () => {
-    const { modalState, openModal, closeModal } = useModal();
+    const [modal, setModal] = useState({
+        title: "",
+        message: "",
+        onConfirm: null,
+    });
+    const [modalIsOpen, setModalIsOpen] = useState(false);
     const [newEmail, setNewEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -88,22 +92,20 @@ const ProfileView = () => {
                 "POST",
                 formData
             );
-            openModal(
-                response.message,
-                "success",
-                null,
-                "Berhasil!",
-                false
-            );
+            setModal({
+                title: "Berhasil!",
+                message: response.message,
+                onConfirm: null,
+            });
+            setModalIsOpen(true);
             pickedFileRef.current = null;
         } catch (err) {
-            openModal(
-                err.message,
-                "error",
-                null,
-                "Gagal!",
-                false
-            );
+            setModal({
+                title: "Gagal!",
+                message: err.message,
+                onConfirm: null,
+            });
+            setModalIsOpen(true);
         } finally {
             setIsSubmitting(false);
         }
