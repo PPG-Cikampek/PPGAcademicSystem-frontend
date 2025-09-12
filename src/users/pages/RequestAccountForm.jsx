@@ -14,6 +14,7 @@ const RequestAccountForm = () => {
     const { modalState, openModal, closeModal } = useModal();
     const [isStudent, setIsStudent] = useState(false);
     const [dataList, setDataList] = useState([]);
+    const [formKey, setFormKey] = useState(0);
     const { isLoading, error, sendRequest, setError } = useHttp();
 
     const navigate = useNavigate();
@@ -156,12 +157,6 @@ const RequestAccountForm = () => {
         }
     }, [accountType]);
 
-    // DynamicForm will handle local input state; we'll receive validated data in onAdd
-
-    const handleAddData = () => {
-        // kept for compatibility if called directly; prefer using onAdd from DynamicForm
-    };
-
     const handleDeleteData = (index) => {
         const updatedDataList = dataList.filter((_, i) => i !== index);
         setDataList(updatedDataList);
@@ -214,7 +209,9 @@ const RequestAccountForm = () => {
                 normalized[f.name] = d.toISOString();
             }
         }
-        setDataList((prev) => [...prev, normalized]);
+    setDataList((prev) => [...prev, normalized]);
+    // increment formKey to force DynamicForm remount and clear values
+    setFormKey((k) => k + 1);
     };
 
     return (
@@ -233,6 +230,7 @@ const RequestAccountForm = () => {
             <div className="flex flex-col lg:flex-row w-full gap-6 px-2 mt-10">
                 <div className="flex flex-col w-full lg:basis-2/5">
                     <DynamicForm
+                        key={formKey}
                         title={`Form Tambah ${
                             isStudent ? "Peserta Didik" : "Tenaga Pendidik"
                         }`}
