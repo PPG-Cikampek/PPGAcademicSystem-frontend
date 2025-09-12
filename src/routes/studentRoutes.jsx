@@ -15,7 +15,7 @@ const StudentDetailView = lazy(() =>
 const UpdateStudentView = lazy(() =>
     import("../students/pages/UpdateStudentView")
 );
-const ProfileView = lazy(() => import("../users/pages/ProfileView"));
+const ProfileView = lazy(() => import("../users/pages/profile/ProfileView"));
 
 export const studentRoutes = [
     {

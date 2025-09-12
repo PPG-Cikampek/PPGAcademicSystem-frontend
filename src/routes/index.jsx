@@ -15,9 +15,9 @@ import { teacherRoutes, TeacherRouteWrapper } from "./teacherRoutes.jsx";
 import { munaqisyRoutes, MunaqisyRouteWrapper } from "./munaqisyRoutes.jsx";
 import { studentRoutes, StudentRouteWrapper } from "./studentRoutes.jsx";
 
-import AuthView from "../users/pages/AuthView.jsx";
-import PasswordResetView from "../users/pages/PasswordResetView.jsx";
-import EmailVerifyView from "../users/pages/EmailVerifyView.jsx";
+import AuthView from "../users/pages/auth/AuthView.jsx";
+import PasswordResetView from "../users/pages/auth/PasswordResetView.jsx";
+import EmailVerifyView from "../users/pages/auth/EmailVerifyView.jsx";
 import StudentIDCard from "../students/id-card/StudentIDCard.jsx";
 
 const getRouteConfig = (userRole) => {

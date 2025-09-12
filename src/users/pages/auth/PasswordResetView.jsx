@@ -1,11 +1,11 @@
 import { useNavigate, useParams } from "react-router-dom";
 
-import useHttp from "../../shared/hooks/http-hook";
-import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
-import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
-import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
-import NewModal from "../../shared/Components/Modal/NewModal";
-import useModal from "../../shared/hooks/useNewModal";
+import useHttp from "../../../shared/hooks/http-hook";
+import ErrorCard from "../../../shared/Components/UIElements/ErrorCard";
+import DynamicForm from "../../../shared/Components/UIElements/DynamicForm";
+import LoadingCircle from "../../../shared/Components/UIElements/LoadingCircle";
+import NewModal from "../../../shared/Components/Modal/NewModal";
+import useModal from "../../../shared/hooks/useNewModal";
 
 const PasswordResetView = () => {
     const { modalState, openModal, closeModal } = useModal();

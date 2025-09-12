@@ -2,7 +2,7 @@ import { lazy } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import { MunaqasyahScoreProvider } from "../munaqisy/context/MunaqasyahScoreContext";
-import ProfileView from "../users/pages/ProfileView";
+import ProfileView from "../users/pages/profile/ProfileView";
 import MunaqasyahScannerView from "../munaqisy/pages/MunaqasyahScannerView";
 import StudentScoresView from "../munaqisy/pages/StudentScoresView";
 import QuestionView from "../munaqisy/pages/QuestionView";

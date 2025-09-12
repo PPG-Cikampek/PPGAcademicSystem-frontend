@@ -1,11 +1,11 @@
 import { useEffect, useState, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { AuthContext } from "../../shared/Components/Context/auth-context";
-import useHttp from "../../shared/hooks/http-hook";
+import { AuthContext } from "../../../shared/Components/Context/auth-context";
+import useHttp from "../../../shared/hooks/http-hook";
 
-import logo from "../../assets/logos/ppgcikampek.webp";
-import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
+import logo from "../../../assets/logos/ppgcikampek.webp";
+import LoadingCircle from "../../../shared/Components/UIElements/LoadingCircle";
 
 const EmailVerifyView = () => {
     const token = useParams().token;

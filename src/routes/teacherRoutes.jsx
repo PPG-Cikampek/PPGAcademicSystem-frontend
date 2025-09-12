@@ -65,7 +65,7 @@ const UpdateAttendanceView = lazy(() =>
     )
 );
 // const StudentReportView = lazy(() => import("../students/pages/StudentReportView"));
-const ProfileView = lazy(() => import("../users/pages/ProfileView"));
+const ProfileView = lazy(() => import("../users/pages/profile/ProfileView"));
 const NewJournalView = lazy(() =>
     import("../teacher-role/journal/pages/NewJournalView")
 );

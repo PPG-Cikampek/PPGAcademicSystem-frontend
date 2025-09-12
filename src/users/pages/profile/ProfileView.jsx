@@ -1,15 +1,15 @@
 import { useContext, useEffect, useState, useRef, useCallback } from "react";
 
-import useHttp from "../../shared/hooks/http-hook";
+import useHttp from "../../../shared/hooks/http-hook";
 
-import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
-import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
-import { AuthContext } from "../../shared/Components/Context/auth-context";
+import ErrorCard from "../../../shared/Components/UIElements/ErrorCard";
+import LoadingCircle from "../../../shared/Components/UIElements/LoadingCircle";
+import { AuthContext } from "../../../shared/Components/Context/auth-context";
 
-import FileUpload from "../../shared/Components/FormElements/FileUpload";
-import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
-import Modal from "../../shared/Components/UIElements/ModalBottomClose";
-import WarningCard from "../../shared/Components/UIElements/WarningCard";
+import FileUpload from "../../../shared/Components/FormElements/FileUpload";
+import DynamicForm from "../../../shared/Components/UIElements/DynamicForm";
+import Modal from "../../../shared/Components/UIElements/ModalBottomClose";
+import WarningCard from "../../../shared/Components/UIElements/WarningCard";
 import { Pencil, X, Check } from "lucide-react";
 import { Icon } from "@iconify-icon/react/dist/iconify.js";
 

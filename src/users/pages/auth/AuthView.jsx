@@ -1,15 +1,15 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import useHttp from "../../shared/hooks/http-hook";
-import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
-import { AuthContext } from "../../shared/Components/Context/auth-context";
+import useHttp from "../../../shared/hooks/http-hook";
+import DynamicForm from "../../../shared/Components/UIElements/DynamicForm";
+import { AuthContext } from "../../../shared/Components/Context/auth-context";
 
-import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
-import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
+import ErrorCard from "../../../shared/Components/UIElements/ErrorCard";
+import LoadingCircle from "../../../shared/Components/UIElements/LoadingCircle";
 
-import logo from "../../assets/logos/ppgcikampek.webp";
-import QRScanner from "../components/QRScanner";
+import logo from "../../../assets/logos/ppgcikampek.webp";
+import QRScanner from "../../components/QRScanner";
 
 const AuthView = () => {
     const [isStudent, setIsStudent] = useState(false);

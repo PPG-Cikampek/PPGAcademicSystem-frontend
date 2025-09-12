@@ -1,15 +1,15 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import useHttp from "../../shared/hooks/http-hook";
-import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
+import useHttp from "../../../shared/hooks/http-hook";
+import DynamicForm from "../../../shared/Components/UIElements/DynamicForm";
 
-import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
-import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
-import NewModal from "../../shared/Components/Modal/NewModal";
-import useModal from "../../shared/hooks/useNewModal";
+import ErrorCard from "../../../shared/Components/UIElements/ErrorCard";
+import LoadingCircle from "../../../shared/Components/UIElements/LoadingCircle";
+import NewModal from "../../../shared/Components/Modal/NewModal";
+import useModal from "../../../shared/hooks/useNewModal";
 
-import { AuthContext } from "../../shared/Components/Context/auth-context";
+import { AuthContext } from "../../../shared/Components/Context/auth-context";
 
 const BulkNewUsersAndStudentsView = () => {
     const [loadedSubBranches, setLoadedSubBranches] = useState([]);

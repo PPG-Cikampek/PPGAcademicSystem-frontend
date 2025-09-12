@@ -1,16 +1,16 @@
 import { useContext, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import useHttp from "../../shared/hooks/http-hook";
-import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
-import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
+import useHttp from "../../../shared/hooks/http-hook";
+import DynamicForm from "../../../shared/Components/UIElements/DynamicForm";
+import ErrorCard from "../../../shared/Components/UIElements/ErrorCard";
 import { Trash, Pencil } from "lucide-react";
-import { AuthContext } from "../../shared/Components/Context/auth-context";
-import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
-import { formatDate } from "../../shared/Utilities/formatDateToLocal";
-import NewModal from "../../shared/Components/Modal/NewModal";
-import useModal from "../../shared/hooks/useNewModal";
-import { studentFields, StudentAccount, AccountField } from "../config/requestAccountConfig";
-import FileUpload from "../../shared/Components/FormElements/FileUpload";
+import { AuthContext } from "../../../shared/Components/Context/auth-context";
+import LoadingCircle from "../../../shared/Components/UIElements/LoadingCircle";
+import { formatDate } from "../../../shared/Utilities/formatDateToLocal";
+import NewModal from "../../../shared/Components/Modal/NewModal";
+import useModal from "../../../shared/hooks/useNewModal";
+import { studentFields, StudentAccount, AccountField } from "../../config/requestAccountConfig";
+import FileUpload from "../../../shared/Components/FormElements/FileUpload";
 // create an any-typed alias to bypass TS prop constraints for existing JS component
 const FileUploadAny: any = FileUpload;
 import { Icon } from "@iconify-icon/react";
