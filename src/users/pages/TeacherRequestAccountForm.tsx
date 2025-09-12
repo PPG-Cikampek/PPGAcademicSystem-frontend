@@ -9,38 +9,46 @@ import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import { formatDate } from "../../shared/Utilities/formatDateToLocal";
 import NewModal from "../../shared/Components/Modal/NewModal";
 import useModal from "../../shared/hooks/useNewModal";
-import { teacherFields } from "../config/requestAccountConfig";
+import { teacherFields, TeacherAccount, AccountField } from "../config/requestAccountConfig";
 
-const TeacherRequestAccountForm = () => {
+interface ResponseData {
+    message: string;
+}
+
+interface AccountFieldWithValue extends AccountField {
+    value?: any;
+}
+
+const TeacherRequestAccountForm: React.FC = () => {
     const { modalState, openModal, closeModal } = useModal();
-    const [dataList, setDataList] = useState([]);
-    const [formKey, setFormKey] = useState(0);
-    const [editingIndex, setEditingIndex] = useState(-1);
+    const [dataList, setDataList] = useState<TeacherAccount[]>([]);
+    const [formKey, setFormKey] = useState<number>(0);
+    const [editingIndex, setEditingIndex] = useState<number>(-1);
     const { isLoading, error, sendRequest, setError } = useHttp();
 
     const navigate = useNavigate();
     const auth = useContext(AuthContext);
 
-    const handleDeleteData = (index) => {
+    const handleDeleteData = (index: number): void => {
         const updatedDataList = dataList.filter((_, i) => i !== index);
         setDataList(updatedDataList);
     };
 
-    const handleSubmit = async () => {
+    const handleSubmit = async (): Promise<void> => {
         const updatedData = {
             subBranchId: auth.userSubBranchId,
             accountList: dataList.map((account) => ({
                 ...account,
-                accountRole: "teacher",
+                accountRole: "teacher" as const,
             })),
         };
 
-        const url = `${import.meta.env.VITE_BACKEND_URL}/users/requestAccounts`;
+        const url = `${(import.meta as any).env.VITE_BACKEND_URL}/users/requestAccounts`;
         const body = JSON.stringify(updatedData);
 
         console.log(body);
 
-        let responseData;
+        let responseData: ResponseData;
         try {
             responseData = await sendRequest(url, "POST", body, {
                 "Content-Type": "application/json",
@@ -48,6 +56,7 @@ const TeacherRequestAccountForm = () => {
             });
         } catch {
             // handled by useHttp
+            return;
         }
         console.log(responseData);
         openModal(
@@ -62,11 +71,11 @@ const TeacherRequestAccountForm = () => {
         );
     };
 
-    const fields = teacherFields;
+    const fields: AccountField[] = teacherFields;
 
-    const handleAddFromDynamicForm = (data) => {
+    const handleAddFromDynamicForm = (data: Record<string, any>): void => {
         // convert date fields to ISO if Date objects or strings
-        const normalized = { ...data };
+        const normalized: Record<string, any> = { ...data };
         for (const f of fields) {
             if (f.type === "date" && normalized[f.name]) {
                 const d = new Date(normalized[f.name]);
@@ -77,11 +86,11 @@ const TeacherRequestAccountForm = () => {
         if (editingIndex >= 0) {
             // update existing entry
             setDataList((prev) =>
-                prev.map((item, i) => (i === editingIndex ? normalized : item))
+                prev.map((item, i) => (i === editingIndex ? normalized as TeacherAccount : item))
             );
             setEditingIndex(-1);
         } else {
-            setDataList((prev) => [...prev, normalized]);
+            setDataList((prev) => [...prev, normalized as TeacherAccount]);
 
             // After adding a new item, if on mobile, scroll to the list
             try {
@@ -104,13 +113,13 @@ const TeacherRequestAccountForm = () => {
         setFormKey((k) => k + 1);
     };
 
-    const handleEditData = (index) => {
+    const handleEditData = (index: number): void => {
         const item = dataList[index];
         if (!item) return;
 
         // prepare fields with value so DynamicForm will set them
-        const populatedFields = fields.map((f) => {
-            const copy = { ...f };
+        const populatedFields: AccountFieldWithValue[] = fields.map((f) => {
+            const copy: AccountFieldWithValue = { ...f };
             // if date field, convert ISO string to Date object
             if (f.type === "date") {
                 copy.value = item[f.name] ? new Date(item[f.name]) : null;
@@ -125,7 +134,7 @@ const TeacherRequestAccountForm = () => {
         setEditingIndex(index);
     };
 
-    const handleCancelEdit = () => {
+    const handleCancelEdit = (): void => {
         setEditingIndex(-1);
         setFormKey((k) => k + 1);
     };
@@ -136,7 +145,9 @@ const TeacherRequestAccountForm = () => {
                 modalState={modalState}
                 onClose={closeModal}
                 isLoading={isLoading}
-            />
+            >
+                <></>
+            </NewModal>
             {error && (
                 <div className="mx-2 mt-12 w-full">
                     <ErrorCard error={error} onClear={() => setError(null)} />
@@ -152,7 +163,7 @@ const TeacherRequestAccountForm = () => {
                             editingIndex >= 0
                                 ? // populate fields with current data for editing
                                   fields.map((f) => {
-                                      const copy = { ...f };
+                                      const copy: AccountFieldWithValue = { ...f };
                                       const value =
                                           dataList[editingIndex]?.[f.name];
                                       if (f.type === "date") {
@@ -193,6 +204,11 @@ const TeacherRequestAccountForm = () => {
                             </div>
                         }
                         footer={false}
+                        logo={null}
+                        subtitle=""
+                        customDescription=""
+                        helpButton={null}
+                        className=""
                     />
                 </div>
 
