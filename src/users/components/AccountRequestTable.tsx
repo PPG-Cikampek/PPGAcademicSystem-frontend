@@ -5,7 +5,7 @@ import {
     columnOrder,
     labelMap,
     AccountRole,
-} from "../config/requestAccountConfig";
+} from "../config";
 
 const DATE_FIELDS = new Set(["dateOfBirth"]);
 

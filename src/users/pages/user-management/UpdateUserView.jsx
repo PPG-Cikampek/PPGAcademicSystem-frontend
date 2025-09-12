@@ -1,12 +1,12 @@
 import { useContext, useState, useEffect, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
 
-import useHttp from "../../shared/hooks/http-hook";
-import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
+import useHttp from "../../../shared/hooks/http-hook";
+import DynamicForm from "../../../shared/Components/UIElements/DynamicForm";
 
-import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
-import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
-import { AuthContext } from "../../shared/Components/Context/auth-context";
+import ErrorCard from "../../../shared/Components/UIElements/ErrorCard";
+import LoadingCircle from "../../../shared/Components/UIElements/LoadingCircle";
+import { AuthContext } from "../../../shared/Components/Context/auth-context";
 
 const UpdateUserView = () => {
     const { isLoading, error, sendRequest, setError } = useHttp();

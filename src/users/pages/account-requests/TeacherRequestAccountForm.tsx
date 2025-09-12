@@ -1,18 +1,16 @@
 import { useContext, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import useHttp from "../../shared/hooks/http-hook";
-import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
-import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
+import useHttp from "../../../shared/hooks/http-hook";
+import DynamicForm from "../../../shared/Components/UIElements/DynamicForm";
+import ErrorCard from "../../../shared/Components/UIElements/ErrorCard";
 import { Trash, Pencil } from "lucide-react";
-import { AuthContext } from "../../shared/Components/Context/auth-context";
-import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
-import { formatDate } from "../../shared/Utilities/formatDateToLocal";
-import NewModal from "../../shared/Components/Modal/NewModal";
-import useModal from "../../shared/hooks/useNewModal";
-import { studentFields, StudentAccount, AccountField } from "../config/requestAccountConfig";
-import FileUpload from "../../shared/Components/FormElements/FileUpload";
-// create an any-typed alias to bypass TS prop constraints for existing JS component
-const FileUploadAny: any = FileUpload;
+import { AuthContext } from "../../../shared/Components/Context/auth-context";
+import LoadingCircle from "../../../shared/Components/UIElements/LoadingCircle";
+import { formatDate } from "../../../shared/Utilities/formatDateToLocal";
+import NewModal from "../../../shared/Components/Modal/NewModal";
+import useModal from "../../../shared/hooks/useNewModal";
+import { teacherFields, TeacherAccount, AccountField } from "../../config";
+import FileUpload from "../../../shared/Components/FormElements/FileUpload";
 import { Icon } from "@iconify-icon/react";
 
 interface ResponseData {
@@ -23,23 +21,27 @@ interface AccountFieldWithValue extends AccountField {
     value?: any;
 }
 
-// Extend StudentAccount locally to hold image File (not sent inside JSON string)
-interface StudentAccountWithImage extends StudentAccount {
-  _imageFile?: File; // transient
-  _thumbnailDataUrl?: string; // if FileUpload provides base64 preview
+interface TeacherAccountWithImage extends TeacherAccount {
+    _imageFile?: File;
 }
 
-const StudentRequestAccountForm: React.FC = () => {
+const FileUploadAny: any = FileUpload;
+
+const TeacherRequestAccountForm: React.FC = () => {
     const { modalState, openModal, closeModal } = useModal();
-    const [dataList, setDataList] = useState<StudentAccountWithImage[]>([]);
+    const [dataList, setDataList] = useState<TeacherAccountWithImage[]>([]);
     const [formKey, setFormKey] = useState<number>(0);
     const [editingIndex, setEditingIndex] = useState<number>(-1);
     const { isLoading, error, sendRequest, setError } = useHttp();
-    const fileInputRef = useRef<HTMLInputElement | null>(null);
-    const pendingImageRef = useRef<File | null>(null);
 
     const navigate = useNavigate();
     const auth = useContext(AuthContext);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const pendingImageRef = useRef<File | null>(null);
+
+    const handleImageCropped = useCallback((file: File) => {
+        pendingImageRef.current = file;
+    }, []);
 
     const handleDeleteData = (index: number): void => {
         const updatedDataList = dataList.filter((_, i) => i !== index);
@@ -48,14 +50,13 @@ const StudentRequestAccountForm: React.FC = () => {
 
     const handleSubmit = async (): Promise<void> => {
         if (dataList.length === 0) return;
-        // Require image for every entry
         for (const entry of dataList) {
             if (!entry._imageFile) {
                 setError(`Foto belum dipilih untuk akun '${entry.name}'.`);
                 return;
             }
         }
-        const accountsPayload = dataList.map(({ _imageFile, _thumbnailDataUrl, ...rest }) => ({ ...rest, accountRole: "student" as const }));
+        const accountsPayload = dataList.map(({ _imageFile, ...rest }) => ({ ...rest, accountRole: "teacher" as const }));
         const formData = new FormData();
         formData.append("subBranchId", auth.userSubBranchId);
         formData.append("accountList", JSON.stringify(accountsPayload));
@@ -70,9 +71,7 @@ const StudentRequestAccountForm: React.FC = () => {
                 body: formData,
             });
             const resData: ResponseData = await response.json();
-            if (!response.ok) {
-                throw new Error(resData.message || "Gagal mengirim permintaan.");
-            }
+            if (!response.ok) throw new Error(resData.message || "Gagal mengirim permintaan.");
             openModal(
                 resData.message,
                 "success",
@@ -88,7 +87,7 @@ const StudentRequestAccountForm: React.FC = () => {
         }
     };
 
-    const fields: AccountField[] = studentFields;
+    const fields: AccountField[] = teacherFields;
 
     const handleAddFromDynamicForm = (data: Record<string, any>): void => {
         // convert date fields to ISO if Date objects or strings
@@ -102,23 +101,18 @@ const StudentRequestAccountForm: React.FC = () => {
 
         if (editingIndex >= 0) {
             // update existing entry
-            setDataList((prev) => prev.map((item, i) => (i === editingIndex ? { ...(normalized as StudentAccountWithImage), _imageFile: pendingImageRef.current || item._imageFile } : item)));
+            setDataList((prev) => prev.map((item, i) => (i === editingIndex ? { ...(normalized as TeacherAccountWithImage), _imageFile: pendingImageRef.current || item._imageFile } : item)));
             setEditingIndex(-1);
         } else {
             setDataList((prev) => [
                 ...prev,
-                { ...(normalized as StudentAccountWithImage), _imageFile: pendingImageRef.current || undefined },
+                { ...(normalized as TeacherAccountWithImage), _imageFile: pendingImageRef.current || undefined },
             ]);
         }
-        pendingImageRef.current = null; // reset after use
-
+        pendingImageRef.current = null;
         // increment formKey to force DynamicForm remount and clear values
         setFormKey((k) => k + 1);
     };
-
-    const handleImageCropped = useCallback((file: File) => {
-        pendingImageRef.current = file;
-    }, []);
 
     const handleEditData = (index: number): void => {
         const item = dataList[index];
@@ -165,7 +159,7 @@ const StudentRequestAccountForm: React.FC = () => {
                 <div className="flex flex-col w-full lg:basis-2/5">
                     <DynamicForm
                         key={formKey}
-                        title="Form Tambah Peserta Didik"
+                        title="Form Tambah Tenaga Pendidik"
                         fields={
                             editingIndex >= 0
                                 ? // populate fields with current data for editing
@@ -213,34 +207,34 @@ const StudentRequestAccountForm: React.FC = () => {
                         footer={false}
                         logo={null}
                         subtitle=""
-                        helpButton={null}
                         customDescription={
-                          <div className="relative">
-                            <FileUploadAny
-                              ref={fileInputRef as any}
-                              accept={".jpg,.jpeg,.png"}
-                              buttonLabel={
-                                isLoading ? (
-                                  <div className="flex items-center">
-                                    <LoadingCircle size={16}>Memproses</LoadingCircle>
-                                  </div>
-                                ) : (
-                                  <div className="flex items-center">
-                                    <Icon icon="jam:upload" width="24" height="24" />
-                                    Foto Profil
-                                  </div>
-                                )
-                              }
-                              buttonClassName={`btn-round-primary text-xs m-0 m-2 ml-1 p-2 pr-3`}
-                              imgClassName={`mt-2 rounded-md size-24 shrink-0`}
-                              defaultImageSrc={"https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"}
-                              onImageCropped={handleImageCropped as any}
-                            />
-                            {editingIndex >= 0 && dataList[editingIndex]?._imageFile && (
-                              <p className="text-xs mt-1 text-gray-500">Foto tersimpan untuk entri ini.</p>
-                            )}
-                          </div>
+                            <div className="relative">
+                                <FileUploadAny
+                                    ref={fileInputRef as any}
+                                    accept={".jpg,.jpeg,.png"}
+                                    buttonLabel={
+                                        isLoading ? (
+                                            <div className="flex items-center">
+                                                <LoadingCircle size={16}>Memproses</LoadingCircle>
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center">
+                                                <Icon icon="jam:upload" width="24" height="24" />
+                                                Foto Profil
+                                            </div>
+                                        )
+                                    }
+                                    buttonClassName={`btn-round-primary text-xs m-0 m-2 ml-1 p-2 pr-3`}
+                                    imgClassName={`mt-2 rounded-md size-24 shrink-0`}
+                                    defaultImageSrc={"https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"}
+                                    onImageCropped={handleImageCropped as any}
+                                />
+                                {editingIndex >= 0 && dataList[editingIndex]?._imageFile && (
+                                    <p className="text-xs mt-1 text-gray-500">Foto tersimpan untuk entri ini.</p>
+                                )}
+                            </div>
                         }
+                        helpButton={null}
                         className=""
                     />
                 </div>
@@ -265,7 +259,7 @@ const StudentRequestAccountForm: React.FC = () => {
                                                 TANGGAL LAHIR
                                             </th>
                                             <th className="border border-gray-200 p-2 text-left font-normal text-gray-500">
-                                                KELAS
+                                                EMAIL
                                             </th>
                                             <th className="border border-gray-200 p-2 text-left font-normal text-gray-500">
                                                 AKSI
@@ -287,7 +281,7 @@ const StudentRequestAccountForm: React.FC = () => {
                                                     )}
                                                 </td>
                                                 <td className="border border-gray-200 p-2 whitespace-nowrap">
-                                                    {data.className}
+                                                    {data.email}
                                                 </td>
                                                 <td className="border border-gray-200 p-2">
                                                     <div className="flex gap-2 items-center">
@@ -349,4 +343,4 @@ const StudentRequestAccountForm: React.FC = () => {
     );
 };
 
-export default StudentRequestAccountForm;
+export default TeacherRequestAccountForm;

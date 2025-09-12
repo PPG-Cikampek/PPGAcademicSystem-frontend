@@ -4,8 +4,8 @@ const DashboardNav = lazy(() =>
     import("../shared/Components/Navigation/DashboardNav/DashboardNav")
 );
 const DashboardView = lazy(() => import("../dashboard/pages/DashboardView"));
-const ProfileView = lazy(() => import("../users/pages/ProfileView"));
-const EmailVerifyView = lazy(() => import("../users/pages/EmailVerifyView"));
+const ProfileView = lazy(() => import("../users/pages/profile/ProfileView"));
+const EmailVerifyView = lazy(() => import("../users/pages/auth/EmailVerifyView"));
 const MunaqasyahView = lazy(() => import("../munaqasyah/pages/MunaqasyahView"));
 const QuestionBankView = lazy(() =>
     import("../munaqasyah/pages/QuestionBankView")

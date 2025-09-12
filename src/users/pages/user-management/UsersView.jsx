@@ -1,11 +1,11 @@
 import { Link } from "react-router-dom";
 
-import NewModal from "../../shared/Components/Modal/NewModal";
-import useModal from "../../shared/hooks/useNewModal";
+import NewModal from "../../../shared/Components/Modal/NewModal";
+import useModal from "../../../shared/hooks/useNewModal";
 import { Trash, PlusIcon, Users } from "lucide-react";
-import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
-import { useUsers } from "../hooks/useUsers";
-import RoleGroup from "../components/RoleGroup";
+import ErrorCard from "../../../shared/Components/UIElements/ErrorCard";
+import { useUsers } from "../../hooks";
+import RoleGroup from "../../components/RoleGroup";
 
 const UsersView = () => {
     const { modalState, openModal, closeModal } = useModal();

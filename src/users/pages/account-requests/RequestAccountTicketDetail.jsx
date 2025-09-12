@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import useHttp from "../../shared/hooks/http-hook";
+import useHttp from "../../../shared/hooks/http-hook";
 import { useParams } from "react-router-dom";
-import AccountRequestTable from "../components/AccountRequestTable";
+import AccountRequestTable from "../../components/AccountRequestTable";
 
 const RequestAccountTicketDetail = () => {
     const [accounts, setAccounts] = useState([]);

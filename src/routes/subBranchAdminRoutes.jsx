@@ -36,19 +36,19 @@ const UpdateTeacherView = lazy(() =>
 const StudentReportView = lazy(() =>
     import("../students/pages/StudentReportView")
 );
-const ProfileView = lazy(() => import("../users/pages/ProfileView"));
-const EmailVerifyView = lazy(() => import("../users/pages/EmailVerifyView"));
+const ProfileView = lazy(() => import("../users/pages/profile/ProfileView"));
+const EmailVerifyView = lazy(() => import("../users/pages/auth/EmailVerifyView"));
 const SubBranchPerformanceView = lazy(() =>
     import("../performance/pages/SubBranchPerformanceView")
 );
 const RequestAccountView = lazy(() =>
-    import("../users/pages/RequestAccountView")
+    import("../users/pages/account-requests/RequestAccountView")
 );
 const RequestAccountForm = lazy(() =>
-    import("../users/pages/RequestAccountForm")
+    import("../users/pages/account-requests/RequestAccountForm")
 );
 const RequestAccountTicketDetail = lazy(() =>
-    import("../users/pages/RequestAccountTicketDetail")
+    import("../users/pages/account-requests/RequestAccountTicketDetail")
 );
 const SubBranchMunaqasyahView = lazy(() =>
     import("../munaqasyah/pages/SubBranchMunaqasyahView")
