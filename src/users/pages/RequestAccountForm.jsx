@@ -9,6 +9,7 @@ import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import { formatDate } from "../../shared/Utilities/formatDateToLocal";
 import NewModal from "../../shared/Components/Modal/NewModal";
 import useModal from "../../shared/hooks/useNewModal";
+import { studentFields as sharedStudentFields, teacherFields as sharedTeacherFields } from "../config/requestAccountConfig";
 
 const RequestAccountForm = () => {
     const { modalState, openModal, closeModal } = useModal();
@@ -22,133 +23,9 @@ const RequestAccountForm = () => {
     const accountType = useParams().accountType;
     const auth = useContext(AuthContext);
 
-    const teacherFields = [
-        {
-            name: "name",
-            label: "Nama",
-            placeholder: "Nama Lengkap",
-            type: "text",
-            required: true,
-        },
-        {
-            name: "dateOfBirth",
-            label: "Tanggal Lahir",
-            placeholder: "Tanggal Lahir",
-            type: "date",
-            required: true,
-        },
-        {
-            name: "email",
-            label: "Email",
-            placeholder: "Email",
-            type: "email",
-            required: true,
-        },
-        {
-            name: "phone",
-            label: "Nomor WA Aktif",
-            placeholder: "8123456789",
-            type: "phone",
-            required: true,
-        },
-        {
-            name: "position",
-            label: "Posisi",
-            placeholder: "Pilih Posisi",
-            type: "select",
-            required: true,
-            options: [
-                { label: "MT Desa", value: "branchTeacher" },
-                { label: "MT Kelompok", value: "subBranchTeacher" },
-                { label: "MS", value: "localTeacher" },
-                { label: "Asisten", value: "assistant" },
-            ],
-        },
-        {
-            name: "gender",
-            label: "Jenis Kelamin",
-            type: "select",
-            placeholder: "Pilih Jenis Kelamin",
-            required: true,
-            options: [
-                { label: "Laki-Laki", value: "male" },
-                { label: "Perempuan", value: "female" },
-            ],
-        },
-        {
-            name: "address",
-            label: "Alamat",
-            placeholder: "Alamat Lengkap",
-            type: "textarea",
-            required: true,
-        },
-    ];
-
-    const studentFields = [
-        {
-            name: "name",
-            label: "Nama",
-            placeholder: "Nama Lengkap",
-            type: "text",
-            required: true,
-        },
-        {
-            name: "dateOfBirth",
-            label: "Tanggal Lahir",
-            placeholder: "Tanggal Lahir",
-            type: "date",
-            required: true,
-        },
-        {
-            name: "className",
-            label: "Kelas",
-            placeholder: "Pilih Kelas",
-            type: "select",
-            required: true,
-            options: [
-                { label: "Kelas PRA-PAUD", value: "Kelas PRA-PAUD" },
-                { label: "Kelas PAUD", value: "Kelas PAUD" },
-                { label: "Kelas 1", value: "Kelas 1" },
-                { label: "Kelas 2", value: "Kelas 2" },
-                { label: "Kelas 3", value: "Kelas 3" },
-                { label: "Kelas 4", value: "Kelas 4" },
-                { label: "Kelas 5", value: "Kelas 5" },
-                { label: "Kelas 6", value: "Kelas 6" },
-            ],
-        },
-        {
-            name: "gender",
-            label: "Jenis Kelamin",
-            type: "select",
-            placeholder: "Pilih Jenis Kelamin",
-            required: true,
-            options: [
-                { label: "Laki-Laki", value: "male" },
-                { label: "Perempuan", value: "female" },
-            ],
-        },
-        {
-            name: "parentName",
-            label: "Nama Orang Tua/Wali",
-            placeholder: "Nama Orang Tua/Wali",
-            type: "text",
-            required: true,
-        },
-        {
-            name: "parentPhone",
-            label: "Nomor WA Orang Tua/Wali",
-            placeholder: "8123456789",
-            type: "phone",
-            required: true,
-        },
-        {
-            name: "address",
-            label: "Alamat",
-            placeholder: "Alamat Lengkap",
-            type: "textarea",
-            required: true,
-        },
-    ];
+    // replaced local field definitions with shared config constants
+    const teacherFields = sharedTeacherFields;
+    const studentFields = sharedStudentFields;
 
     useEffect(() => {
         if (accountType === "student") {
