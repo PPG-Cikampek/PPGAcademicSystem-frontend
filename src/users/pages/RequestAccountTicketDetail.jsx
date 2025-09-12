@@ -1,32 +1,44 @@
 import { useEffect, useState } from "react";
 import useHttp from "../../shared/hooks/http-hook";
 import { useParams } from "react-router-dom";
-import { formatDate } from "../../shared/Utilities/formatDateToLocal";
+import AccountRequestTable from "../components/AccountRequestTable";
 
 const RequestAccountTicketDetail = () => {
-    const [data, setData] = useState();
-
+    const [accounts, setAccounts] = useState([]);
+    const [role, setRole] = useState();
     const { isLoading, sendRequest } = useHttp();
-
-    const ticketId = useParams().ticketId;
-
-    console.log(ticketId);
+    const { ticketId } = useParams();
 
     useEffect(() => {
-        const url = `${
-            import.meta.env.VITE_BACKEND_URL
-        }/users/account-requests/ticket/${ticketId}`;
-
+        let abort = false;
         const fetchTicketData = async () => {
+            const url = `${import.meta.env.VITE_BACKEND_URL}/users/account-requests/ticket/${ticketId}`;
             try {
                 const responseData = await sendRequest(url);
-                setData(responseData[0].accountList);
-                console.log(JSON.stringify(responseData));
-            } catch {
-                // handled by useHttp
+                /* Expected shape examples:
+                   [{ accountList: [ {...}, ... ], accountRole: 'student' }]
+                   or { accountList: [...], accountRole: 'teacher' }
+                */
+                let container = responseData;
+                if (!container) return;
+                if (Array.isArray(container)) {
+                    container = container[0];
+                }
+                const list = container?.accountList || [];
+                if (!abort) {
+                    setAccounts(list);
+                    setRole(container?.accountRole || list[0]?.accountRole);
+                }
+            } catch (e) {
+                if (import.meta.env.DEV) {
+                    console.warn("Failed to load ticket detail", e);
+                }
             }
         };
         fetchTicketData();
+        return () => {
+            abort = true;
+        };
     }, [sendRequest, ticketId]);
 
     return (
@@ -36,50 +48,13 @@ const RequestAccountTicketDetail = () => {
                     <h1 className="text-2xl font-semibold text-gray-900">
                         Daftar Pendaftaran Akun
                     </h1>
-                    {data && console.log(data)}
-                    {!isLoading && data && (
-                        <>
-                            <div className="w-full bg-white shadow-xs rounded-md overflow-auto text-nowrap mt-4">
-                                <table className="w-full">
-                                    <thead>
-                                        <tr>
-                                            <th className="border border-gray-200 p-2 text-left font-normal text-gray-500">
-                                                NAMA
-                                            </th>
-                                            <th className="border border-gray-200 p-2 text-left font-normal text-gray-500">
-                                                TANGGAL LAHIR
-                                            </th>
-                                            <th className="border border-gray-200 p-2 text-left font-normal text-gray-500">
-                                                {data.accountRole === "student"
-                                                    ? "KELAS"
-                                                    : "EMAIL"}
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {data.map((data, index) => (
-                                            <tr key={index}>
-                                                <td className="border border-gray-200 p-2">
-                                                    {data.name}
-                                                </td>
-                                                <td className="border border-gray-200 p-2">
-                                                    {formatDate(
-                                                        data.dateOfBirth
-                                                    )}
-                                                </td>
-                                                <td className="border border-gray-200 p-2">
-                                                    {data.accountRole ===
-                                                    "student"
-                                                        ? data.className
-                                                        : data.email}
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </>
-                    )}
+                    <div className="w-full mt-4">
+                        {isLoading ? (
+                            <div className="text-gray-500 text-sm">Memuat data...</div>
+                        ) : (
+                            <AccountRequestTable data={accounts} role={role} />
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

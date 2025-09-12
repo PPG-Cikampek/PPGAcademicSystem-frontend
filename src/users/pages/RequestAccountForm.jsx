@@ -359,6 +359,7 @@ const RequestAccountForm = () => {
                                                 TANGGAL LAHIR
                                             </th>
                                             <th className="border border-gray-200 p-2 text-left font-normal text-gray-500">
+                                                {/* Use per-item role when available, fallback to page accountType */}
                                                 {isStudent ? "KELAS" : "EMAIL"}
                                             </th>
                                             <th className="border border-gray-200 p-2 text-left font-normal text-gray-500">
@@ -381,7 +382,8 @@ const RequestAccountForm = () => {
                                                     )}
                                                 </td>
                                                 <td className="border border-gray-200 p-2 whitespace-nowrap">
-                                                    {isStudent
+                                                    {/* determine role for this row: prefer explicit accountRole, else fallback to page accountType */}
+                                                    {((data.accountRole || (accountType === "student" ? "student" : "teacher")) === "student")
                                                         ? data.className
                                                         : data.email}
                                                 </td>
