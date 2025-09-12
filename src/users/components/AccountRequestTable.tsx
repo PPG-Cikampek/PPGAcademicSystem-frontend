@@ -59,6 +59,8 @@ const AccountRequestTable = ({ data = [], role, className = "" }: Props) => {
                     clickableRows: false,
                     entriesOptions: [5, 10, 25],
                 }}
+                onRowClick={undefined}
+                tableId={undefined}
             />
         </div>
     );
