@@ -145,7 +145,7 @@ const RequestAccountView = () => {
         },
         {
             key: "accountList",
-            label: "Jumlah Akun",
+            label: "Jumlah",
             cellAlign: "center",
             headerAlign: "center",
             sortable: true,

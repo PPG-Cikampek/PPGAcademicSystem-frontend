@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import useHttp from "../../shared/hooks/http-hook";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
 import { useNavigate } from "react-router-dom";
@@ -6,6 +6,7 @@ import { formatDate } from "../../shared/Utilities/formatDateToLocal";
 import DataTable from "../../shared/Components/UIElements/DataTable";
 import NewModal from "../../shared/Components/Modal/NewModal";
 import useModal from "../../shared/hooks/useNewModal";
+import { set } from "date-fns";
 
 const RequestedAccountView = () => {
     const [tickets, setTickets] = useState();
@@ -13,10 +14,19 @@ const RequestedAccountView = () => {
     const { isLoading, sendRequest } = useHttp();
     const [processingTicket, setProcessingTicket] = useState(null);
     const [rejectionReason, setRejectionReason] = useState("");
-    const [modalChildren, setModalChildren] = useState(null);
+    const [showRejectionInput, setShowRejectionInput] = useState(false);
+    // useRef to keep a mutable reference to the latest rejection reason so
+    // callbacks created earlier (like the modal confirm) can read the current
+    // value instead of a stale value captured by closure.
+    const rejectionReasonRef = useRef("");
 
     const navigate = useNavigate();
     const auth = useContext(AuthContext);
+
+    // Debug: log rejectionReason whenever it changes so we can observe live updates
+    useEffect(() => {
+        console.log("useEffect - rejectionReason changed:", rejectionReason);
+    }, [rejectionReason]);
 
     useEffect(() => {
         fetchTickets();
@@ -39,10 +49,22 @@ const RequestedAccountView = () => {
         const ticket = tickets?.tickets?.find(
             (t) => t.ticketId === ticketId || t._id === ticketId
         );
+        console.log(
+            "handleRespondTicket - current rejectionReason:",
+            rejectionReason
+        );
 
         const confirmAction = async () => {
-            // Validate rejection reason when rejecting
-            if (respond === "rejected" && (!rejectionReason || rejectionReason.trim() === "")) {
+            // Validate rejection reason when rejecting — read from ref (latest)
+            const currentReason = rejectionReasonRef.current;
+            console.log(
+                "confirmAction - rejectionReason (from ref):",
+                currentReason
+            );
+            if (
+                respond === "rejected" &&
+                (!currentReason || currentReason.trim() === "")
+            ) {
                 openModal(
                     "Alasan penolakan tidak boleh kosong.",
                     "info",
@@ -50,19 +72,21 @@ const RequestedAccountView = () => {
                     "Info",
                     false
                 );
-                return;
+                setShowRejectionInput(false);
             }
 
             const body = JSON.stringify({
                 ticketId,
                 respond,
-                ...(respond === "rejected" && { reason: rejectionReason }),
+                ...(respond === "rejected" && { reason: currentReason }),
             });
+            console.log(body);
             const url = `${
                 import.meta.env.VITE_BACKEND_URL
             }/users/account-requests/ticket`;
 
             try {
+                console.log(body);
                 setProcessingTicket(ticketId);
                 const responseData = await sendRequest(url, "PATCH", body, {
                     "Content-Type": "application/json",
@@ -90,8 +114,11 @@ const RequestedAccountView = () => {
             } finally {
                 setProcessingTicket(null);
                 setRejectionReason("");
-                setModalChildren(null);
+                rejectionReasonRef.current = "";
+                setShowRejectionInput(false);
             }
+            // prevent modal from closing automatically; we close it manually above
+            return false;
         };
 
         const userName = ticket?.userId?.name || "Tidak Diketahui";
@@ -99,31 +126,12 @@ const RequestedAccountView = () => {
         const actionWord = respond === "rejected" ? "Tolak" : "Setujui";
 
         if (respond === "rejected") {
-            setModalChildren(
-                <div className="mb-4">
-                    <label
-                        htmlFor="rejection-reason"
-                        className="block text-sm font-medium text-gray-700 mb-2"
-                    >
-                        Alasan Penolakan
-                    </label>
-                    <textarea
-                        id="rejection-reason"
-                        value={rejectionReason}
-                        onChange={(e) => {
-                            const newVal = e.target.value;
-                            console.log(newVal);
-                            setRejectionReason(newVal);
-                        }}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                        rows="3"
-                        placeholder="Masukkan alasan penolakan..."
-                        required
-                    />
-                </div>
-            );
+            // Show the rejection textarea inside the modal. Don't store JSX in state —
+            // store a boolean flag so the textarea remains connected to the
+            // component state (rejectionReason) and updates correctly.
+            setShowRejectionInput(true);
         } else {
-            setModalChildren(null);
+            setShowRejectionInput(false);
         }
 
         openModal(
@@ -174,6 +182,7 @@ const RequestedAccountView = () => {
                 const result = await sendRequest(url, "POST", null, {
                     Authorization: "Bearer " + auth.token,
                 });
+                console.log("Approved result:", result);
                 await fetchTickets();
                 openModal(
                     result.message || "Berhasil memproses semua tiket!",
@@ -187,6 +196,8 @@ const RequestedAccountView = () => {
             } finally {
                 setProcessingTicket(null);
             }
+            // Prevent modal from closing automatically;
+            return false;
         };
 
         openModal(
@@ -196,6 +207,9 @@ const RequestedAccountView = () => {
             "Konfirmasi",
             true
         );
+
+        // Prevent modal from closing automatically
+        return false;
     };
 
     const columns = [
@@ -318,12 +332,35 @@ const RequestedAccountView = () => {
                 modalState={modalState}
                 onClose={() => {
                     closeModal();
-                    setModalChildren(null);
+                    setShowRejectionInput(false);
                     setRejectionReason("");
                 }}
                 isLoading={isLoading}
             >
-                {modalChildren}
+                {showRejectionInput && (
+                    <div className="mb-4">
+                        <label
+                            htmlFor="rejection-reason"
+                            className="block text-sm font-medium text-gray-700 mb-2"
+                        >
+                            Alasan Penolakan
+                        </label>
+                        <textarea
+                            id="rejection-reason"
+                            value={rejectionReason}
+                            onChange={(e) => {
+                                const newVal = e.target.value;
+                                console.log("onChange - newVal:", newVal);
+                                setRejectionReason(newVal);
+                                rejectionReasonRef.current = newVal;
+                            }}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                            rows="3"
+                            placeholder="Masukkan alasan penolakan..."
+                            required
+                        />
+                    </div>
+                )}
             </NewModal>
 
             <div className="flex items-center justify-between gap-4 mb-4">

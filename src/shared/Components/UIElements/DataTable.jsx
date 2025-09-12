@@ -352,7 +352,7 @@ const DataTable = ({
                             <>
                                 {currentItems.map(
                                     (item, index) => (
-                                        console.log(item),
+                                        // console.log(item),
                                         (
                                             <tr
                                                 key={item.id || index}
