@@ -1,8 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import useHttp from "../../shared/hooks/http-hook";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 import { Trash } from "lucide-react";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
@@ -14,7 +13,6 @@ import useModal from "../../shared/hooks/useNewModal";
 const RequestAccountForm = () => {
     const { modalState, openModal, closeModal } = useModal();
     const [isStudent, setIsStudent] = useState(false);
-    const [formData, setFormData] = useState({});
     const [dataList, setDataList] = useState([]);
     const { isLoading, error, sendRequest, setError } = useHttp();
 
@@ -48,7 +46,7 @@ const RequestAccountForm = () => {
             name: "phone",
             label: "Nomor WA Aktif",
             placeholder: "8123456789",
-            type: "tel",
+            type: "phone",
             required: true,
         },
         {
@@ -138,7 +136,7 @@ const RequestAccountForm = () => {
             name: "parentPhone",
             label: "Nomor WA Orang Tua/Wali",
             placeholder: "8123456789",
-            type: "tel",
+            type: "phone",
             required: true,
         },
         {
@@ -158,26 +156,10 @@ const RequestAccountForm = () => {
         }
     }, [accountType]);
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
-    };
-
-    const handleDateChange = (birthDate, name) => {
-        birthDate = new Date(birthDate).toISOString();
-        setFormData({ ...formData, [name]: birthDate });
-    };
+    // DynamicForm will handle local input state; we'll receive validated data in onAdd
 
     const handleAddData = () => {
-        const fields = isStudent ? studentFields : teacherFields;
-        for (let field of fields) {
-            if (!formData[field.name]) {
-                setError(`${field.label} tidak boleh kosong!`);
-                return;
-            }
-        }
-        setDataList([...dataList, formData]);
-        setFormData({});
+        // kept for compatibility if called directly; prefer using onAdd from DynamicForm
     };
 
     const handleDeleteData = (index) => {
@@ -223,6 +205,18 @@ const RequestAccountForm = () => {
 
     const fields = isStudent ? studentFields : teacherFields;
 
+    const handleAddFromDynamicForm = (data) => {
+        // convert date fields to ISO if Date objects or strings
+        const normalized = { ...data };
+        for (const f of fields) {
+            if (f.type === "date" && normalized[f.name]) {
+                const d = new Date(normalized[f.name]);
+                normalized[f.name] = d.toISOString();
+            }
+        }
+        setDataList((prev) => [...prev, normalized]);
+    };
+
     return (
         <div className="max-w-6xl mx-auto flex flex-col items-center-safe">
             <NewModal
@@ -237,119 +231,35 @@ const RequestAccountForm = () => {
             )}
 
             <div className="flex flex-col lg:flex-row w-full gap-6 px-2 mt-10">
-                
-                <div className="card-basic rounded-md flex flex-col w-full lg:basis-2/5">
-                    <div className="p-2 flex flex-col justify-center items-center mb-4 mt-2">
-                        <h2 className="text-2xl font-medium text-center">
-                            {isStudent
-                                ? "Peserta Didik Baru"
-                                : "Tenaga Pendidik Baru"}
-                        </h2>
-                    </div>
-                    <form className="flex flex-col gap-6 items-stretch mb-6">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full">
-                            {fields.map((field) => (
-                                <div
-                                    key={field.name}
-                                    className={`flex flex-col w-full ${
-                                        field.name === "address"
-                                            ? "md:col-span-2"
-                                            : ""
-                                    }`}
-                                >
-                                    <label
-                                        htmlFor={field.name}
-                                        className="block text-gray-700 pb-1"
-                                    >
-                                        {field.label}
-                                    </label>
-                                    {field.type === "select" ? (
-                                        <select
-                                            id={field.name}
-                                            name={field.name}
-                                            value={formData[field.name] || ""}
-                                            onChange={handleInputChange}
-                                            required={field.required}
-                                            className="w-full p-2 border rounded-md shadow-xs hover:ring-secondary-subtle focus:outline-hidden focus:ring-2 focus:ring-secondary transition-all duration-300"
-                                        >
-                                            <option value="" disabled>
-                                                {field.placeholder}
-                                            </option>
-                                            {field.options.map((option) => (
-                                                <option
-                                                    key={option.value}
-                                                    value={option.value}
-                                                >
-                                                    {option.label}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    ) : field.type === "date" ? (
-                                        <DatePicker
-                                            selected={
-                                                formData[field.name] || null
-                                            }
-                                            onChange={(birthDate) =>
-                                                handleDateChange(
-                                                    birthDate,
-                                                    field.name
-                                                )
-                                            }
-                                            className="w-full p-2 border rounded-md shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300"
-                                            dateFormat="dd/MM/yyyy"
-                                            wrapperClassName="w-full"
-                                            showYearDropdown
-                                            showMonthDropdown
-                                            isClearable
-                                        />
-                                    ) : field.type === "textarea" ? (
-                                        <textarea
-                                            id={field.name}
-                                            name={field.name}
-                                            placeholder={field.placeholder}
-                                            value={formData[field.name] || ""}
-                                            onChange={handleInputChange}
-                                            required={field.required}
-                                            rows={3}
-                                            className="w-full p-2 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300"
-                                        />
-                                    ) : (
-                                        <input
-                                            id={field.name}
-                                            name={field.name}
-                                            type={field.type}
-                                            placeholder={field.placeholder}
-                                            value={formData[field.name] || ""}
-                                            onChange={handleInputChange}
-                                            required={field.required}
-                                            className="w-full p-2 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300"
-                                        />
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                        <div className="flex justify-end">
+                <div className="flex flex-col w-full lg:basis-2/5">
+                    <DynamicForm
+                        title={`Form Tambah ${
+                            isStudent ? "Peserta Didik" : "Tenaga Pendidik"
+                        }`}
+                        fields={fields}
+                        onSubmit={(data) => handleAddFromDynamicForm(data)}
+                        button={
                             <button
-                                type="button"
+                                type="submit"
                                 className={`button-primary ${
                                     isLoading
                                         ? "opacity-50 cursor-not-allowed"
                                         : ""
                                 }`}
-                                onClick={handleAddData}
                                 disabled={isLoading}
                             >
                                 Tambah
                             </button>
-                        </div>
-                    </form>
+                        }
+                        footer={false}
+                    />
                 </div>
 
                 {dataList.length > 0 && (
-                    <div className="card-basic rounded-md flex flex-col grow w-full lg:basis-3/5">
+                    <div className="card-basic rounded-md flex flex-col grow w-full h-full lg:basis-3/5">
                         <div>
                             <h3 className="text-lg mt-1 font-normal">
-                                List akun yang akan dibuat:
+                                List Pendaftaran
                             </h3>
                             <div className="overflow-x-auto mt-4">
                                 <table className="min-w-full border-collapse border border-gray-200 text-sm">
@@ -389,7 +299,7 @@ const RequestAccountForm = () => {
                                                 <td className="border border-gray-200 p-2">
                                                     <button
                                                         type="button"
-                                                        className="p-2 rounded-full text-gray-500 hover:bg-gray-200 hover:text-red-500 transition"
+                                                        className="btn-icon-danger"
                                                         onClick={() =>
                                                             handleDeleteData(
                                                                 index
@@ -420,7 +330,7 @@ const RequestAccountForm = () => {
                                 {isLoading ? (
                                     <LoadingCircle>Processing...</LoadingCircle>
                                 ) : (
-                                    "Buat Pendaftaran Akun"
+                                    "Kirim Pendaftaran"
                                 )}
                             </button>
                         </div>
