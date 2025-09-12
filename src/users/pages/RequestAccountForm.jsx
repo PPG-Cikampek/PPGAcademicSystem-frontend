@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import useHttp from "../../shared/hooks/http-hook";
 import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
-import { Trash } from "lucide-react";
+import { Trash, Pencil } from "lucide-react";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import { formatDate } from "../../shared/Utilities/formatDateToLocal";
@@ -15,6 +15,7 @@ const RequestAccountForm = () => {
     const [isStudent, setIsStudent] = useState(false);
     const [dataList, setDataList] = useState([]);
     const [formKey, setFormKey] = useState(0);
+    const [editingIndex, setEditingIndex] = useState(-1);
     const { isLoading, error, sendRequest, setError } = useHttp();
 
     const navigate = useNavigate();
@@ -209,9 +210,49 @@ const RequestAccountForm = () => {
                 normalized[f.name] = d.toISOString();
             }
         }
-    setDataList((prev) => [...prev, normalized]);
-    // increment formKey to force DynamicForm remount and clear values
-    setFormKey((k) => k + 1);
+
+        if (editingIndex >= 0) {
+            // update existing entry
+            setDataList((prev) =>
+                prev.map((item, i) => (i === editingIndex ? normalized : item))
+            );
+            setEditingIndex(-1);
+        } else {
+            setDataList((prev) => [...prev, normalized]);
+        }
+
+        // increment formKey to force DynamicForm remount and clear values
+        setFormKey((k) => k + 1);
+    };
+
+    const handleEditData = (index) => {
+        const item = dataList[index];
+        if (!item) return;
+
+        // prepare fields with value so DynamicForm will set them
+        const populatedFields = fields.map((f) => {
+            const copy = { ...f };
+            // if date field, convert ISO string to Date object
+            if (f.type === "date") {
+                copy.value = item[f.name] ? new Date(item[f.name]) : null;
+            } else {
+                copy.value = item[f.name] !== undefined ? item[f.name] : "";
+            }
+            return copy;
+        });
+
+        // force DynamicForm to use these fields by changing key and fields reference
+        setFormKey((k) => k + 1);
+        // temporarily override fields variable by setting a local state? Instead, we'll keep using fields
+        // but pass populatedFields to DynamicForm via a local variable below using editingIndex
+        setEditingIndex(index);
+        // store populated fields in a ref-like state by setting a transient state value on formKey
+        // We'll leverage formKey change to remount DynamicForm and use `editingIndex` to determine initial fields
+    };
+
+    const handleCancelEdit = () => {
+        setEditingIndex(-1);
+        setFormKey((k) => k + 1);
     };
 
     return (
@@ -234,20 +275,47 @@ const RequestAccountForm = () => {
                         title={`Form Tambah ${
                             isStudent ? "Peserta Didik" : "Tenaga Pendidik"
                         }`}
-                        fields={fields}
+                        fields={
+                            editingIndex >= 0
+                                ? // populate fields with current data for editing
+                                  fields.map((f) => {
+                                      const copy = { ...f };
+                                      const value = dataList[editingIndex]?.[
+                                          f.name
+                                      ];
+                                      if (f.type === "date") {
+                                          copy.value = value ? new Date(value) : null;
+                                      } else {
+                                          copy.value = value !== undefined ? value : "";
+                                      }
+                                      return copy;
+                                  })
+                                : fields
+                        }
                         onSubmit={(data) => handleAddFromDynamicForm(data)}
                         button={
-                            <button
-                                type="submit"
-                                className={`button-primary ${
-                                    isLoading
-                                        ? "opacity-50 cursor-not-allowed"
-                                        : ""
-                                }`}
-                                disabled={isLoading}
-                            >
-                                Tambah
-                            </button>
+                            <div className="flex gap-2">
+                                <button
+                                    type="submit"
+                                    className={`button-primary ${
+                                        isLoading
+                                            ? "opacity-50 cursor-not-allowed"
+                                            : ""
+                                    }`}
+                                    disabled={isLoading}
+                                >
+                                    {editingIndex >= 0 ? "Update" : "Tambah"}
+                                </button>
+                                {editingIndex >= 0 && (
+                                    <button
+                                        type="button"
+                                        className="button-secondary"
+                                        onClick={handleCancelEdit}
+                                    >
+                                        Batal
+                                    </button>
+                                )}
+                            </div>
                         }
                         footer={false}
                     />
@@ -272,7 +340,9 @@ const RequestAccountForm = () => {
                                             <th className="border border-gray-200 p-2 text-left font-normal text-gray-500">
                                                 {isStudent ? "KELAS" : "EMAIL"}
                                             </th>
-                                            <th className="border border-gray-200 p-2 text-left font-normal text-gray-500"></th>
+                                            <th className="border border-gray-200 p-2 text-left font-normal text-gray-500">
+                                                AKSI
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -295,18 +365,33 @@ const RequestAccountForm = () => {
                                                         : data.email}
                                                 </td>
                                                 <td className="border border-gray-200 p-2">
-                                                    <button
-                                                        type="button"
-                                                        className="btn-icon-danger"
-                                                        onClick={() =>
-                                                            handleDeleteData(
-                                                                index
-                                                            )
-                                                        }
-                                                        aria-label="Hapus"
-                                                    >
-                                                        <Trash size={18} />
-                                                    </button>
+                                                    <div className="flex gap-2 items-center">
+                                                        <button
+                                                            type="button"
+                                                            className="btn-icon-primary"
+                                                            onClick={() =>
+                                                                handleEditData(
+                                                                    index
+                                                                )
+                                                            }
+                                                            aria-label="Edit"
+                                                            title="Edit"
+                                                        >
+                                                            <Pencil size={18} />
+                                                        </button>
+                                                        <button
+                                                            type="button"
+                                                            className="btn-icon-danger"
+                                                            onClick={() =>
+                                                                handleDeleteData(
+                                                                    index
+                                                                )
+                                                            }
+                                                            aria-label="Hapus"
+                                                        >
+                                                            <Trash size={18} />
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         ))}
