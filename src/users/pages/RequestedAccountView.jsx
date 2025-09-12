@@ -12,6 +12,8 @@ const RequestedAccountView = () => {
     const { modalState, openModal, closeModal } = useModal();
     const { isLoading, sendRequest } = useHttp();
     const [processingTicket, setProcessingTicket] = useState(null);
+    const [rejectionReason, setRejectionReason] = useState("");
+    const [modalChildren, setModalChildren] = useState(null);
 
     const navigate = useNavigate();
     const auth = useContext(AuthContext);
@@ -38,12 +40,28 @@ const RequestedAccountView = () => {
             (t) => t.ticketId === ticketId || t._id === ticketId
         );
 
-        const body = JSON.stringify({ ticketId, respond });
-        const url = `${
-            import.meta.env.VITE_BACKEND_URL
-        }/users/account-requests/ticket`;
-
         const confirmAction = async () => {
+            // Validate rejection reason when rejecting
+            if (respond === "rejected" && (!rejectionReason || rejectionReason.trim() === "")) {
+                openModal(
+                    "Alasan penolakan tidak boleh kosong.",
+                    "info",
+                    null,
+                    "Info",
+                    false
+                );
+                return;
+            }
+
+            const body = JSON.stringify({
+                ticketId,
+                respond,
+                ...(respond === "rejected" && { reason: rejectionReason }),
+            });
+            const url = `${
+                import.meta.env.VITE_BACKEND_URL
+            }/users/account-requests/ticket`;
+
             try {
                 setProcessingTicket(ticketId);
                 const responseData = await sendRequest(url, "PATCH", body, {
@@ -71,12 +89,42 @@ const RequestedAccountView = () => {
                 console.error("Request handling error:", err);
             } finally {
                 setProcessingTicket(null);
+                setRejectionReason("");
+                setModalChildren(null);
             }
         };
 
         const userName = ticket?.userId?.name || "Tidak Diketahui";
         const accountCount = ticket?.accountList?.length ?? 0;
         const actionWord = respond === "rejected" ? "Tolak" : "Setujui";
+
+        if (respond === "rejected") {
+            setModalChildren(
+                <div className="mb-4">
+                    <label
+                        htmlFor="rejection-reason"
+                        className="block text-sm font-medium text-gray-700 mb-2"
+                    >
+                        Alasan Penolakan
+                    </label>
+                    <textarea
+                        id="rejection-reason"
+                        value={rejectionReason}
+                        onChange={(e) => {
+                            const newVal = e.target.value;
+                            console.log(newVal);
+                            setRejectionReason(newVal);
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                        rows="3"
+                        placeholder="Masukkan alasan penolakan..."
+                        required
+                    />
+                </div>
+            );
+        } else {
+            setModalChildren(null);
+        }
 
         openModal(
             `${actionWord} tiket untuk ${userName} (${accountCount} akun)?`,
@@ -268,9 +316,15 @@ const RequestedAccountView = () => {
         <div className="min-h-screen px-4 py-8 md:p-8">
             <NewModal
                 modalState={modalState}
-                onClose={closeModal}
+                onClose={() => {
+                    closeModal();
+                    setModalChildren(null);
+                    setRejectionReason("");
+                }}
                 isLoading={isLoading}
-            />
+            >
+                {modalChildren}
+            </NewModal>
 
             <div className="flex items-center justify-between gap-4 mb-4">
                 <h2 className="text-xl font-bold">Daftar Pendaftaran Akun</h2>
