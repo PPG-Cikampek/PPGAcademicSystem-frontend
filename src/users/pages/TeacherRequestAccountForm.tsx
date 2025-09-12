@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import useHttp from "../../shared/hooks/http-hook";
 import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
@@ -10,6 +10,8 @@ import { formatDate } from "../../shared/Utilities/formatDateToLocal";
 import NewModal from "../../shared/Components/Modal/NewModal";
 import useModal from "../../shared/hooks/useNewModal";
 import { teacherFields, TeacherAccount, AccountField } from "../config/requestAccountConfig";
+import FileUpload from "../../shared/Components/FormElements/FileUpload";
+import { Icon } from "@iconify-icon/react";
 
 interface ResponseData {
     message: string;
@@ -19,15 +21,27 @@ interface AccountFieldWithValue extends AccountField {
     value?: any;
 }
 
+interface TeacherAccountWithImage extends TeacherAccount {
+    _imageFile?: File;
+}
+
+const FileUploadAny: any = FileUpload;
+
 const TeacherRequestAccountForm: React.FC = () => {
     const { modalState, openModal, closeModal } = useModal();
-    const [dataList, setDataList] = useState<TeacherAccount[]>([]);
+    const [dataList, setDataList] = useState<TeacherAccountWithImage[]>([]);
     const [formKey, setFormKey] = useState<number>(0);
     const [editingIndex, setEditingIndex] = useState<number>(-1);
     const { isLoading, error, sendRequest, setError } = useHttp();
 
     const navigate = useNavigate();
     const auth = useContext(AuthContext);
+    const fileInputRef = useRef<HTMLInputElement | null>(null);
+    const pendingImageRef = useRef<File | null>(null);
+
+    const handleImageCropped = useCallback((file: File) => {
+        pendingImageRef.current = file;
+    }, []);
 
     const handleDeleteData = (index: number): void => {
         const updatedDataList = dataList.filter((_, i) => i !== index);
@@ -35,40 +49,42 @@ const TeacherRequestAccountForm: React.FC = () => {
     };
 
     const handleSubmit = async (): Promise<void> => {
-        const updatedData = {
-            subBranchId: auth.userSubBranchId,
-            accountList: dataList.map((account) => ({
-                ...account,
-                accountRole: "teacher" as const,
-            })),
-        };
-
-        const url = `${(import.meta as any).env.VITE_BACKEND_URL}/users/requestAccounts`;
-        const body = JSON.stringify(updatedData);
-
-        console.log(body);
-
-        let responseData: ResponseData;
-        try {
-            responseData = await sendRequest(url, "POST", body, {
-                "Content-Type": "application/json",
-                Authorization: "Bearer " + auth.token,
-            });
-        } catch {
-            // handled by useHttp
-            return;
+        if (dataList.length === 0) return;
+        for (const entry of dataList) {
+            if (!entry._imageFile) {
+                setError(`Foto belum dipilih untuk akun '${entry.name}'.`);
+                return;
+            }
         }
-        console.log(responseData);
-        openModal(
-            responseData.message,
-            "success",
-            () => {
-                navigate(-1);
-                return false; // Prevent immediate redirect
-            },
-            "Berhasil!",
-            false
-        );
+        const accountsPayload = dataList.map(({ _imageFile, ...rest }) => ({ ...rest, accountRole: "teacher" as const }));
+        const formData = new FormData();
+        formData.append("subBranchId", auth.userSubBranchId);
+        formData.append("accountList", JSON.stringify(accountsPayload));
+        dataList.forEach((entry) => {
+            if (entry._imageFile) formData.append("images", entry._imageFile);
+        });
+        const url = `${(import.meta as any).env.VITE_BACKEND_URL}/users/requestAccounts`;
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                headers: { Authorization: "Bearer " + auth.token },
+                body: formData,
+            });
+            const resData: ResponseData = await response.json();
+            if (!response.ok) throw new Error(resData.message || "Gagal mengirim permintaan.");
+            openModal(
+                resData.message,
+                "success",
+                () => {
+                    navigate(-1);
+                    return false;
+                },
+                "Berhasil!",
+                false
+            );
+        } catch (e: any) {
+            setError(e.message || "Gagal mengirim permintaan.");
+        }
     };
 
     const fields: AccountField[] = teacherFields;
@@ -85,30 +101,15 @@ const TeacherRequestAccountForm: React.FC = () => {
 
         if (editingIndex >= 0) {
             // update existing entry
-            setDataList((prev) =>
-                prev.map((item, i) => (i === editingIndex ? normalized as TeacherAccount : item))
-            );
+            setDataList((prev) => prev.map((item, i) => (i === editingIndex ? { ...(normalized as TeacherAccountWithImage), _imageFile: pendingImageRef.current || item._imageFile } : item)));
             setEditingIndex(-1);
         } else {
-            setDataList((prev) => [...prev, normalized as TeacherAccount]);
-
-            // After adding a new item, if on mobile, scroll to the list
-            try {
-                // use 1024px as breakpoint matching lg in Tailwind (lg: 1024px)
-                if (typeof window !== "undefined" && window.innerWidth < 1024) {
-                    const el = document.getElementById("list-pendaftaran");
-                    if (el && el.scrollIntoView) {
-                        // small timeout to ensure DOM updated after state change
-                        setTimeout(() => {
-                            el.scrollIntoView({ behavior: "smooth", block: "start" });
-                        }, 120);
-                    }
-                }
-            } catch (e) {
-                // fail silently; scrolling is optional
-            }
+            setDataList((prev) => [
+                ...prev,
+                { ...(normalized as TeacherAccountWithImage), _imageFile: pendingImageRef.current || undefined },
+            ]);
         }
-
+        pendingImageRef.current = null;
         // increment formKey to force DynamicForm remount and clear values
         setFormKey((k) => k + 1);
     };
@@ -206,7 +207,33 @@ const TeacherRequestAccountForm: React.FC = () => {
                         footer={false}
                         logo={null}
                         subtitle=""
-                        customDescription=""
+                        customDescription={
+                            <div className="relative">
+                                <FileUploadAny
+                                    ref={fileInputRef as any}
+                                    accept={".jpg,.jpeg,.png"}
+                                    buttonLabel={
+                                        isLoading ? (
+                                            <div className="flex items-center">
+                                                <LoadingCircle size={16}>Memproses</LoadingCircle>
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center">
+                                                <Icon icon="jam:upload" width="24" height="24" />
+                                                Foto Profil
+                                            </div>
+                                        )
+                                    }
+                                    buttonClassName={`btn-round-primary text-xs m-0 m-2 ml-1 p-2 pr-3`}
+                                    imgClassName={`mt-2 rounded-md size-24 shrink-0`}
+                                    defaultImageSrc={"https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"}
+                                    onImageCropped={handleImageCropped as any}
+                                />
+                                {editingIndex >= 0 && dataList[editingIndex]?._imageFile && (
+                                    <p className="text-xs mt-1 text-gray-500">Foto tersimpan untuk entri ini.</p>
+                                )}
+                            </div>
+                        }
                         helpButton={null}
                         className=""
                     />
