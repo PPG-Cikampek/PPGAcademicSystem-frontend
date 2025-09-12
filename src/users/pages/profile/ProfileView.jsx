@@ -79,6 +79,7 @@ const ProfileView = () => {
         } finally {
             setIsSubmitting(false);
         }
+        return false;
     };
 
     // Handler for name saving
@@ -105,8 +106,8 @@ const ProfileView = () => {
                 return true;
             } catch (err) {
                 openModal(err.message, "error", null, "Gagal!", false);
-                return false;
             }
+            return false;
         },
         [auth.userId, auth.token, sendRequest]
     );
@@ -152,6 +153,7 @@ const ProfileView = () => {
                 console.log(err);
                 openModal(err.message, "error", null, "Gagal!", false);
             }
+            return false;
         };
         openModal(
             "Pesan verifikasi akan dikirim ke inbox Anda.",
@@ -202,8 +204,8 @@ const ProfileView = () => {
                     return true;
                 } catch (err) {
                     openModal(err.message, "error", null, "Gagal!", false);
-                    return false;
                 }
+                return false;
             };
 
             openModal(
@@ -259,8 +261,8 @@ const ProfileView = () => {
                     return true;
                 } catch (err) {
                     openModal(err.message, "error", null, "Gagal!", false);
-                    return false;
                 }
+                return false;
             };
             openModal({
                 title: "Ubah Password?",
@@ -276,7 +278,11 @@ const ProfileView = () => {
     return (
         <div className="container mx-auto p-6 max-w-4xl">
             <div className="card-basic rounded-md flex flex-col items-stretch mb-12">
-                <NewModal modalState={modalState} onClose={closeModal} />
+                <NewModal
+                    modalState={modalState}
+                    onClose={closeModal}
+                    isLoading={isLoading}
+                />
 
                 {!isLoading &&
                     userData &&
