@@ -31,7 +31,9 @@ const NewUserView = () => {
                 );
                 setLoadedSubBranches(responseData.subBranches);
                 console.log(responseData.subBranches);
-            } catch (err) {}
+            } catch {
+                // handled by useHttp
+            }
         };
         fetchSubBranches();
     }, [sendRequest]);
@@ -129,7 +131,8 @@ const NewUserView = () => {
                 "Berhasil!",
                 false
             );
-        } catch (err) {
+        } catch {
+            // handled by useHttp
             // Error is already handled by useHttp
         }
     };
@@ -197,10 +200,7 @@ const NewUserView = () => {
 
     return (
         <div className="m-auto max-w-md mt-14 md:mt-8">
-            <NewModal
-                modalState={modalState}
-                onClose={closeModal}
-            />
+            <NewModal modalState={modalState} onClose={closeModal} />
 
             <div
                 className={`pb-24 transition-opacity duration-300 ${

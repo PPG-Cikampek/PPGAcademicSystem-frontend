@@ -29,7 +29,9 @@ const BulkNewUsersAndStudentsView = () => {
                     }/levels/branches/sub-branches?populate=branchId`
                 );
                 setLoadedSubBranches(responseData.subBranches);
-            } catch (err) {}
+            } catch {
+                // handled by useHttp
+            }
         };
         fetchSubBranches();
     }, [sendRequest]);
@@ -71,7 +73,7 @@ const BulkNewUsersAndStudentsView = () => {
 
     const handleBulkCreate = async (data) => {
         if (!data.count || data.count <= 0) {
-            setMessage("Please enter a valid count.");
+            openModal("Masukkan jumlah yang valid", "warning", null, "Gagal!", false);
             return;
         }
 
@@ -101,17 +103,14 @@ const BulkNewUsersAndStudentsView = () => {
                 "Berhasil!",
                 false
             );
-            } catch (error) {
-                console.error('Bulk creation error:', error);
-            }
+        } catch (error) {
+            console.error("Bulk creation error:", error);
+        }
     };
 
     return (
         <div className="m-auto max-w-md mt-14 md:mt-8">
-            <NewModal
-                modalState={modalState}
-                onClose={closeModal}
-            />
+            <NewModal modalState={modalState} onClose={closeModal} />
 
             <div className="px-2">
                 {error && (

@@ -1,11 +1,4 @@
-import {
-    useContext,
-    useEffect,
-    useState,
-    useRef,
-    useCallback,
-    useMemo,
-} from "react";
+import { useContext, useEffect, useState, useRef, useCallback } from "react";
 
 import useHttp from "../../shared/hooks/http-hook";
 
@@ -61,7 +54,9 @@ const ProfileView = () => {
                     name: response.users.name,
                     email: response.users.email,
                 };
-            } catch (err) {}
+            } catch {
+                // handled by useHttp
+            }
         };
         fetchUserData();
     }, [sendRequest, auth.userId]);

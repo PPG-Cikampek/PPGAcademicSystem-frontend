@@ -37,7 +37,7 @@ export const useUsers = () => {
                 );
                 setUsers(responseData);
                 console.log(responseData);
-            } catch (err) {
+            } catch {
                 // Error is handled by useHttp
             }
         };
@@ -49,23 +49,19 @@ export const useUsers = () => {
     };
 
     const handleDeleteUser = async (userId) => {
-        try {
-            const responseData = await sendRequest(
-                `${import.meta.env.VITE_BACKEND_URL}/users/${userId}`,
-                "DELETE",
-                null,
-                {
-                    Authorization: "Bearer " + auth.token,
-                }
-            );
-            setUsers((prevUsers) => ({
-                ...prevUsers,
-                users: prevUsers.users.filter((user) => user._id !== userId),
-            }));
-            return responseData.message;
-        } catch (err) {
-            throw err;
-        }
+        const responseData = await sendRequest(
+            `${import.meta.env.VITE_BACKEND_URL}/users/${userId}`,
+            "DELETE",
+            null,
+            {
+                Authorization: "Bearer " + auth.token,
+            }
+        );
+        setUsers((prevUsers) => ({
+            ...prevUsers,
+            users: prevUsers.users.filter((user) => user._id !== userId),
+        }));
+        return responseData.message;
     };
 
     const handleBulkDelete = async () => {
@@ -76,22 +72,18 @@ export const useUsers = () => {
         const url = `${import.meta.env.VITE_BACKEND_URL}/users/bulk-delete`;
         const body = JSON.stringify({ userIds: selectedUserIds });
         console.log(body);
-        try {
-            const responseData = await sendRequest(url, "DELETE", body, {
-                "Content-Type": "application/json",
-                Authorization: "Bearer " + auth.token,
-            });
-            setUsers((prevUsers) => ({
-                ...prevUsers,
-                users: prevUsers.users.filter(
-                    (user) => !selectedUserIds.includes(user._id)
-                ),
-            }));
-            setSelectedUserIds([]);
-            return responseData.message;
-        } catch (err) {
-            throw err;
-        }
+        const responseData = await sendRequest(url, "DELETE", body, {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + auth.token,
+        });
+        setUsers((prevUsers) => ({
+            ...prevUsers,
+            users: prevUsers.users.filter(
+                (user) => !selectedUserIds.includes(user._id)
+            ),
+        }));
+        setSelectedUserIds([]);
+        return responseData.message;
     };
 
     return {

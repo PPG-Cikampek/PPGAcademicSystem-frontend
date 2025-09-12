@@ -135,7 +135,9 @@ const RequestAccountForm = () => {
                 "Content-Type": "application/json",
                 Authorization: "Bearer " + auth.token,
             });
-        } catch (err) {}
+        } catch {
+            // handled by useHttp
+        }
         console.log(responseData);
         openModal(
             responseData.message,

@@ -1,13 +1,12 @@
 import { useEffect, useState } from "react";
 import useHttp from "../../shared/hooks/http-hook";
 import { useParams } from "react-router-dom";
-import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import { formatDate } from "../../shared/Utilities/formatDateToLocal";
 
 const RequestAccountTicketDetail = () => {
     const [data, setData] = useState();
 
-    const { isLoading, error, sendRequest, setError } = useHttp();
+    const { isLoading, sendRequest } = useHttp();
 
     const ticketId = useParams().ticketId;
 
@@ -23,7 +22,9 @@ const RequestAccountTicketDetail = () => {
                 const responseData = await sendRequest(url);
                 setData(responseData[0].accountList);
                 console.log(JSON.stringify(responseData));
-            } catch (err) {}
+            } catch {
+                // handled by useHttp
+            }
         };
         fetchTicketData();
     }, [sendRequest, ticketId]);

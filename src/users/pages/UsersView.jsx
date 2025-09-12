@@ -1,6 +1,4 @@
-import { useContext, useState } from "react";
 import { Link } from "react-router-dom";
-import { AuthContext } from "../../shared/Components/Context/auth-context";
 
 import NewModal from "../../shared/Components/Modal/NewModal";
 import useModal from "../../shared/hooks/useNewModal";
@@ -15,7 +13,7 @@ const UsersView = () => {
     const {
         users,
         selectedUserIds,
-        setSelectedUserIds,
+        // setSelectedUserIds,
         roleOrder,
         isLoading,
         error,
@@ -25,8 +23,6 @@ const UsersView = () => {
         navigate,
     } = useUsers();
 
-    const auth = useContext(AuthContext);
-
     const combinedLoading = isLoading || !users;
 
     const handleDeleteUserModal = (userId) => {
@@ -34,7 +30,7 @@ const UsersView = () => {
             try {
                 const message = await handleDeleteUser(userId);
                 openModal(message, "success", null, "Berhasil!", false);
-            } catch (err) {
+            } catch {
                 // Error handled by useHttp
             }
         };
@@ -63,7 +59,7 @@ const UsersView = () => {
             try {
                 const message = await handleBulkDelete();
                 openModal(message, "success", null, "Berhasil!", false);
-            } catch (err) {
+            } catch {
                 // Error handled by useHttp
             }
         };

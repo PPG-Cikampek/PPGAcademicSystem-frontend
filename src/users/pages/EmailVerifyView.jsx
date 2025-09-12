@@ -10,7 +10,7 @@ import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 const EmailVerifyView = () => {
     const token = useParams().token;
     const [message, setMessage] = useState("");
-    const { isLoading, error, sendRequest, setError } = useHttp();
+    const { isLoading, error, sendRequest } = useHttp();
 
     const auth = useContext(AuthContext);
     const navigate = useNavigate();

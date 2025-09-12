@@ -1,6 +1,7 @@
 import DataTable from "../../shared/Components/UIElements/DataTable";
 import getUserRoleTitle from "../../shared/Utilities/getUserRoleTitle";
 import { TableColumns } from "../components/TableColumns";
+import PropTypes from 'prop-types';
 
 const RoleGroup = ({ role, users, navigate, handleDeleteUser, isLoading }) => {
     const roleUsers = users.filter((user) => user.role === role);
@@ -34,6 +35,14 @@ const RoleGroup = ({ role, users, navigate, handleDeleteUser, isLoading }) => {
             <hr className="my-8" />
         </div>
     );
+};
+
+RoleGroup.propTypes = {
+    role: PropTypes.string.isRequired,
+    users: PropTypes.arrayOf(PropTypes.object).isRequired,
+    navigate: PropTypes.func.isRequired,
+    handleDeleteUser: PropTypes.func.isRequired,
+    isLoading: PropTypes.bool.isRequired,
 };
 
 export default RoleGroup;

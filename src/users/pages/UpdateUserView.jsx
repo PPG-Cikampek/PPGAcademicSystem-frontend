@@ -1,11 +1,4 @@
-import {
-    useContext,
-    useState,
-    useEffect,
-    useRef,
-    useCallback,
-    useMemo,
-} from "react";
+import { useContext, useState, useEffect, useRef, useCallback } from "react";
 import { useParams } from "react-router-dom";
 
 import useHttp from "../../shared/hooks/http-hook";
@@ -17,7 +10,6 @@ import { AuthContext } from "../../shared/Components/Context/auth-context";
 
 const UpdateUserView = () => {
     const { isLoading, error, sendRequest, setError } = useHttp();
-    const [isTransitioning, setIsTransitioning] = useState(false);
     const [loadedSubBranches, setLoadedSubBranches] = useState([]);
     const [loadedUser, setLoadedUser] = useState();
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -45,7 +37,9 @@ const UpdateUserView = () => {
                         responseData.users.subBranchId?.name ||
                         responseData.users.subBranchId,
                 };
-            } catch (err) {}
+            } catch {
+                // Error is handled by useHttp
+            }
         };
         fetchUser();
 
@@ -57,7 +51,9 @@ const UpdateUserView = () => {
                     }/levels/branches/sub-branches/`
                 );
                 setLoadedSubBranches(responseData.subBranches);
-            } catch (err) {}
+            } catch {
+                // Error is handled by useHttp
+            }
         };
         fetchSubBranches();
     }, [sendRequest, userId]);
@@ -107,7 +103,7 @@ const UpdateUserView = () => {
                 "Content-Type": "application/json",
                 Authorization: "Bearer " + auth.token,
             });
-        } catch (err) {
+        } catch {
             // Error is already handled by useHttp
         } finally {
             setIsSubmitting(false);
@@ -132,11 +128,7 @@ const UpdateUserView = () => {
                 </div>
             )}
 
-            <div
-                className={`pb-24 transition-opacity duration-300 ${
-                    isTransitioning ? "opacity-0" : "opacity-100"
-                }`}
-            >
+            <div className={`pb-24 transition-opacity duration-300`}>
                 {error && (
                     <ErrorCard error={error} onClear={() => setError(null)} />
                 )}

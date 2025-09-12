@@ -65,7 +65,9 @@ const AuthView = () => {
                 );
                 console.log(responseData.user.subBranchId.branchId.id);
                 console.log(branchYearData);
-            } catch (err) {}
+            } catch (err) {
+                console.log(err);
+            }
 
             let activeBranchYear;
             if (branchYearData && branchYearData.branchYears) {
@@ -89,7 +91,6 @@ const AuthView = () => {
                 } catch (err) {
                     console.log(err);
                 }
-            } else {
             }
 
             console.log("logging IN");
