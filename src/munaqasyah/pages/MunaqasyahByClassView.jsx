@@ -1,8 +1,7 @@
 import { useState, useMemo, useContext } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import useModal from "../../shared/hooks/useModal";
-import Modal from "../../shared/Components/Modal";
-import ModalFooter from "../../shared/Components/ModalFooter";
+import useModal from "../../shared/hooks/useNewModal";
+import NewModal from "../../shared/Components/Modal/NewModal";
 import SkeletonLoader from "../../shared/Components/UIElements/SkeletonLoader";
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 
@@ -57,12 +56,10 @@ const MunaqasyahByClassView = () => {
     const subBranchId = auth.userSubBranchId;
 
     const {
-        isOpen: modalIsOpen,
-        modal,
+        modalState,
         openModal,
         closeModal,
-        setModal,
-    } = useModal({ title: "", message: "", onConfirm: null });
+    } = useModal();
 
     const {
         data: responseData,
@@ -289,20 +286,10 @@ const MunaqasyahByClassView = () => {
     return (
         <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">
             <div className="max-w-6xl mx-auto">
-                <Modal
-                    isOpen={modalIsOpen}
-                    title={modal.title}
-                    message={modal.message}
+                <NewModal
+                    modalState={modalState}
                     onClose={closeModal}
-                    onConfirm={modal.onConfirm}
-                    footer={
-                        <ModalFooter
-                            isLoading={loadingIdx !== null}
-                            onClose={closeModal}
-                            onConfirm={modal.onConfirm}
-                            showConfirm={!!modal.onConfirm}
-                        />
-                    }
+                    isLoading={loadingIdx !== null}
                 />
                 <div className="flex justify-between items-center mb-6 h-9">
                     <h1 className="text-2xl font-semibold text-gray-900">
@@ -365,58 +352,32 @@ const MunaqasyahByClassView = () => {
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        openModal({
-                                                            title: "Konfirmasi",
-                                                            message:
-                                                                "Unduh Raport untuk Orang Tua?",
-                                                            onConfirm: () => {
-                                                                setModal(
-                                                                    (prev) => ({
-                                                                        ...prev,
-                                                                        message:
-                                                                            "Menghitung Nilai..",
-                                                                        title: "Mohon Tunggu",
-                                                                    })
-                                                                );
-                                                                setLoadingIdx(
-                                                                    idx
-                                                                );
-                                                                setTimeout(
-                                                                    () => {
-                                                                        downloadReport(
-                                                                            score
-                                                                                .studentId
-                                                                                .name,
-                                                                            scores[
-                                                                                idx
-                                                                            ],
-                                                                            score.studentNis,
-                                                                            score
-                                                                                .classId
-                                                                                .name,
-                                                                            score
-                                                                                .branchYearId
-                                                                                .academicYearId
-                                                                                .name,
-                                                                            branchAvgScores
-                                                                        );
-                                                                        setLoadingIdx(
-                                                                            null
-                                                                        );
-                                                                        openModal(
-                                                                            {
-                                                                                title: "Berhasil!",
-                                                                                message:
-                                                                                    "Berhasil! Periksa folder unduhan anda.",
-                                                                                onConfirm:
-                                                                                    null,
-                                                                            }
-                                                                        );
-                                                                    },
-                                                                    1200
-                                                                );
+                                                        openModal(
+                                                            "Unduh Raport untuk Orang Tua?",
+                                                            "confirmation",
+                                                            () => {
+                                                                setLoadingIdx(idx);
+                                                                setTimeout(() => {
+                                                                    downloadReport(
+                                                                        score.studentId.name,
+                                                                        scores[idx],
+                                                                        score.studentNis,
+                                                                        score.classId.name,
+                                                                        score.branchYearId.academicYearId.name,
+                                                                        branchAvgScores
+                                                                    );
+                                                                    setLoadingIdx(null);
+                                                                    openModal(
+                                                                        "Berhasil! Periksa folder unduhan anda.",
+                                                                        "success",
+                                                                        null,
+                                                                        "Berhasil!"
+                                                                    );
+                                                                }, 1200);
                                                             },
-                                                        });
+                                                            "Konfirmasi",
+                                                            true
+                                                        );
                                                     }}
                                                     className="btn-primary-outline m-0 text-gray-700"
                                                     disabled={
@@ -461,58 +422,32 @@ const MunaqasyahByClassView = () => {
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        openModal({
-                                                            title: "Konfirmasi",
-                                                            message:
-                                                                "Unduh Raport untuk Pengurus?",
-                                                            onConfirm: () => {
-                                                                setModal(
-                                                                    (prev) => ({
-                                                                        ...prev,
-                                                                        message:
-                                                                            "Menghitung Nilai..",
-                                                                        title: "Mohon Tunggu",
-                                                                    })
-                                                                );
-                                                                setLoadingIdx(
-                                                                    idx
-                                                                );
-                                                                setTimeout(
-                                                                    () => {
-                                                                        downloadReport(
-                                                                            score
-                                                                                .studentId
-                                                                                .name,
-                                                                            rawScores[
-                                                                                idx
-                                                                            ],
-                                                                            score.studentNis,
-                                                                            score
-                                                                                .classId
-                                                                                .name,
-                                                                            score
-                                                                                .branchYearId
-                                                                                .academicYearId
-                                                                                .name,
-                                                                            branchAvgScores
-                                                                        );
-                                                                        setLoadingIdx(
-                                                                            null
-                                                                        );
-                                                                        openModal(
-                                                                            {
-                                                                                title: "Berhasil!",
-                                                                                message:
-                                                                                    "Berhasil! Periksa folder unduhan anda.",
-                                                                                onConfirm:
-                                                                                    null,
-                                                                            }
-                                                                        );
-                                                                    },
-                                                                    1200
-                                                                );
+                                                        openModal(
+                                                            "Unduh Raport untuk Pengurus?",
+                                                            "confirmation",
+                                                            () => {
+                                                                setLoadingIdx(idx);
+                                                                setTimeout(() => {
+                                                                    downloadReport(
+                                                                        score.studentId.name,
+                                                                        rawScores[idx],
+                                                                        score.studentNis,
+                                                                        score.classId.name,
+                                                                        score.branchYearId.academicYearId.name,
+                                                                        branchAvgScores
+                                                                    );
+                                                                    setLoadingIdx(null);
+                                                                    openModal(
+                                                                        "Berhasil! Periksa folder unduhan anda.",
+                                                                        "success",
+                                                                        null,
+                                                                        "Berhasil!"
+                                                                    );
+                                                                }, 1200);
                                                             },
-                                                        });
+                                                            "Konfirmasi",
+                                                            true
+                                                        );
                                                     }}
                                                     className="btn-primary-outline m-0 text-gray-700"
                                                     disabled={

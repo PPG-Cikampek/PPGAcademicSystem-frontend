@@ -6,20 +6,17 @@ import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 import DataTable from "../../shared/Components/UIElements/DataTable";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
 import getMunaqasyahStatusName from "../utilities/getMunaqasyahStatusName";
-import Modal from "../../shared/Components/Modal";
-import ModalFooter from "../../shared/Components/ModalFooter";
-import useModal from "../../shared/hooks/useModal";
+import NewModal from "../../shared/Components/Modal/NewModal";
+import useModal from "../../shared/hooks/useNewModal";
 
 const BranchAdminMunaqasyahDetailView = () => {
     const [subBranchData, setSubBranchData] = useState([]);
     const { sendRequest, isLoading, error, setError } = useHttp();
     const {
-        isOpen: modalIsOpen,
-        modal,
+        modalState,
         openModal,
         closeModal,
-        setModal,
-    } = useModal({ title: "", message: "", onConfirm: null });
+    } = useModal();
 
     const auth = useContext(AuthContext);
     const teachingGroupId = useParams().teachingGroupId;
@@ -190,53 +187,49 @@ const BranchAdminMunaqasyahDetailView = () => {
                 const responseData = await sendRequest(url, "PATCH", body, {
                     "Content-Type": "application/json",
                 });
-                openModal({
-                    title: "Berhasil!",
-                    message: responseData.message,
-                    onConfirm: null,
-                });
+                openModal(
+                    responseData.message,
+                    "success",
+                    null,
+                    "Berhasil!"
+                );
                 BranchAdminMunaqasyahDetailView.fetchSubBranchData(); // Refresh sub-branch data
             } catch (err) {
                 setError(err.message);
-                openModal({
-                    title: "Gagal!",
-                    message: err.message,
-                    onConfirm: null,
-                });
+                openModal(
+                    err.message,
+                    "error",
+                    null,
+                    "Gagal!"
+                );
             }
         };
 
         if (actionName === "start") {
-            openModal({
-                title: `Konfirmasi`,
-                message: `Mulai Munaosah untuk Kelompok ${subBranchName}?`,
-                onConfirm: () => confirmAction("inProgress"),
-            });
+            openModal(
+                `Mulai Munaosah untuk Kelompok ${subBranchName}?`,
+                "confirmation",
+                () => confirmAction("inProgress"),
+                "Konfirmasi",
+                true
+            );
         } else {
-            openModal({
-                title: `Konfirmasi`,
-                message: `Selesaikan Munaosah untuk Kelompok ${subBranchName}?`,
-                onConfirm: () => confirmAction("completed"),
-            });
+            openModal(
+                `Selesaikan Munaosah untuk Kelompok ${subBranchName}?`,
+                "confirmation",
+                () => confirmAction("completed"),
+                "Konfirmasi",
+                true
+            );
         }
     };
 
     return (
         <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8 pb-24">
-            <Modal
-                isOpen={modalIsOpen}
-                title={modal.title}
-                message={modal.message}
+            <NewModal
+                modalState={modalState}
                 onClose={closeModal}
-                onConfirm={modal.onConfirm}
-                footer={
-                    <ModalFooter
-                        isLoading={isLoading}
-                        onClose={closeModal}
-                        onConfirm={modal.onConfirm}
-                        showConfirm={!!modal.onConfirm}
-                    />
-                }
+                isLoading={isLoading}
             />
             <div className="max-w-6xl mx-auto">
                 {error && (

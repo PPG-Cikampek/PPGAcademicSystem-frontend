@@ -1,22 +1,19 @@
 import React from "react";
 import { academicYearFormatter } from "../../shared/Utilities/academicYearFormatter";
 import getMunaqasyahStatusName from "../utilities/getMunaqasyahStatusName";
-import useModal from "../../shared/hooks/useModal";
+import useModal from "../../shared/hooks/useNewModal";
 import useHttp from "../../shared/hooks/http-hook";
-import Modal from "../../shared/Components/Modal";
-import ModalFooter from "../../shared/Components/ModalFooter";
+import NewModal from "../../shared/Components/Modal/NewModal";
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 
 const MunaqasyahCard = ({ year, onClick, isClickAble = true, fetchData }) => {
     const { sendRequest, isLoading, error, setError } = useHttp();
 
     const {
-        isOpen: modalIsOpen,
-        modal,
+        modalState,
         openModal,
         closeModal,
-        setModal,
-    } = useModal({ title: "", message: "", onConfirm: null });
+    } = useModal();
 
     const branchMunaqasyahStatusHandler = (actionName, name, branchYearId) => {
         const confirmAction = async (action) => {
@@ -31,40 +28,46 @@ const MunaqasyahCard = ({ year, onClick, isClickAble = true, fetchData }) => {
                 const responseData = await sendRequest(url, "PATCH", body, {
                     "Content-Type": "application/json",
                 });
-                openModal({
-                    title: "Berhasil!",
-                    message: responseData.message,
-                    onConfirm: null,
-                });
+                openModal(
+                    responseData.message,
+                    "success",
+                    null,
+                    "Berhasil!"
+                );
                 if (typeof fetchData === "function") {
                     await fetchData(); // Refresh parent data to update year.munaqasyahStatus
                 }
             } catch (err) {
                 setError(err.message);
-                openModal({
-                    title: "Gagal!",
-                    message: err.message,
-                    onConfirm: null,
-                });
+                openModal(
+                    err.message,
+                    "error",
+                    null,
+                    "Gagal!"
+                );
             }
         };
 
         if (actionName === "start") {
-            openModal({
-                title: `Konfirmasi`,
-                message: `Mulai Munaosah Desa untuk Tahun Ajaran ${academicYearFormatter(
+            openModal(
+                `Mulai Munaosah Desa untuk Tahun Ajaran ${academicYearFormatter(
                     name
                 )}?`,
-                onConfirm: () => confirmAction("inProgress"),
-            });
+                "confirmation",
+                () => confirmAction("inProgress"),
+                "Konfirmasi",
+                true
+            );
         } else {
-            openModal({
-                title: `Konfirmasi`,
-                message: `Selesaikan Munaosah Desa untuk Tahun Ajaran ${academicYearFormatter(
+            openModal(
+                `Selesaikan Munaosah Desa untuk Tahun Ajaran ${academicYearFormatter(
                     name
                 )}?`,
-                onConfirm: () => confirmAction("completed"),
-            });
+                "confirmation", 
+                () => confirmAction("completed"),
+                "Konfirmasi",
+                true
+            );
         }
     };
 
@@ -77,20 +80,10 @@ const MunaqasyahCard = ({ year, onClick, isClickAble = true, fetchData }) => {
                 className="card-basic rounded-md flex-col m-0 p-0"
                 onClick={typeof onClick === "function" ? onClick : undefined}
             >
-                <Modal
-                    isOpen={modalIsOpen}
-                    title={modal.title}
-                    message={modal.message}
+                <NewModal
+                    modalState={modalState}
                     onClose={closeModal}
-                    onConfirm={modal.onConfirm}
-                    footer={
-                        <ModalFooter
-                            isLoading={isLoading}
-                            onClose={closeModal}
-                            onConfirm={modal.onConfirm}
-                            showConfirm={!!modal.onConfirm}
-                        />
-                    }
+                    isLoading={isLoading}
                 />
                 <div
                     className={`p-6 ${
