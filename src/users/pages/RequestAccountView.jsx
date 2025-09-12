@@ -189,7 +189,7 @@ const RequestAccountView = () => {
                 ) : item.status === "cancelled" ||
                   item.status === "rejected" ? (
                     <span className="text-xs text-gray-500 italic">
-                        Tidak ada aksi
+                        Selesai
                     </span>
                 ) : (
                     <span className="text-xs text-green-600 font-medium">

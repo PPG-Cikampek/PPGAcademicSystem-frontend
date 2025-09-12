@@ -55,7 +55,7 @@ const StudentRequestAccountForm: React.FC = () => {
                 return;
             }
         }
-        const accountsPayload = dataList.map(({ _imageFile, _thumbnailDataUrl, ...rest }) => rest);
+        const accountsPayload = dataList.map(({ _imageFile, _thumbnailDataUrl, ...rest }) => ({ ...rest, accountRole: "student" as const }));
         const formData = new FormData();
         formData.append("subBranchId", auth.userSubBranchId);
         formData.append("accountList", JSON.stringify(accountsPayload));

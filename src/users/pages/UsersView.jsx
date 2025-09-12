@@ -41,6 +41,8 @@ const UsersView = () => {
             "Peringatan!",
             true
         );
+        // prevent modal from closing immediately
+        return false;
     };
 
     const handleBulkDeleteModal = () => {
