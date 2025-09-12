@@ -1,103 +1,35 @@
-import { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../../shared/Components/Context/auth-context";
-import useHttp from "../../shared/hooks/http-hook";
+import { useUsersData } from "./useUsersData";
+import { useUserDeletion } from "./useUserDeletion";
+import { useUserSelection } from "./useUserSelection";
+import { USER_ROLE_ORDER } from "../config";
 
+/**
+ * Main hook for users management functionality
+ * Composes smaller, focused hooks for better maintainability
+ */
 export const useUsers = () => {
-    const [users, setUsers] = useState();
-    const [selectedUserIds, setSelectedUserIds] = useState([]);
-    const [groupVisibility, setGroupVisibility] = useState({
-        admin: true,
-        BranchAdmin: true,
-        subBranchAdmin: true,
-        teacher: true,
-        student: true,
-        curriculum: true,
-    });
-
-    const roleOrder = [
-        "admin",
-        "branchAdmin",
-        "subBranchAdmin",
-        "teacher",
-        "student",
-        "curriculum",
-        "munaqisy",
-    ];
-
-    const { isLoading, error, sendRequest, setError } = useHttp();
     const navigate = useNavigate();
-    const auth = useContext(AuthContext);
+    
+    // Separate concerns into focused hooks
+    const { users, setUsers, isLoading, error, setError } = useUsersData();
+    const { selectedUserIds, setSelectedUserIds } = useUserSelection();
+    const { handleDeleteUser, handleBulkDelete } = useUserDeletion(setUsers);
 
-    useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                const responseData = await sendRequest(
-                    `${import.meta.env.VITE_BACKEND_URL}/users/`
-                );
-                setUsers(responseData);
-                console.log(responseData);
-            } catch {
-                // Error is handled by useHttp
-            }
-        };
-        fetchUsers();
-    }, [sendRequest]);
-
-    const toggleGroupVisibility = (role) => {
-        setGroupVisibility((prev) => ({ ...prev, [role]: !prev[role] }));
-    };
-
-    const handleDeleteUser = async (userId) => {
-        const responseData = await sendRequest(
-            `${import.meta.env.VITE_BACKEND_URL}/users/${userId}`,
-            "DELETE",
-            null,
-            {
-                Authorization: "Bearer " + auth.token,
-            }
-        );
-        setUsers((prevUsers) => ({
-            ...prevUsers,
-            users: prevUsers.users.filter((user) => user._id !== userId),
-        }));
-        return responseData.message;
-    };
-
-    const handleBulkDelete = async () => {
-        if (selectedUserIds.length === 0) {
-            throw new Error("Please select at least one user.");
-        }
-
-        const url = `${import.meta.env.VITE_BACKEND_URL}/users/bulk-delete`;
-        const body = JSON.stringify({ userIds: selectedUserIds });
-        console.log(body);
-        const responseData = await sendRequest(url, "DELETE", body, {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + auth.token,
-        });
-        setUsers((prevUsers) => ({
-            ...prevUsers,
-            users: prevUsers.users.filter(
-                (user) => !selectedUserIds.includes(user._id)
-            ),
-        }));
-        setSelectedUserIds([]);
-        return responseData.message;
-    };
+    // Create bound version of handleBulkDelete with current selection state
+    const handleBulkDeleteWithSelection = () => 
+        handleBulkDelete(selectedUserIds, setSelectedUserIds);
 
     return {
         users,
         selectedUserIds,
         setSelectedUserIds,
-        groupVisibility,
-        toggleGroupVisibility,
-        roleOrder,
+        roleOrder: USER_ROLE_ORDER,
         isLoading,
         error,
         setError,
         handleDeleteUser,
-        handleBulkDelete,
+        handleBulkDelete: handleBulkDeleteWithSelection,
         navigate,
     };
 };

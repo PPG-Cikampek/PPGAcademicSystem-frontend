@@ -9,7 +9,7 @@ import LoadingCircle from "../../../shared/Components/UIElements/LoadingCircle";
 import { formatDate } from "../../../shared/Utilities/formatDateToLocal";
 import NewModal from "../../../shared/Components/Modal/NewModal";
 import useModal from "../../../shared/hooks/useNewModal";
-import { teacherFields, TeacherAccount, AccountField } from "../../config/requestAccountConfig";
+import { teacherFields, TeacherAccount, AccountField } from "../../config";
 import FileUpload from "../../../shared/Components/FormElements/FileUpload";
 import { Icon } from "@iconify-icon/react";
 

@@ -9,7 +9,7 @@ import LoadingCircle from "../../../shared/Components/UIElements/LoadingCircle";
 import { formatDate } from "../../../shared/Utilities/formatDateToLocal";
 import NewModal from "../../../shared/Components/Modal/NewModal";
 import useModal from "../../../shared/hooks/useNewModal";
-import { studentFields, StudentAccount, AccountField } from "../../config/requestAccountConfig";
+import { studentFields, StudentAccount, AccountField } from "../../config";
 import FileUpload from "../../../shared/Components/FormElements/FileUpload";
 // create an any-typed alias to bypass TS prop constraints for existing JS component
 const FileUploadAny: any = FileUpload;
