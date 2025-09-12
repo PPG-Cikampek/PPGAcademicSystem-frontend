@@ -274,7 +274,7 @@ const RequestAccountView = () => {
                     </div>
                 ) : tickets &&
                   (!tickets.tickets || tickets.tickets.length === 0) ? (
-                    <div className="bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
+                    <div className="bg-white rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
                         <div className="mx-auto flex flex-col items-center">
                             <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
                                 <Users className="h-10 w-10 text-gray-400" />
@@ -295,7 +295,7 @@ const RequestAccountView = () => {
                                 </Link>
                                 <Link
                                     to="/settings/requestAccount/student"
-                                    className="btn-primary"
+                                    className="btn-primary-outline"
                                 >
                                     Buat Pendaftaran Siswa
                                 </Link>
