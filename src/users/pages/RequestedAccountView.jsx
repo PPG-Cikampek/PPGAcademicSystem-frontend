@@ -1,5 +1,4 @@
 import { useContext, useEffect, useState } from "react";
-import { useMemo } from "react";
 import useHttp from "../../shared/hooks/http-hook";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
 import { useNavigate } from "react-router-dom";
@@ -18,22 +17,20 @@ const RequestedAccountView = () => {
     const auth = useContext(AuthContext);
 
     useEffect(() => {
+        fetchTickets();
+    }, [sendRequest]);
+
+    const fetchTickets = async () => {
         const url = `${
             import.meta.env.VITE_BACKEND_URL
         }/users/account-requests/`;
-
-        console.log(url);
-        const fetchTickets = async () => {
-            try {
-                const responseData = await sendRequest(url);
-                setTickets(responseData);
-                console.log(responseData);
-            } catch (err) {
-                // Error is handled by useHttp
-            }
-        };
-        fetchTickets();
-    }, [sendRequest]);
+        try {
+            const responseData = await sendRequest(url);
+            setTickets(responseData);
+        } catch {
+            // handled in hook
+        }
+    };
 
     const handleRespondTicket = async (ticketId, respond) => {
         // Find ticket details so we can show a clearer confirmation message
@@ -105,6 +102,53 @@ const RequestedAccountView = () => {
             rejected: "Ditolak",
             approved: "Disetujui",
         }[type]);
+
+    const handleApproveAll = () => {
+        const pendingCount =
+            tickets?.tickets?.filter((t) => t.status === "pending").length || 0;
+        if (pendingCount === 0) {
+            openModal(
+                "Tidak ada tiket pending untuk diproses.",
+                "info",
+                null,
+                "Info",
+                false
+            );
+            return;
+        }
+
+        const doApprove = async () => {
+            const url = `${
+                import.meta.env.VITE_BACKEND_URL
+            }/users/account-requests/approve-all`;
+            try {
+                setProcessingTicket("approve-all");
+                const result = await sendRequest(url, "POST", null, {
+                    Authorization: "Bearer " + auth.token,
+                });
+                await fetchTickets();
+                openModal(
+                    result.message || "Berhasil memproses semua tiket!",
+                    "success",
+                    null,
+                    "Berhasil!",
+                    false
+                );
+            } catch {
+                // handled in hook
+            } finally {
+                setProcessingTicket(null);
+            }
+        };
+
+        openModal(
+            `Setujui & buat semua akun dari semua tiket pending?`,
+            "confirmation",
+            doApprove,
+            "Konfirmasi",
+            true
+        );
+    };
 
     const columns = [
         {
@@ -228,7 +272,19 @@ const RequestedAccountView = () => {
                 isLoading={isLoading}
             />
 
-            <h2 className="text-xl font-bold mb-4">Daftar Pendaftaran Akun</h2>
+            <div className="flex items-center justify-between gap-4 mb-4">
+                <h2 className="text-xl font-bold">Daftar Pendaftaran Akun</h2>
+                <button
+                    onClick={handleApproveAll}
+                    className="btn-primary-outline"
+                    disabled={isLoading || processingTicket === "approve-all"}
+                    aria-disabled={
+                        isLoading || processingTicket === "approve-all"
+                    }
+                >
+                    Setujui & Buat Semua Tiket Pending
+                </button>
+            </div>
             <div className="max-w-6xl mx-auto">
                 <p className="text-sm text-gray-600 mb-2">
                     Total: {tickets?.tickets?.length ?? 0} permintaan
