@@ -10,19 +10,15 @@ import ProfileImageUpload from "./components/ProfileImageUpload";
 import ProfileInfo from "./components/ProfileInfo";
 import EmailSection from "./components/EmailSection";
 import PasswordSection from "./components/PasswordSection";
-import ProfileModal from "./components/ProfileModal";
+import NewModal from "../../../shared/Components/Modal/NewModal";
+import useNewModal from "../../../shared/hooks/useNewModal";
 
 const ProfileView = () => {
-    const [modal, setModal] = useState({
-        title: "",
-        message: "",
-        onConfirm: null,
-    });
-    const [modalIsOpen, setModalIsOpen] = useState(false);
     const [userData, setUserData] = useState();
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const { isLoading, error, sendRequest, setError } = useHttp();
+    const { modalState, openModal, closeModal } = useNewModal();
 
     // Use refs for large binary data to avoid re-renders
     const pickedFileRef = useRef(null);
@@ -76,66 +72,55 @@ const ProfileView = () => {
                 "POST",
                 formData
             );
-            setModal({
-                title: "Berhasil!",
-                message: response.message,
-                onConfirm: null,
-            });
-            setModalIsOpen(true);
+            openModal(response.message, "success", null, "Berhasil!", false);
             pickedFileRef.current = null;
         } catch (err) {
-            setModal({
-                title: "Gagal!",
-                message: err.message,
-                onConfirm: null,
-            });
-            setModalIsOpen(true);
+            openModal(err.message, "error", null, "Gagal!", false);
         } finally {
             setIsSubmitting(false);
         }
     };
 
     // Handler for name saving
-    const handleSaveName = useCallback(async (newName) => {
-        try {
-            const response = await sendRequest(
-                `${import.meta.env.VITE_BACKEND_URL}/users/${auth.userId}`,
-                "PATCH",
-                JSON.stringify({ name: newName }),
-                {
-                    "Content-Type": "application/json",
-                    Authorization: "Bearer " + auth.token,
-                }
-            );
-            setUserData((prev) => ({ ...prev, name: newName }));
-            setModal({
-                title: "Berhasil!",
-                message: response.message || "Nama berhasil diubah.",
-                onConfirm: null,
-            });
-            setModalIsOpen(true);
-            return true;
-        } catch (err) {
-            setModal({
-                title: "Gagal!",
-                message: err.message,
-                onConfirm: null,
-            });
-            setModalIsOpen(true);
-            return false;
-        }
-    }, [auth.userId, auth.token, sendRequest]);
+    const handleSaveName = useCallback(
+        async (newName) => {
+            try {
+                const response = await sendRequest(
+                    `${import.meta.env.VITE_BACKEND_URL}/users/${auth.userId}`,
+                    "PATCH",
+                    JSON.stringify({ name: newName }),
+                    {
+                        "Content-Type": "application/json",
+                        Authorization: "Bearer " + auth.token,
+                    }
+                );
+                setUserData((prev) => ({ ...prev, name: newName }));
+                openModal(
+                    response.message || "Nama berhasil diubah.",
+                    "success",
+                    null,
+                    "Berhasil!",
+                    false
+                );
+                return true;
+            } catch (err) {
+                openModal(err.message, "error", null, "Gagal!", false);
+                return false;
+            }
+        },
+        [auth.userId, auth.token, sendRequest]
+    );
 
     const handleEmailVerification = useCallback(() => {
         // Guard: ensure userData is loaded before attempting to read email
         if (!userData || !userData.email) {
-            setModal({
-                title: "Gagal!",
-                message:
-                    "Data pengguna belum dimuat. Silakan coba lagi setelah halaman selesai dimuat.",
-                onConfirm: null,
-            });
-            setModalIsOpen(true);
+            openModal(
+                "Data pengguna belum dimuat. Silakan coba lagi setelah halaman selesai dimuat.",
+                "error",
+                null,
+                "Gagal!",
+                false
+            );
             return;
         }
 
@@ -156,149 +141,142 @@ const ProfileView = () => {
                         Authorization: "Bearer " + auth.token,
                     }
                 );
-                setModal({
-                    title: "Berhasil!",
-                    message: responseData.message,
-                    onConfirm: null,
-                });
-                setModalIsOpen(true);
+                openModal(
+                    responseData.message,
+                    "success",
+                    null,
+                    "Berhasil!",
+                    false
+                );
             } catch (err) {
                 console.log(err);
-                setModal({
-                    title: "Gagal!",
-                    message: err.message,
-                    onConfirm: null,
-                });
-                setModalIsOpen(true);
+                openModal(err.message, "error", null, "Gagal!", false);
             }
         };
-        setModal({
-            title: "Verifikasi Email?",
-            message: "Pesan verifikasi akan dikirim ke inbox Anda.",
-            onConfirm: verifyEmail,
-        });
-        setModalIsOpen(true);
+        openModal(
+            "Pesan verifikasi akan dikirim ke inbox Anda.",
+            "confirmation",
+            verifyEmail,
+            "Verifikasi Email?",
+            true
+        );
     }, [auth.token, sendRequest, userData]);
 
-    const handleEmailUpdate = useCallback(async (newEmail) => {
-        if (!userData || !userData.email) {
-            setModal({
-                title: "Gagal!",
-                message:
+    const handleEmailUpdate = useCallback(
+        async (newEmail) => {
+            if (!userData || !userData.email) {
+                openModal(
                     "Data pengguna belum dimuat. Silakan coba lagi setelah halaman selesai dimuat.",
-                onConfirm: null,
-            });
-            setModalIsOpen(true);
-            return false;
-        }
-
-        const updateEmail = async () => {
-            try {
-                const responseData = await sendRequest(
-                    `${
-                        import.meta.env.VITE_BACKEND_URL
-                    }/users/request-verify-email`,
-                    "POST",
-                    JSON.stringify({
-                        email: userData.email,
-                        newEmail,
-                        isNewEmail: true,
-                    }),
-                    {
-                        "Content-Type": "application/json",
-                        Authorization: "Bearer " + auth.token,
-                    }
+                    "error",
+                    null,
+                    "Gagal!",
+                    false
                 );
-                setModal({
-                    title: "Berhasil!",
-                    message: responseData.message,
-                    onConfirm: null,
-                });
-                setModalIsOpen(true);
-                return true;
-            } catch (err) {
-                setModal({
-                    title: "Gagal!",
-                    message: err.message,
-                    onConfirm: null,
-                });
-                setModalIsOpen(true);
                 return false;
             }
-        };
 
-        setModal({
-            title: "Ubah Email?",
-            message: "Pesan verifikasi akan dikirim ke email baru Anda.",
-            onConfirm: updateEmail,
-        });
-        setModalIsOpen(true);
-        return true;
-    }, [auth.token, sendRequest, userData]);
+            const updateEmail = async () => {
+                try {
+                    const responseData = await sendRequest(
+                        `${
+                            import.meta.env.VITE_BACKEND_URL
+                        }/users/request-verify-email`,
+                        "POST",
+                        JSON.stringify({
+                            email: userData.email,
+                            newEmail,
+                            isNewEmail: true,
+                        }),
+                        {
+                            "Content-Type": "application/json",
+                            Authorization: "Bearer " + auth.token,
+                        }
+                    );
+                    openModal(
+                        responseData.message,
+                        "success",
+                        null,
+                        "Berhasil!",
+                        false
+                    );
+                    return true;
+                } catch (err) {
+                    openModal(err.message, "error", null, "Gagal!", false);
+                    return false;
+                }
+            };
 
-    const handlePasswordUpdate = useCallback(async ({ oldPassword, newPassword, confirmNewPassword }) => {
-        if (!userData || !userData.email) {
-            setModal({
-                title: "Gagal!",
-                message:
+            openModal(
+                "Pesan verifikasi akan dikirim ke email baru Anda.",
+                "confirmation",
+                updateEmail,
+                "Ubah Email?",
+                true
+            );
+            return true;
+        },
+        [auth.token, sendRequest, userData]
+    );
+
+    const handlePasswordUpdate = useCallback(
+        async ({ oldPassword, newPassword, confirmNewPassword }) => {
+            if (!userData || !userData.email) {
+                openModal(
                     "Data pengguna belum dimuat. Silakan coba lagi setelah halaman selesai dimuat.",
-                onConfirm: null,
-            });
-            setModalIsOpen(true);
-            return false;
-        }
-
-        const updatePassword = async () => {
-            try {
-                const response = await sendRequest(
-                    `${import.meta.env.VITE_BACKEND_URL}/users/change-password`,
-                    "POST",
-                    JSON.stringify({
-                        email: userData.email,
-                        oldPassword,
-                        newPassword,
-                        confirmNewPassword,
-                    }),
-                    {
-                        "Content-Type": "application/json",
-                        Authorization: "Bearer " + auth.token,
-                    }
+                    "error",
+                    null,
+                    "Gagal!",
+                    false
                 );
-                setModal({
-                    title: "Berhasil!",
-                    message: response.message,
-                    onConfirm: null,
-                });
-                setModalIsOpen(true);
-                return true;
-            } catch (err) {
-                setModal({
-                    title: "Gagal!",
-                    message: err.message,
-                    onConfirm: null,
-                });
-                setModalIsOpen(true);
                 return false;
             }
-        };
-        setModal({
-            title: "Ubah Password?",
-            message: "Apakah anda yakin untuk mengubah password?",
-            onConfirm: updatePassword,
-        });
-        setModalIsOpen(true);
-        return true;
-    }, [auth.token, sendRequest, userData]);
+
+            const updatePassword = async () => {
+                try {
+                    const response = await sendRequest(
+                        `${
+                            import.meta.env.VITE_BACKEND_URL
+                        }/users/change-password`,
+                        "POST",
+                        JSON.stringify({
+                            email: userData.email,
+                            oldPassword,
+                            newPassword,
+                            confirmNewPassword,
+                        }),
+                        {
+                            "Content-Type": "application/json",
+                            Authorization: "Bearer " + auth.token,
+                        }
+                    );
+                    openModal(
+                        response.message,
+                        "success",
+                        null,
+                        "Berhasil!",
+                        false
+                    );
+                    return true;
+                } catch (err) {
+                    openModal(err.message, "error", null, "Gagal!", false);
+                    return false;
+                }
+            };
+            openModal({
+                title: "Ubah Password?",
+                message: "Apakah anda yakin untuk mengubah password?",
+                onConfirm: updatePassword,
+            });
+            setModalIsOpen(true);
+            return true;
+        },
+        [auth.token, sendRequest, userData]
+    );
 
     return (
         <div className="container mx-auto p-6 max-w-4xl">
             <div className="card-basic rounded-md flex flex-col items-stretch mb-12">
-                <ProfileModal
-                    isOpen={modalIsOpen}
-                    modal={modal}
-                    isLoading={isLoading}
-                    onClose={() => setModalIsOpen(false)}
-                />
+                <NewModal modalState={modalState} onClose={closeModal} />
 
                 {!isLoading &&
                     userData &&
