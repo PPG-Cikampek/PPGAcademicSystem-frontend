@@ -219,6 +219,22 @@ const RequestAccountForm = () => {
             setEditingIndex(-1);
         } else {
             setDataList((prev) => [...prev, normalized]);
+
+            // After adding a new item, if on mobile, scroll to the list
+            try {
+                // use 1024px as breakpoint matching lg in Tailwind (lg: 1024px)
+                if (typeof window !== "undefined" && window.innerWidth < 1024) {
+                    const el = document.getElementById("list-pendaftaran");
+                    if (el && el.scrollIntoView) {
+                        // small timeout to ensure DOM updated after state change
+                        setTimeout(() => {
+                            el.scrollIntoView({ behavior: "smooth", block: "start" });
+                        }, 120);
+                    }
+                }
+            } catch (e) {
+                // fail silently; scrolling is optional
+            }
         }
 
         // increment formKey to force DynamicForm remount and clear values
@@ -280,13 +296,15 @@ const RequestAccountForm = () => {
                                 ? // populate fields with current data for editing
                                   fields.map((f) => {
                                       const copy = { ...f };
-                                      const value = dataList[editingIndex]?.[
-                                          f.name
-                                      ];
+                                      const value =
+                                          dataList[editingIndex]?.[f.name];
                                       if (f.type === "date") {
-                                          copy.value = value ? new Date(value) : null;
+                                          copy.value = value
+                                              ? new Date(value)
+                                              : null;
                                       } else {
-                                          copy.value = value !== undefined ? value : "";
+                                          copy.value =
+                                              value !== undefined ? value : "";
                                       }
                                       return copy;
                                   })
@@ -322,7 +340,10 @@ const RequestAccountForm = () => {
                 </div>
 
                 {dataList.length > 0 && (
-                    <div className="card-basic rounded-md flex flex-col grow w-full h-full lg:basis-3/5">
+                    <div
+                        id="list-pendaftaran"
+                        className="card-basic rounded-md flex flex-col grow w-full h-full lg:basis-3/5"
+                    >
                         <div>
                             <h3 className="text-lg mt-1 font-normal">
                                 List Pendaftaran
