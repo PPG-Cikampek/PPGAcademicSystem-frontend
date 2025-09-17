@@ -98,7 +98,7 @@ const Sidebar = ({ linksList, children }) => {
             {/* Sidebar */}
             <div
                 className={`
-                    fixed md:sticky md:top-0
+                    fixed md:sticky top-0
                     h-full md:h-screen
                     bg-white text-gray-800 border-gray-200 
                     transition-all duration-300 ease-in-out will-change-[transform]
