@@ -33,6 +33,8 @@ const UsersView = () => {
             } catch {
                 // Error handled by useHttp
             }
+            // prevent modal from closing immediately
+            return false;
         };
         openModal(
             "Hapus Pengguna?",
@@ -41,8 +43,6 @@ const UsersView = () => {
             "Peringatan!",
             true
         );
-        // prevent modal from closing immediately
-        return false;
     };
 
     const handleBulkDeleteModal = () => {
@@ -64,6 +64,8 @@ const UsersView = () => {
             } catch {
                 // Error handled by useHttp
             }
+            // prevent modal from closing immediately
+            return false;
         };
 
         openModal(
