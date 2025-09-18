@@ -104,7 +104,7 @@ const FileUpload = forwardRef((props, ref) => {
                         </div>
                     </CropperModal>
                 ) : (
-                    <div>
+                    <div className={`${props.className}`}>
                         <img
                             src={previewUrl || props.defaultImageSrc}
                             alt="preview"

@@ -32,7 +32,7 @@ const TeacherRequestAccountForm: React.FC = () => {
     const [dataList, setDataList] = useState<TeacherAccountWithImage[]>([]);
     const [formKey, setFormKey] = useState<number>(0);
     const [editingIndex, setEditingIndex] = useState<number>(-1);
-    const { isLoading, error, sendRequest, setError } = useHttp();
+    const { isLoading, error, sendRequest, setError, setIsLoading } = useHttp();
 
     const navigate = useNavigate();
     const auth = useContext(AuthContext);
@@ -49,6 +49,8 @@ const TeacherRequestAccountForm: React.FC = () => {
     };
 
     const handleSubmit = async (): Promise<void> => {
+        setError(null);
+        setIsLoading(true);
         if (dataList.length === 0) return;
         for (const entry of dataList) {
             if (!entry._imageFile) {
@@ -56,14 +58,19 @@ const TeacherRequestAccountForm: React.FC = () => {
                 return;
             }
         }
-        const accountsPayload = dataList.map(({ _imageFile, ...rest }) => ({ ...rest, accountRole: "teacher" as const }));
+        const accountsPayload = dataList.map(({ _imageFile, ...rest }) => ({
+            ...rest,
+            accountRole: "teacher" as const,
+        }));
         const formData = new FormData();
         formData.append("subBranchId", auth.userSubBranchId);
         formData.append("accountList", JSON.stringify(accountsPayload));
         dataList.forEach((entry) => {
             if (entry._imageFile) formData.append("images", entry._imageFile);
         });
-        const url = `${(import.meta as any).env.VITE_BACKEND_URL}/users/requestAccounts`;
+        const url = `${
+            (import.meta as any).env.VITE_BACKEND_URL
+        }/users/requestAccounts`;
         try {
             const response = await fetch(url, {
                 method: "POST",
@@ -71,7 +78,10 @@ const TeacherRequestAccountForm: React.FC = () => {
                 body: formData,
             });
             const resData: ResponseData = await response.json();
-            if (!response.ok) throw new Error(resData.message || "Gagal mengirim permintaan.");
+            if (!response.ok)
+                throw new Error(
+                    resData.message || "Gagal mengirim permintaan."
+                );
             openModal(
                 resData.message,
                 "success",
@@ -84,6 +94,8 @@ const TeacherRequestAccountForm: React.FC = () => {
             );
         } catch (e: any) {
             setError(e.message || "Gagal mengirim permintaan.");
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -101,12 +113,25 @@ const TeacherRequestAccountForm: React.FC = () => {
 
         if (editingIndex >= 0) {
             // update existing entry
-            setDataList((prev) => prev.map((item, i) => (i === editingIndex ? { ...(normalized as TeacherAccountWithImage), _imageFile: pendingImageRef.current || item._imageFile } : item)));
+            setDataList((prev) =>
+                prev.map((item, i) =>
+                    i === editingIndex
+                        ? {
+                              ...(normalized as TeacherAccountWithImage),
+                              _imageFile:
+                                  pendingImageRef.current || item._imageFile,
+                          }
+                        : item
+                )
+            );
             setEditingIndex(-1);
         } else {
             setDataList((prev) => [
                 ...prev,
-                { ...(normalized as TeacherAccountWithImage), _imageFile: pendingImageRef.current || undefined },
+                {
+                    ...(normalized as TeacherAccountWithImage),
+                    _imageFile: pendingImageRef.current || undefined,
+                },
             ]);
         }
         pendingImageRef.current = null;
@@ -164,7 +189,9 @@ const TeacherRequestAccountForm: React.FC = () => {
                             editingIndex >= 0
                                 ? // populate fields with current data for editing
                                   fields.map((f) => {
-                                      const copy: AccountFieldWithValue = { ...f };
+                                      const copy: AccountFieldWithValue = {
+                                          ...f,
+                                      };
                                       const value =
                                           dataList[editingIndex]?.[f.name];
                                       if (f.type === "date") {
@@ -210,28 +237,40 @@ const TeacherRequestAccountForm: React.FC = () => {
                         customDescription={
                             <div className="relative">
                                 <FileUploadAny
+                                    className="flex flex-col items-center"
                                     ref={fileInputRef as any}
                                     accept={".jpg,.jpeg,.png"}
                                     buttonLabel={
                                         isLoading ? (
                                             <div className="flex items-center">
-                                                <LoadingCircle size={16}>Memproses</LoadingCircle>
+                                                <LoadingCircle size={16}>
+                                                    Memproses
+                                                </LoadingCircle>
                                             </div>
                                         ) : (
                                             <div className="flex items-center">
-                                                <Icon icon="jam:upload" width="24" height="24" />
+                                                <Icon
+                                                    icon="jam:upload"
+                                                    width="24"
+                                                    height="24"
+                                                />
                                                 Foto Profil
                                             </div>
                                         )
                                     }
-                                    buttonClassName={`btn-round-primary text-xs m-0 m-2 ml-1 p-2 pr-3`}
+                                    buttonClassName={`btn-round-primary text-xs m-2 p-2 pr-3`}
                                     imgClassName={`mt-2 rounded-md size-24 shrink-0`}
-                                    defaultImageSrc={"https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"}
+                                    defaultImageSrc={
+                                        "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541"
+                                    }
                                     onImageCropped={handleImageCropped as any}
                                 />
-                                {editingIndex >= 0 && dataList[editingIndex]?._imageFile && (
-                                    <p className="text-xs mt-1 text-gray-500">Foto tersimpan untuk entri ini.</p>
-                                )}
+                                {editingIndex >= 0 &&
+                                    dataList[editingIndex]?._imageFile && (
+                                        <p className="text-xs mt-1 text-gray-500">
+                                            Foto tersimpan untuk entri ini.
+                                        </p>
+                                    )}
                             </div>
                         }
                         helpButton={null}
