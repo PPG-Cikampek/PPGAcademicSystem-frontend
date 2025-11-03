@@ -1,4 +1,4 @@
-import { useContext, useState, useRef, useCallback } from "react";
+import { useContext, useState, useRef, useCallback, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useHttp from "../../../shared/hooks/http-hook";
 import DynamicForm from "../../../shared/Components/UIElements/DynamicForm";
@@ -43,6 +43,13 @@ const TeacherRequestAccountForm: React.FC = () => {
     const activeRequestRef = useRef<XMLHttpRequest | null>(null);
     const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
+    // Scroll to top when error changes to non-null value
+    useEffect(() => {
+        if (error !== null) {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+    }, [error]);
+
     const handleImageCropped = useCallback((file: File) => {
         pendingImageRef.current = file;
     }, []);
@@ -85,7 +92,8 @@ const TeacherRequestAccountForm: React.FC = () => {
             formData.append("subBranchId", auth.userSubBranchId);
             formData.append("accountList", JSON.stringify(accountsPayload));
             entriesSnapshot.forEach((entry) => {
-                if (entry._imageFile) formData.append("images", entry._imageFile);
+                if (entry._imageFile)
+                    formData.append("images", entry._imageFile);
             });
 
             const url = `${
@@ -97,7 +105,10 @@ const TeacherRequestAccountForm: React.FC = () => {
                     const xhr = new XMLHttpRequest();
                     activeRequestRef.current = xhr;
                     xhr.open("POST", url);
-                    xhr.setRequestHeader("Authorization", "Bearer " + auth.token);
+                    xhr.setRequestHeader(
+                        "Authorization",
+                        "Bearer " + auth.token
+                    );
 
                     xhr.upload.onprogress = (event) => {
                         if (event.lengthComputable && event.total > 0) {
@@ -124,7 +135,9 @@ const TeacherRequestAccountForm: React.FC = () => {
                                 );
                             }
                         } catch (err) {
-                            reject(new Error("Respon tidak valid dari server."));
+                            reject(
+                                new Error("Respon tidak valid dari server.")
+                            );
                         }
                     };
 
@@ -393,7 +406,7 @@ const TeacherRequestAccountForm: React.FC = () => {
                     />
                 </div>
 
-                {dataList.length > 0 && (
+                {dataList.length > 0 ? (
                     <div
                         id="list-pendaftaran"
                         className="card-basic rounded-md flex flex-col grow w-full h-full lg:basis-3/5"
@@ -490,6 +503,12 @@ const TeacherRequestAccountForm: React.FC = () => {
                                 )}
                             </button>
                         </div>
+                    </div>
+                ) : (
+                    <div className="card-basic rounded-md flex flex-col grow w-full h-full lg:basis-3/5 items-center justify-center">
+                        <p className="text-gray-500">
+                            Belum ada data yang ditambahkan.
+                        </p>
                     </div>
                 )}
             </div>
