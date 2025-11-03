@@ -52,7 +52,7 @@ const TeacherRequestAccountForm: React.FC = () => {
         setError(null);
         if (isLoading) return;
         if (dataList.length === 0) {
-            setError("Tambahkan minimal satu akun sebelum mengirim.");
+            setError("Tidak ada akun untuk diajukan!");
             return;
         }
 
