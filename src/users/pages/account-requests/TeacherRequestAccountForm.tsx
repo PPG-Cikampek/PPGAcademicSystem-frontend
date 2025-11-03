@@ -48,57 +48,84 @@ const TeacherRequestAccountForm: React.FC = () => {
         setDataList(updatedDataList);
     };
 
-    const handleSubmit = async (): Promise<void> => {
+    const handleSubmit = (): void => {
         setError(null);
-        setIsLoading(true);
-        if (dataList.length === 0) return;
+        if (isLoading) return;
+        if (dataList.length === 0) {
+            setError("Tambahkan minimal satu akun sebelum mengirim.");
+            return;
+        }
+
         for (const entry of dataList) {
             if (!entry._imageFile) {
                 setError(`Foto belum dipilih untuk akun '${entry.name}'.`);
-                setIsLoading(false);
                 return;
             }
         }
-        const accountsPayload = dataList.map(({ _imageFile, ...rest }) => ({
-            ...rest,
-            accountRole: "teacher" as const,
-        }));
-        const formData = new FormData();
-        formData.append("subBranchId", auth.userSubBranchId);
-        formData.append("accountList", JSON.stringify(accountsPayload));
-        dataList.forEach((entry) => {
-            if (entry._imageFile) formData.append("images", entry._imageFile);
-        });
-        const url = `${
-            (import.meta as any).env.VITE_BACKEND_URL
-        }/users/requestAccounts`;
-        try {
-            const response = await fetch(url, {
-                method: "POST",
-                headers: { Authorization: "Bearer " + auth.token },
-                body: formData,
-            });
-            const resData: ResponseData = await response.json();
-            if (!response.ok)
-                throw new Error(
-                    resData.message || "Gagal mengirim permintaan."
-                );
-            openModal(
-                resData.message,
-                "success",
-                () => {
-                    navigate(-1);
-                    return false;
-                },
-                "Berhasil!",
-                false
+
+        const entriesSnapshot = dataList.map((entry) => ({ ...entry }));
+
+        const confirmSubmit = async () => {
+            setError(null);
+            setIsLoading(true);
+
+            const accountsPayload = entriesSnapshot.map(
+                ({ _imageFile, ...rest }) => ({
+                    ...rest,
+                    accountRole: "teacher" as const,
+                })
             );
-        } catch (e: any) {
-            setError(e.message || "Gagal mengirim permintaan.");
-            setIsLoading(false);
-        } finally {
-            setIsLoading(false);
-        }
+
+            const formData = new FormData();
+            formData.append("subBranchId", auth.userSubBranchId);
+            formData.append("accountList", JSON.stringify(accountsPayload));
+            entriesSnapshot.forEach((entry) => {
+                if (entry._imageFile) formData.append("images", entry._imageFile);
+            });
+
+            const url = `${
+                (import.meta as any).env.VITE_BACKEND_URL
+            }/users/requestAccounts`;
+
+            try {
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: { Authorization: "Bearer " + auth.token },
+                    body: formData,
+                });
+                const resData: ResponseData = await response.json();
+                if (!response.ok)
+                    throw new Error(
+                        resData.message || "Gagal mengirim permintaan."
+                    );
+                openModal(
+                    resData.message,
+                    "success",
+                    () => {
+                        navigate(-1);
+                        return false;
+                    },
+                    "Berhasil!",
+                    false
+                );
+            } catch (e: any) {
+                const message = e?.message || "Gagal mengirim permintaan.";
+                setError(message);
+                openModal(message, "error", null, "Gagal!", false);
+            } finally {
+                setIsLoading(false);
+            }
+
+            return false;
+        };
+
+        openModal(
+            `Kirim permintaan akun untuk ${entriesSnapshot.length} tenaga pendidik?`,
+            "confirmation",
+            confirmSubmit,
+            "Konfirmasi Pengiriman",
+            true
+        );
     };
 
     const fields: AccountField[] = teacherFields;
