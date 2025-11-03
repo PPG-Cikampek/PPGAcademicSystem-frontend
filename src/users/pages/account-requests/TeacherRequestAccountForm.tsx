@@ -32,6 +32,7 @@ const TeacherRequestAccountForm: React.FC = () => {
     const [dataList, setDataList] = useState<TeacherAccountWithImage[]>([]);
     const [formKey, setFormKey] = useState<number>(0);
     const [editingIndex, setEditingIndex] = useState<number>(-1);
+    const [uploadProgress, setUploadProgress] = useState<number | null>(null);
     const { isLoading, error, sendRequest, setError, setIsLoading } = useHttp();
 
     const navigate = useNavigate();
@@ -68,6 +69,7 @@ const TeacherRequestAccountForm: React.FC = () => {
         const confirmSubmit = async () => {
             setError(null);
             setIsLoading(true);
+            setUploadProgress(0);
 
             const accountsPayload = entriesSnapshot.map(
                 ({ _imageFile, ...rest }) => ({
@@ -87,17 +89,50 @@ const TeacherRequestAccountForm: React.FC = () => {
                 (import.meta as any).env.VITE_BACKEND_URL
             }/users/requestAccounts`;
 
-            try {
-                const response = await fetch(url, {
-                    method: "POST",
-                    headers: { Authorization: "Bearer " + auth.token },
-                    body: formData,
+            const sendWithProgress = () =>
+                new Promise<ResponseData>((resolve, reject) => {
+                    const xhr = new XMLHttpRequest();
+                    xhr.open("POST", url);
+                    xhr.setRequestHeader("Authorization", "Bearer " + auth.token);
+
+                    xhr.upload.onprogress = (event) => {
+                        if (event.lengthComputable && event.total > 0) {
+                            const percent = Math.round(
+                                (event.loaded / event.total) * 100
+                            );
+                            setUploadProgress(percent);
+                        }
+                    };
+
+                    xhr.onload = () => {
+                        try {
+                            const resData: ResponseData = JSON.parse(
+                                xhr.responseText || "{}"
+                            );
+                            if (xhr.status >= 200 && xhr.status < 300) {
+                                resolve(resData);
+                            } else {
+                                reject(
+                                    new Error(
+                                        resData.message ||
+                                            "Gagal mengirim permintaan."
+                                    )
+                                );
+                            }
+                        } catch (err) {
+                            reject(new Error("Respon tidak valid dari server."));
+                        }
+                    };
+
+                    xhr.onerror = () => {
+                        reject(new Error("Jaringan bermasalah."));
+                    };
+
+                    xhr.send(formData);
                 });
-                const resData: ResponseData = await response.json();
-                if (!response.ok)
-                    throw new Error(
-                        resData.message || "Gagal mengirim permintaan."
-                    );
+
+            try {
+                const resData = await sendWithProgress();
                 openModal(
                     resData.message,
                     "success",
@@ -114,6 +149,7 @@ const TeacherRequestAccountForm: React.FC = () => {
                 openModal(message, "error", null, "Gagal!", false);
             } finally {
                 setIsLoading(false);
+                setUploadProgress(null);
             }
 
             return false;
@@ -200,6 +236,8 @@ const TeacherRequestAccountForm: React.FC = () => {
                 modalState={modalState}
                 onClose={closeModal}
                 isLoading={isLoading}
+                loadingVariant="bar"
+                progress={uploadProgress}
             >
                 <></>
             </NewModal>

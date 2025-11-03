@@ -21,6 +21,8 @@ const NewModal = ({
     confirmText = "OK",
     cancelText = "Batal",
     isLoading = false,
+    loadingVariant = "spinner",
+    progress = null,
 }) => {
     const { isOpen, message, type, title, onConfirm, showCancel, size } =
         modalState;
@@ -164,55 +166,90 @@ const NewModal = ({
                             {getIcon()}
                         </div>
                         <div className="flex-1 min-w-0">
-                            {title && <h4 className="mb-1">{title}</h4>}
-                            {message && (
-                                <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">
-                                    {message}
-                                </p>
+                            {((loadingVariant === "bar" && isLoading) ||
+                                title) && (
+                                <h4 className="mb-1">
+                                    {loadingVariant === "bar" && isLoading
+                                        ? "Memroses..."
+                                        : title}
+                                </h4>
                             )}
+                            {!(loadingVariant === "bar" && isLoading) &&
+                                message && (
+                                    <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">
+                                        {message}
+                                    </p>
+                                )}
                         </div>
                     </div>
 
                     {/* Custom content */}
-                    {children && <div className="mb-6">{children}</div>}
+                    {!(loadingVariant === "bar" && isLoading) && children && (
+                        <div className="mb-6">{children}</div>
+                    )}
 
                     {/* Action buttons */}
-                    <div className="flex justify-end space-x-3">
-                        {showCancel && (
-                            <button
-                                onClick={onClose}
-                                disabled={isLoading}
-                                className="btn-round-gray
+                    {!(loadingVariant === "bar" && isLoading) && (
+                        <div className="flex justify-end space-x-3">
+                            {showCancel && (
+                                <button
+                                    onClick={onClose}
+                                    disabled={isLoading}
+                                    className="btn-round-gray
                 "
-                            >
-                                {cancelText}
-                            </button>
-                        )}
-                        <button
-                            onClick={async () => {
-                                // If this is a confirmation modal (has onConfirm), execute it
-                                if (onConfirm) {
-                                    let shouldClose = true;
-                                    const result = await onConfirm();
-                                    if (result === false) shouldClose = false;
-                                    if (shouldClose) onClose();
-                                } else {
-                                    // For notification modals (success, error, info), just close
-                                    onClose();
-                                }
-                            }}
-                            disabled={isLoading}
-                            className={`${typeStyles.buttonStyle}
+                                >
+                                    {cancelText}
+                                </button>
+                            )}
+                            <button
+                                onClick={async () => {
+                                    // If this is a confirmation modal (has onConfirm), execute it
+                                    if (onConfirm) {
+                                        let shouldClose = true;
+                                        const result = await onConfirm();
+                                        if (result === false)
+                                            shouldClose = false;
+                                        if (shouldClose) onClose();
+                                    } else {
+                                        // For notification modals (success, error, info), just close
+                                        onClose();
+                                    }
+                                }}
+                                disabled={isLoading}
+                                className={`${typeStyles.buttonStyle}
                 ${isLoading ? "opacity-50 cursor-not-allowed" : ""}
               `}
-                        >
-                            {isLoading ? (
-                                <LoadingCircle>Memroses...</LoadingCircle>
-                            ) : (
-                                confirmText
-                            )}
-                        </button>
-                    </div>
+                            >
+                                {isLoading ? (
+                                    <LoadingCircle>Memroses...</LoadingCircle>
+                                ) : (
+                                    confirmText
+                                )}
+                            </button>
+                        </div>
+                    )}
+
+                    {/* Progress bar */}
+                    {isLoading &&
+                        loadingVariant === "bar" &&
+                        typeof progress === "number" && (
+                            <div className="flex flex-col items-center gap-1 min-w-[8rem] mt-4">
+                                <span className="text-xs font-medium text-gray-600">
+                                    {`${Math.min(100, Math.max(0, progress))}%`}
+                                </span>
+                                <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                                    <div
+                                        className="h-full bg-blue-500 transition-[width] duration-150 ease-out"
+                                        style={{
+                                            width: `${Math.min(
+                                                100,
+                                                Math.max(0, progress)
+                                            )}%`,
+                                        }}
+                                    />
+                                </div>
+                            </div>
+                        )}
                 </div>
             </div>
         </ReactModal>
