@@ -13,6 +13,7 @@ import { studentFields, StudentAccount, AccountField } from "../../config";
 import FileUpload from "../../../shared/Components/FormElements/FileUpload";
 // create an any-typed alias to bypass TS prop constraints for existing JS component
 const FileUploadAny: any = FileUpload;
+const CANCEL_UPLOAD_MESSAGE = "Permintaan dibatalkan oleh pengguna.";
 import { Icon } from "@iconify-icon/react";
 
 interface ResponseData {
@@ -38,6 +39,8 @@ const StudentRequestAccountForm: React.FC = () => {
     const { isLoading, error, sendRequest, setError, setIsLoading } = useHttp();
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const pendingImageRef = useRef<File | null>(null);
+    const activeRequestRef = useRef<XMLHttpRequest | null>(null);
+    const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
     const navigate = useNavigate();
     const auth = useContext(AuthContext);
@@ -91,6 +94,7 @@ const StudentRequestAccountForm: React.FC = () => {
             const sendWithProgress = () =>
                 new Promise<ResponseData>((resolve, reject) => {
                     const xhr = new XMLHttpRequest();
+                    activeRequestRef.current = xhr;
                     xhr.open("POST", url);
                     xhr.setRequestHeader("Authorization", "Bearer " + auth.token);
 
@@ -127,6 +131,10 @@ const StudentRequestAccountForm: React.FC = () => {
                         reject(new Error("Jaringan bermasalah."));
                     };
 
+                    xhr.onabort = () => {
+                        reject(new Error(CANCEL_UPLOAD_MESSAGE));
+                    };
+
                     xhr.send(formData);
                 });
 
@@ -145,10 +153,13 @@ const StudentRequestAccountForm: React.FC = () => {
             } catch (e: any) {
                 const message = e?.message || "Gagal mengirim permintaan.";
                 setError(message);
-                openModal(message, "error", null, "Gagal!", false);
+                if (message !== CANCEL_UPLOAD_MESSAGE) {
+                    openModal(message, "error", null, "Gagal!", false);
+                }
             } finally {
                 setIsLoading(false);
                 setUploadProgress(null);
+                activeRequestRef.current = null;
             }
 
             return false;
@@ -234,14 +245,51 @@ const StudentRequestAccountForm: React.FC = () => {
         setFormKey((k) => k + 1);
     };
 
+    const handleAttemptCloseModal = (): void => {
+        if (isLoading && uploadProgress !== null && activeRequestRef.current) {
+            setIsCancelModalOpen(true);
+            return;
+        }
+        closeModal();
+    };
+
+    const handleConfirmCancelUpload = (): boolean => {
+        const request = activeRequestRef.current;
+        if (request) {
+            request.abort();
+            activeRequestRef.current = null;
+        }
+        setIsLoading(false);
+        setUploadProgress(null);
+        setIsCancelModalOpen(false);
+        setError(CANCEL_UPLOAD_MESSAGE);
+        closeModal();
+        return true;
+    };
+
     return (
         <div className="max-w-6xl mx-auto flex flex-col items-center-safe">
             <NewModal
                 modalState={modalState}
-                onClose={closeModal}
+                onClose={handleAttemptCloseModal}
                 isLoading={isLoading}
                 loadingVariant="bar"
                 progress={uploadProgress}
+            >
+                <></>
+            </NewModal>
+            <NewModal
+                modalState={{
+                    isOpen: isCancelModalOpen,
+                    type: "warning",
+                    title: "Batalkan Permintaan?",
+                    onConfirm: handleConfirmCancelUpload,
+                    showCancel: true,
+                    size: "md",
+                }}
+                onClose={() => setIsCancelModalOpen(false)}
+                confirmText="Ya, batalkan"
+                cancelText="Tidak"
             >
                 <></>
             </NewModal>
