@@ -239,7 +239,7 @@ const NewModal = ({
                                 </span>
                                 <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
                                     <div
-                                        className="h-full bg-blue-500 transition-[width] duration-150 ease-out"
+                                        className="h-full bg-blue-500 transition-[width] duration-150 ease-out animate-pulse"
                                         style={{
                                             width: `${Math.min(
                                                 100,
