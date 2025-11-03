@@ -55,6 +55,7 @@ const TeacherRequestAccountForm: React.FC = () => {
         for (const entry of dataList) {
             if (!entry._imageFile) {
                 setError(`Foto belum dipilih untuk akun '${entry.name}'.`);
+                setIsLoading(false);
                 return;
             }
         }
@@ -94,6 +95,7 @@ const TeacherRequestAccountForm: React.FC = () => {
             );
         } catch (e: any) {
             setError(e.message || "Gagal mengirim permintaan.");
+            setIsLoading(false);
         } finally {
             setIsLoading(false);
         }
