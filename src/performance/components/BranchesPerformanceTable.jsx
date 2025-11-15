@@ -28,6 +28,7 @@ const BranchesPerformanceTable = ({ filterState, setFilterState }) => {
         filterState.selectedAcademicYear,
         filterState.selectedBranch,
         filterState.selectedBranchYear,
+        filterState.selectedTeachingGroup,
         filterState.startDate,
         filterState.endDate,
     ]);

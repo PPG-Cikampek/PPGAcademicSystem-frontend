@@ -683,6 +683,7 @@ const BranchPerformanceView = () => {
                                                 currentView:
                                                     "teachingGroupsTable",
                                                 selectedClass: null,
+                                                selectedTeachingGroup: null,
                                             }))
                                         }
                                     >

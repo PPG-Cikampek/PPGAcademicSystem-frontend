@@ -55,6 +55,7 @@ const PerformanceView = () => {
 
     // Dropdown options lists
     const [branchesList, setBranchesList] = useState();
+    const [teachingGroupsList, setTeachingGroupsList] = useState();
     const [subBranchesList, setSubBranchesList] = useState();
     const [classesList, setClassesList] = useState();
 
@@ -153,6 +154,7 @@ const PerformanceView = () => {
         }));
 
         setBranchesList([]);
+        setTeachingGroupsList([]);
         setSubBranchesList([]);
         setClassesList([]);
 
@@ -170,6 +172,47 @@ const PerformanceView = () => {
             setBranchesList(responseData.branches);
         } catch (err) {}
     }, [sendRequest]);
+
+    const fetchTeachingGroups = useCallback(async () => {
+        console.log("fetching teachingGroups!");
+        try {
+            const responseData = await sendRequest(
+                `${import.meta.env.VITE_BACKEND_URL}/branchYears/${
+                    auth.currentBranchYearId
+                }/teaching-groups`
+            );
+            setTeachingGroupsList(responseData.teachingGroups);
+        } catch (err) {}
+    }, [sendRequest]);
+
+       const fetchSubBranchesList = useCallback(
+        async (branchId) => {
+            try {
+                const responseData = await sendRequest(
+                    `${
+                        import.meta.env.VITE_BACKEND_URL
+                    }/levels/branches/${branchId}?populate=true`
+                );
+                setSubBranchesList(responseData.branch.subBranches);
+            } catch (err) {}
+        },
+        [sendRequest]
+    );
+
+     const fetchClassesList = useCallback(
+        async (subBranchId) => {
+            const url = `${
+                import.meta.env.VITE_BACKEND_URL
+            }/classes/sub-branch/${subBranchId}/academic-year/${
+                filterState.selectedAcademicYear
+            }`;
+            try {
+                const responseData = await sendRequest(url);
+                setClassesList(responseData.subBranchYear.classes);
+            } catch (err) {}
+        },
+        [sendRequest, filterState.selectedAcademicYear]
+    );
 
     const selectBranchHandler = useCallback((branchId) => {
         setFilterState((prev) => ({
@@ -189,26 +232,35 @@ const PerformanceView = () => {
             violationData: null,
         }));
 
+        setTeachingGroupsList([]);
         setSubBranchesList([]);
         setClassesList([]);
 
         if (branchId !== "") {
-            fetchSubBranchesList(branchId);
+            fetchTeachingGroups(branchId);
         }
     }, []);
 
-    const fetchSubBranchesList = useCallback(
-        async (branchId) => {
-            try {
-                const responseData = await sendRequest(
-                    `${
-                        import.meta.env.VITE_BACKEND_URL
-                    }/levels/branches/${branchId}?populate=true`
-                );
-                setSubBranchesList(responseData.branch.subBranches);
-            } catch (err) {}
+    const selectTeachingGroupHandler = useCallback(
+        (teachingGroupId) => {
+            setFilterState((prev) => ({
+                ...prev,
+                selectedTeachingGroup: teachingGroupId,
+                selectedSubBranch: null,
+                selectedClass: null,
+                currentView: "teachingGroupsTable",
+            }));
+
+            setDisplayState((prev) => ({
+                ...prev,
+            }));
+
+            if (teachingGroupId !== "") {
+                fetchSubBranchesList(teachingGroupId);
+                fetchClassesList(teachingGroupId);
+            }
         },
-        [sendRequest]
+        [fetchSubBranchesList, fetchClassesList]
     );
 
     const selectSubBranchHandler = useCallback((subBranchId) => {
@@ -231,21 +283,6 @@ const PerformanceView = () => {
             fetchClassesList(subBranchId);
         }
     }, []);
-
-    const fetchClassesList = useCallback(
-        async (subBranchId) => {
-            const url = `${
-                import.meta.env.VITE_BACKEND_URL
-            }/classes/sub-branch/${subBranchId}/academic-year/${
-                filterState.selectedAcademicYear
-            }`;
-            try {
-                const responseData = await sendRequest(url);
-                setClassesList(responseData.subBranchYear.classes);
-            } catch (err) {}
-        },
-        [sendRequest, filterState.selectedAcademicYear]
-    );
 
     const selectClassHandler = useCallback((classId) => {
         setFilterState((prev) => ({
@@ -377,6 +414,7 @@ const PerformanceView = () => {
                                         <div>Tahun Ajaran</div>
                                         <div>Periode</div>
                                         <div>Desa</div>
+                                        <div>KBM</div>
                                         <div>Kelompok</div>
                                         <div>Kelas</div>
                                     </div>
@@ -480,6 +518,45 @@ const PerformanceView = () => {
                                                             value={branch._id}
                                                         >
                                                             {branch.name}
+                                                        </option>
+                                                    )
+                                                )}
+                                        </select>
+                                        <select
+                                            value={
+                                                filterState.selectedTeachingGroup
+                                                    ? filterState.selectedTeachingGroup
+                                                    : ""
+                                            }
+                                            onChange={(e) =>
+                                                selectTeachingGroupHandler(
+                                                    e.target.value
+                                                )
+                                            }
+                                            className={`border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300 ${
+                                                filterState.selectedAcademicYear
+                                                    ? ""
+                                                    : "opacity-50 cursor-not-allowed"
+                                            }`}
+                                            disabled={
+                                                !filterState.selectedAcademicYear
+                                            }
+                                        >
+                                            <option value={""}>
+                                                {!filterState.selectedAcademicYear
+                                                    ? "Pilih Tahun Ajaran"
+                                                    : "Semua"}
+                                            </option>
+                                            {teachingGroupsList &&
+                                                teachingGroupsList.map(
+                                                    (teachingGroup, index) => (
+                                                        <option
+                                                            key={index}
+                                                            value={
+                                                                teachingGroup._id
+                                                            }
+                                                        >
+                                                            {teachingGroup.name}
                                                         </option>
                                                     )
                                                 )}
@@ -651,8 +728,7 @@ const PerformanceView = () => {
                                         onClick={() =>
                                             setFilterState((prev) => ({
                                                 ...prev,
-                                                currentView:
-                                                    "branchesTable",
+                                                currentView: "branchesTable",
                                                 selectedBranch: null,
                                             }))
                                         }
@@ -679,6 +755,7 @@ const PerformanceView = () => {
                                                 currentView:
                                                     "teachingGroupsTable",
                                                 selectedClass: null,
+                                                selectedTeachingGroup: null,
                                             }))
                                         }
                                     >
