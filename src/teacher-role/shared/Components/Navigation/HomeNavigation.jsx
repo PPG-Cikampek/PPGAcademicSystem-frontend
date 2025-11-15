@@ -13,6 +13,7 @@ import {
     CalendarCog,
     Settings,
     BookOpenText,
+    CodeXml
 } from "lucide-react";
 
 const HomeNavigation = ({ children }) => {
@@ -82,6 +83,13 @@ const HomeNavigation = ({ children }) => {
                       label: "Pengaturan Akun",
                   },
               ];
+
+              links.push({
+                  link: "/info-portal",
+                  icon: <CodeXml />,
+                  label: "Portal Pengembang",
+                  end: true,
+              });
 
     return (
         <Sidebar linksList={links}>

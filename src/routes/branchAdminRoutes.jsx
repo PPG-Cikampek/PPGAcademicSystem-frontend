@@ -10,6 +10,7 @@ import AddSubBranchToTeachingGroupView from "../teaching-group/page/AddSubBranch
 import BranchAdminMunaqasyahDetailView from "../munaqasyah/pages/BranchAdminMunaqasyahDetailView";
 import UpdateClassView from "../class/pages/UpdateClassView";
 import UpdateTeachingGroupView from "../teaching-group/page/UpdateTeachingGroupView";
+import { infoPortalRoutes } from "./infoPortalRoutes";
 
 const DashboardNav = lazy(() =>
     import("../shared/Components/Navigation/DashboardNav/DashboardNav")
@@ -113,6 +114,8 @@ export const branchAdminRoutes = [
         path: "/munaqasyah/:branchYearId",
         element: <BranchAdminMunaqasyahDetailView />,
     },
+    // Info Portal routes (accessible to all authenticated users)
+    ...infoPortalRoutes,
 ];
 
 export const BranchAdminRouteWrapper = ({ children }) => (

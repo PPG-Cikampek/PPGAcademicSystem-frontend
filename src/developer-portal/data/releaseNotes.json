@@ -1,0 +1,46 @@
+[
+    {
+        "version": "1.5.57",
+        "date": "2025-10-31",
+        "highlights": [
+            "Virtualized attended students list",
+            "Dashboard load speed improvements",
+            "Fixes for student profile exports"
+        ]
+    },
+    {
+        "version": "1.5.55",
+        "date": "2025-09-12",
+        "highlights": [
+            "Branch-year bulk editor",
+            "New munaqasyah reports",
+            "Improved email verification flow"
+        ]
+    },
+    {
+        "version": "1.5.53",
+        "date": "2025-09-12",
+        "highlights": [
+            "Branch-year bulk editor",
+            "New munaqasyah reports",
+            "Improved email verification flow"
+        ]
+    },
+    {
+        "version": "1.5.51",
+        "date": "2025-09-12",
+        "highlights": [
+            "Branch-year bulk editor",
+            "New munaqasyah reports",
+            "Improved email verification flow"
+        ]
+    },{
+        "version": "1.5.50",
+        "date": "2025-10-31",
+        "highlights": [
+            "Virtualized attended students list",
+            "Dashboard load speed improvements",
+            "Fixes for student profile exports"
+        ]
+    }
+]

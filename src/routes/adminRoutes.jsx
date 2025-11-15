@@ -1,6 +1,7 @@
 import { lazy } from 'react';
 import PreviewReport from '../munaqasyah/pages/PreviewReport';
 import ClassesViewByAcademicYear from '../class/pages/ClassesViewByAcademicYear';
+import { infoPortalRoutes } from './infoPortalRoutes';
 
 const DashboardNav = lazy(() => import("../shared/Components/Navigation/DashboardNav/DashboardNav"));
 const DashboardView = lazy(() => import("../dashboard/pages/DashboardView"));
@@ -80,6 +81,8 @@ export const adminRoutes = [
     { path: '/munaqasyah/question-bank/:classGrade/:questionId/update', element: <UpdateQuestionView /> },
     { path: '/munaqasyah/question-package', element: <QuestionPackageView/> },
     { path: '/munaqasyah/question-package/class', element: <CategoryPackageView/> },
+    // Info Portal routes (accessible to all authenticated users)
+    ...infoPortalRoutes,
 ];
 
 export const AdminRouteWrapper = ({ children }) => (

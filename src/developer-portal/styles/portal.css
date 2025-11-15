@@ -1,0 +1,52 @@
+.portal-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+/* Dashboard Portal Layout */
+.portal-dashboard {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: 2fr 1fr;
+}
+
+/* Responsive - Stack on smaller screens */
+@media (max-width: 1024px) {
+    .portal-dashboard {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* On smaller screens make the announcements sidebar sit on top */
+@media (max-width: 1024px) {
+    .announcements-sidebar {
+        top: 0;
+        z-index: 50; /* Ensure it's visually above other sections */
+        background: white; /* Match the announcements card background */
+        box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+}
+
+/* Sticky positioning for announcements sidebar */
+.announcements-sidebar {
+    position: sticky;
+    top: 2rem;
+    z-index: 10; /* Keep above normal content by default */
+}
+
+/* Smooth transitions for sections */
+.portal-section {
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StudentAttendanceProvider } from "../teacher-role/scan/context/StudentAttendanceContext";
 import { MunaqasyahScoreProvider } from "../munaqisy/context/MunaqasyahScoreContext";
 import StudentReportView from "../students/pages/StudentReportView";
+import { infoPortalRoutes } from "./infoPortalRoutes";
 
 const MunaqasyahScannerView = lazy(() =>
     import("../munaqisy/pages/MunaqasyahScannerView")
@@ -275,6 +276,8 @@ export const teacherRoutes = [
             </PageHeader>
         ),
     },
+    // Info Portal routes (accessible to all authenticated users)
+    ...infoPortalRoutes,
 ];
 
 export const TeacherRouteWrapper = ({ children }) => (

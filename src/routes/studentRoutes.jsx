@@ -1,4 +1,5 @@
 import { lazy } from "react";
+import { infoPortalRoutes } from "./infoPortalRoutes";
 
 const PageHeader = lazy(() =>
     import("../teacher-role/shared/Components/Navigation/PageHeader")
@@ -50,6 +51,8 @@ export const studentRoutes = [
             </PageHeader>
         ),
     },
+    // Info Portal routes (accessible to all authenticated users)
+    ...infoPortalRoutes,
 ];
 
 export const StudentRouteWrapper = ({ children }) => (

@@ -1,4 +1,5 @@
 import { lazy } from "react";
+import { infoPortalRoutes } from "./infoPortalRoutes";
 
 const DashboardNav = lazy(() =>
     import("../shared/Components/Navigation/DashboardNav/DashboardNav")
@@ -59,6 +60,8 @@ export const curriculumRoutes = [
         path: "/munaqasyah/question-package/class",
         element: <CategoryPackageView />,
     },
+    // Info Portal routes (accessible to all authenticated users)
+    ...infoPortalRoutes,
 ];
 
 export const CurriculumRouteWrapper = ({ children }) => (

@@ -4,6 +4,7 @@ import SubBranchAdminClassesView from "../class/pages/SubBranchAdminClassesView"
 import TeachingGroupDetailView from "../teaching-group/page/TeachingGroupDetailView";
 import BranchYearsView from "../academic/pages/BranchYearsView";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { infoPortalRoutes } from "./infoPortalRoutes";
 
 const DashboardNav = lazy(() =>
     import("../shared/Components/Navigation/DashboardNav/DashboardNav")
@@ -116,6 +117,8 @@ export const subBranchAdminRoutes = [
             </QueryClientProvider>
         ),
     },
+    // Info Portal routes (accessible to all authenticated users)
+    ...infoPortalRoutes,
 ];
 
 export const SubBranchAdminRouteWrapper = ({ children }) => (

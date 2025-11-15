@@ -1,0 +1,16 @@
+[
+    {
+        "id": "feat-branch-automation",
+        "title": "Pengadaan kelas khusus",
+        "description": "Streamline branch year rollover tasks with one-click automation and safety guards.",
+        "status": "planned",
+        "eta": "2025-12-01T00:00:00Z"
+    },
+    {
+        "id": "feat-teacher-analytics",
+        "title": "Teacher Performance Analytics",
+        "description": "Provide aggregated teaching metrics, lesson coverage, and engagement trends.",
+        "status": "planned",
+        "eta": "2026-01-15T00:00:00Z"
+    }
+]

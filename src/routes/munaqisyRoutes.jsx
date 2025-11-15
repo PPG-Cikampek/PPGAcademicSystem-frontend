@@ -1,5 +1,6 @@
 import { lazy } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { infoPortalRoutes } from "./infoPortalRoutes";
 
 import { MunaqasyahScoreProvider } from "../munaqisy/context/MunaqasyahScoreContext";
 import ProfileView from "../users/pages/profile/ProfileView";
@@ -46,6 +47,8 @@ export const munaqisyRoutes = [
             </PageHeader>
         ),
     },
+    // Info Portal routes (accessible to all authenticated users)
+    ...infoPortalRoutes,
 ];
 
 export const MunaqisyRouteWrapper = ({ children }) => (

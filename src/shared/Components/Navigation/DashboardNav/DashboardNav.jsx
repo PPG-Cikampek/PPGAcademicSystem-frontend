@@ -16,6 +16,7 @@ import {
     FolderCog,
     CalendarCog,
     BookOpenText,
+    CodeXml
 } from "lucide-react";
 
 const DashboardNav = ({ children }) => {
@@ -202,6 +203,13 @@ const DashboardNav = ({ children }) => {
             },
         ];
     }
+
+    links.push({
+        link: "/info-portal",
+        icon: <CodeXml />,
+        label: "Portal Pengembang",
+        end: true,
+    });
 
     return (
         <Sidebar linksList={links}>
