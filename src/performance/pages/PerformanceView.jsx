@@ -1,12 +1,10 @@
-import { useContext, useState, useEffect, useCallback, useMemo } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useCallback, useMemo } from "react";
 
 import DatePicker, { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import idID from "date-fns/locale/id";
 
 import useHttp from "../../shared/hooks/http-hook";
-import { AuthContext } from "../../shared/Components/Context/auth-context";
 
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 
@@ -58,9 +56,6 @@ const PerformanceView = () => {
     const [teachingGroupsList, setTeachingGroupsList] = useState();
     const [subBranchesList, setSubBranchesList] = useState();
     const [classesList, setClassesList] = useState();
-
-    const auth = useContext(AuthContext);
-    const navigate = useNavigate();
 
     const violationTranslations = {
         attribute: "Perlengkapan Belajar",
@@ -173,34 +168,93 @@ const PerformanceView = () => {
         } catch (err) {}
     }, [sendRequest]);
 
-    const fetchTeachingGroups = useCallback(async () => {
-        console.log("fetching teachingGroups!");
-        try {
-            const responseData = await sendRequest(
-                `${import.meta.env.VITE_BACKEND_URL}/branchYears/${
-                    auth.currentBranchYearId
-                }/teaching-groups`
-            );
-            setTeachingGroupsList(responseData.teachingGroups);
-        } catch (err) {}
-    }, [sendRequest]);
+    const fetchTeachingGroups = useCallback(
+        async (branchYearId) => {
+            if (!branchYearId) {
+                setTeachingGroupsList([]);
+                return;
+            }
 
-       const fetchSubBranchesList = useCallback(
-        async (branchId) => {
             try {
                 const responseData = await sendRequest(
-                    `${
-                        import.meta.env.VITE_BACKEND_URL
-                    }/levels/branches/${branchId}?populate=true`
+                    `${import.meta.env.VITE_BACKEND_URL}/branchYears/${branchYearId}/teaching-groups`
                 );
-                setSubBranchesList(responseData.branch.subBranches);
+                setTeachingGroupsList(responseData?.teachingGroups || []);
             } catch (err) {}
         },
         [sendRequest]
     );
 
-     const fetchClassesList = useCallback(
+    const fetchBranchYearForBranch = useCallback(
+        async (branchId, academicYearId) => {
+            if (!branchId || !academicYearId) {
+                return null;
+            }
+
+            try {
+                const responseData = await sendRequest(
+                    `${import.meta.env.VITE_BACKEND_URL}/branchYears/branch/${branchId}`
+                );
+                const branchYearsRaw = responseData?.branchYears;
+                const branchYears = Array.isArray(branchYearsRaw)
+                    ? branchYearsRaw
+                    : Array.isArray(branchYearsRaw?.branchYears)
+                    ? branchYearsRaw.branchYears
+                    : [];
+
+                const matchingBranchYear = branchYears.find((branchYear) => {
+                    const academicYear = branchYear?.academicYearId;
+                    if (!academicYear) {
+                        return false;
+                    }
+
+                    if (typeof academicYear === "string") {
+                        return academicYear === academicYearId;
+                    }
+
+                    if (academicYear?._id) {
+                        return academicYear._id === academicYearId;
+                    }
+
+                    return false;
+                });
+
+                return (
+                    matchingBranchYear?._id || matchingBranchYear?.id || null
+                );
+            } catch (err) {
+                return null;
+            }
+        },
+        [sendRequest]
+    );
+
+    const fetchSubBranchesList = useCallback(
+        async (teachingGroupId) => {
+            if (!teachingGroupId) {
+                setSubBranchesList([]);
+                return;
+            }
+
+            try {
+                const responseData = await sendRequest(
+                    `${
+                        import.meta.env.VITE_BACKEND_URL
+                    }/levels/teaching-groups/${teachingGroupId}/sub-branches`
+                );
+                setSubBranchesList(responseData?.subBranches || []);
+            } catch (err) {}
+        },
+        [sendRequest]
+    );
+
+    const fetchClassesList = useCallback(
         async (subBranchId) => {
+            if (!subBranchId || !filterState.selectedAcademicYear) {
+                setClassesList([]);
+                return;
+            }
+
             const url = `${
                 import.meta.env.VITE_BACKEND_URL
             }/classes/sub-branch/${subBranchId}/academic-year/${
@@ -208,38 +262,69 @@ const PerformanceView = () => {
             }`;
             try {
                 const responseData = await sendRequest(url);
-                setClassesList(responseData.subBranchYear.classes);
+                setClassesList(responseData?.subBranchYear?.classes || []);
             } catch (err) {}
         },
         [sendRequest, filterState.selectedAcademicYear]
     );
 
-    const selectBranchHandler = useCallback((branchId) => {
-        setFilterState((prev) => ({
-            ...prev,
-            selectedBranch: branchId,
-            selectedSubBranch: null,
-            selectedClass: null,
-            selectedBranchYear: null,
-            selectedTeachingGroup: null,
-            currentView: "branchesTable",
-        }));
+    const selectBranchHandler = useCallback(
+        (branchId) => {
+            const academicYearId = filterState.selectedAcademicYear;
 
-        setDisplayState((prev) => ({
-            ...prev,
-            attendanceData: null,
-            overallAttendances: null,
-            violationData: null,
-        }));
+            setFilterState((prev) => ({
+                ...prev,
+                selectedBranch: branchId,
+                selectedSubBranch: null,
+                selectedClass: null,
+                selectedBranchYear: null,
+                selectedTeachingGroup: null,
+                currentView: "branchesTable",
+            }));
 
-        setTeachingGroupsList([]);
-        setSubBranchesList([]);
-        setClassesList([]);
+            setDisplayState((prev) => ({
+                ...prev,
+                attendanceData: null,
+                overallAttendances: null,
+                violationData: null,
+            }));
 
-        if (branchId !== "") {
-            fetchTeachingGroups(branchId);
-        }
-    }, []);
+            setTeachingGroupsList([]);
+            setSubBranchesList([]);
+            setClassesList([]);
+
+            if (!branchId || !academicYearId) {
+                return;
+            }
+
+            (async () => {
+                const branchYearId = await fetchBranchYearForBranch(
+                    branchId,
+                    academicYearId
+                );
+
+                let shouldLoadTeachingGroups = false;
+
+                setFilterState((prev) => {
+                    if (prev.selectedBranch !== branchId) {
+                        return prev;
+                    }
+
+                    shouldLoadTeachingGroups = true;
+
+                    return {
+                        ...prev,
+                        selectedBranchYear: branchYearId,
+                    };
+                });
+
+                if (shouldLoadTeachingGroups) {
+                    fetchTeachingGroups(branchYearId);
+                }
+            })();
+        },
+        [fetchBranchYearForBranch, fetchTeachingGroups, filterState.selectedAcademicYear]
+    );
 
     const selectTeachingGroupHandler = useCallback(
         (teachingGroupId) => {
@@ -255,34 +340,39 @@ const PerformanceView = () => {
                 ...prev,
             }));
 
+            setSubBranchesList([]);
+            setClassesList([]);
+
             if (teachingGroupId !== "") {
                 fetchSubBranchesList(teachingGroupId);
-                fetchClassesList(teachingGroupId);
             }
         },
-        [fetchSubBranchesList, fetchClassesList]
+        [fetchSubBranchesList]
     );
 
-    const selectSubBranchHandler = useCallback((subBranchId) => {
-        setFilterState((prev) => ({
-            ...prev,
-            selectedSubBranch: subBranchId,
-            selectedClass: null,
-        }));
+    const selectSubBranchHandler = useCallback(
+        (subBranchId) => {
+            setFilterState((prev) => ({
+                ...prev,
+                selectedSubBranch: subBranchId,
+                selectedClass: null,
+            }));
 
-        setDisplayState((prev) => ({
-            ...prev,
-            attendanceData: null,
-            overallAttendances: null,
-            violationData: null,
-        }));
+            setDisplayState((prev) => ({
+                ...prev,
+                attendanceData: null,
+                overallAttendances: null,
+                violationData: null,
+            }));
 
-        setClassesList([]);
+            setClassesList([]);
 
-        if (subBranchId !== "") {
-            fetchClassesList(subBranchId);
-        }
-    }, []);
+            if (subBranchId !== "") {
+                fetchClassesList(subBranchId);
+            }
+        },
+        [fetchClassesList]
+    );
 
     const selectClassHandler = useCallback((classId) => {
         setFilterState((prev) => ({
@@ -356,6 +446,7 @@ const PerformanceView = () => {
 
         // Clear dependent lists
         setBranchesList([]);
+        setTeachingGroupsList([]);
         setSubBranchesList([]);
         setClassesList([]);
     }, []);
@@ -385,6 +476,7 @@ const PerformanceView = () => {
                 "startDate",
                 "endDate",
                 "selectedBranch",
+                "selectedTeachingGroup",
                 "selectedSubBranch",
                 "selectedClass",
             ]),
@@ -534,17 +626,19 @@ const PerformanceView = () => {
                                                 )
                                             }
                                             className={`border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300 ${
-                                                filterState.selectedAcademicYear
+                                                filterState.selectedBranchYear
                                                     ? ""
                                                     : "opacity-50 cursor-not-allowed"
                                             }`}
                                             disabled={
-                                                !filterState.selectedAcademicYear
+                                                !filterState.selectedBranchYear
                                             }
                                         >
                                             <option value={""}>
                                                 {!filterState.selectedAcademicYear
                                                     ? "Pilih Tahun Ajaran"
+                                                    : !filterState.selectedBranch
+                                                    ? "Pilih Desa"
                                                     : "Semua"}
                                             </option>
                                             {teachingGroupsList &&
@@ -572,12 +666,22 @@ const PerformanceView = () => {
                                                     e.target.value
                                                 )
                                             }
-                                            className="px-2 py-1 border border-gray-400 rounded-full active:ring-2 active:ring-blue-300"
+                                            className={`px-2 py-1 border border-gray-400 rounded-full active:ring-2 active:ring-blue-300 ${
+                                                filterState.selectedTeachingGroup
+                                                    ? ""
+                                                    : "opacity-50 cursor-not-allowed"
+                                            }`}
                                             disabled={
-                                                !filterState.selectedBranch
+                                                !filterState.selectedTeachingGroup
                                             }
                                         >
-                                            <option value={""}>Semua</option>
+                                            <option value={""}>
+                                                {!filterState.selectedAcademicYear
+                                                    ? "Pilih Tahun Ajaran"
+                                                    : !filterState.selectedTeachingGroup
+                                                    ? "Pilih KBM"
+                                                    : "Semua"}
+                                            </option>
                                             {subBranchesList &&
                                                 subBranchesList.map(
                                                     (subBranch, index) => (
@@ -603,12 +707,24 @@ const PerformanceView = () => {
                                                     e.target.value
                                                 )
                                             }
-                                            className="px-2 py-1 border border-gray-400 rounded-full active:ring-2 active:ring-blue-300"
+                                            className={`px-2 py-1 border border-gray-400 rounded-full active:ring-2 active:ring-blue-300 ${
+                                                filterState.selectedSubBranch
+                                                    ? ""
+                                                    : "opacity-50 cursor-not-allowed"
+                                            }`}
                                             disabled={
                                                 !filterState.selectedSubBranch
                                             }
                                         >
-                                            <option value={""}>Semua</option>
+                                            <option value={""}>
+                                                {!filterState.selectedAcademicYear
+                                                    ? "Pilih Tahun Ajaran"
+                                                    : !filterState.selectedTeachingGroup
+                                                    ? "Pilih KBM"
+                                                    : !filterState.selectedSubBranch
+                                                    ? "Pilih Kelompok"
+                                                    : "Semua"}
+                                            </option>
                                             {classesList &&
                                                 classesList.map(
                                                     (cls, index) => (
@@ -756,6 +872,7 @@ const PerformanceView = () => {
                                                     "teachingGroupsTable",
                                                 selectedClass: null,
                                                 selectedTeachingGroup: null,
+                                                selectedSubBranch: null,
                                             }))
                                         }
                                     >

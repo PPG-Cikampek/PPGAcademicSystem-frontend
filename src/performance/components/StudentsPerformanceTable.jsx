@@ -35,8 +35,8 @@ const StudentsPerformanceTable = ({ filterState }) => {
             return {
                 ...baseFilters,
                 branchYearId:
-                    filterState.selectedBranchYear || auth.currentBranchYearId,
-                branchId: auth.userBranchId,
+                    auth.userRole !== "admin" ? filterState.selectedBranchYear || auth.currentBranchYearId : null,
+                branchId: auth.userRole !== "admin" ? auth.userBranchId : null,
                 teachingGroupId: filterState.selectedTeachingGroup || null,
                 subBranchId: filterState.selectedSubBranch || null,
             };
