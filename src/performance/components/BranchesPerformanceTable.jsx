@@ -3,7 +3,7 @@ import DataTable from "../../shared/Components/UIElements/DataTable";
 import { useAttendancePerformance } from "../../shared/queries/useAttendancePerformances";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
 
-const ClassesPerformanceTable = ({ filterState, setFilterState }) => {
+const BranchesPerformanceTable = ({ filterState, setFilterState }) => {
     const auth = useContext(AuthContext);
 
     const requestFilters = useMemo(() => {
@@ -11,116 +11,58 @@ const ClassesPerformanceTable = ({ filterState, setFilterState }) => {
             return null;
         }
 
-        const baseFilters = {
+        return {
             academicYearId: filterState.selectedAcademicYear,
+            branchId: filterState.selectedBranch || null,
+            branchYearId: filterState.selectedBranchYear || null,
+            subBranchId: null,
+            classId: null,
             startDate: filterState.startDate
                 ? filterState.startDate.toISOString()
                 : null,
             endDate: filterState.endDate
                 ? filterState.endDate.toISOString()
                 : null,
-            classId: filterState.selectedClass || null,
         };
-
-        if (
-            auth.userRole === "admin" ||
-            auth.userRole === "branchAdmin"
-        ) {
-            const branchYearId =
-                auth.userRole !== "admin" ? filterState.selectedBranchYear || auth.currentBranchYearId : null;
-            const branchId =
-                filterState.selectedBranch || auth.userBranchId;
-
-            if ((auth.userRole !== "admin" && !branchYearId) || !branchId) {
-                return null;
-            }
-
-            return {
-                ...baseFilters,
-                branchYearId,
-                branchId,
-                teachingGroupId: filterState.selectedTeachingGroup || null,
-                subBranchId: filterState.selectedSubBranch || null,
-            };
-        }
-
-        if (auth.userRole === "subBranchAdmin") {
-            return {
-                ...baseFilters,
-                branchId: auth.userBranchId,
-                subBranchId: auth.userSubBranchId,
-            };
-        }
-
-        if (auth.userRole === "teacher") {
-            return {
-                ...baseFilters,
-                branchId: auth.userBranchId,
-                teacherClassIds: auth.userClassIds,
-            };
-        }
-
-        return null;
     }, [
-        auth.currentBranchYearId,
-        auth.userBranchId,
-        auth.userClassIds,
-        auth.userRole,
-        filterState.selectedBranch,
         filterState.selectedAcademicYear,
+        filterState.selectedBranch,
         filterState.selectedBranchYear,
-        filterState.selectedClass,
-        filterState.selectedSubBranch,
-        filterState.selectedTeachingGroup,
         filterState.startDate,
         filterState.endDate,
     ]);
 
-    const { data, isLoading } = useAttendancePerformance(
-        requestFilters ?? {},
-        {
-            enabled: !!requestFilters,
-        }
-    );
+    const { data, isLoading } = useAttendancePerformance(requestFilters ?? {}, {
+        enabled: !!requestFilters,
+    });
 
-    const tableData = useMemo(() => {
-        if (!data?.studentsDataByClass) {
+    const branchesData = useMemo(() => {
+        if (!data?.studentsDataByBranch) {
             return [];
         }
 
-        if (
-            (auth.userRole === "admin" || auth.userRole === "branchAdmin") &&
-            filterState.selectedSubBranch
-        ) {
-            return data.studentsDataByClass.filter(
-                (cls) => cls.subBranchId === filterState.selectedSubBranch
+        if (filterState.selectedBranch) {
+            return data.studentsDataByBranch.filter(
+                (branch) => branch.branchId === filterState.selectedBranch
             );
         }
 
-        return data.studentsDataByClass;
-    }, [
-        auth.userRole,
-        data?.studentsDataByClass,
-        filterState.selectedSubBranch,
-    ]);
+        return data.studentsDataByBranch;
+    }, [data?.studentsDataByBranch, filterState.selectedBranch]);
 
-    const clsColumns = useMemo(
+    const branchColumns = useMemo(
         () => [
             {
-                key: "clsName",
-                label: "Nama",
+                key: "branchName",
+                label: "Nama Daerah",
                 sortable: true,
+                render: (branch) => (
+                    <span>Daerah {branch?.branchName || "-"}</span>
+                ),
             },
             {
                 key: "studentsCount",
                 label: "Jumlah Siswa",
-                cellAlign: "center",
-                headerAlign: "center",
-                sortable: true,
-            },
-            {
-                key: "attendancesCount",
-                label: "Total Pertemuan",
                 cellAlign: "center",
                 headerAlign: "center",
                 sortable: true,
@@ -131,9 +73,9 @@ const ClassesPerformanceTable = ({ filterState, setFilterState }) => {
                 sortable: true,
                 cellAlign: "center",
                 headerAlign: "center",
-                render: (cls) => (
+                render: (branch) => (
                     <div className="place-self-center w-12 text-center badge-green">
-                        {cls?.attendances?.Hadir || 0}%
+                        {branch?.attendances?.Hadir || 0}%
                     </div>
                 ),
             },
@@ -145,9 +87,9 @@ const ClassesPerformanceTable = ({ filterState, setFilterState }) => {
                           sortable: true,
                           cellAlign: "center",
                           headerAlign: "center",
-                          render: (cls) => (
+                          render: (branch) => (
                               <div className="place-self-center w-12 text-center badge-primary">
-                                  {cls?.attendances?.Terlambat || 0}%
+                                  {branch?.attendances?.Terlambat || 0}%
                               </div>
                           ),
                       },
@@ -159,9 +101,9 @@ const ClassesPerformanceTable = ({ filterState, setFilterState }) => {
                 sortable: true,
                 cellAlign: "center",
                 headerAlign: "center",
-                render: (cls) => (
+                render: (branch) => (
                     <div className="place-self-center w-12 text-center badge-yellow">
-                        {cls?.attendances?.Izin || 0}%
+                        {branch?.attendances?.Izin || 0}%
                     </div>
                 ),
             },
@@ -171,9 +113,9 @@ const ClassesPerformanceTable = ({ filterState, setFilterState }) => {
                 sortable: true,
                 cellAlign: "center",
                 headerAlign: "center",
-                render: (cls) => (
+                render: (branch) => (
                     <div className="place-self-center w-12 text-center badge-violet">
-                        {cls?.attendances?.Sakit || 0}%
+                        {branch?.attendances?.Sakit || 0}%
                     </div>
                 ),
             },
@@ -183,12 +125,9 @@ const ClassesPerformanceTable = ({ filterState, setFilterState }) => {
                 sortable: true,
                 cellAlign: "center",
                 headerAlign: "center",
-                render: (cls) => (
+                render: (branch) => (
                     <div className="place-self-center w-12 text-center badge-red">
-                        {cls?.attendances["Tanpa Keterangan"]
-                            ? cls.attendances["Tanpa Keterangan"]
-                            : 0}
-                        %
+                        {branch?.attendances?.["Tanpa Keterangan"] || 0}%
                     </div>
                 ),
             },
@@ -196,16 +135,22 @@ const ClassesPerformanceTable = ({ filterState, setFilterState }) => {
                 key: "actions",
                 label: "Aksi",
                 headerAlign: "center",
-                render: (cls) => (
+                render: (branch) => (
                     <div className="place-self-center">
                         <button
                             className="btn-primary-outline"
+                            disabled={!branch?.branchId}
                             onClick={() =>
-                                setFilterState({
-                                    ...filterState,
-                                    currentView: "studentsTable",
-                                    selectedClass: cls.classId,
-                                })
+                                branch?.branchId &&
+                                setFilterState((prev) => ({
+                                    ...prev,
+                                    currentView: "teachingGroupsTable",
+                                    selectedBranch: branch.branchId,
+                                    selectedBranchYear: branch.branchYearId,
+                                    selectedTeachingGroup: null,
+                                    selectedSubBranch: null,
+                                    selectedClass: null,
+                                }))
                             }
                         >
                             Lihat Detail
@@ -214,15 +159,15 @@ const ClassesPerformanceTable = ({ filterState, setFilterState }) => {
                 ),
             },
         ],
-        [auth.userRole, filterState, setFilterState]
+        [auth.userRole, setFilterState]
     );
 
     return (
         <DataTable
-            data={tableData}
-            columns={clsColumns}
-            searchableColumns={["name"]}
-            initialSort={{ key: "name", direction: "ascending" }}
+            data={branchesData}
+            columns={branchColumns}
+            searchableColumns={["branchName"]}
+            initialSort={{ key: "branchName", direction: "ascending" }}
             initialEntriesPerPage={50}
             config={{
                 showFilter: false,
@@ -237,4 +182,4 @@ const ClassesPerformanceTable = ({ filterState, setFilterState }) => {
     );
 };
 
-export default ClassesPerformanceTable;
+export default BranchesPerformanceTable;

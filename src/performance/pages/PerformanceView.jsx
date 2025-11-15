@@ -11,12 +11,17 @@ import { AuthContext } from "../../shared/Components/Context/auth-context";
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 
 import PieChart from "../components/PieChart";
+import BranchesPerformanceTable from "../components/BranchesPerformanceTable";
 import { academicYearFormatter } from "../../shared/Utilities/academicYearFormatter";
 import { getMonday } from "../../shared/Utilities/getMonday";
 import {
     hasUnappliedFilters as hasUnappliedFiltersHelper,
     hasFiltersChanged as hasFiltersChangedHelper,
 } from "../utilities/filterHelpers";
+import TeachingGroupsPerformanceTable from "../components/TeachingGroupsPerformanceTable";
+import SubBranchesPerformanceTable from "../components/SubBranchesPerformanceTable";
+import ClassesPerformanceTable from "../components/ClassesPerformanceTable";
+import StudentsPerformanceTable from "../components/StudentsPerformanceTable";
 
 const PerformanceView = () => {
     const { isLoading, error, sendRequest, setError } = useHttp();
@@ -29,21 +34,16 @@ const PerformanceView = () => {
         selectedBranch: null,
         selectedSubBranch: null,
         selectedClass: null,
+        selectedBranchYear: null,
+        selectedTeachingGroup: null,
+        currentView: "branchesTable",
     };
 
     // Academic years list (static data)
     const [academicYearsList, setAcademicYearsList] = useState();
 
     // Filter state - for user selections (doesn't trigger data fetches)
-    const [filterState, setFilterState] = useState({
-        selectedAcademicYear: null,
-        startDate: null,
-        endDate: null,
-        periode: null,
-        selectedBranch: null,
-        selectedSubBranch: null,
-        selectedClass: null,
-    });
+    const [filterState, setFilterState] = useState(initialFilterState);
 
     // Display state - for currently shown data (only updates when "Tampilkan" is clicked)
     const [displayState, setDisplayState] = useState({
@@ -82,7 +82,9 @@ const PerformanceView = () => {
         const url = `${import.meta.env.VITE_BACKEND_URL}/attendances/overview/`;
         const body = JSON.stringify({
             academicYearId: filterState.selectedAcademicYear,
+            // branchYearId: filterState.selectedBranchYear,
             branchId: filterState.selectedBranch,
+            teachingGroupId: filterState.selectedTeachingGroup,
             subBranchId: filterState.selectedSubBranch,
             classId: filterState.selectedClass,
             startDate: filterState.startDate
@@ -138,6 +140,9 @@ const PerformanceView = () => {
             selectedBranch: null,
             selectedSubBranch: null,
             selectedClass: null,
+            selectedBranchYear: null,
+            selectedTeachingGroup: null,
+            currentView: "branchesTable",
         }));
 
         setDisplayState((prev) => ({
@@ -172,6 +177,9 @@ const PerformanceView = () => {
             selectedBranch: branchId,
             selectedSubBranch: null,
             selectedClass: null,
+            selectedBranchYear: null,
+            selectedTeachingGroup: null,
+            currentView: "branchesTable",
         }));
 
         setDisplayState((prev) => ({
@@ -347,24 +355,24 @@ const PerformanceView = () => {
     );
 
     return (
-        <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">
-            <main className="max-w-6xl mx-auto">
+        <div className="bg-gray-50 md:p-8 px-4 py-8 min-h-screen">
+            <main className="mx-auto max-w-6xl">
                 {academicYearsList && (
-                    <div className="card-basic rounded-md flex-col gap-4">
+                    <div className="flex-col gap-4 rounded-md card-basic">
                         <div className="flex justify-between">
                             <div className={`flex flex-col`}>
-                                <h2 className="text-xl font-bold">
+                                <h2 className="font-bold text-xl">
                                     Daerah Cikampek
                                 </h2>
-                                {/* <p className="text-sm text-gray-600">
+                                {/* <p className="text-gray-600 text-sm">
                           Target Semester: {subBranchData.semesterTarget} hari
                       </p> */}
                             </div>
                         </div>
 
-                        <div className="flex flex-col md:flex-row justify-between gap-4">
-                            <div className="flex flex-col gap-5 items-start">
-                                <div className="flex flex-row gap-4 items-center">
+                        <div className="flex md:flex-row flex-col justify-between gap-4">
+                            <div className="flex flex-col items-start gap-5">
+                                <div className="flex flex-row items-center gap-4">
                                     <div className="flex flex-col gap-[18px]">
                                         <div>Tahun Ajaran</div>
                                         <div>Periode</div>
@@ -372,7 +380,7 @@ const PerformanceView = () => {
                                         <div>Kelompok</div>
                                         <div>Kelas</div>
                                     </div>
-                                    <div className="flex flex-col gap-2 ">
+                                    <div className="flex flex-col gap-2">
                                         <select
                                             value={
                                                 filterState.selectedAcademicYear
@@ -384,7 +392,7 @@ const PerformanceView = () => {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300"
+                                            className="px-2 py-1 border border-gray-400 rounded-full active:ring-2 active:ring-blue-300"
                                             disabled={false}
                                         >
                                             {!filterState.selectedAcademicYear && (
@@ -458,7 +466,7 @@ const PerformanceView = () => {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300"
+                                            className="px-2 py-1 border border-gray-400 rounded-full active:ring-2 active:ring-blue-300"
                                             disabled={
                                                 !filterState.selectedAcademicYear
                                             }
@@ -487,7 +495,7 @@ const PerformanceView = () => {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300"
+                                            className="px-2 py-1 border border-gray-400 rounded-full active:ring-2 active:ring-blue-300"
                                             disabled={
                                                 !filterState.selectedBranch
                                             }
@@ -518,7 +526,7 @@ const PerformanceView = () => {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300"
+                                            className="px-2 py-1 border border-gray-400 rounded-full active:ring-2 active:ring-blue-300"
                                             disabled={
                                                 !filterState.selectedSubBranch
                                             }
@@ -539,7 +547,7 @@ const PerformanceView = () => {
                                     </div>
                                 </div>
 
-                                <div className="flex justify-center mt-4 gap-2">
+                                <div className="flex justify-center gap-2 mt-4">
                                     {hasUnappliedFilters && (
                                         <button
                                             onClick={handleApplyFilter}
@@ -558,14 +566,14 @@ const PerformanceView = () => {
                                         <button
                                             onClick={handleResetFilter}
                                             disabled={isLoading}
-                                            className="btn-danger-outline rounded-full"
+                                            className="rounded-full btn-danger-outline"
                                         >
                                             Reset Filter
                                         </button>
                                     )}
                                 </div>
 
-                                <div className="self-start flex flex-row gap-2">
+                                <div className="flex flex-row self-start gap-2">
                                     {/* Left Column: Violation Names */}
                                     <div className="flex flex-col gap-1">
                                         {memoizedViolationData &&
@@ -586,7 +594,7 @@ const PerformanceView = () => {
                                     </div>
 
                                     {/* Right Column: Case Counts */}
-                                    <div className="flex flex-col gap-1 ">
+                                    <div className="flex flex-col gap-1">
                                         {memoizedViolationData &&
                                             !isLoading &&
                                             filterState.selectedAcademicYear &&
@@ -604,7 +612,7 @@ const PerformanceView = () => {
                                 </div>
                             </div>
                             {(!academicYearsList || isLoading) && (
-                                <div className="place-self-center justify-self-center self-center mx-auto">
+                                <div className="justify-self-center self-center place-self-center mx-auto">
                                     <LoadingCircle size={32} />
                                 </div>
                             )}
@@ -622,6 +630,120 @@ const PerformanceView = () => {
                         </div>
                     </div>
                 )}
+                {displayState.violationData &&
+                    !isLoading &&
+                    filterState.selectedAcademicYear &&
+                    (filterState.currentView === "branchesTable" ? (
+                        <div className="print-avoid-break">
+                            <h2>Performa Daerah</h2>
+                            <BranchesPerformanceTable
+                                filterState={filterState}
+                                setFilterState={setFilterState}
+                            />
+                        </div>
+                    ) : filterState.currentView === "teachingGroupsTable" ? (
+                        <div className="print-avoid-break">
+                            <div className="flex justify-between">
+                                <h2>Performa Desa</h2>
+                                <div className="flex gap-2 no-print">
+                                    <button
+                                        className="btn-round-gray"
+                                        onClick={() =>
+                                            setFilterState((prev) => ({
+                                                ...prev,
+                                                currentView:
+                                                    "branchesTable",
+                                                selectedBranch: null,
+                                            }))
+                                        }
+                                    >
+                                        Kembali
+                                    </button>
+                                </div>
+                            </div>
+                            <TeachingGroupsPerformanceTable
+                                filterState={filterState}
+                                setFilterState={setFilterState}
+                            />
+                        </div>
+                    ) : filterState.currentView === "subBranchesTable" ? (
+                        <div className="print-avoid-break">
+                            <div className="flex justify-between">
+                                <h2>Performa KBM</h2>
+                                <div className="flex gap-2 no-print">
+                                    <button
+                                        className="btn-round-gray"
+                                        onClick={() =>
+                                            setFilterState((prev) => ({
+                                                ...prev,
+                                                currentView:
+                                                    "teachingGroupsTable",
+                                                selectedClass: null,
+                                            }))
+                                        }
+                                    >
+                                        Kembali
+                                    </button>
+                                </div>
+                            </div>
+                            <SubBranchesPerformanceTable
+                                filterState={filterState}
+                                setFilterState={setFilterState}
+                            />
+                        </div>
+                    ) : filterState.currentView === "classesTable" ? (
+                        <div className="print-avoid-break">
+                            <div className="flex justify-between">
+                                <h2>Performa Kelompok</h2>
+                                <div className="flex gap-2 no-print">
+                                    <button
+                                        className="btn-round-gray"
+                                        onClick={() =>
+                                            setFilterState((prev) => ({
+                                                ...prev,
+                                                currentView: "subBranchesTable",
+                                                selectedClass: null,
+                                            }))
+                                        }
+                                    >
+                                        Kembali
+                                    </button>
+                                </div>
+                            </div>
+                            <ClassesPerformanceTable
+                                selectedSubBranch={
+                                    filterState.selectedSubBranch
+                                }
+                                startDate={filterState.startDate}
+                                endDate={filterState.endDate}
+                                filterState={filterState}
+                                setFilterState={setFilterState}
+                            />
+                        </div>
+                    ) : (
+                        <div className="print-avoid-break">
+                            <div className="flex justify-between">
+                                <h2>Performa Kelas</h2>
+                                <div className="flex gap-2 no-print">
+                                    <button
+                                        className="btn-round-gray"
+                                        onClick={() =>
+                                            setFilterState((prev) => ({
+                                                ...prev,
+                                                currentView: "classesTable",
+                                                selectedClass: null,
+                                            }))
+                                        }
+                                    >
+                                        Kembali
+                                    </button>
+                                </div>
+                            </div>
+                            <StudentsPerformanceTable
+                                filterState={filterState}
+                            />
+                        </div>
+                    ))}
             </main>
         </div>
     );

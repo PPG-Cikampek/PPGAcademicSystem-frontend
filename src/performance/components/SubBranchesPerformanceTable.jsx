@@ -7,18 +7,23 @@ const SubBranchesPerformanceTable = ({ filterState, setFilterState }) => {
     const auth = useContext(AuthContext);
 
     const requestFilters = useMemo(() => {
+        const branchYearId =
+            auth.userRole !== "admin" ? filterState.selectedBranchYear || auth?.currentBranchYearId : null  ;
+        const branchId = filterState.selectedBranch || auth?.userBranchId;
+
         if (
             !filterState.selectedAcademicYear ||
             !filterState.selectedTeachingGroup ||
-            !auth?.currentBranchYearId
+            (auth.userRole !== "admin" && !branchYearId) ||
+            !branchId
         ) {
             return null;
         }
 
         return {
             academicYearId: filterState.selectedAcademicYear,
-            branchYearId: auth.currentBranchYearId,
-            branchId: auth.userBranchId,
+            branchYearId,
+            branchId,
             teachingGroupId: filterState.selectedTeachingGroup,
             subBranchId: filterState.selectedSubBranch || null,
             classId: filterState.selectedClass || null,
@@ -33,6 +38,8 @@ const SubBranchesPerformanceTable = ({ filterState, setFilterState }) => {
         auth?.currentBranchYearId,
         auth?.userBranchId,
         filterState.selectedAcademicYear,
+        filterState.selectedBranch,
+        filterState.selectedBranchYear,
         filterState.selectedTeachingGroup,
         filterState.selectedSubBranch,
         filterState.selectedClass,

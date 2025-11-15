@@ -11,14 +11,18 @@ const TeachingGroupsPerformanceTable = ({
     const userRole = JSON.parse(localStorage.getItem("userData")).role;
 
     const requestFilters = useMemo(() => {
-        if (!filterState.selectedAcademicYear || !auth?.currentBranchYearId) {
+        const branchYearId =
+            auth.userRole !== "admin" ? filterState.selectedBranchYear || auth?.currentBranchYearId : null;
+        const branchId = filterState.selectedBranch || auth?.userBranchId;
+
+        if (!filterState.selectedAcademicYear || (auth.userRole !== "admin" && !branchYearId) || !branchId) {
             return null;
         }
 
         return {
             academicYearId: filterState.selectedAcademicYear,
-            branchYearId: auth.currentBranchYearId,
-            branchId: auth.userBranchId,
+            branchYearId,
+            branchId,
             teachingGroupId: filterState.selectedTeachingGroup || null,
             subBranchId: filterState.selectedSubBranch || null,
             classId: filterState.selectedClass || null,
@@ -33,6 +37,8 @@ const TeachingGroupsPerformanceTable = ({
         auth?.currentBranchYearId,
         auth?.userBranchId,
         filterState.selectedAcademicYear,
+        filterState.selectedBranch,
+        filterState.selectedBranchYear,
         filterState.selectedTeachingGroup,
         filterState.selectedSubBranch,
         filterState.selectedClass,
@@ -46,6 +52,8 @@ const TeachingGroupsPerformanceTable = ({
             enabled: !!requestFilters,
         }
     );
+
+    console.log(attendanceData);
 
     const teachingGroupColumns = useMemo(() => [
         {
