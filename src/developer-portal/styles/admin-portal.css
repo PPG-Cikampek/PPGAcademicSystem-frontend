@@ -1,0 +1,21 @@
+.admin-portal-container {
+    background-color: #f8fafc;
+}
+
+.admin-portal-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.admin-portal-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
+}
+
+.admin-portal-table table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+.admin-portal-table thead th {
+    letter-spacing: 0.08em;
+}

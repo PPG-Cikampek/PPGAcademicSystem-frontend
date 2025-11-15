@@ -2,6 +2,7 @@ import { lazy } from 'react';
 import PreviewReport from '../munaqasyah/pages/PreviewReport';
 import ClassesViewByAcademicYear from '../class/pages/ClassesViewByAcademicYear';
 import { infoPortalRoutes } from './infoPortalRoutes';
+import { adminPortalRoutes as developerPortalAdminRoutes } from '../developer-portal/adminPortalRoutes';
 
 const DashboardNav = lazy(() => import("../shared/Components/Navigation/DashboardNav/DashboardNav"));
 const DashboardView = lazy(() => import("../dashboard/pages/DashboardView"));
@@ -83,6 +84,8 @@ export const adminRoutes = [
     { path: '/munaqasyah/question-package/class', element: <CategoryPackageView/> },
     // Info Portal routes (accessible to all authenticated users)
     ...infoPortalRoutes,
+    // Admin portal management routes
+    ...developerPortalAdminRoutes,
 ];
 
 export const AdminRouteWrapper = ({ children }) => (

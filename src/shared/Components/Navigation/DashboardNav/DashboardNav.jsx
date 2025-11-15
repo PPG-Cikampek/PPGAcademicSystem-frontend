@@ -16,7 +16,8 @@ import {
     FolderCog,
     CalendarCog,
     BookOpenText,
-    CodeXml
+    CodeXml,
+    Wrench,
 } from "lucide-react";
 
 const DashboardNav = ({ children }) => {
@@ -82,6 +83,11 @@ const DashboardNav = ({ children }) => {
                         link: "/settings/requested-accounts",
                         label: "Pendaftaran Guru/Siswa",
                         icon: <UserRoundPlus />,
+                    },
+                    {
+                        link: "/admin/portal",
+                        icon: <Wrench />,
+                        label: "Kelola Portal",
                     },
                     // { link: '/settings/more', label: 'Lainnya', icon: <Settings /> },
                 ],
