@@ -18,7 +18,7 @@ const HomeScreenView = lazy(() =>
 const HomeNavigation = lazy(() =>
     import("../teacher-role/shared/Components/Navigation/HomeNavigation")
 );
-const HelpCenterView = lazy(() => import("../shared/pages/HelpCenterView"));
+const HelpCenterView = lazy(() => import("../help-center/pages/HelpCenterView"));
 
 const queryClient = new QueryClient();
 

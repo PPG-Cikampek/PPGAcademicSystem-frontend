@@ -79,7 +79,7 @@ const MaterialProgressView = lazy(() =>
 const NewMaterialProgresslView = lazy(() =>
     import("../teacher-role/materialProgress/pages/NewMaterialProgressView")
 );
-const HelpCenterView = lazy(() => import("../shared/pages/HelpCenterView"));
+const HelpCenterView = lazy(() => import("../help-center/pages/HelpCenterView"));
 
 export const teacherRoutes = [
     { path: "/dashboard", element: <HomeScreenView /> },

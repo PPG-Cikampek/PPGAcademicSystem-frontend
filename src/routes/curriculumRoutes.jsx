@@ -29,7 +29,7 @@ const QuestionPackageView = lazy(() =>
 const CategoryPackageView = lazy(() =>
     import("../munaqasyah/pages/CategoryPackageView")
 );
-const HelpCenterView = lazy(() => import("../shared/pages/HelpCenterView"));
+const HelpCenterView = lazy(() => import("../help-center/pages/HelpCenterView"));
 
 export const curriculumRoutes = [
     { path: "/verify-email/:token", element: <EmailVerifyView /> },

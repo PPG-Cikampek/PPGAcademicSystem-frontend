@@ -54,7 +54,7 @@ const RequestAccountForm = lazy(() =>
 const RequestAccountTicketDetail = lazy(() =>
     import("../users/pages/account-requests/RequestAccountTicketDetail")
 );
-const HelpCenterView = lazy(() => import("../shared/pages/HelpCenterView"));
+const HelpCenterView = lazy(() => import("../help-center/pages/HelpCenterView"));
 
 export const branchAdminRoutes = [
     { path: "/verify-email/:token", element: <EmailVerifyView /> },

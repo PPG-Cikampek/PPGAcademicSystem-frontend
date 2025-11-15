@@ -60,7 +60,7 @@ const MunaqasyahClassList = lazy(() =>
 const MunaqasyahByClassView = lazy(() =>
     import("../munaqasyah/pages/MunaqasyahByClassView")
 );
-const HelpCenterView = lazy(() => import("../shared/pages/HelpCenterView"));
+const HelpCenterView = lazy(() => import("../help-center/pages/HelpCenterView"));
 
 export const subBranchAdminRoutes = [
     { path: "/verify-email/:token", element: <EmailVerifyView /> },

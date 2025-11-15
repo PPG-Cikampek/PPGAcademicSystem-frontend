@@ -41,7 +41,7 @@ const RequestedAccountView = lazy(() => import("../users/pages/account-requests/
 const UpdateQuestionView = lazy(() => import("../munaqasyah/pages/UpdateQuestionView"));
 const QuestionPackageView = lazy(() => import('../munaqasyah/pages/QuestionPackageView'));
 const CategoryPackageView = lazy(() => import('../munaqasyah/pages/CategoryPackageView'));
-const HelpCenterView = lazy(() => import('../shared/pages/HelpCenterView'));
+const HelpCenterView = lazy(() => import('../help-center/pages/HelpCenterView'));
 
 export const adminRoutes = [
     { path: '/verify-email/:token', element: <EmailVerifyView /> },
