@@ -24,7 +24,7 @@ const AnnouncementCard = ({ announcement }) => {
                     {announcement.type}
                 </span>
             </div>
-            <p className="mb-3 text-gray-600 text-sm">{announcement.body}</p>
+            <p className="mb-3 text-gray-600 text-sm whitespace-pre-line">{announcement.body}</p>
             {announcement.publishedAt && (
                 <p className="text-gray-400 text-xs">
                     Dipublikasikan:{" "}

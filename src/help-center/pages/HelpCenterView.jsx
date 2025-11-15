@@ -73,7 +73,7 @@ const HelpCenterView = () => {
                 <div className="mb-12">
                     <h2 className="flex items-center gap-2 mb-6 font-semibold text-gray-900 text-xl">
                         <MessageSquare className="w-5 h-5" />
-                        Pertanyaan yang Sering Diajukan (FAQ)
+                        Pertanyaan Umum (FAQ)
                     </h2>
                     {faqQuery.isLoading ? (
                         <div className="flex justify-center bg-white shadow-xs py-12 border border-gray-100 rounded-md">

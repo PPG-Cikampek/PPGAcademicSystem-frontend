@@ -28,11 +28,11 @@ const FeatureCard = ({ feature }) => {
                     {statusMapping[feature.status] || "Tidak Diketahui"}
                 </span>
             </div>
-            <p className="mb-4 text-gray-600 text-sm">{feature.description}</p>
+            <p className="mb-4 text-gray-600 text-sm whitespace-pre-line">{feature.description}</p>
             <div className="flex flex-wrap gap-2 text-gray-500 text-xs">
                 {feature.eta && (
                     <span className="bg-gray-100 px-2 py-1 rounded">
-                        Rencana: {feature.eta}
+                        Dimulai: {feature.eta}
                     </span>
                 )}
             </div>

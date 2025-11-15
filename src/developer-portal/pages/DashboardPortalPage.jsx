@@ -18,7 +18,7 @@ const DashboardPortalPage = () => {
         <div className="bg-gray-50 md:p-8 px-4 py-8 min-h-screen">
             <div className="mx-auto max-w-7xl">
                 <PortalHeader
-                    title="Portal Informasi"
+                    title="Portal Informasi Pengembang"
                     description="Informasi real-time tentang pengembangan aplikasi."
                 />
 
