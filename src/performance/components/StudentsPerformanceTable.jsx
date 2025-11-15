@@ -1,64 +1,85 @@
-import { useState, useContext, useMemo } from "react";
+import { useContext, useMemo } from "react";
 import DataTable from "../../shared/Components/UIElements/DataTable";
 import StudentInitial from "../../shared/Components/UIElements/StudentInitial";
 import StudentReportView from "../../students/pages/StudentReportView";
 import { useAttendancePerformance } from "../../shared/queries/useAttendancePerformances";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
 
-const StudentsPerformanceTable = ({ studentsData, filterState }) => {
+const StudentsPerformanceTable = ({ filterState }) => {
     const auth = useContext(AuthContext);
-    console.log(filterState);
+
+    const requestFilters = useMemo(() => {
+        if (!filterState.selectedAcademicYear) {
+            return null;
+        }
+
+        const baseFilters = {
+            academicYearId: filterState.selectedAcademicYear,
+            startDate: filterState.startDate
+                ? filterState.startDate.toISOString()
+                : null,
+            endDate: filterState.endDate
+                ? filterState.endDate.toISOString()
+                : null,
+            classId: filterState.selectedClass || null,
+        };
+
+        if (
+            auth.userRole === "admin" ||
+            auth.userRole === "branchAdmin"
+        ) {
+            if (!auth.currentBranchYearId) {
+                return null;
+            }
+
+            return {
+                ...baseFilters,
+                branchYearId:
+                    filterState.selectedBranchYear || auth.currentBranchYearId,
+                branchId: auth.userBranchId,
+                teachingGroupId: filterState.selectedTeachingGroup || null,
+                subBranchId: filterState.selectedSubBranch || null,
+            };
+        }
+
+        if (auth.userRole === "subBranchAdmin") {
+            return {
+                ...baseFilters,
+                branchId: auth.userBranchId,
+                subBranchId: auth.userSubBranchId,
+            };
+        }
+
+        if (auth.userRole === "teacher") {
+            return {
+                ...baseFilters,
+                branchId: auth.userBranchId,
+                teacherClassIds: auth.userClassIds,
+            };
+        }
+
+        return null;
+    }, [
+        auth.currentBranchYearId,
+        auth.userBranchId,
+        auth.userClassIds,
+        auth.userRole,
+        auth.userSubBranchId,
+        filterState.selectedAcademicYear,
+        filterState.selectedBranchYear,
+        filterState.selectedClass,
+        filterState.selectedSubBranch,
+        filterState.selectedTeachingGroup,
+        filterState.startDate,
+        filterState.endDate,
+    ]);
+
     const { data: attendanceData, isLoading } = useAttendancePerformance(
+        requestFilters ?? {},
         {
-            ...(filterState.selectedAcademicYear
-                ? { academicYearId: filterState.selectedAcademicYear }
-                : {}),
-            ...(filterState.selectedBranchYear
-                ? { branchYearId: filterState.selectedBranchYear }
-                : {}),
-            branchId: auth.userBranchId,
-            subBranchId:
-                auth.userRole === "teacher"
-                    ? null
-                    : auth.userRole === "subBranchAdmin"
-                    ? auth.userSubBranchId
-                    : filterState.selectedSubBranch,
-            classId: filterState.selectedClass,
-            startDate: filterState.startDate
-                ? filterState.startDate.toISOString()
-                : null,
-            endDate: filterState.endDate
-                ? filterState.endDate.toISOString()
-                : null,
-        },
-        {
-            ...(filterState.selectedAcademicYear
-                ? { academicYearId: filterState.selectedAcademicYear }
-                : {}),
-            ...(filterState.selectedBranchYear
-                ? { branchYearId: filterState.selectedBranchYear }
-                : {}),
-            ...(filterState.selectedClass
-                ? { classId: filterState.selectedClass }
-                : {}),
-            branchId: auth.userBranchId,
-            subBranchId: auth.userSubBranchId,
-            classId: filterState.selectedClass,
-            startDate: filterState.startDate
-                ? filterState.startDate.toISOString()
-                : null,
-            endDate: filterState.endDate
-                ? filterState.endDate.toISOString()
-                : null,
-        },
-        {
-            enabled: !!!studentsData,
+            enabled: !!requestFilters,
         }
     );
-
-    attendanceData
-        ? console.log(attendanceData)
-        : console.log("No attendance data available");
 
     const studentColumns = useMemo(
         () => [
@@ -77,7 +98,7 @@ const StudentsPerformanceTable = ({ studentsData, filterState }) => {
                                       }`
                             }
                             alt={student.name}
-                            className="size-10 rounded-full m-auto shrink-0 border border-gray-200 bg-white"
+                            className="bg-white m-auto border border-gray-200 rounded-full size-10 shrink-0"
                         />
                     ) : (
                         <StudentInitial
@@ -103,7 +124,7 @@ const StudentsPerformanceTable = ({ studentsData, filterState }) => {
                 cellAlign: "center",
                 headerAlign: "center",
                 render: (student) => (
-                    <div className="badge-green w-12 place-self-center text-center">
+                    <div className="place-self-center w-12 text-center badge-green">
                         {student.attendances.Hadir}%
                     </div>
                 ),
@@ -117,7 +138,7 @@ const StudentsPerformanceTable = ({ studentsData, filterState }) => {
                           cellAlign: "center",
                           headerAlign: "center",
                           render: (student) => (
-                              <div className="badge-primary w-12 place-self-center text-center">
+                              <div className="place-self-center w-12 text-center badge-primary">
                                   {student.attendances.Terlambat}%
                               </div>
                           ),
@@ -131,7 +152,7 @@ const StudentsPerformanceTable = ({ studentsData, filterState }) => {
                 cellAlign: "center",
                 headerAlign: "center",
                 render: (student) => (
-                    <div className="badge-yellow w-12 place-self-center text-center">
+                    <div className="place-self-center w-12 text-center badge-yellow">
                         {student.attendances.Izin}%
                     </div>
                 ),
@@ -143,7 +164,7 @@ const StudentsPerformanceTable = ({ studentsData, filterState }) => {
                 cellAlign: "center",
                 headerAlign: "center",
                 render: (student) => (
-                    <div className="badge-violet w-12 place-self-center text-center">
+                    <div className="place-self-center w-12 text-center badge-violet">
                         {student.attendances.Sakit}%
                     </div>
                 ),
@@ -155,7 +176,7 @@ const StudentsPerformanceTable = ({ studentsData, filterState }) => {
                 cellAlign: "center",
                 headerAlign: "center",
                 render: (student) => (
-                    <div className="badge-red w-12 place-self-center text-center">
+                    <div className="place-self-center w-12 text-center badge-red">
                         {student.attendances["Tanpa Keterangan"]}%
                     </div>
                 ),
@@ -199,7 +220,7 @@ const StudentsPerformanceTable = ({ studentsData, filterState }) => {
 
     return (
         <DataTable
-            data={attendanceData?.studentsData}
+            data={attendanceData?.studentsData || []}
             columns={studentColumns}
             searchableColumns={["name"]}
             initialSort={{ key: "name", direction: "ascending" }}

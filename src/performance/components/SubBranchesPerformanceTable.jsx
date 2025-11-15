@@ -1,14 +1,59 @@
-import { useMemo } from "react";
+import { useContext, useMemo } from "react";
 import DataTable from "../../shared/Components/UIElements/DataTable";
+import { useAttendancePerformance } from "../../shared/queries/useAttendancePerformances";
+import { AuthContext } from "../../shared/Components/Context/auth-context";
 
-const SubBranchesPerformanceTable = ({ data, filterState, setFilterState }) => {
+const SubBranchesPerformanceTable = ({ filterState, setFilterState }) => {
+    const auth = useContext(AuthContext);
+
+    const requestFilters = useMemo(() => {
+        if (
+            !filterState.selectedAcademicYear ||
+            !filterState.selectedTeachingGroup ||
+            !auth?.currentBranchYearId
+        ) {
+            return null;
+        }
+
+        return {
+            academicYearId: filterState.selectedAcademicYear,
+            branchYearId: auth.currentBranchYearId,
+            branchId: auth.userBranchId,
+            teachingGroupId: filterState.selectedTeachingGroup,
+            subBranchId: filterState.selectedSubBranch || null,
+            classId: filterState.selectedClass || null,
+            startDate: filterState.startDate
+                ? filterState.startDate.toISOString()
+                : null,
+            endDate: filterState.endDate
+                ? filterState.endDate.toISOString()
+                : null,
+        };
+    }, [
+        auth?.currentBranchYearId,
+        auth?.userBranchId,
+        filterState.selectedAcademicYear,
+        filterState.selectedTeachingGroup,
+        filterState.selectedSubBranch,
+        filterState.selectedClass,
+        filterState.startDate,
+        filterState.endDate,
+    ]);
+
+    const { data, isLoading } = useAttendancePerformance(
+        requestFilters ?? {},
+        {
+            enabled: !!requestFilters,
+        }
+    );
+
     const filteredData = useMemo(
         () =>
-            data.filter(
+            (data?.studentsDataBySubBranch || []).filter(
                 (item) =>
                     item.teachingGroupId === filterState.selectedTeachingGroup
             ),
-        [data, filterState.selectedTeachingGroup]
+        [data?.studentsDataBySubBranch, filterState.selectedTeachingGroup]
     );
 
     const userRole = JSON.parse(localStorage.getItem("userData")).role;
@@ -36,7 +81,7 @@ const SubBranchesPerformanceTable = ({ data, filterState, setFilterState }) => {
             cellAlign: "center",
             headerAlign: "center",
             render: (subBranch) => (
-                <div className="badge-green w-12 place-self-center text-center">
+                <div className="place-self-center w-12 text-center badge-green">
                     {subBranch?.attendances?.Hadir || 0}%
                 </div>
             ),
@@ -50,7 +95,7 @@ const SubBranchesPerformanceTable = ({ data, filterState, setFilterState }) => {
                       cellAlign: "center",
                       headerAlign: "center",
                       render: (subBranch) => (
-                          <div className="badge-primary w-12 place-self-center text-center">
+                          <div className="place-self-center w-12 text-center badge-primary">
                               {subBranch?.attendances?.Terlambat || 0}%
                           </div>
                       ),
@@ -64,7 +109,7 @@ const SubBranchesPerformanceTable = ({ data, filterState, setFilterState }) => {
             cellAlign: "center",
             headerAlign: "center",
             render: (subBranch) => (
-                <div className="badge-yellow w-12 place-self-center text-center">
+                <div className="place-self-center w-12 text-center badge-yellow">
                     {subBranch?.attendances?.Izin || 0}%
                 </div>
             ),
@@ -76,7 +121,7 @@ const SubBranchesPerformanceTable = ({ data, filterState, setFilterState }) => {
             cellAlign: "center",
             headerAlign: "center",
             render: (subBranch) => (
-                <div className="badge-violet w-12 place-self-center text-center">
+                <div className="place-self-center w-12 text-center badge-violet">
                     {subBranch?.attendances?.Sakit || 0}%
                 </div>
             ),
@@ -88,7 +133,7 @@ const SubBranchesPerformanceTable = ({ data, filterState, setFilterState }) => {
             cellAlign: "center",
             headerAlign: "center",
             render: (subBranch) => (
-                <div className="badge-red w-12 place-self-center text-center">
+                <div className="place-self-center w-12 text-center badge-red">
                     {subBranch?.attendances["Tanpa Keterangan"]
                         ? subBranch.attendances["Tanpa Keterangan"]
                         : 0}
@@ -134,6 +179,7 @@ const SubBranchesPerformanceTable = ({ data, filterState, setFilterState }) => {
                 showPagination: false,
                 entriesOptions: [10, 20, 30],
             }}
+            isLoading={isLoading}
         />
     );
 };

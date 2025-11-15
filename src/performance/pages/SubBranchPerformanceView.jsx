@@ -54,7 +54,6 @@ const SubBranchPerformanceView = () => {
         violationData: null,
         appliedFilters: null, // Keep track of which filters were used for the current data
         classData: null,
-        studentsData: null,
     });
 
     // Dropdown options lists
@@ -107,8 +106,6 @@ const SubBranchPerformanceView = () => {
                 overallAttendances: responseData.overallStats,
                 violationData: responseData.violationStats,
                 appliedFilters: { ...filterState }, // Snapshot of current filters
-                studentsData: responseData.studentsData,
-                studentsDataByClass: responseData.studentsDataByClass,
             });
         } catch (err) {
             console.error("Error fetching attendance data:", err);
@@ -252,7 +249,6 @@ const SubBranchPerformanceView = () => {
             violationData: null,
             appliedFilters: null,
             classData: null,
-            studentsData: null,
         });
 
         // Clear classes list
@@ -441,15 +437,15 @@ const SubBranchPerformanceView = () => {
     }, []);
 
     return (
-        <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">
-            <main id="report" className="max-w-6xl mx-auto mb-24">
+        <div className="bg-gray-50 md:p-8 px-4 py-8 min-h-screen">
+            <main id="report" className="mx-auto mb-24 max-w-6xl">
                 {/* PDF Header - Only visible in PDF */}
-                <div className="hidden print:block pdf-generation:block mb-6">
-                    <div className="text-center border-b pb-4 mb-6">
-                        <h1 className="text-2xl font-bold mb-2">
+                <div className="hidden pdf-generation:block print:block mb-6">
+                    <div className="mb-6 pb-4 border-b text-center">
+                        <h1 className="mb-2 font-bold text-2xl">
                             Laporan Performa Kehadiran
                         </h1>
-                        <div className="text-sm text-gray-600">
+                        <div className="text-gray-600 text-sm">
                             <p>
                                 Diterbitkan secara elektronik pada:{" "}
                                 {new Date().toLocaleDateString("id-ID", {
@@ -465,9 +461,9 @@ const SubBranchPerformanceView = () => {
                     </div>
                 </div>
                 {academicYearsList && (
-                    <div className="card-basic rounded-md flex-col gap-4">
-                        <div className="flex flex-col md:flex-row justify-between gap-4">
-                            <div className="hidden print:flex pdf-generation:flex flex-row items-center gap-[18px]">
+                    <div className="flex-col gap-4 rounded-md card-basic">
+                        <div className="flex md:flex-row flex-col justify-between gap-4">
+                            <div className="hidden pdf-generation:flex print:flex flex-row items-center gap-[18px]">
                                 <div className="flex flex-col gap-4">
                                     <div>Tahun Ajaran</div>
                                     <div>Periode</div>
@@ -509,8 +505,8 @@ const SubBranchPerformanceView = () => {
                             </div>
 
                             <div className="flex flex-col gap-5 no-print">
-                                <div className="flex flex-row gap-4 items-center">
-                                    <div className="flex flex-col gap-[18px] items-start">
+                                <div className="flex flex-row items-center gap-4">
+                                    <div className="flex flex-col items-start gap-[18px]">
                                         <div>Tahun Ajaran</div>
                                         <div>Periode</div>
                                         <div>Kelas</div>
@@ -527,7 +523,7 @@ const SubBranchPerformanceView = () => {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300"
+                                            className="px-2 py-1 border border-gray-400 rounded-full active:ring-2 active:ring-blue-300"
                                             disabled={false}
                                         >
                                             {!filterState.selectedAcademicYear && (
@@ -625,7 +621,7 @@ const SubBranchPerformanceView = () => {
                                     </div>
                                 </div>
 
-                                <div className="flex justify-center mt-4 gap-2 no-print">
+                                <div className="flex justify-center gap-2 mt-4 no-print">
                                     {hasUnappliedFilters && (
                                         <button
                                             onClick={handleApplyFilter}
@@ -652,7 +648,7 @@ const SubBranchPerformanceView = () => {
                                         <button
                                             onClick={handleResetFilter}
                                             disabled={isLoading}
-                                            className="btn-danger-outline rounded-full flex flex-row items-center gap-2"
+                                            className="flex flex-row items-center gap-2 rounded-full btn-danger-outline"
                                         >
                                             {isLoading ? (
                                                 <span>
@@ -674,7 +670,7 @@ const SubBranchPerformanceView = () => {
                                                 isLoading ||
                                                 !displayState.violationData
                                             }
-                                            className="button-primary mt-0 rounded-full flex flex-row items-center gap-2"
+                                            className="flex flex-row items-center gap-2 mt-0 rounded-full button-primary"
                                             title={
                                                 !displayState.violationData
                                                     ? "Apply filter terlebih dahulu untuk mengunduh laporan"
@@ -695,7 +691,7 @@ const SubBranchPerformanceView = () => {
                                     )}
                                 </div>
 
-                                <div className="self-start flex flex-row gap-2 print-avoid-break">
+                                <div className="flex flex-row self-start gap-2 print-avoid-break">
                                     {/* Left Column: Violation Names */}
                                     <div className="flex flex-col gap-1">
                                         {memoizedViolationData &&
@@ -716,7 +712,7 @@ const SubBranchPerformanceView = () => {
                                     </div>
 
                                     {/* Right Column: Case Counts */}
-                                    <div className="flex flex-col gap-1 ">
+                                    <div className="flex flex-col gap-1">
                                         {memoizedViolationData &&
                                             !isLoading &&
                                             filterState.selectedAcademicYear &&
@@ -736,7 +732,7 @@ const SubBranchPerformanceView = () => {
 
                             {(!academicYearsList || isLoading) &&
                                 displayState.attendanceData !== null && (
-                                    <div className="place-self-center justify-self-center self-center mx-auto">
+                                    <div className="justify-self-center self-center place-self-center mx-auto">
                                         <LoadingCircle size={32} />
                                     </div>
                                 )}
@@ -761,7 +757,6 @@ const SubBranchPerformanceView = () => {
                         <div className="print-avoid-break">
                             <h2>Performa Kelompok</h2>
                             <ClassesPerformanceTable
-                                data={displayState.studentsDataByClass}
                                 filterState={filterState}
                                 setFilterState={setFilterState}
                             />

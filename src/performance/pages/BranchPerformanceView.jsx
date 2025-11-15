@@ -151,11 +151,6 @@ const BranchPerformanceView = () => {
                 overallAttendances: responseData.overallStats,
                 violationData: responseData.violationStats,
                 appliedFilters: { ...filterState }, // Snapshot of current filters
-                studentsData: responseData.studentsData,
-                studentsDataByClass: responseData.studentsDataByClass,
-                studentsDataBySubBranch: responseData.studentsDataBySubBranch,
-                studentsDataByTeachingGroup:
-                    responseData.studentsDataByTeachingGroup,
             });
         } catch (err) {
             console.error("Error fetching attendance data:", err);
@@ -350,22 +345,22 @@ const BranchPerformanceView = () => {
     );
 
     return (
-        <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">
-            <main className="max-w-6xl mx-auto">
+        <div className="bg-gray-50 md:p-8 px-4 py-8 min-h-screen">
+            <main className="mx-auto max-w-6xl">
                 {academicYearsList && (
-                    <div className="card-basic rounded-md flex-col gap-4">
+                    <div className="flex-col gap-4 rounded-md card-basic">
                         <div className="flex justify-between">
                             <div className={`flex flex-col`}>
-                                <h2 className="text-xl font-bold">Desa</h2>
-                                {/* <p className="text-sm text-gray-600">
+                                <h2 className="font-bold text-xl">Desa</h2>
+                                {/* <p className="text-gray-600 text-sm">
                           Target Semester: {subBranchData.semesterTarget} hari
                       </p> */}
                             </div>
                         </div>
 
-                        <div className="flex flex-col md:flex-row justify-between gap-4">
-                            <div className="flex flex-col gap-5 items-start">
-                                <div className="flex flex-row gap-4 items-center">
+                        <div className="flex md:flex-row flex-col justify-between gap-4">
+                            <div className="flex flex-col items-start gap-5">
+                                <div className="flex flex-row items-center gap-4">
                                     <div className="flex flex-col gap-[18px]">
                                         <div>Tahun Ajaran</div>
                                         <div>Periode</div>
@@ -373,7 +368,7 @@ const BranchPerformanceView = () => {
                                         <div>Kelompok</div>
                                         <div>Kelas</div>
                                     </div>
-                                    <div className="flex flex-col gap-2 ">
+                                    <div className="flex flex-col gap-2">
                                         <select
                                             value={
                                                 filterState.selectedAcademicYear
@@ -385,7 +380,7 @@ const BranchPerformanceView = () => {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300"
+                                            className="px-2 py-1 border border-gray-400 rounded-full active:ring-2 active:ring-blue-300"
                                             disabled={false}
                                         >
                                             {!filterState.selectedAcademicYear && (
@@ -574,7 +569,7 @@ const BranchPerformanceView = () => {
                                     </div>
                                 </div>
 
-                                <div className="flex justify-center mt-4 gap-2">
+                                <div className="flex justify-center gap-2 mt-4">
                                     {hasUnappliedFilters && (
                                         <button
                                             onClick={handleApplyFilter}
@@ -600,14 +595,14 @@ const BranchPerformanceView = () => {
                                         <button
                                             onClick={handleResetFilter}
                                             disabled={isLoading}
-                                            className="btn-danger-outline rounded-full"
+                                            className="rounded-full btn-danger-outline"
                                         >
                                             Reset Filter
                                         </button>
                                     )}
                                 </div>
 
-                                <div className="self-start flex flex-row gap-2">
+                                <div className="flex flex-row self-start gap-2">
                                     {/* Left Column: Violation Names */}
                                     <div className="flex flex-col gap-1">
                                         {memoizedViolationData &&
@@ -628,7 +623,7 @@ const BranchPerformanceView = () => {
                                     </div>
 
                                     {/* Right Column: Case Counts */}
-                                    <div className="flex flex-col gap-1 ">
+                                    <div className="flex flex-col gap-1">
                                         {memoizedViolationData &&
                                             !isLoading &&
                                             filterState.selectedAcademicYear &&
@@ -646,7 +641,7 @@ const BranchPerformanceView = () => {
                                 </div>
                             </div>
                             {(!academicYearsList || isLoading) && (
-                                <div className="place-self-center justify-self-center self-center mx-auto">
+                                <div className="justify-self-center self-center place-self-center mx-auto">
                                     <LoadingCircle size={32} />
                                 </div>
                             )}
@@ -671,7 +666,6 @@ const BranchPerformanceView = () => {
                         <div className="print-avoid-break">
                             <h2>Performa Desa</h2>
                             <TeachingGroupsPerformanceTable
-                                data={displayState.studentsDataByTeachingGroup}
                                 filterState={filterState}
                                 setFilterState={setFilterState}
                             />
@@ -697,7 +691,6 @@ const BranchPerformanceView = () => {
                                 </div>
                             </div>
                             <SubBranchesPerformanceTable
-                                data={displayState.studentsDataBySubBranch}
                                 filterState={filterState}
                                 setFilterState={setFilterState}
                             />

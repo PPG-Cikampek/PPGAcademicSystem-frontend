@@ -52,7 +52,6 @@ const TeacherPerformanceView = () => {
         violationData: null,
         appliedFilters: null, // Keep track of which filters were used for the current data
         classData: null,
-        studentsData: null,
     });
 
     // Dropdown options lists
@@ -106,8 +105,6 @@ const TeacherPerformanceView = () => {
                 overallAttendances: responseData.overallStats,
                 violationData: responseData.violationStats,
                 appliedFilters: { ...filterState }, // Snapshot of current filters
-                studentsData: responseData.studentsData,
-                studentsDataByClass: responseData.studentsDataByClass,
             });
         } catch (err) {
             console.error("Error fetching attendance data:", err);
@@ -285,7 +282,6 @@ const TeacherPerformanceView = () => {
             violationData: null,
             appliedFilters: null,
             classData: null,
-            studentsData: null,
         });
 
         // Clear dependent lists
@@ -326,14 +322,14 @@ const TeacherPerformanceView = () => {
     // studentColumns moved to StudentPerformanceTable component
 
     return (
-        <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">
-            <main className="max-w-6xl mx-auto mb-24">
+        <div className="bg-gray-50 md:p-8 px-4 py-8 min-h-screen">
+            <main className="mx-auto mb-24 max-w-6xl">
                 {academicYearsList && (
-                    <div className="card-basic rounded-md flex-col gap-4">
-                        <div className="flex flex-col md:flex-row justify-between gap-4">
+                    <div className="flex-col gap-4 rounded-md card-basic">
+                        <div className="flex md:flex-row flex-col justify-between gap-4">
                             <div className="flex flex-col gap-5">
-                                <div className="flex flex-row gap-4 items-center">
-                                    <div className="flex flex-col gap-[18px] items-start">
+                                <div className="flex flex-row items-center gap-4">
+                                    <div className="flex flex-col items-start gap-[18px]">
                                         <div>Tahun Ajaran</div>
                                         <div>Periode</div>
                                         <div>Kelas</div>
@@ -350,7 +346,7 @@ const TeacherPerformanceView = () => {
                                                     e.target.value
                                                 )
                                             }
-                                            className="border border-gray-400 px-2 py-1 rounded-full active:ring-2 active:ring-blue-300"
+                                            className="px-2 py-1 border border-gray-400 rounded-full active:ring-2 active:ring-blue-300"
                                             disabled={false}
                                         >
                                             {!filterState.selectedAcademicYear && (
@@ -486,7 +482,7 @@ const TeacherPerformanceView = () => {
                                     </div>
                                 </div>
 
-                                <div className="flex justify-center mt-4 gap-2">
+                                <div className="flex justify-center gap-2 mt-4">
                                     {hasUnappliedFilters && (
                                         <button
                                             onClick={handleApplyFilter}
@@ -512,14 +508,14 @@ const TeacherPerformanceView = () => {
                                         <button
                                             onClick={handleResetFilter}
                                             disabled={isLoading}
-                                            className="btn-danger-outline rounded-full"
+                                            className="rounded-full btn-danger-outline"
                                         >
                                             Reset Filter
                                         </button>
                                     )}
                                 </div>
 
-                                <div className="self-start flex flex-row gap-2">
+                                <div className="flex flex-row self-start gap-2">
                                     {/* Left Column: Violation Names */}
                                     <div className="flex flex-col gap-1">
                                         {memoizedViolationData &&
@@ -540,7 +536,7 @@ const TeacherPerformanceView = () => {
                                     </div>
 
                                     {/* Right Column: Case Counts */}
-                                    <div className="flex flex-col gap-1 ">
+                                    <div className="flex flex-col gap-1">
                                         {memoizedViolationData &&
                                             !isLoading &&
                                             filterState.selectedAcademicYear &&
@@ -559,7 +555,7 @@ const TeacherPerformanceView = () => {
                             </div>
                             {(!academicYearsList || isLoading) &&
                                 displayState.attendanceData !== null && (
-                                    <div className="place-self-center justify-self-center self-center mx-auto">
+                                    <div className="justify-self-center self-center place-self-center mx-auto">
                                         <LoadingCircle size={32} />
                                     </div>
                                 )}
@@ -584,7 +580,6 @@ const TeacherPerformanceView = () => {
                         <div className="print-avoid-break">
                             <h2>Performa Siswa</h2>
                             <ClassesPerformanceTable
-                                data={displayState.studentsDataByClass}
                                 filterState={filterState}
                                 setFilterState={setFilterState}
                             />
@@ -609,7 +604,6 @@ const TeacherPerformanceView = () => {
                                 </div>
                             </div>
                             <StudentsPerformanceTable
-                                studentsData={displayState.studentsData}
                                 filterState={filterState}
                             />
                         </div>

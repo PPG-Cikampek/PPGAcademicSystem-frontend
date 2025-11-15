@@ -1,12 +1,51 @@
-import { useMemo } from "react";
+import { useContext, useMemo } from "react";
 import DataTable from "../../shared/Components/UIElements/DataTable";
+import { useAttendancePerformance } from "../../shared/queries/useAttendancePerformances";
+import { AuthContext } from "../../shared/Components/Context/auth-context";
 
 const TeachingGroupsPerformanceTable = ({
-    data,
     filterState,
     setFilterState,
 }) => {
+    const auth = useContext(AuthContext);
     const userRole = JSON.parse(localStorage.getItem("userData")).role;
+
+    const requestFilters = useMemo(() => {
+        if (!filterState.selectedAcademicYear || !auth?.currentBranchYearId) {
+            return null;
+        }
+
+        return {
+            academicYearId: filterState.selectedAcademicYear,
+            branchYearId: auth.currentBranchYearId,
+            branchId: auth.userBranchId,
+            teachingGroupId: filterState.selectedTeachingGroup || null,
+            subBranchId: filterState.selectedSubBranch || null,
+            classId: filterState.selectedClass || null,
+            startDate: filterState.startDate
+                ? filterState.startDate.toISOString()
+                : null,
+            endDate: filterState.endDate
+                ? filterState.endDate.toISOString()
+                : null,
+        };
+    }, [
+        auth?.currentBranchYearId,
+        auth?.userBranchId,
+        filterState.selectedAcademicYear,
+        filterState.selectedTeachingGroup,
+        filterState.selectedSubBranch,
+        filterState.selectedClass,
+        filterState.startDate,
+        filterState.endDate,
+    ]);
+
+    const { data: attendanceData, isLoading } = useAttendancePerformance(
+        requestFilters ?? {},
+        {
+            enabled: !!requestFilters,
+        }
+    );
 
     const teachingGroupColumns = useMemo(() => [
         {
@@ -31,7 +70,7 @@ const TeachingGroupsPerformanceTable = ({
             cellAlign: "center",
             headerAlign: "center",
             render: (teachingGroup) => (
-                <div className="badge-green w-12 place-self-center text-center">
+                <div className="place-self-center w-12 text-center badge-green">
                     {teachingGroup?.attendances?.Hadir || 0}%
                 </div>
             ),
@@ -45,7 +84,7 @@ const TeachingGroupsPerformanceTable = ({
                       cellAlign: "center",
                       headerAlign: "center",
                       render: (teachingGroup) => (
-                          <div className="badge-primary w-12 place-self-center text-center">
+                          <div className="place-self-center w-12 text-center badge-primary">
                               {teachingGroup?.attendances?.Terlambat || 0}%
                           </div>
                       ),
@@ -59,7 +98,7 @@ const TeachingGroupsPerformanceTable = ({
             cellAlign: "center",
             headerAlign: "center",
             render: (teachingGroup) => (
-                <div className="badge-yellow w-12 place-self-center text-center">
+                <div className="place-self-center w-12 text-center badge-yellow">
                     {teachingGroup?.attendances?.Izin || 0}%
                 </div>
             ),
@@ -71,7 +110,7 @@ const TeachingGroupsPerformanceTable = ({
             cellAlign: "center",
             headerAlign: "center",
             render: (teachingGroup) => (
-                <div className="badge-violet w-12 place-self-center text-center">
+                <div className="place-self-center w-12 text-center badge-violet">
                     {teachingGroup?.attendances?.Sakit || 0}%
                 </div>
             ),
@@ -83,7 +122,7 @@ const TeachingGroupsPerformanceTable = ({
             cellAlign: "center",
             headerAlign: "center",
             render: (teachingGroup) => (
-                <div className="badge-red w-12 place-self-center text-center">
+                <div className="place-self-center w-12 text-center badge-red">
                     {teachingGroup?.attendances["Tanpa Keterangan"]
                         ? teachingGroup.attendances["Tanpa Keterangan"]
                         : 0}
@@ -117,7 +156,7 @@ const TeachingGroupsPerformanceTable = ({
 
     return (
         <DataTable
-            data={data}
+            data={attendanceData?.studentsDataByTeachingGroup || []}
             columns={teachingGroupColumns}
             searchableColumns={["name"]}
             initialSort={{ key: "name", direction: "ascending" }}
@@ -130,6 +169,7 @@ const TeachingGroupsPerformanceTable = ({
                 showPagination: false,
                 entriesOptions: [10, 20, 30],
             }}
+            isLoading={isLoading}
         />
     );
 };
