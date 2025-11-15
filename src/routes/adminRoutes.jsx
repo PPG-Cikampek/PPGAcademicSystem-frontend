@@ -41,11 +41,13 @@ const RequestedAccountView = lazy(() => import("../users/pages/account-requests/
 const UpdateQuestionView = lazy(() => import("../munaqasyah/pages/UpdateQuestionView"));
 const QuestionPackageView = lazy(() => import('../munaqasyah/pages/QuestionPackageView'));
 const CategoryPackageView = lazy(() => import('../munaqasyah/pages/CategoryPackageView'));
+const HelpCenterView = lazy(() => import('../shared/pages/HelpCenterView'));
 
 export const adminRoutes = [
     { path: '/verify-email/:token', element: <EmailVerifyView /> },
     { path: '/profile/:userId', element: <ProfileView /> },
     { path: '/dashboard', element: <DashboardView /> },
+    { path: '/help-center', element: <HelpCenterView /> },
     { path: '/dashboard/classes', element: <ClassesViewByAcademicYear/> },
     { path: '/dashboard/classes/academic-year', element: <ClassesView /> },
     { path: '/dashboard/classes/academic-year/:classId', element: <ClassDetailView /> },

@@ -60,11 +60,13 @@ const MunaqasyahClassList = lazy(() =>
 const MunaqasyahByClassView = lazy(() =>
     import("../munaqasyah/pages/MunaqasyahByClassView")
 );
+const HelpCenterView = lazy(() => import("../shared/pages/HelpCenterView"));
 
 export const subBranchAdminRoutes = [
     { path: "/verify-email/:token", element: <EmailVerifyView /> },
     { path: "/profile/:userId", element: <ProfileView /> },
     { path: "/dashboard", element: <DashboardView /> },
+    { path: "/help-center", element: <HelpCenterView /> },
     { path: "/dashboard/classes", element: <SubBranchAdminClassesView /> },
     { path: "/dashboard/classes/:classId", element: <ClassDetailView /> },
     { path: "/dashboard/students", element: <StudentsView /> },

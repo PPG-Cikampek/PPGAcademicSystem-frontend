@@ -17,6 +17,7 @@ const UpdateStudentView = lazy(() =>
     import("../students/pages/UpdateStudentView")
 );
 const ProfileView = lazy(() => import("../users/pages/profile/ProfileView"));
+const HelpCenterView = lazy(() => import("../shared/pages/HelpCenterView"));
 
 export const studentRoutes = [
     {
@@ -24,6 +25,14 @@ export const studentRoutes = [
         element: (
             <PageHeader>
                 <StudentDashboardView />
+            </PageHeader>
+        ),
+    },
+    {
+        path: "/help-center",
+        element: (
+            <PageHeader>
+                <HelpCenterView />
             </PageHeader>
         ),
     },

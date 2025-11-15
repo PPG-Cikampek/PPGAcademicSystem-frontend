@@ -29,11 +29,13 @@ const QuestionPackageView = lazy(() =>
 const CategoryPackageView = lazy(() =>
     import("../munaqasyah/pages/CategoryPackageView")
 );
+const HelpCenterView = lazy(() => import("../shared/pages/HelpCenterView"));
 
 export const curriculumRoutes = [
     { path: "/verify-email/:token", element: <EmailVerifyView /> },
     { path: "/profile/:userId", element: <ProfileView /> },
     { path: "/dashboard", element: <DashboardView /> },
+    { path: "/help-center", element: <HelpCenterView /> },
     { path: "/munaqasyah", element: <MunaqasyahView /> },
     {
         path: "/munaqasyah/question-bank",

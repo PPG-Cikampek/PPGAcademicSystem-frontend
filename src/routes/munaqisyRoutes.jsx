@@ -18,11 +18,20 @@ const HomeScreenView = lazy(() =>
 const HomeNavigation = lazy(() =>
     import("../teacher-role/shared/Components/Navigation/HomeNavigation")
 );
+const HelpCenterView = lazy(() => import("../shared/pages/HelpCenterView"));
 
 const queryClient = new QueryClient();
 
 export const munaqisyRoutes = [
     { path: "/", element: <HomeScreenView /> },
+    {
+        path: "/help-center",
+        element: (
+            <PageHeader>
+                <HelpCenterView />
+            </PageHeader>
+        ),
+    },
     {
         path: "/settings/profile/:userId",
         element: (

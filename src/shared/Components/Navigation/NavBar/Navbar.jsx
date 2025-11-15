@@ -155,15 +155,21 @@ const Navbar = () => {
     };
 
     const ProfileButton = () => {
+        const displayName = (auth.userName || "")
+            .trim()
+            .split(/\s+/)
+            .slice(0, 2)
+            .join(" ");
+
         return (
             <FloatingMenu
                 boxWidth="w-36"
-                label={auth.userName}
+                label="Profile"
                 style={`btn-secondary-outline-sharp py-3 max-md:text-right`}
                 buttons={[
                     {
                         icon: User,
-                        label: "Profile",
+                        label: displayName,
                         onClick: () => navigate(`/profile/${auth.userId}`),
                     },
                     {
@@ -222,13 +228,13 @@ const Navbar = () => {
                     : "100%",
             }}
         >
-            <div className="px-4 mx-auto w-full">
+            <div className="mx-auto px-4 w-full">
                 <div className="flex justify-between items-center h-16">
                     {/* Logo */}
-                    <div className="flex gap-2 md:gap-6 items-center">
+                    <div className="flex items-center gap-2 md:gap-6">
                         <div className="flex shrink-0">
                             <button
-                                className="btn-icon-white text-gray-800 active:ring-2 ring-gray-400 ring-offset-1"
+                                className="ring-gray-400 active:ring-2 ring-offset-1 text-gray-800 btn-icon-white"
                                 onClick={sidebarHandler}
                             >
                                 {sidebar.isSidebarOpen ? (
@@ -248,16 +254,17 @@ const Navbar = () => {
                             <NavLink
                                 key={link.id}
                                 to={link.path}
-                                className={`btn-secondary-outline-sharp py-3`}
+                                className={`btn-secondary-outline-sharp py-3 m-0`}
                             >
                                 {link.name}
                             </NavLink>
                         ))}
+
                         <ProfileButton />
                     </div>
 
                     {/* Mobile Navigation Icons */}
-                    <div className="align-center md:hidden flex space-x-4">
+                    <div className="md:hidden flex space-x-4 align-end">
                         {/* {navLinks.map((link) => (
                             <NavLink
                                 key={link.id}

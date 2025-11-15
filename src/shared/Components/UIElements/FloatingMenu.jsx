@@ -69,7 +69,7 @@ const FloatingMenu = ({
                                         : "text-gray-700"
                                 }`}
                         >
-                            {button.icon && <button.icon className="w-4 h-4" />}
+                            {button.icon && <button.icon className="w-4 h-4 shrink-0" />}
                             {button.label}
                         </button>
                     ))}

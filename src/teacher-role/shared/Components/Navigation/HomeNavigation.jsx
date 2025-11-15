@@ -13,7 +13,8 @@ import {
     CalendarCog,
     Settings,
     BookOpenText,
-    CodeXml
+    CodeXml,
+    HelpCircle,
 } from "lucide-react";
 
 const HomeNavigation = ({ children }) => {
@@ -83,6 +84,13 @@ const HomeNavigation = ({ children }) => {
                       label: "Pengaturan Akun",
                   },
               ];
+
+              links.push({
+                  link: "/help-center",
+                  icon: <HelpCircle />,
+                  label: "Pusat Bantuan",
+                  end: true,
+              });
 
               links.push({
                   link: "/info-portal",

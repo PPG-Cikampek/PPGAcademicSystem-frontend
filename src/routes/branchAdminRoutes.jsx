@@ -54,11 +54,13 @@ const RequestAccountForm = lazy(() =>
 const RequestAccountTicketDetail = lazy(() =>
     import("../users/pages/account-requests/RequestAccountTicketDetail")
 );
+const HelpCenterView = lazy(() => import("../shared/pages/HelpCenterView"));
 
 export const branchAdminRoutes = [
     { path: "/verify-email/:token", element: <EmailVerifyView /> },
     { path: "/profile/:userId", element: <ProfileView /> },
     { path: "/dashboard", element: <DashboardView /> },
+    { path: "/help-center", element: <HelpCenterView /> },
     { path: "/dashboard/classes", element: <SubBranchAdminClassesView /> },
     { path: "/dashboard/classes/:classId", element: <ClassDetailView /> },
     { path: "/dashboard/classes/:classId/edit", element: <UpdateClassView /> },

@@ -18,6 +18,7 @@ import {
     BookOpenText,
     CodeXml,
     Wrench,
+    HelpCircle,
 } from "lucide-react";
 
 const DashboardNav = ({ children }) => {
@@ -209,6 +210,13 @@ const DashboardNav = ({ children }) => {
             },
         ];
     }
+
+    links.push({
+        link: "/help-center",
+        icon: <HelpCircle />,
+        label: "Pusat Bantuan",
+        end: true,
+    });
 
     links.push({
         link: "/info-portal",
