@@ -1,0 +1,20 @@
+.faq-table-section,
+.faq-form-section {
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.75rem;
+    padding: 1.5rem;
+}
+
+.faq-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+@media (min-width: 768px) {
+    .faq-form-section,
+    .faq-table-section {
+        padding: 2rem;
+    }
+}

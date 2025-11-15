@@ -1,65 +1,19 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
-    HelpCircle,
     Shield,
-    Wrench,
-    Mail,
     Phone,
     MessageSquare,
     ChevronDown,
     ChevronUp,
-    BookOpen,
-    Users,
-    Settings,
-    FileQuestion,
 } from "lucide-react";
+import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
+import { useFAQs } from "../hooks/useFAQData";
 
 const HelpCenterView = () => {
     const [expandedFaq, setExpandedFaq] = useState(null);
 
-    // FAQ Data
-    const faqData = [
-        {
-            id: 1,
-            question: "Bagaimana cara login ke sistem?",
-            answer: "Gunakan email dan password yang telah terdaftar. Jika lupa password, klik tombol 'Lupa Password' di halaman login untuk mereset password Anda.",
-        },
-        {
-            id: 2,
-            question: "Bagaimana cara mengisi presensi siswa?",
-            answer: "Guru dapat mengisi presensi melalui menu 'Kelas', pilih kelas yang diinginkan, kemudian klik 'Presensi'. Tandai siswa yang hadir/tidak hadir dan simpan data.",
-        },
-        {
-            id: 3,
-            question: "Bagaimana cara melihat nilai siswa?",
-            answer: "Untuk melihat nilai, masuk ke menu 'Peserta Didik', pilih siswa yang diinginkan, kemudian lihat tab 'Nilai' untuk melihat riwayat nilai lengkap.",
-        },
-        {
-            id: 4,
-            question: "Apa yang harus dilakukan jika data tidak muncul?",
-            answer: "Coba refresh halaman dengan menekan F5 atau Ctrl+R. Jika masalah berlanjut, periksa koneksi internet Anda atau hubungi administrator sistem.",
-        },
-        {
-            id: 5,
-            question: "Bagaimana cara mengubah data profil?",
-            answer: "Klik foto profil atau nama Anda di pojok kanan atas, pilih 'Profil', kemudian klik tombol 'Edit' untuk mengubah informasi profil Anda.",
-        },
-        {
-            id: 6,
-            question: "Bagaimana cara mengelola tahun ajaran?",
-            answer: "Admin dapat mengelola tahun ajaran melalui menu 'Tahun Ajaran'. Anda dapat menambah, mengaktifkan, atau menonaktifkan tahun ajaran sesuai kebutuhan.",
-        },
-        {
-            id: 7,
-            question: "Apakah data saya aman?",
-            answer: "Ya, sistem kami menggunakan enkripsi dan praktik keamanan terbaik untuk melindungi data Anda. Data hanya dapat diakses oleh pengguna yang memiliki hak akses.",
-        },
-        {
-            id: 8,
-            question: "Bagaimana cara logout dari sistem?",
-            answer: "Klik foto profil atau nama Anda di pojok kanan atas, kemudian pilih 'Keluar' untuk logout dari sistem dengan aman.",
-        },
-    ];
+    const faqQuery = useFAQs();
+    const faqData = useMemo(() => faqQuery.data || [], [faqQuery.data]);
 
     // Contact channels
     const contactChannels = [
@@ -109,7 +63,6 @@ const HelpCenterView = () => {
                 {/* Header Section */}
                 <div className="mb-8">
                     <div className="flex items-center gap-3 mb-4">
-                        <HelpCircle className="w-8 h-8 text-blue-600" />
                         <h1 className="font-semibold text-gray-900 text-2xl">
                             Pusat Bantuan
                         </h1>
@@ -122,35 +75,45 @@ const HelpCenterView = () => {
                         <MessageSquare className="w-5 h-5" />
                         Pertanyaan yang Sering Diajukan (FAQ)
                     </h2>
-                    <div className="space-y-3">
-                        {faqData.map((faq) => (
-                            <div
-                                key={faq.id}
-                                className="bg-white shadow-xs border border-gray-100 rounded-md overflow-hidden"
-                            >
-                                <button
-                                    onClick={() => toggleFaq(faq.id)}
-                                    className="flex justify-between items-center hover:bg-gray-50 px-6 py-4 w-full text-left transition-colors duration-200"
+                    {faqQuery.isLoading ? (
+                        <div className="flex justify-center bg-white shadow-xs py-12 border border-gray-100 rounded-md">
+                            <LoadingCircle size={28} />
+                        </div>
+                    ) : faqData.length === 0 ? (
+                        <div className="bg-white shadow-xs p-6 border border-gray-100 rounded-md text-gray-500 text-sm text-center">
+                            Belum ada pertanyaan yang tersedia saat ini.
+                        </div>
+                    ) : (
+                        <div className="space-y-3">
+                            {faqData.map((faq) => (
+                                <div
+                                    key={faq.id}
+                                    className="bg-white shadow-xs border border-gray-100 rounded-md overflow-hidden"
                                 >
-                                    <span className="font-medium text-gray-900">
-                                        {faq.question}
-                                    </span>
-                                    {expandedFaq === faq.id ? (
-                                        <ChevronUp className="w-5 h-5 text-gray-500 shrink-0" />
-                                    ) : (
-                                        <ChevronDown className="w-5 h-5 text-gray-500 shrink-0" />
+                                    <button
+                                        onClick={() => toggleFaq(faq.id)}
+                                        className="flex justify-between items-center hover:bg-gray-50 px-6 py-4 w-full text-left transition-colors duration-200"
+                                    >
+                                        <span className="font-medium text-gray-900">
+                                            {faq.question}
+                                        </span>
+                                        {expandedFaq === faq.id ? (
+                                            <ChevronUp className="w-5 h-5 text-gray-500 shrink-0" />
+                                        ) : (
+                                            <ChevronDown className="w-5 h-5 text-gray-500 shrink-0" />
+                                        )}
+                                    </button>
+                                    {expandedFaq === faq.id && (
+                                        <div className="bg-gray-50 px-6 py-4 border-gray-100 border-t">
+                                            <p className="text-gray-700">
+                                                {faq.answer}
+                                            </p>
+                                        </div>
                                     )}
-                                </button>
-                                {expandedFaq === faq.id && (
-                                    <div className="bg-gray-50 px-6 py-4 border-gray-100 border-t">
-                                        <p className="text-gray-700">
-                                            {faq.answer}
-                                        </p>
-                                    </div>
-                                )}
-                            </div>
-                        ))}
-                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 <h2 className="flex items-center gap-2 mb-6 font-semibold text-gray-900 text-xl">
@@ -162,7 +125,7 @@ const HelpCenterView = () => {
                     <p className="mb-6 text-gray-600">
                         Hubungi Tim ICT untuk dukungan lebih lanjut.
                     </p>
-                    <div className="flex md:flex-row flex-col gap-6">
+                    <div className="flex md:flex-row flex-col justify-between gap-6">
                         {contactChannels.map((channel) => (
                             <div
                                 key={channel.id}

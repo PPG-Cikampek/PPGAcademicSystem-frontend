@@ -88,7 +88,12 @@ const DashboardNav = ({ children }) => {
                     {
                         link: "/admin/portal",
                         icon: <Wrench />,
-                        label: "Kelola Portal",
+                        label: "Portal Pengembang",
+                    },
+                    {
+                        link: "/help-center/admin",
+                        icon: <HelpCircle />,
+                        label: "Pusat Bantuan",
                     },
                     // { link: '/settings/more', label: 'Lainnya', icon: <Settings /> },
                 ],

@@ -86,11 +86,11 @@ const Sidebar = ({ linksList, children }) => {
     };
 
     return (
-        <div className="relative h-full md:flex">
+        <div className="relative md:flex h-full">
             {/* Overlay for mobile when sidebar is open */}
             {sidebar.isSidebarOpen && (
                 <div
-                    className="fixed inset-0 bg-black/20 md:hidden z-20"
+                    className="md:hidden z-20 fixed inset-0 bg-black/20"
                     onClick={sidebarHandler}
                 />
             )}
@@ -124,7 +124,7 @@ const Sidebar = ({ linksList, children }) => {
                                 PPG Cikampek
                             </span>
                             {version && sidebar.isSidebarOpen && (
-                                <span className="text-xs shrink-0 whitespace-nowrap">
+                                <span className="text-xs whitespace-nowrap shrink-0">
                                     v{version.version} -{" "}
                                     {formatDate(
                                         new Date(version.timestamp * 1000),
@@ -278,10 +278,10 @@ const Sidebar = ({ linksList, children }) => {
                 {(auth.userRole === "teacher" ||
                     auth.userRole === "munaqisy" ||
                     auth.userRole === "student") && (
-                    <div className="flex items-center justify-end p-4">
+                    <div className="flex justify-end items-center p-4">
                         <button
                             onClick={auth.logout}
-                            className="btn-primary-outline flex items-center p-2"
+                            className="flex items-center p-2 btn-primary-outline"
                         >
                             <LogOut size={18} strokeWidth={2.5} />
                             <span className="ml-2">Logout</span>

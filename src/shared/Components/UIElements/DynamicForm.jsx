@@ -70,17 +70,17 @@ const DynamicForm = ({
                     <img
                         src={logo}
                         alt="logo"
-                        className="size-24 self-center"
+                        className="self-center size-24"
                     />
                 )}
 
                 {title && (
-                    <h2 className="text-2xl mt-4 font-medium text-center">
+                    <h2 className="mt-4 font-medium text-2xl text-center">
                         {title}
                     </h2>
                 )}
                 {subtitle && (
-                    <p className="text-lg mt-1 font-normal text-center">
+                    <p className="mt-1 font-normal text-lg text-center">
                         {subtitle}
                     </p>
                 )}
@@ -95,7 +95,7 @@ const DynamicForm = ({
                     fields.map((field) => (
                         <div key={field.name} className="mt-4 md:mt-6 w-full">
                             {labels && field.label && (
-                                <label className="block text-gray-700 pb-1">
+                                <label className="block pb-1 text-gray-700">
                                     {field.label}
                                 </label>
                             )}
@@ -104,10 +104,11 @@ const DynamicForm = ({
                                     defaultValue={field.value || ""}
                                     {...register(field.name, {
                                         required: field.required,
+                                        ...(field.validation || {}),
                                     })}
                                     disabled={field.disabled}
                                     rows={field.textAreaRows}
-                                    className={` w-full p-2 mb-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 ${
+                                    className={` w-full p-2 mb-1 border rounded-sm shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 ${
                                         field.disabled
                                             ? "bg-gray-200 cursor-not-allowed"
                                             : "bg-white"
@@ -133,6 +134,7 @@ const DynamicForm = ({
                                     defaultValue={field.value || ""}
                                     {...register(field.name, {
                                         required: field.required,
+                                        ...(field.validation || {}),
                                     })}
                                     disabled={field.disabled}
                                     className={` w-full p-2 border rounded-md shadow-xs hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 ${
@@ -167,7 +169,7 @@ const DynamicForm = ({
                                     min="1900"
                                     max={currentYear + 1}
                                     step="1"
-                                    className={` w-full p-2 mb-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 ${
+                                    className={` w-full p-2 mb-1 border rounded-sm shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 ${
                                         field.disabled
                                             ? "bg-gray-200 cursor-not-allowed"
                                             : "bg-white"
@@ -175,7 +177,7 @@ const DynamicForm = ({
                                 />
                             ) : field.type === "phone" ? (
                                 <div className="relative flex items-center">
-                                    <span className="absolute left-0 px-2 text-gray-500 border-r border-gray-300">
+                                    <span className="left-0 absolute px-2 border-gray-300 border-r text-gray-500">
                                         +62
                                     </span>
                                     <input
@@ -191,9 +193,10 @@ const DynamicForm = ({
                                                 message:
                                                     "Nomor tidak valid! (contoh valid: 8123456789)",
                                             },
+                                            ...(field.validation || {}),
                                         })}
                                         disabled={field.disabled}
-                                        className={` w-full pl-12 p-2 mb-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 ${
+                                        className={` w-full pl-12 p-2 mb-1 border rounded-sm shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 ${
                                             field.disabled
                                                 ? "bg-gray-200 cursor-not-allowed"
                                                 : "bg-white"
@@ -215,6 +218,7 @@ const DynamicForm = ({
                                                 }
                                                 {...register(field.name, {
                                                     required: field.required,
+                                                    ...(field.validation || {}),
                                                 })}
                                                 disabled={
                                                     field.disabled ||
@@ -253,9 +257,10 @@ const DynamicForm = ({
                                                 message: `Maximum value is ${field.max}`,
                                             },
                                         }),
+                                        ...(field.validation || {}),
                                     })}
                                     disabled={field.disabled}
-                                    className={` w-full p-2 mb-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary 
+                                    className={` w-full p-2 mb-1 border rounded-sm shadow-xs hover:ring-1 hover:ring-primary 
                                 focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 
                                 ${
                                     field.disabled
@@ -325,7 +330,7 @@ const DynamicForm = ({
                                                                 field.placeholder ||
                                                                 ""
                                                             }
-                                                            className={`w-full p-2 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary 
+                                                            className={`w-full p-2 border rounded-sm shadow-xs hover:ring-1 hover:ring-primary 
                                                             focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 ${
                                                                 field.disabled
                                                                     ? "bg-gray-200 cursor-not-allowed"
@@ -388,7 +393,7 @@ const DynamicForm = ({
                                                                 field.placeholder ||
                                                                 ""
                                                             }
-                                                            className={`w-full p-2 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary 
+                                                            className={`w-full p-2 border rounded-sm shadow-xs hover:ring-1 hover:ring-primary 
                                                             focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 ${
                                                                 field.disabled
                                                                     ? "bg-gray-200 cursor-not-allowed"
@@ -411,7 +416,7 @@ const DynamicForm = ({
                                                                     : [""]
                                                             );
                                                         }}
-                                                        className="px-2 pt-1 text-danger hover:bg-danger/10 rounded-full transition-colors"
+                                                        className="hover:bg-danger/10 px-2 pt-1 rounded-full text-danger transition-colors"
                                                     >
                                                         <Icon
                                                             icon="mdi:delete"
@@ -426,7 +431,7 @@ const DynamicForm = ({
                                                 onClick={() =>
                                                     onChange([...value, ""])
                                                 }
-                                                className="text-sm text-primary hover:text-primary-dark flex items-center gap-1"
+                                                className="flex items-center gap-1 text-primary hover:text-primary-dark text-sm"
                                             >
                                                 <Icon
                                                     icon="mdi:plus"
@@ -451,9 +456,10 @@ const DynamicForm = ({
                                         placeholder={field.placeholder || ""}
                                         {...register(field.name, {
                                             required: field.required,
+                                            ...(field.validation || {}),
                                         })}
                                         disabled={field.disabled}
-                                        className={` w-full p-2 mb-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 ${
+                                        className={` w-full p-2 mb-1 border rounded-sm shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300 ${
                                             field.disabled
                                                 ? "bg-gray-200 cursor-not-allowed"
                                                 : ""
@@ -465,7 +471,7 @@ const DynamicForm = ({
                                             onClick={() =>
                                                 setShowPassword(!showPassword)
                                             }
-                                            className="absolute inset-y-0 right-0 px-3 flex items-center text-sm leading-5"
+                                            className="right-0 absolute inset-y-0 flex items-center px-3 text-sm leading-5"
                                         >
                                             {!showPassword ? (
                                                 <Icon
@@ -497,9 +503,9 @@ const DynamicForm = ({
                 {helpButton}
                 {button}
                 {footer && (
-                    <div className="border-t-[0.5px] text-xs font-light text-center p-4 mt-6">
+                    <div className="mt-6 p-4 border-t-[0.5px] font-light text-xs text-center">
                         <p>©PPG Cikampek All Right Reserved {currentYear}</p>
-                        {/* <p>© <a href="http://localhost:5173/" className='underline active:text-primary'>PPG Cikampek</a> All Right Reserved {currentYear}</p> */}
+                        {/* <p>© <a href="http://localhost:5173/" className='active:text-primary underline'>PPG Cikampek</a> All Right Reserved {currentYear}</p> */}
                     </div>
                 )}
             </form>
