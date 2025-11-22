@@ -46,3 +46,4 @@ export {
     useDeleteBranchMutation,
     useDeleteSubBranchMutation,
 } from "./useLevels";
+export { useMunaqasyah } from "./useMunaqasyah";
