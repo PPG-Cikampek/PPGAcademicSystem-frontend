@@ -1,23 +1,18 @@
-import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import useHttp from "../../shared/hooks/http-hook";
 import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
 
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import NewModal from "../../shared/Components/Modal/NewModal";
 import useModal from "../../shared/hooks/useNewModal";
-import { AuthContext } from "../../shared/Components/Context/auth-context";
+import { useCreateQuestionMutation } from "../../shared/queries/useQuestionBank";
 
 const NewQuestionView = () => {
     const { modalState, openModal, closeModal } = useModal();
-
-    const { isLoading, error, sendRequest, setError } = useHttp();
-
     const navigate = useNavigate();
     const classGrade = useParams().classGrade;
-    const auth = useContext(AuthContext);
+    const createQuestionMutation = useCreateQuestionMutation();
 
     const questionCategory = [
         { label: "Membaca Al-Qur'an/Tilawati", value: "reciting" },
@@ -127,12 +122,8 @@ const NewQuestionView = () => {
     ];
 
     const handleFormSubmit = async (data) => {
-        const url = `${
-            import.meta.env.VITE_BACKEND_URL
-        }/munaqasyahs/questions/`;
-
-        const body = JSON.stringify({
-            classGrade: classGrade,
+        const payload = {
+            classGrade,
             type: data.type,
             category: data.category,
             semester: data.semester,
@@ -142,16 +133,12 @@ const NewQuestionView = () => {
             instruction: data.instruction,
             question: data.question,
             answers: data.answers,
-        });
+        };
 
-        console.log(body);
-
-        let responseData;
         try {
-            responseData = await sendRequest(url, "POST", body, {
-                "Content-Type": "application/json",
-                Authorization: "Bearer " + auth.token,
-            });
+            const responseData = await createQuestionMutation.mutateAsync(
+                payload
+            );
             openModal(
                 responseData.message,
                 "success",
@@ -163,23 +150,33 @@ const NewQuestionView = () => {
                 false
             );
         } catch (err) {
-            // Error is already handled by useHttp
+            // Error state is surfaced via React Query
         }
     };
 
+    const mutationErrorMessage =
+        createQuestionMutation.error?.response?.data?.message ||
+        createQuestionMutation.error?.message ||
+        (createQuestionMutation.error
+            ? String(createQuestionMutation.error)
+            : null) ||
+        null;
+
+    const isSubmitting = createQuestionMutation.isPending;
+
     return (
-        <div className="m-auto max-w-md mt-14 md:mt-8">
+        <div className="m-auto mt-14 md:mt-8 max-w-md">
             <NewModal
                 modalState={modalState}
                 onClose={closeModal}
+                isLoading={isSubmitting}
             />
 
             <div className={`pb-24 transition-opacity duration-300`}>
-                {error && (
+                {mutationErrorMessage && (
                     <div className="px-2">
                         <ErrorCard
-                            error={error}
-                            onClear={() => setError(null)}
+                            error={mutationErrorMessage}
                         />
                     </div>
                 )}
@@ -187,8 +184,8 @@ const NewQuestionView = () => {
                     title="Tambah Bank Soal"
                     // subtitle={'Sistem Akademik Digital'}
                     fields={questionFields}
-                    onSubmit={handleFormSubmit || null}
-                    disabled={isLoading}
+                    onSubmit={handleFormSubmit}
+                    disabled={isSubmitting}
                     reset={false}
                     footer={false}
                     button={
@@ -196,13 +193,13 @@ const NewQuestionView = () => {
                             <button
                                 type="submit"
                                 className={`button-primary ${
-                                    isLoading
+                                    isSubmitting
                                         ? "opacity-50 cursor-not-allowed"
                                         : ""
                                 }`}
-                                disabled={isLoading}
+                                disabled={isSubmitting}
                             >
-                                {isLoading ? (
+                                {isSubmitting ? (
                                     <LoadingCircle>Processing...</LoadingCircle>
                                 ) : (
                                     "Tambah"

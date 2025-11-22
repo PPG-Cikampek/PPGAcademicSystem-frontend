@@ -1,8 +1,5 @@
-import { useContext, useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { AuthContext } from "../../shared/Components/Context/auth-context";
-import useHttp from "../../shared/hooks/http-hook";
 import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
 
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
@@ -10,30 +7,21 @@ import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 
 import NewModal from "../../shared/Components/Modal/NewModal";
 import useModal from "../../shared/hooks/useNewModal";
+import {
+    useQuestion,
+    useUpdateQuestionMutation,
+} from "../../shared/queries/useQuestionBank";
 
 const UpdateQuestionView = () => {
     const { modalState, openModal, closeModal } = useModal();
-    const { isLoading, error, sendRequest, setError } = useHttp();
-    const [loadedQuestion, setLoadedQuestion] = useState();
-
-    const auth = useContext(AuthContext);
-
     const questionId = useParams().questionId;
     const navigate = useNavigate();
-
-    useEffect(() => {
-        const fetchQuestion = async () => {
-            const url = `${
-                import.meta.env.VITE_BACKEND_URL
-            }/munaqasyahs/questions/${questionId}`;
-
-            try {
-                const responseData = await sendRequest(url);
-                setLoadedQuestion(responseData.question);
-            } catch (err) {}
-        };
-        fetchQuestion();
-    }, [sendRequest]);
+    const {
+        data: loadedQuestion,
+        isLoading: isQuestionLoading,
+        error: queryError,
+    } = useQuestion(questionId);
+    const updateQuestionMutation = useUpdateQuestionMutation();
 
     const questionCategory = [
         { label: "Membaca Al-Qur'an/Tilawati", value: "reciting" },
@@ -123,7 +111,7 @@ const UpdateQuestionView = () => {
             inputType: "textarea",
             textAreaRows: 3,
             required: false,
-            value: loadedQuestion?.answers || "",
+            value: loadedQuestion?.answers ?? undefined,
         },
         {
             name: "maxScore",
@@ -138,7 +126,7 @@ const UpdateQuestionView = () => {
             type: "multi-input",
             required: false,
             inputType: "number",
-            value: loadedQuestion?.scoreOptions || "",
+            value: loadedQuestion?.scoreOptions ?? undefined,
         },
         {
             name: "instruction",
@@ -152,29 +140,23 @@ const UpdateQuestionView = () => {
     ];
 
     const handleFormSubmit = async (data) => {
-        const url = `${
-            import.meta.env.VITE_BACKEND_URL
-        }/munaqasyahs/questions/${questionId}`;
-
-        const body = JSON.stringify({
-            type: data.type,
-            category: data.category,
-            semester: data.semester,
-            curriculumMonth: data.curriculumMonth,
-            maxScore: data.maxScore,
-            scoreOptions: data.scoreOptions,
-            instruction: data.instruction,
-            question: data.question,
-            answers: data.answers,
-        });
-
-        let responseData;
         try {
-            responseData = await sendRequest(url, "PATCH", body, {
-                "Content-Type": "application/json",
-                Authorization: "Bearer " + auth.token,
+            const payload = {
+                type: data.type,
+                category: data.category,
+                semester: data.semester,
+                curriculumMonth: data.curriculumMonth,
+                maxScore: data.maxScore,
+                scoreOptions: data.scoreOptions,
+                instruction: data.instruction,
+                question: data.question,
+                answers: data.answers,
+            };
+            const responseData = await updateQuestionMutation.mutateAsync({
+                questionId,
+                data: payload,
+                classGrade: loadedQuestion?.classGrade,
             });
-            console.log(responseData);
             openModal(
                 responseData.message,
                 "success",
@@ -185,23 +167,59 @@ const UpdateQuestionView = () => {
                 "Berhasil!",
                 false
             );
-        } catch (err) {}
+        } catch (err) {
+            // Error state is exposed via React Query
+        }
     };
 
+    const mutationErrorMessage =
+        updateQuestionMutation.error?.response?.data?.message ||
+        updateQuestionMutation.error?.message ||
+        (updateQuestionMutation.error
+            ? String(updateQuestionMutation.error)
+            : null) ||
+        null;
+
+    const queryErrorMessage =
+        queryError?.response?.data?.message ||
+        queryError?.message ||
+        (queryError ? String(queryError) : null) ||
+        null;
+
+    const isSubmitting = updateQuestionMutation.isPending;
+    const isProcessing = isQuestionLoading || isSubmitting;
+    const isFormDisabled =
+        isProcessing || Boolean(queryError) || !loadedQuestion;
+    const showLoadingState = isProcessing || !loadedQuestion;
+    const notFoundMessage =
+        loadedQuestion === null && !isQuestionLoading && !queryError
+            ? "Data soal tidak ditemukan."
+            : null;
+
     return (
-        <div className="m-auto max-w-md mt-14 md:mt-8">
+        <div className="m-auto mt-14 md:mt-8 max-w-md">
             <NewModal
                 modalState={modalState}
                 onClose={closeModal}
-                isLoading={isLoading}
+                isLoading={isSubmitting}
             />
 
             <div className={`pb-24 transition-opacity duration-300`}>
+                {queryErrorMessage && (
+                    <div className="px-2">
+                        <ErrorCard error={queryErrorMessage} />
+                    </div>
+                )}
+                {notFoundMessage && (
+                    <div className="px-2">
+                        <ErrorCard error={notFoundMessage} />
+                    </div>
+                )}
                 <DynamicForm
                     subtitle={"Update Soal Munaqosah"}
                     fields={questionFields}
                     onSubmit={handleFormSubmit}
-                    disabled={isLoading}
+                    disabled={isFormDisabled}
                     reset={false}
                     footer={false}
                     button={
@@ -209,23 +227,24 @@ const UpdateQuestionView = () => {
                             <button
                                 type="submit"
                                 className={`button-primary ${
-                                    isLoading
+                                    isFormDisabled
                                         ? "opacity-50 cursor-not-allowed"
                                         : ""
                                 }`}
-                                disabled={isLoading}
+                                disabled={isFormDisabled}
                             >
-                                {isLoading ? (
-                                    <LoadingCircle>Processing...</LoadingCircle>
+                                {showLoadingState ? (
+                                    <LoadingCircle>
+                                        {isSubmitting
+                                            ? "Processing..."
+                                            : "Loading..."}
+                                    </LoadingCircle>
                                 ) : (
                                     "Update"
                                 )}
                             </button>
-                            {error && (
-                                <ErrorCard
-                                    error={error}
-                                    onClear={() => setError(null)}
-                                />
+                            {mutationErrorMessage && (
+                                <ErrorCard error={mutationErrorMessage} />
                             )}
                         </div>
                     }
