@@ -6,7 +6,7 @@ import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import NewModal from "../../shared/Components/Modal/NewModal";
 import useModal from "../../shared/hooks/useNewModal";
-import { useCreateQuestionMutation } from "../../shared/queries/useQuestionBank";
+import { useCreateQuestionMutation } from "../../shared/queries";
 
 const NewQuestionView = () => {
     const { modalState, openModal, closeModal } = useModal();

@@ -1,10 +1,10 @@
 import { Link } from "react-router-dom";
-import { useMunaqasyah } from "../../shared/queries";
+import { useQuestionBankByClass } from "../../shared/queries";
 import SkeletonLoader from "../../shared/Components/UIElements/SkeletonLoader";
 import { BookOpen } from "lucide-react";
 
-const SelectMunaqasyahClassView = () => {
-    const { data: classes = [], isLoading, error } = useMunaqasyah({
+const QuestionBankByClassView = () => {
+    const { data: classes = [], isLoading, error } = useQuestionBankByClass({
         refetchOnMount: 'always',
         // refetchOnWindowFocus: true,
     });
@@ -69,4 +69,4 @@ const SelectMunaqasyahClassView = () => {
     );
 };
 
-export default SelectMunaqasyahClassView;
+export default QuestionBankByClassView;

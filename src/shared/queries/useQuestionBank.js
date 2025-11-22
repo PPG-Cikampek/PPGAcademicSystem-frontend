@@ -1,6 +1,20 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "./api";
 
+// Fetch munaqasyah question list by classes
+export const useQuestionBankByClass = (options = {}) => {
+    return useQuery({
+        queryKey: ["munaqasyah", "classes"],
+        queryFn: async () => {
+            const response = await api.get(`/munaqasyahs/classes`);
+            return response?.data?.classes ?? response?.data;
+        },
+        ...options,
+    });
+};
+
+export default useQuestionBankByClass;
+
 export const useQuestionBank = (classGrade, options = {}) => {
     return useQuery({
         queryKey: ["questionBank", classGrade],

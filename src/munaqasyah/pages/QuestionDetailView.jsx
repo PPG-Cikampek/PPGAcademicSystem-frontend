@@ -1,6 +1,10 @@
-import { useState, useEffect, useContext } from "react";
+import { useEffect, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import useHttp from "../../shared/hooks/http-hook";
+import {
+    useQuestion,
+    useDeleteQuestionMutation,
+    useUpdateQuestionStatusMutation,
+} from "../../shared/queries/useQuestionBank";
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 
@@ -8,16 +12,52 @@ import getCategoryName from "../utilities/getCategoryName";
 import { Pencil, Trash } from "lucide-react";
 import NewModal from "../../shared/Components/Modal/NewModal";
 import useModal from "../../shared/hooks/useNewModal";
-import { AuthContext } from "../../shared/Components/Context/auth-context";
 
 const QuestionDetailView = () => {
-    const [question, setQuestion] = useState(null);
-    const { isLoading, error, sendRequest } = useHttp();
+    const { questionId } = useParams();
+    const {
+        data: question,
+        isLoading: isLoadingQuestion,
+        error: queryError,
+    } = useQuestion(questionId);
     const { modalState, openModal, closeModal } = useModal();
 
-    const { questionId } = useParams();
     const navigate = useNavigate();
-    const auth = useContext(AuthContext);
+    const deleteQuestionMutation = useDeleteQuestionMutation();
+    const updateQuestionStatusMutation = useUpdateQuestionStatusMutation();
+    const isProcessing =
+        isLoadingQuestion ||
+        deleteQuestionMutation.isPending ||
+        updateQuestionStatusMutation.isPending;
+
+    const mutationErrorMessage =
+        deleteQuestionMutation.error?.response?.data?.message ||
+        deleteQuestionMutation.error?.message ||
+        (deleteQuestionMutation.error
+            ? String(deleteQuestionMutation.error)
+            : null) ||
+        updateQuestionStatusMutation.error?.response?.data?.message ||
+        updateQuestionStatusMutation.error?.message ||
+        (updateQuestionStatusMutation.error
+            ? String(updateQuestionStatusMutation.error)
+            : null) ||
+        null;
+
+    const getTypeName = (type) =>
+        ({
+            multipleChoices: "Pilihan Ganda",
+            shortAnswer: "Jawab Cermat",
+            practice: "Praktik",
+        }[type]);
+
+    const getStatusName = (status) => {
+        const statusMap = {
+            active: "Aktif",
+            inactive: "Non-aktif",
+            checkneeded: "Periksa!",
+        };
+        return statusMap[status] || "Periksa!";
+    };
 
     const getStatusStyle = (type) => {
         switch (type) {
@@ -32,23 +72,7 @@ const QuestionDetailView = () => {
         }
     };
 
-    const getStatusName = (status) => {
-        const statusMap = {
-            active: "Aktif",
-            inactive: "Non-aktif",
-            checkneeded: "Periksa!",
-        };
-        return statusMap[status] || "Periksa!";
-    };
-
-    const getTypeName = (type) =>
-        ({
-            multipleChoices: "Pilihan Ganda",
-            shortAnswer: "Jawab Cermat",
-            practice: "Praktik",
-        }[type]);
-
-    const getMothName = (month) => {
+    const getMonthName = (month) => {
         const monthMap = {
             1: "Januari",
             2: "Februari",
@@ -66,8 +90,8 @@ const QuestionDetailView = () => {
         return monthMap[month] || "kosong";
     };
 
-    const getClassGrade = (grade) =>
-        ({
+    const getClassGrade = (grade) => {
+        const gradeMap = {
             "pra-paud": "Kelas Pra-Paud",
             paud: "Kelas Paud",
             1: "Kelas 1",
@@ -76,47 +100,17 @@ const QuestionDetailView = () => {
             4: "Kelas 4",
             5: "Kelas 5",
             6: "Kelas 6",
-        }[grade]);
-
-    useEffect(() => {
-        let isActive = true;
-
-        const fetchQuestion = async () => {
-            try {
-                const responseData = await sendRequest(
-                    `${
-                        import.meta.env.VITE_BACKEND_URL
-                    }/munaqasyahs/questions/${questionId}`
-                );
-                if (isActive) {
-                    setQuestion(responseData.question);
-                    console.log(responseData);
-                }
-            } catch (err) {
-                // Error handled by useHttp
-            }
         };
-        fetchQuestion();
-
-        return () => {
-            isActive = false;
-        };
-    }, [sendRequest, questionId]);
+        return gradeMap[grade] || "kosong";
+    };
 
     const handleDeleteQuestion = (questionId) => {
         const confirmDelete = async () => {
             try {
-                const responseData = await sendRequest(
-                    `${
-                        import.meta.env.VITE_BACKEND_URL
-                    }/munaqasyahs/questions/${questionId}`,
-                    "DELETE",
-                    null,
-                    {
-                        "Content-Type": "application/json",
-                        Authorization: "Bearer " + auth.token,
-                    }
-                );
+                const responseData = await deleteQuestionMutation.mutateAsync({
+                    questionId,
+                    classGrade: question?.classGrade,
+                });
                 openModal(
                     responseData.message,
                     "success",
@@ -128,8 +122,10 @@ const QuestionDetailView = () => {
                     false
                 );
             } catch (err) {
-                // Error handled by useHttp
+                // Error surfaced via React Query
             }
+            // prevent modal from closing automatically; we close it manually above
+            return false;
         };
         openModal(
             "Hapus Soal?",
@@ -142,20 +138,13 @@ const QuestionDetailView = () => {
 
     const handleUpdateQuestionStatus = (questionId, status) => {
         const confirmUpdate = async () => {
-            const body = JSON.stringify({ status: status });
             try {
-                const responseData = await sendRequest(
-                    `${
-                        import.meta.env.VITE_BACKEND_URL
-                    }/munaqasyahs/questions/${questionId}/status`,
-                    "PATCH",
-                    body,
-                    {
-                        "Content-Type": "application/json",
-                        Authorization: "Bearer " + auth.token,
-                    }
-                );
-                setQuestion({ ...question, status: status });
+                const responseData =
+                    await updateQuestionStatusMutation.mutateAsync({
+                        questionId,
+                        status,
+                        classGrade: question?.classGrade,
+                    });
                 openModal(
                     responseData.message,
                     "success",
@@ -164,7 +153,7 @@ const QuestionDetailView = () => {
                     false
                 );
             } catch (err) {
-                // Error handled by useHttp
+                // Error surfaced via React Query
             }
         };
         openModal(
@@ -176,7 +165,7 @@ const QuestionDetailView = () => {
         );
     };
 
-    if (isLoading) {
+    if (isLoadingQuestion) {
         return (
             <div className="flex justify-center mt-16">
                 <LoadingCircle size={32} />
@@ -184,8 +173,8 @@ const QuestionDetailView = () => {
         );
     }
 
-    if (error) {
-        return <ErrorCard error={error} />;
+    if (queryError) {
+        return <ErrorCard error={queryError} />;
     }
 
     if (!question) {
@@ -193,26 +182,30 @@ const QuestionDetailView = () => {
     }
 
     return (
-        <div className="min-h-screen px-4 py-8 md:p-8">
-            <div className="max-w-4xl mx-auto bg-white rounded-lg shadow-xs p-6">
+        <div className="md:p-8 px-4 py-8 min-h-screen">
+            <div className="bg-white shadow-xs mx-auto p-6 rounded-lg max-w-4xl">
                 <NewModal
                     modalState={modalState}
                     onClose={closeModal}
-                    isLoading={isLoading}
+                    isLoading={isProcessing}
                 />
 
-                <div className="flex flex-col md:flex-row  gap-2 mb-6 md:items-center">
-                    <h1 className="text-2xl font-semibold text-gray-900">
+                <div className="flex md:flex-row flex-col md:items-center gap-2 mb-6">
+                    <h1 className="font-semibold text-gray-900 text-2xl">
                         Detail Soal
                     </h1>
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
-                            navigate(
-                                `/munaqasyah/question-bank/${question.classGrade}/${questionId}/update`
-                            );
+                            if (!isProcessing && question)
+                                navigate(
+                                    `/munaqasyah/question-bank/${question.classGrade}/${questionId}/update`
+                                );
                         }}
-                        className="button-primary m-0 pl-3 gap-1"
+                        className={`button-primary m-0 pl-3 gap-1 ${
+                            isProcessing ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
+                        disabled={isProcessing}
                     >
                         <Pencil className="w-4 h-4" />
                         Edit
@@ -220,142 +213,168 @@ const QuestionDetailView = () => {
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
-                            handleDeleteQuestion(questionId);
+                            if (!isProcessing) handleDeleteQuestion(questionId);
                         }}
-                        className="button-danger m-0 pl-3 gap-1"
+                        className={`button-danger m-0 pl-3 gap-1 ${
+                            isProcessing ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
+                        disabled={isProcessing}
                     >
                         <Trash className="w-4 h-4" />
                         Hapus
                     </button>
-                    {question.status !== "active" && (
+                    {question?.status !== "active" && (
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
-                                handleUpdateQuestionStatus(
-                                    questionId,
-                                    "active"
-                                );
+                                if (!isProcessing)
+                                    handleUpdateQuestionStatus(
+                                        questionId,
+                                        "active"
+                                    );
                             }}
-                            className="button-danger border-green-600 hover:bg-green-600 focus:ring-green-600 m-0 pl-3 gap-1"
+                            className={`button-danger border-green-600 hover:bg-green-600 focus:ring-green-600 m-0 pl-3 gap-1 ${
+                                isProcessing
+                                    ? "opacity-50 cursor-not-allowed"
+                                    : ""
+                            }`}
+                            disabled={isProcessing}
                         >
                             Aktifkan
                         </button>
                     )}
-                    {question.status !== "inactive" &&
-                        question.status !== "checkneeded" && (
+                    {question?.status !== "inactive" &&
+                        question?.status !== "checkneeded" && (
                             <button
                                 onClick={(e) => {
                                     e.stopPropagation();
-                                    handleUpdateQuestionStatus(
-                                        questionId,
-                                        "inactive"
-                                    );
+                                    if (!isProcessing)
+                                        handleUpdateQuestionStatus(
+                                            questionId,
+                                            "inactive"
+                                        );
                                 }}
-                                className="button-danger border-gray-600 hover:bg-gray-600 focus:ring-gray-600 m-0 pl-3 gap-1"
+                                className={`button-danger border-gray-600 hover:bg-gray-600 focus:ring-gray-600 m-0 pl-3 gap-1 ${
+                                    isProcessing
+                                        ? "opacity-50 cursor-not-allowed"
+                                        : ""
+                                }`}
+                                disabled={isProcessing}
                             >
                                 Nonaktifkan
                             </button>
                         )}
-                    {question.status !== "checkneeded" && (
+                    {question?.status !== "checkneeded" && (
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
-                                handleUpdateQuestionStatus(
-                                    questionId,
-                                    "checkneeded"
-                                );
+                                if (!isProcessing)
+                                    handleUpdateQuestionStatus(
+                                        questionId,
+                                        "checkneeded"
+                                    );
                             }}
-                            className="button-danger border-yellow-600 hover:bg-yellow-600 focus:ring-yellow-600 m-0 pl-3 gap-1"
+                            className={`button-danger border-yellow-600 hover:bg-yellow-600 focus:ring-yellow-600 m-0 pl-3 gap-1 ${
+                                isProcessing
+                                    ? "opacity-50 cursor-not-allowed"
+                                    : ""
+                            }`}
+                            disabled={isProcessing}
                         >
                             Tandai Periksa
                         </button>
                     )}
                 </div>
 
+                {mutationErrorMessage && (
+                    <div className="px-2">
+                        <ErrorCard error={mutationErrorMessage} />
+                    </div>
+                )}
                 <div className="space-y-6">
                     <div className="flex flex-col gap-4">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="gap-4 grid grid-cols-1 md:grid-cols-2">
                             <div>
-                                <h3 className="text-sm font-medium text-gray-500">
+                                <h3 className="font-medium text-gray-500 text-sm">
                                     Status
                                 </h3>
                                 <p
                                     className={`${getStatusStyle(
-                                        question.status
+                                        question?.status
                                     )}`}
                                 >
-                                    {getStatusName(question.status)}
+                                    {getStatusName(question?.status)}
                                 </p>
                             </div>
                             <div>
-                                <h3 className="text-sm font-medium text-gray-500">
+                                <h3 className="font-medium text-gray-500 text-sm">
                                     Tipe Soal
                                 </h3>
                                 <p className="mt-1 text-gray-900">
-                                    {getTypeName(question.type)}
+                                    {getTypeName(question?.type)}
                                 </p>
                             </div>
                             <div>
-                                <h3 className="text-sm font-medium text-gray-500">
+                                <h3 className="font-medium text-gray-500 text-sm">
                                     Kategori
                                 </h3>
                                 <p className="mt-1 text-gray-900">
-                                    {getCategoryName(question.category)}
+                                    {getCategoryName(question?.category)}
                                 </p>
                             </div>
                             <div>
-                                <h3 className="text-sm font-medium text-gray-500">
+                                <h3 className="font-medium text-gray-500 text-sm">
                                     Semester
                                 </h3>
                                 <p className="mt-1 text-gray-900">
-                                    {question.semester === "1"
+                                    {question?.semester === "1"
                                         ? "Ganjil"
                                         : "Genap"}
                                 </p>
                             </div>
                             <div>
-                                <h3 className="text-sm font-medium text-gray-500">
+                                <h3 className="font-medium text-gray-500 text-sm">
                                     Bulan Materi
                                 </h3>
                                 <p className="mt-1 text-gray-900">
-                                    {getMothName(question.curriculumMonth)}
+                                    {getMonthName(question?.curriculumMonth)}
                                 </p>
                             </div>
                             <div>
-                                <h3 className="text-sm font-medium text-gray-500">
+                                <h3 className="font-medium text-gray-500 text-sm">
                                     Bobot Nilai Maksimal
                                 </h3>
-                                <p className="mt-1 text-blue-600 font-medium">
-                                    {question.maxScore} Poin
+                                <p className="mt-1 font-medium text-blue-600">
+                                    {question?.maxScore} Poin
                                 </p>
                             </div>
                             <div>
-                                <h3 className="text-sm font-medium text-gray-500">
+                                <h3 className="font-medium text-gray-500 text-sm">
                                     Kelas
                                 </h3>
-                                <p className="mt-1 text-gray-900 font-medium">
-                                    {getClassGrade(question.classGrade)}
+                                <p className="mt-1 font-medium text-gray-900">
+                                    {getClassGrade(question?.classGrade)}
                                 </p>
                             </div>
                         </div>
 
-                        <div className="border-t pt-4">
-                            <h3 className="text-sm font-medium text-gray-500">
+                        <div className="pt-4 border-t">
+                            <h3 className="font-medium text-gray-500 text-sm">
                                 Pertanyaan
                             </h3>
-                            <p className="font-lpmq mt-1 text-gray-900 whitespace-pre-line">
-                                {question.question}
+                            <p className="mt-1 font-lpmq text-gray-900 whitespace-pre-line">
+                                {question?.question}
                             </p>
                         </div>
 
-                        <div className="border-t pt-4">
-                            <h3 className="text-sm font-medium text-gray-500">
+                        <div className="pt-4 border-t">
+                            <h3 className="font-medium text-gray-500 text-sm">
                                 Jawaban
                             </h3>
-                            {question.answers.map((answer, index) => (
+                            {question?.answers?.map((answer, index) => (
                                 <p
                                     key={index}
-                                    className="font-lpmq mt-1 text-gray-900 whitespace-pre-line"
+                                    className="mt-1 font-lpmq text-gray-900 whitespace-pre-line"
                                 >
                                     {answer}
                                 </p>
@@ -363,28 +382,28 @@ const QuestionDetailView = () => {
                         </div>
 
                         {question.instruction && (
-                            <div className="border-t pt-4">
-                                <h3 className="text-sm font-medium text-gray-500">
+                            <div className="pt-4 border-t">
+                                <h3 className="font-medium text-gray-500 text-sm">
                                     Petunjuk Penilaian
                                 </h3>
-                                <pre className="mt-1 text-gray-900 whitespace-pre-line font-sans">
-                                    {question.instruction}
+                                <pre className="mt-1 font-sans text-gray-900 whitespace-pre-line">
+                                    {question?.instruction}
                                 </pre>
                             </div>
                         )}
 
-                        {question.scoreOptions &&
-                            question.scoreOptions.length > 0 && (
-                                <div className="border-t pt-4">
-                                    <h3 className="text-sm font-medium text-gray-500">
+                        {question?.scoreOptions &&
+                            question?.scoreOptions.length > 0 && (
+                                <div className="pt-4 border-t">
+                                    <h3 className="font-medium text-gray-500 text-sm">
                                         Opsi Nilai
                                     </h3>
-                                    <div className="mt-1 flex gap-2 flex-wrap">
-                                        {question.scoreOptions.map(
+                                    <div className="flex flex-wrap gap-2 mt-1">
+                                        {question?.scoreOptions?.map(
                                             (score, index) => (
                                                 <span
                                                     key={index}
-                                                    className="px-2 py-1 bg-gray-100 text-gray-700 rounded-md"
+                                                    className="bg-gray-100 px-2 py-1 rounded-md text-gray-700"
                                                 >
                                                     {score}
                                                 </span>
@@ -399,5 +418,4 @@ const QuestionDetailView = () => {
         </div>
     );
 };
-
 export default QuestionDetailView;

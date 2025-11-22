@@ -11,8 +11,8 @@ const MunaqasyahView = lazy(() => import("../munaqasyah/pages/MunaqasyahView"));
 const QuestionBankView = lazy(() =>
     import("../munaqasyah/pages/QuestionBankView")
 );
-const SelectMunaqasyahClassView = lazy(() =>
-    import("../munaqasyah/pages/SelectMunaqasyahClassView")
+const QuestionBankByClassView = lazy(() =>
+    import("../munaqasyah/pages/QuestionBankByClassView")
 );
 const NewQuestionView = lazy(() =>
     import("../munaqasyah/pages/NewQuestionView")
@@ -39,7 +39,7 @@ export const curriculumRoutes = [
     { path: "/munaqasyah", element: <MunaqasyahView /> },
     {
         path: "/munaqasyah/question-bank",
-        element: <SelectMunaqasyahClassView />,
+        element: <QuestionBankByClassView />,
     },
     {
         path: "/munaqasyah/question-bank/:classGrade",

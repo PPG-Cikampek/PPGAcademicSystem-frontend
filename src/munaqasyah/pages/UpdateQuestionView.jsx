@@ -10,7 +10,7 @@ import useModal from "../../shared/hooks/useNewModal";
 import {
     useQuestion,
     useUpdateQuestionMutation,
-} from "../../shared/queries/useQuestionBank";
+} from "../../shared/queries";
 
 const UpdateQuestionView = () => {
     const { modalState, openModal, closeModal } = useModal();

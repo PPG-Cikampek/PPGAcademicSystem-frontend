@@ -46,4 +46,4 @@ export {
     useDeleteBranchMutation,
     useDeleteSubBranchMutation,
 } from "./useLevels";
-export { useMunaqasyah } from "./useMunaqasyah";
+export { useQuestionBankByClass, useQuestionBank, useQuestion, useCreateQuestionMutation, useUpdateQuestionMutation, useDeleteQuestionMutation } from "./useQuestionBank";

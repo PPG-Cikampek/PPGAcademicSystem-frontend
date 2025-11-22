@@ -34,7 +34,7 @@ const EmailVerifyView = lazy(() => import("../users/pages/auth/EmailVerifyView")
 const RequestAccountTicketDetail = lazy(() => import("../users/pages/account-requests/RequestAccountTicketDetail"));
 const MunaqasyahView = lazy(() => import("../munaqasyah/pages/MunaqasyahView"));
 const QuestionBankView = lazy(() => import("../munaqasyah/pages/QuestionBankView"));
-const SelectMunaqasyahClassView = lazy(() => import("../munaqasyah/pages/SelectMunaqasyahClassView"));
+const QuestionBankByClassView = lazy(() => import("../munaqasyah/pages/QuestionBankByClassView"));
 const NewQuestionView = lazy(() => import("../munaqasyah/pages/NewQuestionView"));
 const QuestionDetailView = lazy(() => import("../munaqasyah/pages/QuestionDetailView"));
 const RequestedAccountView = lazy(() => import("../users/pages/account-requests/RequestedAccountView"));
@@ -81,7 +81,7 @@ export const adminRoutes = [
     { path: '/settings/requestAccount/ticket/:ticketId', element: <RequestAccountTicketDetail /> },
     { path: '/performance', element: <PerformanceView /> },
     { path: '/munaqasyah', element: <MunaqasyahView /> },
-    { path: '/munaqasyah/question-bank', element: <SelectMunaqasyahClassView /> },
+    { path: '/munaqasyah/question-bank', element: <QuestionBankByClassView /> },
     { path: '/munaqasyah/question-bank/:classGrade', element: <QuestionBankView /> },
     { path: '/munaqasyah/question-bank/:classGrade/new', element: <NewQuestionView /> },
     { path: '/munaqasyah/question-bank/:classGrade/:questionId', element: <QuestionDetailView /> },
