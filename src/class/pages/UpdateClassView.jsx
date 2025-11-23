@@ -47,6 +47,10 @@ const UpdateClassView = () => {
                     { label: "Kelas 4", value: "Kelas 4" },
                     { label: "Kelas 5", value: "Kelas 5" },
                     { label: "Kelas 6", value: "Kelas 6" },
+                    { label: "Kelas 7", value: "Kelas 7" },
+                    { label: "Kelas 8", value: "Kelas 8" },
+                    { label: "Kelas 9", value: "Kelas 9" },
+                    { label: "Kelas Khusus", value: "Kelas Khusus" },
                 ],
                 value: loadedClass?.name || "",
                 disabled: true,
@@ -80,7 +84,7 @@ const UpdateClassView = () => {
     };
 
     return (
-        <div className="m-auto max-w-md mt-14 md:mt-8">
+        <div className="m-auto mt-14 md:mt-8 max-w-md">
             <NewModal modalState={modalState} onClose={closeModal} />
 
             <div

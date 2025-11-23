@@ -100,6 +100,10 @@ const QuestionDetailView = () => {
             4: "Kelas 4",
             5: "Kelas 5",
             6: "Kelas 6",
+            7: "Kelas 7",
+            8: "Kelas 8",
+            9: "Kelas 9",
+            khusus: "Kelas Khusus",
         };
         return gradeMap[grade] || "kosong";
     };

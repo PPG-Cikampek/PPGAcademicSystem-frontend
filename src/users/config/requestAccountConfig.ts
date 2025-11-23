@@ -39,7 +39,11 @@ export const studentFields: AccountField[] = [
     { label: 'Kelas 3', value: 'Kelas 3' },
     { label: 'Kelas 4', value: 'Kelas 4' },
     { label: 'Kelas 5', value: 'Kelas 5' },
-    { label: 'Kelas 6', value: 'Kelas 6' }
+    { label: 'Kelas 6', value: 'Kelas 6' },
+    { label: 'Kelas 7', value: 'Kelas 7' },
+    { label: 'Kelas 8', value: 'Kelas 8' },
+    { label: 'Kelas 9', value: 'Kelas 9' },
+    { label: 'Kelas Khusus', value: 'Kelas Khusus' }
   ]},
   { name: 'gender', label: 'Jenis Kelamin', type: 'select', placeholder: 'Pilih Jenis Kelamin', required: true, options: [
     { label: 'Laki-Laki', value: 'male' },
