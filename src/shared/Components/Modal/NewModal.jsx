@@ -14,6 +14,15 @@ if (typeof window !== "undefined") {
     ReactModal.setAppElement("#root");
 }
 
+// Helper function to format bytes to human-readable string
+const formatBytes = (bytes) => {
+    if (bytes === 0 || bytes === null || bytes === undefined) return "0 B";
+    const k = 1024;
+    const sizes = ["B", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+};
+
 const NewModal = ({
     modalState,
     onClose,
@@ -23,6 +32,8 @@ const NewModal = ({
     isLoading = false,
     loadingVariant = "spinner",
     progress = null,
+    uploadedBytes = null,
+    totalBytes = null,
 }) => {
     const { isOpen, message, type, title, onConfirm, showCancel, size } =
         modalState;
@@ -147,7 +158,7 @@ const NewModal = ({
                 {/* Close button */}
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 p-1 rounded-full hover:bg-gray-100 transition-colors z-10"
+                    className="top-4 right-4 z-10 absolute hover:bg-gray-100 p-1 rounded-full transition-colors"
                     aria-label="Close modal"
                 >
                     <FiX className="w-5 h-5 text-gray-500" />
@@ -176,7 +187,7 @@ const NewModal = ({
                             )}
                             {!(loadingVariant === "bar" && isLoading) &&
                                 message && (
-                                    <p className="text-sm text-gray-600 leading-relaxed whitespace-pre-line">
+                                    <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-line">
                                         {message}
                                     </p>
                                 )}
@@ -195,8 +206,7 @@ const NewModal = ({
                                 <button
                                     onClick={onClose}
                                     disabled={isLoading}
-                                    className="btn-round-gray
-                "
+                                    className="btn-round-gray"
                                 >
                                     {cancelText}
                                 </button>
@@ -233,13 +243,22 @@ const NewModal = ({
                     {isLoading &&
                         loadingVariant === "bar" &&
                         typeof progress === "number" && (
-                            <div className="flex flex-col items-center gap-1 min-w-[8rem] mt-4">
-                                <span className="text-xs font-medium text-gray-600">
-                                    {`${Math.min(100, Math.max(0, progress))}%`}
-                                </span>
-                                <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                            <div className="flex flex-col items-center gap-1 mt-4 min-w-[8rem]">
+                                <div className="flex items-center gap-2">
+                                    <span className="font-medium text-gray-600 text-xs">
+                                        {`${Math.min(100, Math.max(0, progress))}%`}
+                                    </span>
+                                    {typeof uploadedBytes === "number" &&
+                                        typeof totalBytes === "number" &&
+                                        totalBytes > 0 && (
+                                            <span className="text-gray-500 text-xs">
+                                                {`(${formatBytes(uploadedBytes)} / ${formatBytes(totalBytes)})`}
+                                            </span>
+                                        )}
+                                </div>
+                                <div className="bg-gray-200 rounded-full w-full h-1.5 overflow-hidden">
                                     <div
-                                        className="h-full bg-blue-500 transition-[width] duration-150 ease-out animate-pulse"
+                                        className="bg-blue-500 h-full transition-[width] animate-pulse duration-150 ease-out"
                                         style={{
                                             width: `${Math.min(
                                                 100,

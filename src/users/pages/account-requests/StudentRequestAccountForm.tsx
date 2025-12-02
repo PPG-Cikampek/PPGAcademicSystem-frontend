@@ -14,6 +14,8 @@ import FileUpload from "../../../shared/Components/FormElements/FileUpload";
 // create an any-typed alias to bypass TS prop constraints for existing JS component
 const FileUploadAny: any = FileUpload;
 const CANCEL_UPLOAD_MESSAGE = "Permintaan dibatalkan oleh pengguna.";
+// Threshold for large file warning (in bytes) - adjust as needed
+const LARGE_FILE_SIZE_THRESHOLD = 5 * 1024 * 1024; // 5 MB
 import { Icon } from "@iconify-icon/react";
 
 interface ResponseData {
@@ -36,6 +38,7 @@ const StudentRequestAccountForm: React.FC = () => {
     const [formKey, setFormKey] = useState<number>(0);
     const [editingIndex, setEditingIndex] = useState<number>(-1);
     const [uploadProgress, setUploadProgress] = useState<number | null>(null);
+    const [uploadBytes, setUploadBytes] = useState<{ loaded: number | null; total: number | null }>({ loaded: null, total: null });
     const { isLoading, error, sendRequest, setError, setIsLoading } = useHttp();
     const fileInputRef = useRef<HTMLInputElement | null>(null);
     const pendingImageRef = useRef<File | null>(null);
@@ -115,6 +118,7 @@ const StudentRequestAccountForm: React.FC = () => {
                                 (event.loaded / event.total) * 100
                             );
                             setUploadProgress(percent);
+                            setUploadBytes({ loaded: event.loaded, total: event.total });
                         }
                     };
 
@@ -172,14 +176,27 @@ const StudentRequestAccountForm: React.FC = () => {
             } finally {
                 setIsLoading(false);
                 setUploadProgress(null);
+                setUploadBytes({ loaded: null, total: null });
                 activeRequestRef.current = null;
             }
 
             return false;
         };
 
+        // Calculate total size for large file warning
+        const totalImageSize = entriesSnapshot.reduce(
+            (acc, entry) => acc + (entry._imageFile?.size || 0),
+            0
+        );
+        const isLargeFile = totalImageSize > LARGE_FILE_SIZE_THRESHOLD;
+        const fileSizeMB = (totalImageSize / (1024 * 1024)).toFixed(2);
+        
+        const confirmMessage = isLargeFile
+            ? `Kirim permintaan akun untuk ${entriesSnapshot.length} peserta didik?\n\nUkuran foto cukup besar (${fileSizeMB} MB), lanjutkan?`
+            : `Kirim permintaan akun untuk ${entriesSnapshot.length} peserta didik?`;
+
         openModal(
-            `Kirim permintaan akun untuk ${entriesSnapshot.length} peserta didik?`,
+            confirmMessage,
             "confirmation",
             confirmSubmit,
             "Konfirmasi Pengiriman",
@@ -281,13 +298,15 @@ const StudentRequestAccountForm: React.FC = () => {
     };
 
     return (
-        <div className="max-w-6xl mx-auto flex flex-col items-center-safe">
+        <div className="flex flex-col items-center-safe mx-auto max-w-6xl">
             <NewModal
                 modalState={modalState}
                 onClose={handleAttemptCloseModal}
                 isLoading={isLoading}
                 loadingVariant="bar"
                 progress={uploadProgress}
+                uploadedBytes={uploadBytes.loaded}
+                totalBytes={uploadBytes.total}
             >
                 <></>
             </NewModal>
@@ -312,7 +331,7 @@ const StudentRequestAccountForm: React.FC = () => {
                 </div>
             )}
 
-            <div className="flex flex-col lg:flex-row w-full gap-6 px-2 mt-10">
+            <div className="flex lg:flex-row flex-col gap-6 mt-10 px-2 w-full">
                 <div className="flex flex-col w-full lg:basis-2/5">
                     <DynamicForm
                         key={formKey}
@@ -400,7 +419,7 @@ const StudentRequestAccountForm: React.FC = () => {
                                 />
                                 {editingIndex >= 0 &&
                                     dataList[editingIndex]?._imageFile && (
-                                        <p className="text-xs mt-1 text-gray-500">
+                                        <p className="mt-1 text-gray-500 text-xs">
                                             Foto tersimpan untuk entri ini.
                                         </p>
                                     )}
@@ -413,26 +432,26 @@ const StudentRequestAccountForm: React.FC = () => {
                 {dataList.length > 0 ? (
                     <div
                         id="list-pendaftaran"
-                        className="card-basic rounded-md flex flex-col grow w-full h-full lg:basis-3/5"
+                        className="flex flex-col rounded-md w-full h-full card-basic grow lg:basis-3/5"
                     >
                         <div>
-                            <h3 className="text-lg mt-1 font-normal">
+                            <h3 className="mt-1 font-normal text-lg">
                                 List Pendaftaran
                             </h3>
-                            <div className="overflow-x-auto mt-4">
-                                <table className="min-w-full border-collapse border border-gray-200 text-sm">
+                            <div className="mt-4 overflow-x-auto">
+                                <table className="border border-gray-200 min-w-full text-sm border-collapse">
                                     <thead>
                                         <tr className="bg-gray-50">
-                                            <th className="border border-gray-200 p-2 text-left font-normal text-gray-500">
+                                            <th className="p-2 border border-gray-200 font-normal text-gray-500 text-left">
                                                 NAMA
                                             </th>
-                                            <th className="border border-gray-200 p-2 text-left font-normal text-gray-500">
+                                            <th className="p-2 border border-gray-200 font-normal text-gray-500 text-left">
                                                 TANGGAL LAHIR
                                             </th>
-                                            <th className="border border-gray-200 p-2 text-left font-normal text-gray-500">
+                                            <th className="p-2 border border-gray-200 font-normal text-gray-500 text-left">
                                                 KELAS
                                             </th>
-                                            <th className="border border-gray-200 p-2 text-left font-normal text-gray-500">
+                                            <th className="p-2 border border-gray-200 font-normal text-gray-500 text-left">
                                                 AKSI
                                             </th>
                                         </tr>
@@ -441,21 +460,21 @@ const StudentRequestAccountForm: React.FC = () => {
                                         {dataList.map((data, index) => (
                                             <tr
                                                 key={index}
-                                                className="odd:bg-white even:bg-gray-50"
+                                                className="even:bg-gray-50 odd:bg-white"
                                             >
-                                                <td className="border border-gray-200 p-2 whitespace-nowrap">
+                                                <td className="p-2 border border-gray-200 whitespace-nowrap">
                                                     {data.name}
                                                 </td>
-                                                <td className="border border-gray-200 p-2 whitespace-nowrap">
+                                                <td className="p-2 border border-gray-200 whitespace-nowrap">
                                                     {formatDate(
                                                         data.dateOfBirth
                                                     )}
                                                 </td>
-                                                <td className="border border-gray-200 p-2 whitespace-nowrap">
+                                                <td className="p-2 border border-gray-200 whitespace-nowrap">
                                                     {data.className}
                                                 </td>
-                                                <td className="border border-gray-200 p-2">
-                                                    <div className="flex gap-2 items-center">
+                                                <td className="p-2 border border-gray-200">
+                                                    <div className="flex items-center gap-2">
                                                         <button
                                                             type="button"
                                                             className="btn-icon-primary"
@@ -509,7 +528,7 @@ const StudentRequestAccountForm: React.FC = () => {
                         </div>
                     </div>
                 ) : (
-                    <div className="card-basic rounded-md flex flex-col grow w-full h-full lg:basis-3/5 items-center justify-center">
+                    <div className="flex flex-col justify-center items-center rounded-md w-full h-full card-basic grow lg:basis-3/5">
                         <p className="text-gray-500">
                             Belum ada data yang ditambahkan.
                         </p>

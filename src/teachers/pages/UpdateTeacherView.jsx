@@ -22,6 +22,8 @@ import FileUpload from "../../shared/Components/FormElements/FileUpload";
 import { Icon } from "@iconify-icon/react";
 
 const CANCEL_UPLOAD_MESSAGE = "Permintaan dibatalkan oleh pengguna.";
+// Threshold for large file warning (in bytes) - adjust as needed
+const LARGE_FILE_SIZE_THRESHOLD = 1 * 1024 * 1024; // 1 MB
 
 const UpdateTeacherView = () => {
     const { modalState, openModal, closeModal } = useModal();
@@ -30,6 +32,7 @@ const UpdateTeacherView = () => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState(null);
     const [uploadProgress, setUploadProgress] = useState(null);
+    const [uploadBytes, setUploadBytes] = useState({ loaded: null, total: null });
     const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
     // Use refs for large binary data to avoid re-renders
@@ -198,6 +201,7 @@ const UpdateTeacherView = () => {
                                     (event.loaded / event.total) * 100
                                 );
                                 setUploadProgress(percent);
+                                setUploadBytes({ loaded: event.loaded, total: event.total });
                             }
                         };
 
@@ -245,14 +249,24 @@ const UpdateTeacherView = () => {
             } finally {
                 setIsSubmitting(false);
                 setUploadProgress(null);
+                setUploadBytes({ loaded: null, total: null });
                 activeRequestRef.current = null;
             }
 
             return false;
         };
 
+        // Calculate total size for large file warning
+        const imageSize = croppedImageRef.current?.size || 0;
+        const isLargeFile = imageSize > LARGE_FILE_SIZE_THRESHOLD;
+        const fileSizeMB = (imageSize / (1024 * 1024)).toFixed(2);
+        
+        const confirmMessage = isLargeFile
+            ? `Simpan perubahan data untuk ${loadedTeacher.name}?\n\nUkuran foto cukup besar (${fileSizeMB} MB), lanjutkan?`
+            : `Simpan perubahan data untuk ${loadedTeacher.name}?`;
+
         openModal(
-            `Simpan perubahan data untuk ${loadedTeacher.name}?`,
+            confirmMessage,
             "confirmation",
             confirmSubmit,
             "Konfirmasi Update",
@@ -290,6 +304,8 @@ const UpdateTeacherView = () => {
                 loadingVariant="bar"
                 isLoading={isSubmitting}
                 progress={uploadProgress}
+                uploadedBytes={uploadBytes.loaded}
+                totalBytes={uploadBytes.total}
             />
             <NewModal
                 modalState={{
