@@ -8,7 +8,7 @@ import {
 } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { useStudent, useUpdateStudentMutation } from "../../shared/queries";
+import { useStudent } from "../../shared/queries";
 import DynamicForm from "../../shared/Components/UIElements/DynamicForm";
 
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
@@ -20,17 +20,22 @@ import FileUpload from "../../shared/Components/FormElements/FileUpload";
 import { Icon } from "@iconify-icon/react";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
 
+const CANCEL_UPLOAD_MESSAGE = "Permintaan dibatalkan oleh pengguna.";
+
 const UpdateStudentView = () => {
     const { modalState, openModal, closeModal } = useModal();
     const [localError, setLocalError] = useState(null);
     const [loadedDate, setLoadedDate] = useState();
     const [fields, setFields] = useState([]);
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [uploadProgress, setUploadProgress] = useState(null);
+    const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
     // Use refs for large binary data to avoid re-renders
     const croppedImageRef = useRef(null);
     const fileInputRef = useRef();
     const originalDataRef = useRef(null); // Store original data for comparison
+    const activeRequestRef = useRef(null); // Store active XHR request
 
     const auth = useContext(AuthContext);
 
@@ -43,28 +48,6 @@ const UpdateStudentView = () => {
         isLoading: isLoadingStudent,
         error: studentError,
     } = useStudent(studentId);
-    const updateStudentMutation = useUpdateStudentMutation({
-        onSuccess: (data) => {
-            openModal(
-                data.message,
-                "success",
-                () => {
-                    navigate(-1);
-                    return false; // Prevent immediate redirect
-                },
-                "Berhasil!",
-                false
-            );
-            setIsSubmitting(false);
-            setLocalError(null);
-        },
-        onError: (error) => {
-            setIsSubmitting(false);
-            setLocalError(
-                error.message || "An error occurred while updating student"
-            );
-        },
-    });
 
     // Handle student data loading and original data setup
     useEffect(() => {
@@ -273,79 +256,192 @@ const UpdateStudentView = () => {
         // Check if any data has actually changed
         if (!hasDataChanged(data)) {
             setLocalError("Tidak ada perubahan data untuk disimpan.");
-            setIsSubmitting(false);
             return;
         }
 
-        setIsSubmitting(true);
-
-        try {
-            const formData = new FormData();
-
-            // Only append changed fields to reduce payload size
-            const original = originalDataRef.current;
-            const formattedName = data.name.replace(
-                /\w\S*/g,
-                (txt) =>
-                    txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
-            );
-            const formattedDate =
-                data.dateOfBirth instanceof Date
-                    ? data.dateOfBirth.toISOString().split("T")[0]
-                    : data.dateOfBirth;
-
-            // Only append changed fields
-            if (auth.userRole === "admin" && original.nis !== data.nis) {
-                formData.append("nis", data.nis);
+        // Only append image if it has been changed
+        if (!croppedImageRef.current) {
+            if (!studentData?.image && auth.userRole !== "admin") {
+                setLocalError("Tidak ada foto yang dipilih!");
+                return;
             }
-            if (original.name !== formattedName) {
-                formData.append("name", formattedName);
-            }
-            if (original.dateOfBirth !== formattedDate) {
-                formData.append("dateOfBirth", formattedDate);
-            }
-            if (original.gender !== data.gender) {
-                formData.append("gender", data.gender);
-            }
-            if (original.parentName !== data.parentName) {
-                formData.append("parentName", data.parentName);
-            }
-            if (original.parentPhone !== data.parentPhone) {
-                formData.append("parentPhone", data.parentPhone);
-            }
-            if (original.address !== data.address) {
-                formData.append("address", data.address);
-            }
-
-            // Only append image if it has been changed
-            if (croppedImageRef.current) {
-                formData.append("image", croppedImageRef.current);
-            } else {
-                if (!studentData?.image && auth.userRole !== "admin") {
-                    setLocalError("Tidak ada foto yang dipilih!");
-                    setIsSubmitting(false);
-                    return;
-                }
-            }
-
-            // Use the mutation
-            await updateStudentMutation.mutateAsync({
-                studentId,
-                formData,
-            });
-        } catch (err) {
-            setIsSubmitting(false);
-            // Error is handled by the mutation's onError
         }
+
+        // Store form data for use in confirmation callback
+        const formDataSnapshot = { ...data };
+
+        const confirmSubmit = async () => {
+            setLocalError(null);
+            setIsSubmitting(true);
+            setUploadProgress(0);
+
+            try {
+                const formData = new FormData();
+
+                // Only append changed fields to reduce payload size
+                const original = originalDataRef.current;
+                const formattedName = formDataSnapshot.name.replace(
+                    /\w\S*/g,
+                    (txt) =>
+                        txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+                );
+                const formattedDate =
+                    formDataSnapshot.dateOfBirth instanceof Date
+                        ? formDataSnapshot.dateOfBirth.toISOString().split("T")[0]
+                        : formDataSnapshot.dateOfBirth;
+
+                // Only append changed fields
+                if (auth.userRole === "admin" && original.nis !== formDataSnapshot.nis) {
+                    formData.append("nis", formDataSnapshot.nis);
+                }
+                if (original.name !== formattedName) {
+                    formData.append("name", formattedName);
+                }
+                if (original.dateOfBirth !== formattedDate) {
+                    formData.append("dateOfBirth", formattedDate);
+                }
+                if (original.gender !== formDataSnapshot.gender) {
+                    formData.append("gender", formDataSnapshot.gender);
+                }
+                if (original.parentName !== formDataSnapshot.parentName) {
+                    formData.append("parentName", formDataSnapshot.parentName);
+                }
+                if (original.parentPhone !== formDataSnapshot.parentPhone) {
+                    formData.append("parentPhone", formDataSnapshot.parentPhone);
+                }
+                if (original.address !== formDataSnapshot.address) {
+                    formData.append("address", formDataSnapshot.address);
+                }
+
+                // Only append image if it has been changed
+                if (croppedImageRef.current) {
+                    formData.append("image", croppedImageRef.current);
+                }
+
+                // Use XHR for progress tracking
+                const url = `${import.meta.env.VITE_BACKEND_URL}/students/${studentId}`;
+                
+                const sendWithProgress = () =>
+                    new Promise((resolve, reject) => {
+                        const xhr = new XMLHttpRequest();
+                        activeRequestRef.current = xhr;
+                        xhr.open("PATCH", url);
+                        xhr.setRequestHeader("Authorization", "Bearer " + auth.token);
+
+                        xhr.upload.onprogress = (event) => {
+                            if (event.lengthComputable && event.total > 0) {
+                                const percent = Math.round(
+                                    (event.loaded / event.total) * 100
+                                );
+                                setUploadProgress(percent);
+                            }
+                        };
+
+                        xhr.onload = () => {
+                            try {
+                                const resData = JSON.parse(xhr.responseText || "{}");
+                                if (xhr.status >= 200 && xhr.status < 300) {
+                                    resolve(resData);
+                                } else {
+                                    reject(new Error(resData.message || "Gagal memperbarui data."));
+                                }
+                            } catch (err) {
+                                reject(new Error("Respon tidak valid dari server."));
+                            }
+                        };
+
+                        xhr.onerror = () => {
+                            reject(new Error("Jaringan bermasalah."));
+                        };
+
+                        xhr.onabort = () => {
+                            reject(new Error(CANCEL_UPLOAD_MESSAGE));
+                        };
+
+                        xhr.send(formData);
+                    });
+
+                const resData = await sendWithProgress();
+                openModal(
+                    resData.message,
+                    "success",
+                    () => {
+                        navigate(-1);
+                        return false;
+                    },
+                    "Berhasil!",
+                    false
+                );
+            } catch (err) {
+                const message = err.message || "Terjadi kesalahan saat memperbarui data.";
+                setLocalError(message);
+                if (message !== CANCEL_UPLOAD_MESSAGE) {
+                    openModal(message, "error", null, "Gagal!", false);
+                }
+            } finally {
+                setIsSubmitting(false);
+                setUploadProgress(null);
+                activeRequestRef.current = null;
+            }
+
+            return false;
+        };
+
+        openModal(
+            `Simpan perubahan data untuk ${studentData.name}?`,
+            "confirmation",
+            confirmSubmit,
+            "Konfirmasi Update",
+            true
+        );
+    };
+
+    const handleAttemptCloseModal = () => {
+        if (isSubmitting && uploadProgress !== null && activeRequestRef.current) {
+            setIsCancelModalOpen(true);
+            return;
+        }
+        closeModal();
+    };
+
+    const handleConfirmCancelUpload = () => {
+        const request = activeRequestRef.current;
+        if (request) {
+            request.abort();
+            activeRequestRef.current = null;
+        }
+        setIsSubmitting(false);
+        setUploadProgress(null);
+        setIsCancelModalOpen(false);
+        setLocalError(CANCEL_UPLOAD_MESSAGE);
+        closeModal();
+        return true;
     };
 
     return (
-        <div className="m-auto max-w-md mt-14 md:mt-8">
+        <div className="m-auto mt-14 md:mt-8 max-w-md">
             <NewModal
                 modalState={modalState}
-                onClose={closeModal}
-                isLoading={isLoadingStudent}
+                onClose={handleAttemptCloseModal}
+                loadingVariant="bar"
+                isLoading={isSubmitting}
+                progress={uploadProgress}
             />
+            <NewModal
+                modalState={{
+                    isOpen: isCancelModalOpen,
+                    type: "warning",
+                    title: "Batalkan Update?",
+                    onConfirm: handleConfirmCancelUpload,
+                    showCancel: true,
+                    size: "md",
+                }}
+                onClose={() => setIsCancelModalOpen(false)}
+                confirmText="Ya, batalkan"
+                cancelText="Tidak"
+            >
+                <></>
+            </NewModal>
 
             {studentError && (
                 <ErrorCard
@@ -477,21 +573,18 @@ const UpdateStudentView = () => {
                                     className={`button-primary ${
                                         isLoadingStudent ||
                                         !studentData ||
-                                        isSubmitting ||
-                                        updateStudentMutation.isPending
+                                        isSubmitting
                                             ? "opacity-50 cursor-not-allowed"
                                             : ""
                                     }`}
                                     disabled={
                                         isLoadingStudent ||
                                         !studentData ||
-                                        isSubmitting ||
-                                        updateStudentMutation.isPending
+                                        isSubmitting
                                     }
                                 >
                                     {isLoadingStudent ||
-                                    isSubmitting ||
-                                    updateStudentMutation.isPending ? (
+                                    isSubmitting ? (
                                         <LoadingCircle>
                                             Processing...
                                         </LoadingCircle>
