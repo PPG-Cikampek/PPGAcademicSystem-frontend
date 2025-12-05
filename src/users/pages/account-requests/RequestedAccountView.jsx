@@ -1,17 +1,17 @@
-import { useContext, useEffect, useState, useRef } from "react";
-import useHttp from "../../../shared/hooks/http-hook";
-import { AuthContext } from "../../../shared/Components/Context/auth-context";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { formatDate } from "../../../shared/Utilities/formatDateToLocal";
 import DataTable from "../../../shared/Components/UIElements/DataTable";
 import NewModal from "../../../shared/Components/Modal/NewModal";
 import useModal from "../../../shared/hooks/useNewModal";
-import { set } from "date-fns";
+import {
+    useAccountRequests,
+    useApproveAllAccountRequestsMutation,
+    useRespondAccountRequestMutation,
+} from "../../../shared/queries";
 
 const RequestedAccountView = () => {
-    const [tickets, setTickets] = useState();
     const { modalState, openModal, closeModal } = useModal();
-    const { isLoading, sendRequest } = useHttp();
     const [processingTicket, setProcessingTicket] = useState(null);
     const [rejectionReason, setRejectionReason] = useState("");
     const [showRejectionInput, setShowRejectionInput] = useState(false);
@@ -21,46 +21,59 @@ const RequestedAccountView = () => {
     const rejectionReasonRef = useRef("");
 
     const navigate = useNavigate();
-    const auth = useContext(AuthContext);
+    const { data: ticketsData, isLoading, isFetching } = useAccountRequests();
 
-    // Debug: log rejectionReason whenever it changes so we can observe live updates
-    useEffect(() => {
-        console.log("useEffect - rejectionReason changed:", rejectionReason);
-    }, [rejectionReason]);
+    const respondTicketMutation = useRespondAccountRequestMutation({
+        onSuccess: (data) => {
+            openModal(
+                data?.message || "Berhasil memproses tiket.",
+                "success",
+                null,
+                "Berhasil!",
+                false
+            );
+        },
+        onError: (error) => {
+            const message =
+                error?.response?.data?.message ||
+                "Gagal memproses tiket. Silakan coba lagi.";
+            openModal(message, "info", null, "Gagal", false);
+        },
+    });
 
-    useEffect(() => {
-        fetchTickets();
-    }, [sendRequest]);
+    const approveAllMutation = useApproveAllAccountRequestsMutation({
+        onSuccess: (data) => {
+            openModal(
+                data?.message || "Berhasil memproses semua tiket!",
+                "success",
+                null,
+                "Berhasil!",
+                false
+            );
+        },
+        onError: (error) => {
+            const message =
+                error?.response?.data?.message ||
+                "Gagal memproses semua tiket. Silakan coba lagi.";
+            openModal(message, "info", null, "Gagal", false);
+        },
+    });
 
-    const fetchTickets = async () => {
-        const url = `${
-            import.meta.env.VITE_BACKEND_URL
-        }/users/account-requests/`;
-        try {
-            const responseData = await sendRequest(url);
-            setTickets(responseData);
-        } catch {
-            // handled in hook
-        }
-    };
+    const isMutating =
+        respondTicketMutation.isPending || approveAllMutation.isPending;
+    const isBusy = isLoading || isMutating;
+
+    const tickets = ticketsData?.tickets || [];
 
     const handleRespondTicket = async (ticketId, respond) => {
         // Find ticket details so we can show a clearer confirmation message
-        const ticket = tickets?.tickets?.find(
+        const ticket = tickets.find(
             (t) => t.ticketId === ticketId || t._id === ticketId
-        );
-        console.log(
-            "handleRespondTicket - current rejectionReason:",
-            rejectionReason
         );
 
         const confirmAction = async () => {
             // Validate rejection reason when rejecting — read from ref (latest)
             const currentReason = rejectionReasonRef.current;
-            console.log(
-                "confirmAction - rejectionReason (from ref):",
-                currentReason
-            );
             if (
                 respond === "rejected" &&
                 (!currentReason || currentReason.trim() === "")
@@ -73,43 +86,18 @@ const RequestedAccountView = () => {
                     false
                 );
                 setShowRejectionInput(false);
+                return;
             }
 
-            const body = JSON.stringify({
-                ticketId,
-                respond,
-                ...(respond === "rejected" && { reason: currentReason }),
-            });
-            console.log(body);
-            const url = `${
-                import.meta.env.VITE_BACKEND_URL
-            }/users/account-requests/ticket`;
-
             try {
-                console.log(body);
                 setProcessingTicket(ticketId);
-                const responseData = await sendRequest(url, "PATCH", body, {
-                    "Content-Type": "application/json",
-                    Authorization: "Bearer " + auth.token,
+                await respondTicketMutation.mutateAsync({
+                    ticketId,
+                    respond,
+                    reason: currentReason,
                 });
-
-                setTickets((prevTickets) => ({
-                    ...prevTickets,
-                    tickets:
-                        prevTickets?.tickets?.filter(
-                            (t) => t._id !== ticketId
-                        ) || [],
-                }));
-
-                openModal(
-                    responseData.message,
-                    "success",
-                    null,
-                    "Berhasil!",
-                    false
-                );
             } catch (err) {
-                // Error handled by useHttp
+                // Error surfaced via mutation onError
                 console.error("Request handling error:", err);
             } finally {
                 setProcessingTicket(null);
@@ -141,6 +129,8 @@ const RequestedAccountView = () => {
             "Peringatan!",
             true
         );
+        // prevent modal from closing automatically; we close it manually above
+        return false;
     };
 
     const getStatusStyle = (type) =>
@@ -160,8 +150,9 @@ const RequestedAccountView = () => {
         }[type]);
 
     const handleApproveAll = () => {
-        const pendingCount =
-            tickets?.tickets?.filter((t) => t.status === "pending").length || 0;
+        const pendingCount = tickets.filter(
+            (t) => t.status === "pending"
+        ).length;
         if (pendingCount === 0) {
             openModal(
                 "Tidak ada tiket pending untuk diproses.",
@@ -174,29 +165,15 @@ const RequestedAccountView = () => {
         }
 
         const doApprove = async () => {
-            const url = `${
-                import.meta.env.VITE_BACKEND_URL
-            }/users/account-requests/approve-all`;
             try {
                 setProcessingTicket("approve-all");
-                const result = await sendRequest(url, "POST", null, {
-                    Authorization: "Bearer " + auth.token,
-                });
-                console.log("Approved result:", result);
-                await fetchTickets();
-                openModal(
-                    result.message || "Berhasil memproses semua tiket!",
-                    "success",
-                    null,
-                    "Berhasil!",
-                    false
-                );
-            } catch {
-                // handled in hook
+                await approveAllMutation.mutateAsync();
+            } catch (err) {
+                console.error("Approve all error:", err);
             } finally {
                 setProcessingTicket(null);
             }
-            // Prevent modal from closing automatically;
+            // prevent modal from closing automatically; we close it manually above
             return false;
         };
 
@@ -207,8 +184,7 @@ const RequestedAccountView = () => {
             "Konfirmasi",
             true
         );
-
-        // Prevent modal from closing automatically
+        // prevent modal from closing automatically; we close it manually above
         return false;
     };
 
@@ -278,14 +254,12 @@ const RequestedAccountView = () => {
                                         "approved"
                                     );
                                 }}
-                                className="btn-primary-outline m-0"
+                                className="m-0 btn-primary-outline"
                                 disabled={
-                                    isLoading ||
-                                    processingTicket === item.ticketId
+                                    isBusy || processingTicket === item.ticketId
                                 }
                                 aria-disabled={
-                                    isLoading ||
-                                    processingTicket === item.ticketId
+                                    isBusy || processingTicket === item.ticketId
                                 }
                                 aria-label={`Setujui tiket ${item.ticketId}`}
                             >
@@ -299,14 +273,12 @@ const RequestedAccountView = () => {
                                         "rejected"
                                     );
                                 }}
-                                className="btn-danger-outline m-0"
+                                className="m-0 btn-danger-outline"
                                 disabled={
-                                    isLoading ||
-                                    processingTicket === item.ticketId
+                                    isBusy || processingTicket === item.ticketId
                                 }
                                 aria-disabled={
-                                    isLoading ||
-                                    processingTicket === item.ticketId
+                                    isBusy || processingTicket === item.ticketId
                                 }
                                 aria-label={`Tolak tiket ${item.ticketId}`}
                             >
@@ -327,7 +299,7 @@ const RequestedAccountView = () => {
     ];
 
     return (
-        <div className="min-h-screen px-4 py-8 md:p-8">
+        <div className="md:p-8 px-4 py-8 min-h-screen">
             <NewModal
                 modalState={modalState}
                 onClose={() => {
@@ -335,13 +307,13 @@ const RequestedAccountView = () => {
                     setShowRejectionInput(false);
                     setRejectionReason("");
                 }}
-                isLoading={isLoading}
+                isLoading={isBusy}
             >
                 {showRejectionInput && (
                     <div className="mb-4">
                         <label
                             htmlFor="rejection-reason"
-                            className="block text-sm font-medium text-gray-700 mb-2"
+                            className="block mb-2 font-medium text-gray-700 text-sm"
                         >
                             Alasan Penolakan
                         </label>
@@ -350,11 +322,10 @@ const RequestedAccountView = () => {
                             value={rejectionReason}
                             onChange={(e) => {
                                 const newVal = e.target.value;
-                                console.log("onChange - newVal:", newVal);
                                 setRejectionReason(newVal);
                                 rejectionReasonRef.current = newVal;
                             }}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                            className="shadow-sm px-3 py-2 border border-gray-300 focus:border-red-500 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 w-full"
                             rows="3"
                             placeholder="Masukkan alasan penolakan..."
                             required
@@ -363,33 +334,39 @@ const RequestedAccountView = () => {
                 )}
             </NewModal>
 
-            <div className="flex items-center justify-between gap-4 mb-4">
-                <h2 className="text-xl font-bold">Daftar Pendaftaran Akun</h2>
+            <div className="flex justify-between items-center gap-4 mb-4">
+                <h2 className="font-bold text-xl">Daftar Pendaftaran Akun</h2>
                 <button
                     onClick={handleApproveAll}
                     className="btn-primary-outline"
-                    disabled={isLoading || processingTicket === "approve-all"}
+                    disabled={
+                        isBusy ||
+                        isFetching ||
+                        processingTicket === "approve-all"
+                    }
                     aria-disabled={
-                        isLoading || processingTicket === "approve-all"
+                        isBusy ||
+                        isFetching ||
+                        processingTicket === "approve-all"
                     }
                 >
                     Setujui & Buat Semua Tiket Pending
                 </button>
             </div>
-            <div className="max-w-6xl mx-auto">
-                <p className="text-sm text-gray-600 mb-2">
-                    Total: {tickets?.tickets?.length ?? 0} permintaan
+            <div className="mx-auto max-w-6xl">
+                <p className="mb-2 text-gray-600 text-sm">
+                    Total: {tickets.length} permintaan
                 </p>
 
-                {isLoading && !tickets && (
-                    <div className="p-6 bg-white rounded shadow text-center">
+                {isLoading && tickets.length === 0 && (
+                    <div className="bg-white shadow p-6 rounded text-center">
                         Memuat permintaan...
                     </div>
                 )}
 
-                {tickets && tickets.tickets?.length > 0 ? (
+                {tickets.length > 0 ? (
                     <DataTable
-                        data={tickets.tickets}
+                        data={tickets}
                         columns={columns}
                         onRowClick={(item) =>
                             navigate(
@@ -397,7 +374,7 @@ const RequestedAccountView = () => {
                             )
                         }
                         searchableColumns={["ticketId", "status"]}
-                        isLoading={isLoading}
+                        isLoading={isLoading || isFetching}
                         initialSort={{
                             key: "createdTime",
                             direction: "descending",
@@ -406,7 +383,7 @@ const RequestedAccountView = () => {
                     />
                 ) : (
                     !isLoading && (
-                        <div className="p-6 bg-white rounded shadow text-center">
+                        <div className="bg-white shadow p-6 rounded text-center">
                             Tidak ada pendaftaran akun baru.
                         </div>
                     )
