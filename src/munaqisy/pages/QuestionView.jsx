@@ -116,6 +116,8 @@ const QuestionView = () => {
                     false
                 );
             }
+        return false;
+
         };
 
         openModal(
@@ -125,10 +127,11 @@ const QuestionView = () => {
             "Konfirmasi",
             true
         );
+        return false;
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 ">
+        <div className="bg-gray-50 min-h-screen">
             {!isLoading && state.error && <ErrorCard error={state.error} />}
             <NewModal
                 modalState={modalState}
@@ -136,31 +139,31 @@ const QuestionView = () => {
                 isLoading={isLoading}
             />
 
-            <div className="flex flex-col pb-24 my-6">
-                <div className="card-basic flex-col justify-between mt-0 mx-4 pr-8 box-border">
-                    <div className="text-lg uppercase font-semibold">
+            <div className="flex flex-col my-6 pb-24">
+                <div className="box-border flex-col justify-between mx-4 mt-0 pr-8 card-basic">
+                    <div className="font-semibold text-lg uppercase">
                         {data.categoryData.label}
                     </div>
-                    <div className="text-base font-medium text-gray-500">
+                    <div className="font-medium text-gray-500 text-base">
                         Nilai: {totalScore || 0}/{examQuestions?.totalScore}
                     </div>
                 </div>
 
-                <div className="mt-6 mx-4 space-y-4">
+                <div className="space-y-4 mx-4 mt-6">
                     {examQuestions?.questions.map((question, index) => (
                         <div
                             key={question.id}
-                            className="card-basic flex-col mt-0 gap-2 mx-0"
+                            className="flex-col gap-2 mx-0 mt-0 card-basic"
                         >
                             <div className="flex justify-between items-center">
-                                <div className="text-lg font-semibold">
+                                <div className="font-semibold text-lg">
                                     Pertanyaan {index + 1}
                                 </div>
                                 <div className="flex flex-col">
-                                    <div className="text-blue-600 font-medium">
+                                    <div className="font-medium text-blue-600">
                                         Nilai Maksimal: {question.maxScore}
                                     </div>
-                                    <div className="text-sm text-gray-500 whitespace-pre-line">
+                                    <div className="text-gray-500 text-sm whitespace-pre-line">
                                         {" "}
                                         Tipe Soal:{" "}
                                         {getMunaqasyahQuestionTypeName(
@@ -181,7 +184,7 @@ const QuestionView = () => {
                                 <div className="font-semibold text-gray-700">
                                     Pertanyaan:
                                 </div>
-                                <div className="mt-1 text-gray-600 whitespace-pre-line font-lpmq text-base">
+                                <div className="mt-1 font-lpmq text-gray-600 text-base whitespace-pre-line">
                                     {question.question}
                                 </div>
                             </div>
@@ -190,7 +193,7 @@ const QuestionView = () => {
                                 <div className="font-semibold text-gray-700">
                                     Jawaban yang Benar:
                                 </div>
-                                <div className="whitespace-pre-line font-lpmq text-base">
+                                <div className="font-lpmq text-base whitespace-pre-line">
                                     {question.answers}
                                 </div>
                             </div>
@@ -198,21 +201,21 @@ const QuestionView = () => {
                             {/* {question.type !== 'multipleChoices' && question.answers[0] !== '' && (
                                 <div className="mt-2">
                                     <div className="font-semibold text-gray-700">Jawaban yang Benar:</div>
-                                    <div className='whitespace-pre-line font-lpmq text-base'>{question.answers[0]}</div>
+                                    <div className='font-lpmq text-base whitespace-pre-line'>{question.answers[0]}</div>
                                 </div>
                             )}
                             {question.type === 'multipleChoices' && question.answers[0] !== '' && (
                                 <div className="mt-2">
                                     <div className="font-semibold text-gray-700">Jawaban yang Benar:</div>
-                                    <ul className="mt-1 text-gray-600 list-disc pl-4">
+                                    <ul className="mt-1 pl-4 text-gray-600 list-disc">
                                         {question.answers.map((answer, idx) => (
-                                            <li key={idx} className='whitespace-pre-line font-lpmq text-base'>{answer}</li>
+                                            <li key={idx} className='font-lpmq text-base whitespace-pre-line'>{answer}</li>
                                         ))}
                                     </ul>
                                 </div>
                             )} */}
                             <div className="mt-4">
-                                <div className="font-semibold text-gray-700 mb-2">
+                                <div className="mb-2 font-semibold text-gray-700">
                                     Nilai:
                                 </div>
                                 <div className="flex flex-wrap gap-3">
@@ -249,10 +252,10 @@ const QuestionView = () => {
                     ))}
                 </div>
 
-                <div className="my-4 mx-6">
+                <div className="mx-6 my-4">
                     <button
                         onClick={handleFinish}
-                        className="button-primary w-full"
+                        className="w-full button-primary"
                     >
                         Simpan Nilai
                     </button>

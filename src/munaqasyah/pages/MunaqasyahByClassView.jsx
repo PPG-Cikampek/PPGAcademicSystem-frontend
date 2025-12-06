@@ -75,7 +75,7 @@ const MunaqasyahByClassView = () => {
         enabled: Boolean(branchYearId && classId && subBranchId),
     });
 
-    const rawScores = React.useMemo(() => {
+    const rawScores = useMemo(() => {
         if (!responseData) return [];
         const matchedClass = responseData.classes.find(
             (cls) => cls.classId._id === classId
@@ -84,7 +84,7 @@ const MunaqasyahByClassView = () => {
         return matchedClass ? matchedClass.scores : [];
     }, [responseData, classId]);
 
-    const branchAvgScores = React.useMemo(() => {
+    const branchAvgScores = useMemo(() => {
         if (!responseData) return [];
         const matchedClass = responseData.classes.find(
             (cls) => cls.classId._id === classId
@@ -228,15 +228,15 @@ const MunaqasyahByClassView = () => {
 
     if (isLoading)
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <div className="w-full max-w-6xl mx-auto px-4 py-2 md:p-5">
+            <div className="flex justify-center items-center bg-gray-50 min-h-screen">
+                <div className="mx-auto md:p-5 px-4 py-2 w-full max-w-6xl">
                     <div className="flex flex-col gap-4">
                         {[...Array(3)].map((_, idx) => (
                             <div
                                 key={idx}
-                                className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 p-6"
+                                className="bg-white shadow-md p-6 border border-gray-200 rounded-lg overflow-hidden"
                             >
-                                <div className="flex flex-col gap-2 items-start">
+                                <div className="flex flex-col items-start gap-2">
                                     <SkeletonLoader
                                         width="180px"
                                         height="20px"
@@ -276,37 +276,37 @@ const MunaqasyahByClassView = () => {
 
     if (error)
         return (
-            <div className="min-h-screen flex justify-center bg-gray-50">
-                <div className="w-full max-w-md mx-auto px-4 py-8 md:p-8">
+            <div className="flex justify-center bg-gray-50 min-h-screen">
+                <div className="mx-auto md:p-8 px-4 py-8 w-full max-w-md">
                     <ErrorCard error={error.message || "Terjadi kesalahan."} />
                 </div>
             </div>
         );
 
     return (
-        <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">
-            <div className="max-w-6xl mx-auto">
+        <div className="bg-gray-50 md:p-8 px-4 py-8 min-h-screen">
+            <div className="mx-auto max-w-6xl">
                 <NewModal
                     modalState={modalState}
                     onClose={closeModal}
                     isLoading={loadingIdx !== null}
                 />
                 <div className="flex justify-between items-center mb-6 h-9">
-                    <h1 className="text-2xl font-semibold text-gray-900">
+                    <h1 className="font-semibold text-gray-900 text-2xl">
                         {rawScores[0]?.classId.name}
                     </h1>
 
                     {expandedCount >= 2 && (
                         <button
                             onClick={collapseAll}
-                            className="btn-neutral-outline mt-0"
+                            className="mt-0 btn-neutral-outline"
                         >
                             Tutup Semua
                         </button>
                     )}
                 </div>
                 <WarningCard
-                    className="items-center justify-start"
+                    className="justify-start items-center"
                     warning="Nilai rata-rata kelas akan muncul setelah satu daerah telah menyelesaikan munaqosah!"
                     onClear={() => setError(null)}
                 />
@@ -327,16 +327,16 @@ const MunaqasyahByClassView = () => {
                         return (
                             <div
                                 key={score._id}
-                                className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200"
+                                className="bg-white shadow-md border border-gray-200 rounded-lg overflow-hidden"
                             >
                                 <div
                                     onClick={() => toggleCard(score._id)}
-                                    className="cursor-pointer p-6 hover:bg-gray-50 transition-colors duration-200"
+                                    className="hover:bg-gray-50 p-6 transition-colors duration-200 cursor-pointer"
                                 >
                                     <div className="flex justify-between items-center">
-                                        <div className="flex flex-col gap-2 items-start">
+                                        <div className="flex flex-col items-start gap-2">
                                             <div>
-                                                <h2 className="text-lg font-medium text-gray-800">
+                                                <h2 className="font-medium text-gray-800 text-lg">
                                                     {score.studentId.name}
                                                 </h2>
                                                 <h3 className="text-gray-700">
@@ -344,11 +344,11 @@ const MunaqasyahByClassView = () => {
                                                 </h3>
                                             </div>
 
-                                            <span className="text-base text-gray-500">
+                                            <span className="text-gray-500 text-base">
                                                 Rata-rata:{" "}
                                                 {calculateAverage(score)}
                                             </span>
-                                            <div className="flex flex-col md:flex-row gap-2 my-2 md:my-0">
+                                            <div className="flex md:flex-row flex-col gap-2 my-2 md:my-0">
                                                 <button
                                                     onClick={(e) => {
                                                         e.stopPropagation();
@@ -379,7 +379,7 @@ const MunaqasyahByClassView = () => {
                                                             true
                                                         );
                                                     }}
-                                                    className="btn-primary-outline m-0 text-gray-700"
+                                                    className="m-0 btn-primary-outline text-gray-700"
                                                     disabled={
                                                         loadingIdx === idx
                                                     }
@@ -407,7 +407,7 @@ const MunaqasyahByClassView = () => {
                                                             branchAvgScores
                                                         );
                                                     }}
-                                                    className="btn-primary-outline m-0 text-gray-700 hidden md:block"
+                                                    className="hidden md:block m-0 btn-primary-outline text-gray-700"
                                                     disabled={
                                                         loadingIdx === idx
                                                     }
@@ -449,7 +449,7 @@ const MunaqasyahByClassView = () => {
                                                             true
                                                         );
                                                     }}
-                                                    className="btn-primary-outline m-0 text-gray-700"
+                                                    className="m-0 btn-primary-outline text-gray-700"
                                                     disabled={
                                                         loadingIdx === idx
                                                     }
@@ -477,7 +477,7 @@ const MunaqasyahByClassView = () => {
                                                             branchAvgScores
                                                         );
                                                     }}
-                                                    className="btn-primary-outline m-0 text-gray-700 hidden md:block"
+                                                    className="hidden md:block m-0 btn-primary-outline text-gray-700"
                                                     disabled={
                                                         loadingIdx === idx
                                                     }
@@ -504,13 +504,13 @@ const MunaqasyahByClassView = () => {
                                     {/* Progress Bar */}
                                     <div className="mt-2 w-full min-w-[180px]">
                                         <div className="flex justify-end mb-1">
-                                            <span className="text-xs text-gray-500 place-self-end">
+                                            <span className="place-self-end text-gray-500 text-xs">
                                                 {progressPercent}%
                                             </span>
                                         </div>
-                                        <div className="w-full bg-gray-200 rounded-full h-2.5">
+                                        <div className="bg-gray-200 rounded-full w-full h-2.5">
                                             <div
-                                                className="animate-pulse bg-blue-600 h-2.5 rounded-full transition-all duration-300"
+                                                className="bg-blue-600 rounded-full h-2.5 transition-all animate-pulse duration-300"
                                                 style={{
                                                     width: `${progressPercent}%`,
                                                     animationDelay: `${
@@ -530,12 +530,12 @@ const MunaqasyahByClassView = () => {
                                         : "max-h-0"
                                 }`}
                                 >
-                                    <div className="px-4 py-4 bg-gray-50 border-t border-gray-200">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 md:gap-4">
+                                    <div className="bg-gray-50 px-4 py-4 border-gray-200 border-t">
+                                        <div className="gap-1 md:gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                                             {scoreCategories.map((category) => (
                                                 <div
                                                     key={category.key}
-                                                    className="flex justify-between items-center p-2 bg-white rounded-sm border"
+                                                    className="flex justify-between items-center bg-white p-2 border rounded-sm"
                                                 >
                                                     <span className="text-gray-600">
                                                         {category.label}
