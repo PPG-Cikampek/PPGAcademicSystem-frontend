@@ -40,6 +40,7 @@ export { useClass, useUpdateClassMutation, useRegisterTeacherToClassMutation, us
 export { useTeachers, useTeacher, useUpdateTeacherMutation } from "./useTeachers";
 
 export { useStudents, useStudent, useUpdateStudentMutation } from "./useStudents";
+export { useUsersList } from "./useUsers";
 
 export {
     useAccountRequests,

@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import { useUsersData } from "./useUsersData";
 import { useUserDeletion } from "./useUserDeletion";
 import { useUserSelection } from "./useUserSelection";
 import { USER_ROLE_ORDER } from "../config";
@@ -11,21 +10,19 @@ import { USER_ROLE_ORDER } from "../config";
 export const useUsers = () => {
     const navigate = useNavigate();
     
-    // Separate concerns into focused hooks
-    const { users, setUsers, isLoading, error, setError } = useUsersData();
     const { selectedUserIds, setSelectedUserIds } = useUserSelection();
-    const { handleDeleteUser, handleBulkDelete } = useUserDeletion(setUsers);
+    const { handleDeleteUser, handleBulkDelete, isDeleting, error, setError } =
+        useUserDeletion();
 
     // Create bound version of handleBulkDelete with current selection state
     const handleBulkDeleteWithSelection = () => 
         handleBulkDelete(selectedUserIds, setSelectedUserIds);
 
     return {
-        users,
         selectedUserIds,
         setSelectedUserIds,
         roleOrder: USER_ROLE_ORDER,
-        isLoading,
+        isLoading: isDeleting,
         error,
         setError,
         handleDeleteUser,

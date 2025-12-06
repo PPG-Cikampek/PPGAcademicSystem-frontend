@@ -11,7 +11,6 @@ const UsersView = () => {
     const { modalState, openModal, closeModal } = useModal();
 
     const {
-        users,
         selectedUserIds,
         // setSelectedUserIds,
         roleOrder,
@@ -22,8 +21,6 @@ const UsersView = () => {
         handleBulkDelete,
         navigate,
     } = useUsers();
-
-    const combinedLoading = isLoading || !users;
 
     const handleDeleteUserModal = (userId) => {
         const confirmDelete = async () => {
@@ -78,8 +75,8 @@ const UsersView = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">
-            <div className="max-w-6xl mx-auto">
+        <div className="bg-gray-50 md:p-8 px-4 py-8 min-h-screen">
+            <div className="mx-auto max-w-6xl">
                 {error && (
                     <ErrorCard error={error} onClear={() => setError(null)} />
                 )}
@@ -91,27 +88,27 @@ const UsersView = () => {
                 />
 
                 <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-semibold text-gray-900">
+                    <h1 className="font-semibold text-gray-900 text-2xl">
                         Daftar User
                     </h1>
                     <div className="flex gap-2">
                         <button
                             onClick={handleBulkDeleteModal}
-                            className="button-danger disabled:hidden"
+                            className="disabled:hidden button-danger"
                             disabled={selectedUserIds.length === 0}
                         >
-                            <Trash className="w-4 h-4 mr-2" />
+                            <Trash className="mr-2 w-4 h-4" />
                             Hapus Akun
                         </button>
                         <Link to="/settings/users/new">
-                            <button className="button-primary pl-[14px]">
-                                <PlusIcon className="w-4 h-4 mr-2" />
+                            <button className="pl-[14px] button-primary">
+                                <PlusIcon className="mr-2 w-4 h-4" />
                                 Tambah Akun
                             </button>
                         </Link>
                         <Link to="/settings/users/bulk-create">
-                            <button className="button-primary pl-[14px]">
-                                <Users className="w-4 h-4 mr-2" />
+                            <button className="pl-[14px] button-primary">
+                                <Users className="mr-2 w-4 h-4" />
                                 Tambah Peserta Didik
                             </button>
                         </Link>
@@ -122,10 +119,8 @@ const UsersView = () => {
                     <RoleGroup
                         key={role}
                         role={role}
-                        users={users ? users.users : []}
                         navigate={navigate}
                         handleDeleteUser={handleDeleteUserModal}
-                        isLoading={combinedLoading}
                     />
                 ))}
             </div>

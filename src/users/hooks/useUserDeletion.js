@@ -1,13 +1,15 @@
 import { useContext } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
 import useHttp from "../../shared/hooks/http-hook";
 
 /**
  * Hook for user deletion operations
  */
-export const useUserDeletion = (setUsers) => {
-    const { sendRequest } = useHttp();
+export const useUserDeletion = () => {
+    const { sendRequest, isLoading: isDeleting, error, setError } = useHttp();
     const auth = useContext(AuthContext);
+    const queryClient = useQueryClient();
 
     const handleDeleteUser = async (userId) => {
         const responseData = await sendRequest(
@@ -18,10 +20,7 @@ export const useUserDeletion = (setUsers) => {
                 Authorization: "Bearer " + auth.token,
             }
         );
-        setUsers((prevUsers) => ({
-            ...prevUsers,
-            users: prevUsers.users.filter((user) => user._id !== userId),
-        }));
+        await queryClient.invalidateQueries({ queryKey: ["users"] });
         return responseData.message;
     };
 
@@ -37,12 +36,7 @@ export const useUserDeletion = (setUsers) => {
             "Content-Type": "application/json",
             Authorization: "Bearer " + auth.token,
         });
-        setUsers((prevUsers) => ({
-            ...prevUsers,
-            users: prevUsers.users.filter(
-                (user) => !selectedUserIds.includes(user._id)
-            ),
-        }));
+        await queryClient.invalidateQueries({ queryKey: ["users"] });
         setSelectedUserIds([]);
         return responseData.message;
     };
@@ -50,5 +44,8 @@ export const useUserDeletion = (setUsers) => {
     return {
         handleDeleteUser,
         handleBulkDelete,
+        isDeleting,
+        error,
+        setError,
     };
 };

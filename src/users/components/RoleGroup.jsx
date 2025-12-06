@@ -1,36 +1,63 @@
-import DataTable from "../../shared/Components/UIElements/DataTable";
+import { useMemo, useState } from "react";
+import ServerDataTable from "../../shared/Components/UIElements/ServerDataTable";
+import { useUsersList } from "../../shared/queries/useUsers";
 import getUserRoleTitle from "../../shared/Utilities/getUserRoleTitle";
 import { TableColumns } from "../components/TableColumns";
 import PropTypes from 'prop-types';
 
-const RoleGroup = ({ role, users, navigate, handleDeleteUser, isLoading }) => {
-    const roleUsers = users.filter((user) => user.role === role);
-    if (!isLoading && roleUsers.length === 0) return null;
+const RoleGroup = ({ role, navigate, handleDeleteUser }) => {
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(5);
+    const [search, setSearch] = useState("");
+    const [sort, setSort] = useState({ key: "name", direction: "asc" });
+
+    const { data, isLoading, isFetching } = useUsersList(
+        {
+            role,
+            page,
+            limit: pageSize,
+            search: search || undefined,
+            sort,
+        },
+        { keepPreviousData: true }
+    );
+
+    const { users = [], total = 0 } = useMemo(
+        () => ({ users: data?.users || [], total: data?.total || 0 }),
+        [data]
+    );
+
+    if (!isLoading && !isFetching && total === 0) return null;
 
     return (
         <div className="mb-8">
-            <h2 className="text-lg font-bold text-gray-900">
+            <h2 className="font-bold text-gray-900 text-lg">
                 {getUserRoleTitle(role)}
             </h2>
-            <DataTable
-                data={roleUsers}
+            <ServerDataTable
+                data={users}
                 columns={TableColumns(role, navigate, handleDeleteUser)}
-                searchableColumns={["name", "email"]}
-                initialSort={{
-                    key: "name",
-                    direction: "ascending",
+                total={total}
+                page={page}
+                pageSize={pageSize}
+                onPageChange={(next) => setPage(next)}
+                onPageSizeChange={(size) => {
+                    setPageSize(size);
+                    setPage(1);
                 }}
-                initialEntriesPerPage={5}
-                config={{
-                    showSearch: true,
-                    showTopEntries: true,
-                    showBottomEntries: true,
-                    showPagination: true,
-                    clickeableRows: false,
-                    entriesOptions: [5, 10, 20, 30],
+                search={search}
+                onSearchChange={(value) => {
+                    setSearch(value);
+                    setPage(1);
                 }}
+                sort={sort}
+                onSortChange={(nextSort) => {
+                    setSort(nextSort);
+                    setPage(1);
+                }}
+                showFilter={false}
+                isLoading={isLoading || isFetching}
                 tableId={`users-table-${role}`}
-                isLoading={isLoading}
             />
             <hr className="my-8" />
         </div>
@@ -39,10 +66,8 @@ const RoleGroup = ({ role, users, navigate, handleDeleteUser, isLoading }) => {
 
 RoleGroup.propTypes = {
     role: PropTypes.string.isRequired,
-    users: PropTypes.arrayOf(PropTypes.object).isRequired,
     navigate: PropTypes.func.isRequired,
     handleDeleteUser: PropTypes.func.isRequired,
-    isLoading: PropTypes.bool.isRequired,
 };
 
 export default RoleGroup;
