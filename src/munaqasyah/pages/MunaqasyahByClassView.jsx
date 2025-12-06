@@ -426,7 +426,7 @@ const MunaqasyahByClassView = () => {
                                                                 branchAvgScores
                                                             );
                                                         }}
-                                                        className="hidden md:block bg-green-500 mt-0 mt-0 border-green-500 button-primary"
+                                                        className="hidden md:block bg-green-500 mt-0 border-green-500 button-primary"
                                                         disabled={
                                                             loadingIdx === idx
                                                         }

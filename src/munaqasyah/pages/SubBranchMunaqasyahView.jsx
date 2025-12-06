@@ -301,9 +301,28 @@ const SubBranchMunaqasyahView = () => {
 
                                             {year.branchYear.isActive !==
                                                 true && (
-                                                <div className="inline-flex items-center gap-1 text-gray-500 italic">
+                                                <div className="flex flex-col items-start gap-1 text-gray-500 italic">
                                                     {/* <CircleAlert /> */}
                                                     Tahun ajaran tidak aktif.
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            navigate(
+                                                                `/munaqasyah/${year.branchYear._id}`,
+                                                                {
+                                                                    state: {
+                                                                        subBranchMunaqasyahStatus:
+                                                                            year
+                                                                                .subBranch
+                                                                                ?.munaqasyahStatus,
+                                                                    },
+                                                                }
+                                                            );
+                                                        }}
+                                                        className="mt-2 button-primary"
+                                                    >
+                                                        Lihat Detail
+                                                    </button>
                                                 </div>
                                             )}
                                         </div>

@@ -22,7 +22,7 @@ const MunaqasyahClassList = () => {
                 const responseData = await sendRequest(
                     `${
                         import.meta.env.VITE_BACKEND_URL
-                    }/scores/sub-branch/${subBranchId}`,
+                    }/scores/branch-year/${branchYearId}?subBranchId=${subBranchId}`,
                     "GET",
                     null,
                     {
@@ -38,7 +38,7 @@ const MunaqasyahClassList = () => {
             }
         };
         fetchClasses();
-    }, [sendRequest, subBranchId, auth.token]);
+    }, [sendRequest, branchYearId, subBranchId, auth.token]);
 
     return (
         <div className="bg-gray-50 md:p-8 px-4 py-8 min-h-screen">
