@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useParams, useLocation } from "react-router-dom";
 import useHttp from "../../shared/hooks/http-hook";
 import SkeletonLoader from "../../shared/Components/UIElements/SkeletonLoader";
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
@@ -13,7 +13,8 @@ const MunaqasyahClassList = () => {
     const auth = useContext(AuthContext);
     const subBranchId = auth.userSubBranchId;
 
-    console.log("Branch Year ID:", branchYearId);
+    const location = useLocation();
+    const subBranchMunaqasyahStatus = location.state?.subBranchMunaqasyahStatus;
 
     useEffect(() => {
         const fetchClasses = async () => {
@@ -40,10 +41,10 @@ const MunaqasyahClassList = () => {
     }, [sendRequest]);
 
     return (
-        <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">
-            <div className="max-w-6xl mx-auto">
+        <div className="bg-gray-50 md:p-8 px-4 py-8 min-h-screen">
+            <div className="mx-auto max-w-6xl">
                 <div className="flex justify-between items-center mb-6">
-                    <h1 className="text-2xl font-semibold text-gray-900">
+                    <h1 className="font-semibold text-gray-900 text-2xl">
                         Daftar Kelas
                     </h1>
                 </div>
@@ -67,7 +68,7 @@ const MunaqasyahClassList = () => {
                         <div key={cls.classId._id}>
                             <Link
                                 to={`/munaqasyah/class/${cls.classId._id}`}
-                                state={{ branchYearId }}
+                                state={{ branchYearId, subBranchMunaqasyahStatus }}
                             >
                                 <div
                                     className={`card-basic hover:bg-gray-100 active:bg-gray-100 hover:cursor-pointer rounded-md justify-start m-0 transition-all duration-200 my-4`}
@@ -75,7 +76,7 @@ const MunaqasyahClassList = () => {
                                     <div className="flex items-center space-x-4">
                                         <div className="flex-1 h-fit">
                                             <div className="flex items-center gap-2">
-                                                <h2 className="text-lg text-gray-900">
+                                                <h2 className="text-gray-900 text-lg">
                                                     {cls.classId.name}
                                                 </h2>
                                             </div>

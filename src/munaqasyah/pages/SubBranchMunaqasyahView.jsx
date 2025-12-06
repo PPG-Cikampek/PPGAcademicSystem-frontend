@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import useHttp from "../../shared/hooks/http-hook";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
@@ -16,8 +16,8 @@ const SubBranchMunaqasyahView = () => {
     const { modalState, openModal, closeModal } = useModal();
     const { isLoading, error, sendRequest, setError } = useHttp();
 
-    const navigate = useNavigate(); 
     const auth = useContext(AuthContext);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchSubBranchYears = async () => {
@@ -231,33 +231,72 @@ const SubBranchMunaqasyahView = () => {
                                                 year.subBranch
                                                     ?.munaqasyahStatus ===
                                                     "inProgress" && (
-                                                        <div className="flex flex-row gap-2">
+                                                    <div className="flex flex-row gap-2">
+                                                        <button
+                                                            className="mt-2 btn-primary-outline"
+                                                            onClick={(e) => {
+                                                                e.preventDefault();
+                                                                e.stopPropagation();
+                                                                munaqasyahStatusHandler(
+                                                                    "finish",
+                                                                    year
+                                                                        .branchYear
+                                                                        .name,
+                                                                    year
+                                                                        .subBranch
+                                                                        ._id
+                                                                );
+                                                            }}
+                                                        >
+                                                            Selesaikan Munaqosah
+                                                        </button>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                navigate(
+                                                                    `/munaqasyah/${year.branchYear._id}`,
+                                                                    {
+                                                                        state: {
+                                                                            subBranchMunaqasyahStatus:
+                                                                                year
+                                                                                    .subBranch
+                                                                                    ?.munaqasyahStatus,
+                                                                        },
+                                                                    }
+                                                                );
+                                                            }}
+                                                            className="mt-2 button-primary"
+                                                        >
+                                                            Lihat Detail
+                                                        </button>
+                                                    </div>
+                                                )}
+
+                                            {year.branchYear
+                                                ?.munaqasyahStatus !==
+                                                "notStarted" &&
+                                                year.subBranch
+                                                    ?.munaqasyahStatus ===
+                                                    "completed" && (
                                                     <button
-                                                        className="mt-2 btn-primary-outline"
                                                         onClick={(e) => {
-                                                            e.preventDefault();
                                                             e.stopPropagation();
-                                                            munaqasyahStatusHandler(
-                                                                "finish",
-                                                                year.branchYear
-                                                                    .name,
-                                                                year.subBranch
-                                                                    ._id
+                                                            navigate(
+                                                                `/munaqasyah/${year.branchYear._id}`,
+                                                                {
+                                                                    state: {
+                                                                        subBranchMunaqasyahStatus:
+                                                                            year
+                                                                                .subBranch
+                                                                                ?.munaqasyahStatus,
+                                                                    },
+                                                                }
                                                             );
                                                         }}
+                                                        className="mt-2 button-primary"
                                                     >
-                                                        Selesaikan Munaqosah
-                                                    </button>
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            e.stopPropagation();
-                                                            navigate(`/munaqasyah/${year.branchYear._id}`);
-                                                        }}
-                                                        className="mt-2 button-primary">
                                                         Lihat Detail
                                                     </button>
-                                                    </div>
                                                 )}
 
                                             {year.branchYear.isActive !==
@@ -279,12 +318,7 @@ const SubBranchMunaqasyahView = () => {
                             "notStarted" &&
                             year.subBranch?.munaqasyahStatus !==
                                 "notStarted" ? (
-                            <Link
-                                key={key}
-                                to={`/munaqasyah/${year.branchYear._id}`}
-                            >
-                                {content}
-                            </Link>
+                            <div key={key}>{content}</div>
                         ) : (
                             <div key={key}>{content}</div>
                         );

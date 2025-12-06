@@ -50,16 +50,15 @@ const MunaqasyahByClassView = () => {
     const navigate = useNavigate();
     const classId = useParams().classId;
     const [branchYearId] = useState(location.state?.branchYearId || []);
+    const [subBranchMunaqasyahStatus] = useState(
+        location.state?.subBranchMunaqasyahStatus || null
+    );
     const [loadingIdx, setLoadingIdx] = useState(null);
 
     const auth = useContext(AuthContext);
     const subBranchId = auth.userSubBranchId;
 
-    const {
-        modalState,
-        openModal,
-        closeModal,
-    } = useModal();
+    const { modalState, openModal, closeModal } = useModal();
 
     const {
         data: responseData,
@@ -348,148 +347,187 @@ const MunaqasyahByClassView = () => {
                                                 Rata-rata:{" "}
                                                 {calculateAverage(score)}
                                             </span>
-                                            <div className="flex md:flex-row flex-col gap-2 my-2 md:my-0">
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        openModal(
-                                                            "Unduh Raport untuk Orang Tua?",
-                                                            "confirmation",
-                                                            () => {
-                                                                setLoadingIdx(idx);
-                                                                setTimeout(() => {
-                                                                    downloadReport(
-                                                                        score.studentId.name,
-                                                                        scores[idx],
-                                                                        score.studentNis,
-                                                                        score.classId.name,
-                                                                        score.branchYearId.academicYearId.name,
-                                                                        branchAvgScores
+                                            {subBranchMunaqasyahStatus !==
+                                                "inProgress" && (
+                                                <div className="flex md:flex-row flex-col gap-2 my-2 md:my-0">
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            openModal(
+                                                                "Unduh Raport untuk Orang Tua?",
+                                                                "confirmation",
+                                                                () => {
+                                                                    setLoadingIdx(
+                                                                        idx
                                                                     );
-                                                                    setLoadingIdx(null);
-                                                                    openModal(
-                                                                        "Berhasil! Periksa folder unduhan anda.",
-                                                                        "success",
-                                                                        null,
-                                                                        "Berhasil!"
+                                                                    setTimeout(
+                                                                        () => {
+                                                                            downloadReport(
+                                                                                score
+                                                                                    .studentId
+                                                                                    .name,
+                                                                                scores[
+                                                                                    idx
+                                                                                ],
+                                                                                score.studentNis,
+                                                                                score
+                                                                                    .classId
+                                                                                    .name,
+                                                                                score
+                                                                                    .branchYearId
+                                                                                    .academicYearId
+                                                                                    .name,
+                                                                                branchAvgScores
+                                                                            );
+                                                                            setLoadingIdx(
+                                                                                null
+                                                                            );
+                                                                            openModal(
+                                                                                "Berhasil! Periksa folder unduhan anda.",
+                                                                                "success",
+                                                                                null,
+                                                                                "Berhasil!"
+                                                                            );
+                                                                        },
+                                                                        1200
                                                                     );
-                                                                }, 1200);
-                                                            },
-                                                            "Konfirmasi",
-                                                            true
-                                                        );
-                                                    }}
-                                                    className="bg-green-500 mt-0 border-green-500 button-primary"
-                                                    disabled={
-                                                        loadingIdx === idx
-                                                    }
-                                                >
-                                                    {loadingIdx === idx ? (
-                                                        <LoadingCircle
-                                                            size={18}
-                                                        />
-                                                    ) : null}
-                                                    Unduh Raport Orang Tua
-                                                </button>
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        // Use normalized score for PDF
-                                                        previewReport(
-                                                            score.studentId
-                                                                .name,
-                                                            scores[idx],
-                                                            score.studentNis,
-                                                            score.classId.name,
-                                                            score.branchYearId
-                                                                .academicYearId
-                                                                .name,
-                                                            branchAvgScores
-                                                        );
-                                                    }}
-                                                    className="hidden md:block bg-green-500 mt-0 mt-0 border-green-500 button-primary"
-                                                    disabled={
-                                                        loadingIdx === idx
-                                                    }
-                                                >
-                                                    {loadingIdx === idx ? (
-                                                        <LoadingCircle
-                                                            size={18}
-                                                        />
-                                                    ) : null}
-                                                    Lihat Raport Orang Tua
-                                                </button>
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        openModal(
-                                                            "Unduh Raport untuk Pengurus?",
-                                                            "confirmation",
-                                                            () => {
-                                                                setLoadingIdx(idx);
-                                                                setTimeout(() => {
-                                                                    downloadReport(
-                                                                        score.studentId.name,
-                                                                        rawScores[idx],
-                                                                        score.studentNis,
-                                                                        score.classId.name,
-                                                                        score.branchYearId.academicYearId.name,
-                                                                        branchAvgScores
+                                                                },
+                                                                "Konfirmasi",
+                                                                true
+                                                            );
+                                                        }}
+                                                        className="bg-green-500 mt-0 border-green-500 button-primary"
+                                                        disabled={
+                                                            loadingIdx === idx
+                                                        }
+                                                    >
+                                                        {loadingIdx === idx ? (
+                                                            <LoadingCircle
+                                                                size={18}
+                                                            />
+                                                        ) : null}
+                                                        Unduh Raport Orang Tua
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            // Use normalized score for PDF
+                                                            previewReport(
+                                                                score.studentId
+                                                                    .name,
+                                                                scores[idx],
+                                                                score.studentNis,
+                                                                score.classId
+                                                                    .name,
+                                                                score
+                                                                    .branchYearId
+                                                                    .academicYearId
+                                                                    .name,
+                                                                branchAvgScores
+                                                            );
+                                                        }}
+                                                        className="hidden md:block bg-green-500 mt-0 mt-0 border-green-500 button-primary"
+                                                        disabled={
+                                                            loadingIdx === idx
+                                                        }
+                                                    >
+                                                        {loadingIdx === idx ? (
+                                                            <LoadingCircle
+                                                                size={18}
+                                                            />
+                                                        ) : null}
+                                                        Lihat Raport Orang Tua
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            openModal(
+                                                                "Unduh Raport untuk Pengurus?",
+                                                                "confirmation",
+                                                                () => {
+                                                                    setLoadingIdx(
+                                                                        idx
                                                                     );
-                                                                    setLoadingIdx(null);
-                                                                    openModal(
-                                                                        "Berhasil! Periksa folder unduhan anda.",
-                                                                        "success",
-                                                                        null,
-                                                                        "Berhasil!"
+                                                                    setTimeout(
+                                                                        () => {
+                                                                            downloadReport(
+                                                                                score
+                                                                                    .studentId
+                                                                                    .name,
+                                                                                rawScores[
+                                                                                    idx
+                                                                                ],
+                                                                                score.studentNis,
+                                                                                score
+                                                                                    .classId
+                                                                                    .name,
+                                                                                score
+                                                                                    .branchYearId
+                                                                                    .academicYearId
+                                                                                    .name,
+                                                                                branchAvgScores
+                                                                            );
+                                                                            setLoadingIdx(
+                                                                                null
+                                                                            );
+                                                                            openModal(
+                                                                                "Berhasil! Periksa folder unduhan anda.",
+                                                                                "success",
+                                                                                null,
+                                                                                "Berhasil!"
+                                                                            );
+                                                                        },
+                                                                        1200
                                                                     );
-                                                                }, 1200);
-                                                            },
-                                                            "Konfirmasi",
-                                                            true
-                                                        );
-                                                    }}
-                                                    className="m-0 btn-primary-outline text-gray-700"
-                                                    disabled={
-                                                        loadingIdx === idx
-                                                    }
-                                                >
-                                                    {loadingIdx === idx ? (
-                                                        <LoadingCircle
-                                                            size={18}
-                                                        />
-                                                    ) : null}
-                                                    Unduh Raport Pengurus
-                                                </button>
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        // Use raw score for PDF
-                                                        previewReport(
-                                                            score.studentId
-                                                                .name,
-                                                            rawScores[idx],
-                                                            score.studentNis,
-                                                            score.classId.name,
-                                                            score.branchYearId
-                                                                .academicYearId
-                                                                .name,
-                                                            branchAvgScores
-                                                        );
-                                                    }}
-                                                    className="hidden md:block m-0 btn-primary-outline text-gray-700"
-                                                    disabled={
-                                                        loadingIdx === idx
-                                                    }
-                                                >
-                                                    {loadingIdx === idx ? (
-                                                        <LoadingCircle
-                                                            size={18}
-                                                        />
-                                                    ) : null}
-                                                    Lihat Raport Pengurus
-                                                </button>
-                                            </div>
+                                                                },
+                                                                "Konfirmasi",
+                                                                true
+                                                            );
+                                                        }}
+                                                        className="m-0 btn-primary-outline text-gray-700"
+                                                        disabled={
+                                                            loadingIdx === idx
+                                                        }
+                                                    >
+                                                        {loadingIdx === idx ? (
+                                                            <LoadingCircle
+                                                                size={18}
+                                                            />
+                                                        ) : null}
+                                                        Unduh Raport Pengurus
+                                                    </button>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            // Use raw score for PDF
+                                                            previewReport(
+                                                                score.studentId
+                                                                    .name,
+                                                                rawScores[idx],
+                                                                score.studentNis,
+                                                                score.classId
+                                                                    .name,
+                                                                score
+                                                                    .branchYearId
+                                                                    .academicYearId
+                                                                    .name,
+                                                                branchAvgScores
+                                                            );
+                                                        }}
+                                                        className="hidden md:block m-0 btn-primary-outline text-gray-700"
+                                                        disabled={
+                                                            loadingIdx === idx
+                                                        }
+                                                    >
+                                                        {loadingIdx === idx ? (
+                                                            <LoadingCircle
+                                                                size={18}
+                                                            />
+                                                        ) : null}
+                                                        Lihat Raport Pengurus
+                                                    </button>
+                                                </div>
+                                            )}
                                         </div>
 
                                         <ChevronDown
