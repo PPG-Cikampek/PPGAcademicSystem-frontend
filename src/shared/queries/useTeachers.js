@@ -1,14 +1,32 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "./api";
 
-export const useTeachers = (subBranchId, options = {}) => {
+export const useTeachers = (scopeOrSubBranchId = {}, options = {}) => {
+    const scope =
+        typeof scopeOrSubBranchId === "object" && scopeOrSubBranchId !== null
+            ? scopeOrSubBranchId
+            : { subBranchId: scopeOrSubBranchId };
+    const { role, branchId, subBranchId } = scope;
     return useQuery({
-        queryKey: ["teachers", subBranchId],
+        queryKey: ["teachers", role, branchId, subBranchId],
         queryFn: async () => {
-            const response = await api.get(`/teachers/sub-branch/${subBranchId}`);
+            let url;
+            if (role === "admin") {
+                url = `/teachers`;
+            } else if (role === "branchAdmin") {
+                url = `/teachers/branch/${branchId}`;
+            } else {
+                url = `/teachers/sub-branch/${subBranchId}`;
+            }
+            const response = await api.get(url);
             return response.data.teachers;
         },
-        enabled: !!subBranchId,
+        enabled:
+            role === "admin"
+                ? true
+                : role === "branchAdmin"
+                ? Boolean(branchId)
+                : Boolean(subBranchId),
         ...options,
     });
 };

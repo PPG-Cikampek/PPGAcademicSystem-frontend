@@ -1,6 +1,6 @@
-import { useState, useEffect, useContext } from "react";
+import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import useHttp from "../../shared/hooks/http-hook";
+import { useTeachers } from "../../shared/queries";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
 
 import WarningCard from "../../shared/Components/UIElements/WarningCard";
@@ -8,35 +8,13 @@ import DataTable from "../../shared/Components/UIElements/DataTable";
 import getTeacherPositionName from "../../shared/Utilities/getTeacherPositionName";
 
 const TeachersView = () => {
-    const [teachers, setTeachers] = useState([]);
-    const { isLoading, sendRequest } = useHttp();
-
     const navigate = useNavigate();
     const auth = useContext(AuthContext);
-
-    useEffect(() => {
-        const url =
-            auth.userRole === "admin"
-                ? `${import.meta.env.VITE_BACKEND_URL}/teachers`
-                : auth.userRole === "branchAdmin"
-                ? `${import.meta.env.VITE_BACKEND_URL}/teachers/branch/${
-                      auth.userBranchId
-                  }`
-                : `${import.meta.env.VITE_BACKEND_URL}/teachers/sub-branch/${
-                      auth.userSubBranchId
-                  }`;
-        const fetchTeachers = async () => {
-            try {
-                const responseData = await sendRequest(url);
-                setTeachers(responseData.teachers);
-                console.log(responseData.teachers);
-                console.log(auth.userSubBranchId);
-            } catch (err) {
-                // Error is handled by useHttp
-            }
-        };
-        fetchTeachers();
-    }, [sendRequest]);
+    const { data: teachers = [], isLoading } = useTeachers({
+        role: auth.userRole,
+        branchId: auth.userBranchId,
+        subBranchId: auth.userSubBranchId,
+    });
 
     const getInitials = (gender) => {
         return gender
@@ -62,10 +40,10 @@ const TeachersView = () => {
                                   }`
                         }
                         alt={teacher.name}
-                        className="size-10 rounded-full m-auto min-w-10 border border-gray-200 bg-white"
+                        className="bg-white m-auto border border-gray-200 rounded-full min-w-10 size-10"
                     />
                 ) : (
-                    <div className="size-10 rounded-full bg-blue-200 text-blue-500 flex items-center justify-center font-medium m-auto">
+                    <div className="flex justify-center items-center bg-blue-200 m-auto rounded-full size-10 font-medium text-blue-500">
                         {getInitials(teacher.name)}
                     </div>
                 ),
@@ -183,16 +161,15 @@ const TeachersView = () => {
     }
 
     return (
-        <div className="min-h-screen px-4 py-8 md:p-8">
-            <div className="max-w-6xl mx-auto">
+        <div className="md:p-8 px-4 py-8 min-h-screen">
+            <div className="mx-auto max-w-6xl">
                 <div className="flex flex-col justify-between items-start gap-2 mb-4">
-                    <h1 className="text-2xl font-semibold text-gray-900">
+                    <h1 className="font-semibold text-gray-900 text-2xl">
                         Daftar Tenaga Pendidik
                     </h1>
                     <WarningCard
-                        className="items-center justify-start"
+                        className="justify-start items-center"
                         warning="Penambahan tenaga pendidik baru dapat dilakukan melalui fitur Pendaftaran Akun."
-                        onClear={() => setError(null)}
                     />
                 </div>
 
