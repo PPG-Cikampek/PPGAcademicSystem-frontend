@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { formatDate } from "../../../shared/Utilities/formatDateToLocal";
-import DataTable from "../../../shared/Components/UIElements/DataTable";
+import ServerDataTable from "../../../shared/Components/UIElements/ServerDataTable";
 import NewModal from "../../../shared/Components/Modal/NewModal";
 import useModal from "../../../shared/hooks/useNewModal";
 import {
@@ -15,13 +15,28 @@ const RequestedAccountView = () => {
     const [processingTicket, setProcessingTicket] = useState(null);
     const [rejectionReason, setRejectionReason] = useState("");
     const [showRejectionInput, setShowRejectionInput] = useState(false);
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const [search, setSearch] = useState("");
+    const [filters, setFilters] = useState({ status: "" });
+    const [sort, setSort] = useState({ key: "createdTime", direction: "desc" });
     // useRef to keep a mutable reference to the latest rejection reason so
     // callbacks created earlier (like the modal confirm) can read the current
     // value instead of a stale value captured by closure.
     const rejectionReasonRef = useRef("");
 
     const navigate = useNavigate();
-    const { data: ticketsData, isLoading, isFetching } = useAccountRequests();
+    const { data: ticketsData, isLoading, isFetching } = useAccountRequests(
+        {
+            page,
+            limit: pageSize,
+            search: search || undefined,
+            status: filters.status || undefined,
+            sortBy: sort.key,
+            sortDir: sort.direction,
+        },
+        { keepPreviousData: true }
+    );
 
     const respondTicketMutation = useRespondAccountRequestMutation({
         onSuccess: (data) => {
@@ -64,6 +79,7 @@ const RequestedAccountView = () => {
     const isBusy = isLoading || isMutating;
 
     const tickets = ticketsData?.tickets || [];
+    const totalTickets = ticketsData?.total || tickets.length || 0;
 
     const handleRespondTicket = async (ticketId, respond) => {
         // Find ticket details so we can show a clearer confirmation message
@@ -298,6 +314,17 @@ const RequestedAccountView = () => {
         },
     ];
 
+    const filterOptions = [
+        {
+            key: "status",
+            label: "Status",
+            options: ["pending", "approved", "rejected", "cancelled"],
+        },
+    ];
+
+    // check if any filter value is applied (non-empty)
+    const hasActiveFilter = Object.values(filters || {}).some((val) => val !== undefined && val !== "" && val !== null);
+
     return (
         <div className="md:p-8 px-4 py-8 min-h-screen">
             <NewModal
@@ -355,30 +382,48 @@ const RequestedAccountView = () => {
             </div>
             <div className="mx-auto max-w-6xl">
                 <p className="mb-2 text-gray-600 text-sm">
-                    Total: {tickets.length} permintaan
+                    {isLoading && tickets.length === 0 ? "Memuat permintaan..." : `Total: ${totalTickets} permintaan`}
                 </p>
 
-                {isLoading && tickets.length === 0 && (
-                    <div className="bg-white shadow p-6 rounded text-center">
-                        Memuat permintaan...
-                    </div>
-                )}
-
-                {tickets.length > 0 ? (
-                    <DataTable
+                {tickets.length > 0 || isLoading || isFetching || search || hasActiveFilter ? (
+                    <ServerDataTable
                         data={tickets}
                         columns={columns}
+                        total={totalTickets}
+                        page={page}
+                        pageSize={pageSize}
+                        onPageChange={(nextPage) => setPage(nextPage)}
+                        onPageSizeChange={(size) => {
+                            setPageSize(size);
+                            setPage(1);
+                        }}
+                        search={search}
+                        onSearchChange={(value) => {
+                            setSearch(value);
+                            setPage(1);
+                        }}
+                        filters={filters}
+                        onFiltersChange={(nextFilters) => {
+                            setFilters(nextFilters);
+                            setPage(1);
+                        }}
+                        filterOptions={filterOptions}
+                        sort={sort}
+                        onSortChange={(nextSort) => {
+                            setSort(nextSort);
+                            setPage(1);
+                        }}
+                        isLoading={isLoading || isFetching}
+                        emptyMessage={
+                            search || hasActiveFilter
+                                ? "Tidak ditemukan hasil untuk pencarian atau filter yang dipilih."
+                                : "Tidak ada pendaftaran akun baru."
+                        }
                         onRowClick={(item) =>
                             navigate(
                                 `/settings/requestAccount/ticket/${item.ticketId}`
                             )
                         }
-                        searchableColumns={["ticketId", "status"]}
-                        isLoading={isLoading || isFetching}
-                        initialSort={{
-                            key: "createdTime",
-                            direction: "descending",
-                        }}
                         tableId="requestAccount-table"
                     />
                 ) : (

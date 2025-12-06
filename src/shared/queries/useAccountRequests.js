@@ -1,13 +1,16 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "./api";
 
-const ACCOUNT_REQUESTS_KEY = ["accountRequests"];
+const ACCOUNT_REQUESTS_BASE_KEY = ["accountRequests"];
 
-export const useAccountRequests = (options = {}) => {
+// Fetch account requests with server-side pagination/filter/sort
+export const useAccountRequests = (params = {}, options = {}) => {
     return useQuery({
-        queryKey: ACCOUNT_REQUESTS_KEY,
+        queryKey: [...ACCOUNT_REQUESTS_BASE_KEY, params],
         queryFn: async () => {
-            const response = await api.get("/users/account-requests/");
+            const response = await api.get("/users/account-requests/", {
+                params,
+            });
             return response.data;
         },
         ...options,
@@ -33,7 +36,9 @@ export const useRespondAccountRequestMutation = (options = {}) => {
             return response.data;
         },
         onSuccess: (data, variables, context) => {
-            queryClient.invalidateQueries({ queryKey: ACCOUNT_REQUESTS_KEY });
+            queryClient.invalidateQueries({
+                queryKey: ACCOUNT_REQUESTS_BASE_KEY,
+            });
 
             if (typeof userOnSuccess === "function") {
                 userOnSuccess(data, variables, context);
@@ -60,7 +65,9 @@ export const useApproveAllAccountRequestsMutation = (options = {}) => {
             return response.data;
         },
         onSuccess: (data, variables, context) => {
-            queryClient.invalidateQueries({ queryKey: ACCOUNT_REQUESTS_KEY });
+            queryClient.invalidateQueries({
+                queryKey: ACCOUNT_REQUESTS_BASE_KEY,
+            });
 
             if (typeof userOnSuccess === "function") {
                 userOnSuccess(data, variables, context);
