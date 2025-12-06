@@ -76,6 +76,11 @@ const DashboardNav = ({ children }) => {
                         icon: <CalendarCog />,
                     },
                     {
+                        link: "/munaqasyah/monitor",
+                        label: "Monitor Munaqosah",
+                        icon: <BookOpenText />,
+                    },
+                    {
                         link: "/settings/users",
                         label: "User",
                         icon: <UserCog />,

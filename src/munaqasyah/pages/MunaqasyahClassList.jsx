@@ -9,7 +9,11 @@ const MunaqasyahClassList = () => {
     const [classes, setClasses] = useState();
     const { isLoading, error, sendRequest, setError } = useHttp();
 
-    const { branchYearId, subBranchId: paramSubBranchId } = useParams();
+    const {
+        branchYearId,
+        subBranchId: paramSubBranchId,
+        branchId: paramBranchId,
+    } = useParams();
     const auth = useContext(AuthContext);
     const subBranchId = paramSubBranchId || auth.userSubBranchId;
 
@@ -69,7 +73,9 @@ const MunaqasyahClassList = () => {
                             <Link
                                 to={
                                     paramSubBranchId
-                                        ? `/munaqasyah/${branchYearId}/sub-branch/${subBranchId}/class/${cls.classId._id}`
+                                        ? paramBranchId
+                                            ? `/munaqasyah/monitor/${branchYearId}/branch/${paramBranchId}/sub-branch/${subBranchId}/class/${cls.classId._id}`
+                                            : `/munaqasyah/${branchYearId}/sub-branch/${subBranchId}/class/${cls.classId._id}`
                                         : `/munaqasyah/class/${cls.classId._id}`
                                 }
                                 state={{

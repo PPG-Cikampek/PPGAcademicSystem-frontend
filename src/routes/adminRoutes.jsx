@@ -1,4 +1,5 @@
 import { lazy } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import PreviewReport from '../munaqasyah/pages/PreviewReport';
 import ClassesViewByAcademicYear from '../class/pages/ClassesViewByAcademicYear';
 import { infoPortalRoutes } from './infoPortalRoutes';
@@ -33,6 +34,10 @@ const ProfileView = lazy(() => import("../users/pages/profile/ProfileView"));
 const EmailVerifyView = lazy(() => import("../users/pages/auth/EmailVerifyView"));
 const RequestAccountTicketDetail = lazy(() => import("../users/pages/account-requests/RequestAccountTicketDetail"));
 const MunaqasyahView = lazy(() => import("../munaqasyah/pages/MunaqasyahView"));
+const AdminMunaqasyahView = lazy(() => import("../munaqasyah/pages/AdminMunaqasyahView"));
+const AdminMunaqasyahDetailView = lazy(() => import("../munaqasyah/pages/AdminMunaqasyahDetailView"));
+const MunaqasyahClassList = lazy(() => import("../munaqasyah/pages/MunaqasyahClassList"));
+const MunaqasyahByClassView = lazy(() => import("../munaqasyah/pages/MunaqasyahByClassView"));
 const QuestionBankView = lazy(() => import("../munaqasyah/pages/QuestionBankView"));
 const QuestionBankByClassView = lazy(() => import("../munaqasyah/pages/QuestionBankByClassView"));
 const NewQuestionView = lazy(() => import("../munaqasyah/pages/NewQuestionView"));
@@ -80,6 +85,20 @@ export const adminRoutes = [
     { path: '/settings/requested-accounts', element: <RequestedAccountView /> },
     { path: '/settings/requestAccount/ticket/:ticketId', element: <RequestAccountTicketDetail /> },
     { path: '/performance', element: <PerformanceView /> },
+    { path: '/munaqasyah/monitor', element: <AdminMunaqasyahView /> },
+    { path: '/munaqasyah/monitor/:branchYearId/branch/:branchId', element: <AdminMunaqasyahDetailView /> },
+    {
+        path: '/munaqasyah/monitor/:branchYearId/branch/:branchId/sub-branch/:subBranchId',
+        element: <MunaqasyahClassList />,
+    },
+    {
+        path: '/munaqasyah/monitor/:branchYearId/branch/:branchId/sub-branch/:subBranchId/class/:classId',
+        element: (
+            <QueryClientProvider client={new QueryClient()}>
+                <MunaqasyahByClassView />
+            </QueryClientProvider>
+        ),
+    },
     { path: '/munaqasyah', element: <MunaqasyahView /> },
     { path: '/munaqasyah/question-bank', element: <QuestionBankByClassView /> },
     { path: '/munaqasyah/question-bank/:classGrade', element: <QuestionBankView /> },
