@@ -96,7 +96,7 @@ const MunaqasyahByClassView = () => {
         if (
             rawScores.length > 0 &&
             rawScores[0].classId &&
-            !/(5|6)/.test(rawScores[0].classId.name)
+            /(PAUD|PRA-PAUD|1|2|3|4)/.test(rawScores[0].classId.name)
         ) {
             return DEFAULT_SCORE_CATEGORIES.filter(
                 (cat) =>

@@ -98,7 +98,7 @@ const StudentScoresView = () => {
     if (
         state.studentData &&
         state.studentData.className &&
-        !/(5|6)/.test(state.studentData.className)
+        /(PAUD|PRA-PAUD|1|2|3|4)/.test(state.studentData.className)
     ) {
         filteredScoreCategories = scoreCategories.filter(
             (cat) =>
@@ -148,13 +148,13 @@ const StudentScoresView = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 ">
-            <div className="flex items-center justify-between p-4">
-                <h1 className="text-2xl font-semibold text-gray-900 mr-4">
+        <div className="bg-gray-50 min-h-screen">
+            <div className="flex justify-between items-center p-4">
+                <h1 className="mr-4 font-semibold text-gray-900 text-2xl">
                     Munaqosah
                 </h1>
                 <button
-                    className="button-primary m-0"
+                    className="m-0 button-primary"
                     onClick={() => {
                         handleFinish();
                         // general.setMessage(true);
@@ -165,10 +165,10 @@ const StudentScoresView = () => {
             </div>
             {isLoading ? (
                 <div className="flex flex-col pb-24">
-                    <div className="card-basic justify-between mt-0 mx-4 pr-8 box-border">
+                    <div className="box-border justify-between mx-4 mt-0 pr-8 card-basic">
                         <div className="flex flex-col">
                             <div className="flex-1 h-fit">
-                                <div className="flex gap-2 items-center">
+                                <div className="flex items-center gap-2">
                                     <SkeletonLoader
                                         variant="circular"
                                         width={40}
@@ -194,7 +194,7 @@ const StudentScoresView = () => {
                             className="self-center mt-2"
                         />
                     </div>
-                    <div className="mt-4 mx-4">
+                    <div className="mx-4 mt-4">
                         {filteredScoreCategories.map((cat, idx) => (
                             <div key={cat.key} className="mb-2">
                                 <SkeletonLoader width={220} height={32} />
@@ -207,11 +207,11 @@ const StudentScoresView = () => {
                 state.studentScore &&
                 state.studentData && (
                     <div className="flex flex-col pb-24">
-                        <div className="card-basic justify-between items-center mt-0 mx-4 pr-8 box-border">
+                        <div className="box-border justify-between items-center mx-4 mt-0 pr-8 card-basic">
                             <SequentialAnimation variant={1}>
                                 <div className="flex flex-col">
                                     <div className="flex-1 h-fit">
-                                        <div className="flex gap-2 items-center">
+                                        <div className="flex items-center gap-2">
                                             {state.studentData.image ? (
                                                 <img
                                                     src={
@@ -230,7 +230,7 @@ const StudentScoresView = () => {
                                                               }`
                                                     }
                                                     alt="Profile"
-                                                    className="rounded-full size-10 shrink-0 border border-gray-200 bg-white"
+                                                    className="bg-white border border-gray-200 rounded-full size-10 shrink-0"
                                                 />
                                             ) : (
                                                 <StudentInitial
@@ -244,7 +244,7 @@ const StudentScoresView = () => {
                                                 <div className="uppercase">
                                                     {state.studentData.name}
                                                 </div>
-                                                <div className="text-xs text-gray-800">
+                                                <div className="text-gray-800 text-xs">
                                                     {state.studentData.nis}
                                                 </div>
                                             </div>
@@ -253,7 +253,7 @@ const StudentScoresView = () => {
                                 </div>
                             </SequentialAnimation>
                             <SequentialAnimation variant={1}>
-                                <div className="uppercase font-semibold self-center">
+                                <div className="self-center font-semibold uppercase">
                                     {state.studentData.className}
                                 </div>
                             </SequentialAnimation>
