@@ -1,40 +1,19 @@
-import { useState, useEffect, useContext } from "react";
+import { useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import useHttp from "../../shared/hooks/http-hook";
+import { useStudents } from "../../shared/queries";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
 import StudentInitial from "../../shared/Components/UIElements/StudentInitial";
 import WarningCard from "../../shared/Components/UIElements/WarningCard";
 import DataTable from "../../shared/Components/UIElements/DataTable";
 
 const StudentsView = () => {
-    const [students, setStudents] = useState([]);
-    const { isLoading, sendRequest } = useHttp();
     const navigate = useNavigate();
     const auth = useContext(AuthContext);
-
-    useEffect(() => {
-        const url =
-            auth.userRole === "admin"
-                ? `${import.meta.env.VITE_BACKEND_URL}/students`
-                : auth.userRole === "branchAdmin"
-                ? `${import.meta.env.VITE_BACKEND_URL}/students/branch/${
-                      auth.userBranchId
-                  }`
-                : `${import.meta.env.VITE_BACKEND_URL}/students/sub-branch/${
-                      auth.userSubBranchId
-                  }`;
-
-        const fetchStudents = async () => {
-            try {
-                const responseData = await sendRequest(url);
-                setStudents(responseData.students);
-                console.log(responseData.students);
-            } catch (err) {
-                // Error is handled by useHttp
-            }
-        };
-        fetchStudents();
-    }, [sendRequest]);
+    const { data: students = [], isLoading } = useStudents({
+        role: auth.userRole,
+        branchId: auth.userBranchId,
+        subBranchId: auth.userSubBranchId,
+    });
 
     const columns = [
         {
@@ -52,7 +31,7 @@ const StudentsView = () => {
                                   }`
                         }
                         alt={student.name}
-                        className="size-10 rounded-full m-auto shrink-0 border border-gray-200 bg-white"
+                        className="bg-white m-auto border border-gray-200 rounded-full size-10 shrink-0"
                     />
                 ) : (
                     <StudentInitial
@@ -183,16 +162,15 @@ const StudentsView = () => {
     }
 
     return (
-        <div className="min-h-screen px-4 py-8 md:p-8">
-            <div className="max-w-6xl mx-auto">
+        <div className="md:p-8 px-4 py-8 min-h-screen">
+            <div className="mx-auto max-w-6xl">
                 <div className="flex flex-col justify-between items-stretch gap-2 mb-4">
-                    <h1 className="text-2xl font-semibold text-gray-900">
+                    <h1 className="font-semibold text-gray-900 text-2xl">
                         Daftar Peserta Didik
                     </h1>
                     <WarningCard
-                        className="items-center justify-start"
+                        className="justify-start items-center"
                         warning="Penambahan peserta didik Baru dapat dilakukan melalui fitur Pendaftaran Akun"
-                        onClear={() => setError(null)}
                     />
                 </div>
                 {students && (

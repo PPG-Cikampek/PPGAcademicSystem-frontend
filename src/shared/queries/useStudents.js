@@ -1,15 +1,31 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "./api";
 
-// Fetch students list by sub-branch ID
-export const useStudents = (subBranchId, options = {}) => {
+// Fetch students list scoped by the current role and IDs
+export const useStudents = (
+    { role, branchId, subBranchId } = {},
+    options = {}
+) => {
     return useQuery({
-        queryKey: ["students", subBranchId],
+        queryKey: ["students", role, branchId, subBranchId],
         queryFn: async () => {
-            const response = await api.get(`/students/sub-branch/${subBranchId}`);
+            let url;
+            if (role === "admin") {
+                url = `/students`;
+            } else if (role === "branchAdmin") {
+                url = `/students/branch/${branchId}`;
+            } else {
+                url = `/students/sub-branch/${subBranchId}`;
+            }
+            const response = await api.get(url);
             return response.data.students;
         },
-        enabled: !!subBranchId,
+        enabled:
+            role === "admin"
+                ? true
+                : role === "branchAdmin"
+                ? Boolean(branchId)
+                : Boolean(subBranchId),
         ...options,
     });
 };
