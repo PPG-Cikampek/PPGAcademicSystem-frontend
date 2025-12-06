@@ -379,7 +379,7 @@ const MunaqasyahByClassView = () => {
                                                             true
                                                         );
                                                     }}
-                                                    className="m-0 btn-primary-outline text-gray-700"
+                                                    className="bg-green-500 mt-0 border-green-500 button-primary"
                                                     disabled={
                                                         loadingIdx === idx
                                                     }
@@ -407,7 +407,7 @@ const MunaqasyahByClassView = () => {
                                                             branchAvgScores
                                                         );
                                                     }}
-                                                    className="hidden md:block m-0 btn-primary-outline text-gray-700"
+                                                    className="hidden md:block bg-green-500 mt-0 mt-0 border-green-500 button-primary"
                                                     disabled={
                                                         loadingIdx === idx
                                                     }
