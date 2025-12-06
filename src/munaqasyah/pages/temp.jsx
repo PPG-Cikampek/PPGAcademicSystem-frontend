@@ -1,6 +1,6 @@
 import { useContext, useMemo } from "react";
 import useHttp from "../../shared/hooks/http-hook";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import SkeletonLoader from "../../shared/Components/UIElements/SkeletonLoader";
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 import DataTable from "../../shared/Components/UIElements/DataTable";
@@ -11,28 +11,28 @@ import useModal from "../../shared/hooks/useNewModal";
 import { useBranchSubBranchSummary } from "../../shared/queries/useMunaqasyah";
 
 const BranchAdminMunaqasyahDetailView = () => {
-    const { sendRequest, isLoading: isMutating, error: httpError, setError } =
-        useHttp();
+    const {
+        sendRequest,
+        isLoading: isMutating,
+        error: httpError,
+        setError,
+    } = useHttp();
     const { modalState, openModal, closeModal } = useModal();
 
     const auth = useContext(AuthContext);
     const { branchYearId: routeBranchYearId } = useParams();
-    const navigate = useNavigate();
     const location = useLocation();
     const state =
         location.state && location.state.year ? location.state.year : {};
-    const branchYearId =
-        routeBranchYearId || state._id || auth.currentBranchYearId;
 
     const {
         data: summaryData,
         isLoading,
         error,
         refetch,
-    } = useBranchSubBranchSummary(auth.userBranchId, branchYearId, {
+    } = useBranchSubBranchSummary(auth.userBranchId, routeBranchYearId, {
         refetchInterval:
             state?.munaqasyahStatus === "inProgress" ? 3000 : false,
-        refetchOnWindowFocus: false,
     });
 
     const subBranchData = useMemo(
@@ -62,13 +62,13 @@ const BranchAdminMunaqasyahDetailView = () => {
             headerAlign: "left",
             cellAlign: "left",
         },
-        // {
-        //     key: "munaqisyCount",
-        //     label: "Jumlah Munaqis",
-        //     sortable: true,
-        //     headerAlign: "center",
-        //     cellAlign: "center",
-        // },
+        {
+            key: "munaqisyCount",
+            label: "Jumlah Munaqis",
+            sortable: true,
+            headerAlign: "center",
+            cellAlign: "center",
+        },
         {
             key: "studentCount",
             label: "Jumlah Siswa",
@@ -118,7 +118,7 @@ const BranchAdminMunaqasyahDetailView = () => {
                 item.munaqasyahStatus === "notStarted" ? (
                     <button
                         className="disabled:opacity-50 btn-primary-outline"
-                        // disabled={state.munaqasyahStatus !== "inProgress"}
+                        disabled={state.munaqasyahStatus !== "inProgress"}
                         onClick={() =>
                             subBranchMunaqasyahStatusHandler(
                                 "start",
@@ -130,14 +130,12 @@ const BranchAdminMunaqasyahDetailView = () => {
                         Mulai
                     </button>
                 ) : item.munaqasyahStatus === "inProgress" ? (
-                    <div className="flex flex-row gap-2">
+                    <>
                         <button
-                            className="mt-0 button-primary"
-                            onClick={() =>
-                                handleMonitor(item._id, item.munaqasyahStatus)
-                            }
+                            className="disabled:opacity-50 mx-1 btn-primary-outline"
+                            // onClick={() => navigate(`/dashboard/teaching-groups/${teachingGroupId}/sub-branches/${item._id}`)}
                         >
-                            Pantau
+                            Lihat
                         </button>
                         <button
                             className="disabled:opacity-50 mx-1 btn-primary-outline"
@@ -151,16 +149,14 @@ const BranchAdminMunaqasyahDetailView = () => {
                         >
                             Selesaikan
                         </button>
-                    </div>
+                    </>
                 ) : (
                     <>
                         <button
                             className="disabled:opacity-50 mx-1 btn-primary-outline"
-                            onClick={() =>
-                                handleMonitor(item._id, item.munaqasyahStatus)
-                            }
+                            // onClick={() => navigate(`/dashboard/teaching-groups/${teachingGroupId}/sub-branches/${item._id}`)}
                         >
-                            Monitor
+                            Lihat
                         </button>
                         <button
                             className="disabled:opacity-50 mx-1 btn-primary-outline"
@@ -222,16 +218,6 @@ const BranchAdminMunaqasyahDetailView = () => {
                 true
             );
         }
-    };
-
-    const handleMonitor = (subBranchId, subBranchMunaqasyahStatus) => {
-        navigate(`/munaqasyah/${branchYearId}/sub-branch/${subBranchId}`, {
-            state: {
-                branchYearId,
-                subBranchId,
-                subBranchMunaqasyahStatus,
-            },
-        });
     };
 
     return (
@@ -303,7 +289,7 @@ const BranchAdminMunaqasyahDetailView = () => {
                                     clickableRows: false,
                                     entriesOptions: [5, 10, 20, 30],
                                 }}
-                                tableId={`branch-sub-branches-table-${branchYearId}`}
+                                tableId={`branch-sub-branches-table-${routeBranchYearId}`}
                             />
                         </div>
                     </>

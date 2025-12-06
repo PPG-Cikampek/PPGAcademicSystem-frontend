@@ -48,15 +48,15 @@ const MunaqasyahByClassView = () => {
     const [expandedCards, setExpandedCards] = useState({});
     const location = useLocation();
     const navigate = useNavigate();
-    const classId = useParams().classId;
-    const [branchYearId] = useState(location.state?.branchYearId || []);
-    const [subBranchMunaqasyahStatus] = useState(
-        location.state?.subBranchMunaqasyahStatus || null
-    );
+    const { branchYearId: paramBranchYearId, subBranchId: paramSubBranchId, classId } =
+        useParams();
+    const branchYearId = paramBranchYearId || location.state?.branchYearId;
+    const subBranchMunaqasyahStatus =
+        location.state?.subBranchMunaqasyahStatus || null;
     const [loadingIdx, setLoadingIdx] = useState(null);
 
     const auth = useContext(AuthContext);
-    const subBranchId = auth.userSubBranchId;
+    const subBranchId = paramSubBranchId || auth.userSubBranchId;
 
     const { modalState, openModal, closeModal } = useModal();
 

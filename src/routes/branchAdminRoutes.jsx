@@ -10,6 +10,9 @@ import AddSubBranchToTeachingGroupView from "../teaching-group/page/AddSubBranch
 import BranchAdminMunaqasyahDetailView from "../munaqasyah/pages/BranchAdminMunaqasyahDetailView";
 import UpdateClassView from "../class/pages/UpdateClassView";
 import UpdateTeachingGroupView from "../teaching-group/page/UpdateTeachingGroupView";
+import MunaqasyahClassList from "../munaqasyah/pages/MunaqasyahClassList";
+import MunaqasyahByClassView from "../munaqasyah/pages/MunaqasyahByClassView";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { infoPortalRoutes } from "./infoPortalRoutes";
 
 const DashboardNav = lazy(() =>
@@ -115,6 +118,18 @@ export const branchAdminRoutes = [
     {
         path: "/munaqasyah/:branchYearId",
         element: <BranchAdminMunaqasyahDetailView />,
+    },
+    {
+        path: "/munaqasyah/:branchYearId/sub-branch/:subBranchId",
+        element: <MunaqasyahClassList />,
+    },
+    {
+        path: "/munaqasyah/:branchYearId/sub-branch/:subBranchId/class/:classId",
+        element: (
+            <QueryClientProvider client={new QueryClient()}>
+                <MunaqasyahByClassView />
+            </QueryClientProvider>
+        ),
     },
     // Info Portal routes (accessible to all authenticated users)
     ...infoPortalRoutes,

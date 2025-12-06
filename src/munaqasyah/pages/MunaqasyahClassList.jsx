@@ -9,9 +9,9 @@ const MunaqasyahClassList = () => {
     const [classes, setClasses] = useState();
     const { isLoading, error, sendRequest, setError } = useHttp();
 
-    const branchYearId = useParams().branchYearId;
+    const { branchYearId, subBranchId: paramSubBranchId } = useParams();
     const auth = useContext(AuthContext);
-    const subBranchId = auth.userSubBranchId;
+    const subBranchId = paramSubBranchId || auth.userSubBranchId;
 
     const location = useLocation();
     const subBranchMunaqasyahStatus = location.state?.subBranchMunaqasyahStatus;
@@ -38,7 +38,7 @@ const MunaqasyahClassList = () => {
             }
         };
         fetchClasses();
-    }, [sendRequest]);
+    }, [sendRequest, subBranchId, auth.token]);
 
     return (
         <div className="bg-gray-50 md:p-8 px-4 py-8 min-h-screen">
@@ -67,8 +67,16 @@ const MunaqasyahClassList = () => {
                     classes.map((cls) => (
                         <div key={cls.classId._id}>
                             <Link
-                                to={`/munaqasyah/class/${cls.classId._id}`}
-                                state={{ branchYearId, subBranchMunaqasyahStatus }}
+                                to={
+                                    paramSubBranchId
+                                        ? `/munaqasyah/${branchYearId}/sub-branch/${subBranchId}/class/${cls.classId._id}`
+                                        : `/munaqasyah/class/${cls.classId._id}`
+                                }
+                                state={{
+                                    branchYearId,
+                                    subBranchId,
+                                    subBranchMunaqasyahStatus,
+                                }}
                             >
                                 <div
                                     className={`card-basic hover:bg-gray-100 active:bg-gray-100 hover:cursor-pointer rounded-md justify-start m-0 transition-all duration-200 my-4`}
