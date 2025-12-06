@@ -1,19 +1,52 @@
-import { useContext } from "react";
+import { useContext, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useStudents } from "../../shared/queries";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
 import StudentInitial from "../../shared/Components/UIElements/StudentInitial";
 import WarningCard from "../../shared/Components/UIElements/WarningCard";
-import DataTable from "../../shared/Components/UIElements/DataTable";
+import ServerDataTable from "../../shared/Components/UIElements/ServerDataTable";
 
 const StudentsView = () => {
     const navigate = useNavigate();
     const auth = useContext(AuthContext);
-    const { data: students = [], isLoading } = useStudents({
-        role: auth.userRole,
-        branchId: auth.userBranchId,
-        subBranchId: auth.userSubBranchId,
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const [search, setSearch] = useState("");
+    const [filters, setFilters] = useState({
+        isActive: "",
+        isProfileComplete: "",
+        isInternal: "",
+        branch: "",
+        group: "",
     });
+    const [sort, setSort] = useState({ key: "name", direction: "asc" });
+
+    const { data: studentsData, isLoading, isFetching } = useStudents(
+        {
+            role: auth.userRole,
+            branchId: auth.userBranchId,
+            subBranchId: auth.userSubBranchId,
+            page,
+            limit: pageSize,
+            search: search || undefined,
+            filters: {
+                isActive: filters.isActive || undefined,
+                isProfileComplete: filters.isProfileComplete || undefined,
+                isInternal: filters.isInternal || undefined,
+                branch: filters.branch || undefined,
+                group: filters.group || undefined,
+            },
+            sort: {
+                key: sort.key,
+                direction: sort.direction,
+            },
+        },
+        { keepPreviousData: true }
+    );
+
+    const students = studentsData?.students || [];
+    const total = studentsData?.total ?? students.length;
+    const filterMeta = studentsData?.filterMeta || {};
 
     const columns = [
         {
@@ -74,14 +107,13 @@ const StudentsView = () => {
                       key: "branch",
                       label: "Desa",
                       sortable: true,
-                      render: (student) =>
-                          student.userId.subBranchId.branchId.name,
+                      render: (student) => student.userId?.subBranchId?.branchId?.name || "-",
                   },
                   {
                       key: "group",
                       label: "Kelompok",
                       sortable: true,
-                      render: (student) => student.userId.subBranchId.name,
+                      render: (student) => student.userId?.subBranchId?.name || "-",
                   },
               ]
             : []),
@@ -91,7 +123,7 @@ const StudentsView = () => {
                       key: "group",
                       label: "Kelompok",
                       sortable: true,
-                      render: (student) => student.userId.subBranchId.name,
+                      render: (student) => student.userId?.subBranchId?.name || "-",
                   },
               ]
             : []),
@@ -110,56 +142,79 @@ const StudentsView = () => {
         },
     ];
 
-    const filterOptions = [
-        {
-            key: "isActive",
-            label: "Status",
-            options: ["Aktif", "Tidak Aktif"],
-        },
-        {
-            key: "isProfileComplete",
-            label: "Kelengkapan Profil",
-            options: ["Lengkap", "Lengkapi"],
-        },
-    ];
-
-    if (students?.length > 0) {
-        const branches = [
-            ...new Set(
-                students
-                    .map((s) => s?.userId?.subBranchId?.branchId?.name)
-                    .filter(Boolean)
-            ),
+    const filterOptions = useMemo(() => {
+        const options = [
+            {
+                key: "isActive",
+                label: "Status",
+                options: [
+                    { label: "Aktif", value: "true" },
+                    { label: "Tidak Aktif", value: "false" },
+                ],
+            },
+            {
+                key: "isProfileComplete",
+                label: "Kelengkapan Profil",
+                options: [
+                    { label: "Lengkap", value: "true" },
+                    { label: "Lengkapi", value: "false" },
+                ],
+            },
+            {
+                key: "isInternal",
+                label: "Label",
+                options: [
+                    { label: "Internal", value: "true" },
+                    { label: "Simpatisan", value: "false" },
+                ],
+            },
         ];
-        const subBranches = [
-            ...new Set(
-                students
-                    .map((s) => s?.userId?.subBranchId?.name)
-                    .filter(Boolean)
-            ),
-        ];
 
-        if (auth.userRole === "admin") {
-            filterOptions.push(
-                {
-                    key: "branch",
-                    label: "Desa",
-                    options: branches,
-                },
-                {
-                    key: "group",
-                    label: "Kelompok",
-                    options: subBranches,
-                }
-            );
-        } else if (auth.userRole === "branchAdmin") {
-            filterOptions.push({
-                key: "group",
-                label: "Kelompok",
-                options: subBranches,
+        const branches = filterMeta.branches?.length
+            ? filterMeta.branches
+            : [
+                  ...new Map(
+                      students
+                          .map((s) => {
+                              const id = s?.userId?.subBranchId?.branchId?._id;
+                              const name = s?.userId?.subBranchId?.branchId?.name;
+                              return id && name ? [id, name] : null;
+                          })
+                          .filter(Boolean)
+                  ).entries(),
+              ].map(([id, name]) => ({ id, name }));
+
+        const groups = filterMeta.groups?.length
+            ? filterMeta.groups
+            : [
+                  ...new Map(
+                      students
+                          .map((s) => {
+                              const id = s?.userId?.subBranchId?._id;
+                              const name = s?.userId?.subBranchId?.name;
+                              return id && name ? [id, name] : null;
+                          })
+                          .filter(Boolean)
+                  ).entries(),
+              ].map(([id, name]) => ({ id, name }));
+
+        if (auth.userRole === "admin" && branches.length > 0) {
+            options.push({
+                key: "branch",
+                label: "Desa",
+                options: branches.map((b) => ({ label: b.name, value: b.id })),
             });
         }
-    }
+        if ((auth.userRole === "admin" || auth.userRole === "branchAdmin") && groups.length > 0) {
+            options.push({
+                key: "group",
+                label: "Kelompok",
+                options: groups.map((g) => ({ label: g.name, value: g.id })),
+            });
+        }
+
+        return options;
+    }, [auth.userRole, filterMeta, students]);
 
     return (
         <div className="md:p-8 px-4 py-8 min-h-screen">
@@ -174,17 +229,39 @@ const StudentsView = () => {
                     />
                 </div>
                 {students && (
-                    <DataTable
+                    <ServerDataTable
                         data={students}
                         columns={columns}
+                        total={total}
+                        page={page}
+                        pageSize={pageSize}
+                        onPageChange={(next) => setPage(next)}
+                        onPageSizeChange={(size) => {
+                            setPageSize(size);
+                            setPage(1);
+                        }}
+                        search={search}
+                        onSearchChange={(value) => {
+                            setSearch(value);
+                            setPage(1);
+                        }}
+                        filters={filters}
+                        onFiltersChange={(nextFilters) => {
+                            setFilters(nextFilters);
+                            setPage(1);
+                        }}
+                        filterOptions={filterOptions}
+                        sort={sort}
+                        onSortChange={(nextSort) => {
+                            setSort(nextSort);
+                            setPage(1);
+                        }}
+                        isLoading={isLoading || isFetching}
+                        emptyMessage="Tidak ada peserta didik."
                         onRowClick={(student) =>
                             navigate(`/dashboard/students/${student._id}`)
                         }
-                        searchableColumns={["name", "nis"]}
-                        initialSort={{ key: "name", direction: "ascending" }}
-                        isLoading={isLoading}
-                        filterOptions={filterOptions}
-                        tableId="students-table" // <-- Add unique tableId
+                        tableId="students-table"
                     />
                 )}
             </div>

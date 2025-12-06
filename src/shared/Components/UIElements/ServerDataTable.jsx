@@ -139,7 +139,7 @@ const ServerDataTable = ({
                             <span>Pencarian:</span>
                             <input
                                 type="text"
-                                className="bg-white shadow-xs px-2 py-1 border rounded-[4px] focus:outline-hidden hover:ring-1 hover:ring-primary focus:ring-2 focus:ring-primary transition-all duration-300"
+                                className="bg-white shadow-xs px-2 py-1 border rounded-sm focus:outline-hidden hover:ring-1 hover:ring-primary focus:ring-2 focus:ring-primary transition-all duration-300"
                                 value={search}
                                 onChange={(e) =>
                                     onSearchChange && onSearchChange(e.target.value)

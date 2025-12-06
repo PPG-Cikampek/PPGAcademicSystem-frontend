@@ -20,7 +20,7 @@ const AddStudentToClassView = () => {
         isLoading: isStudentsLoading,
         error: studentsError,
         refetch: refetchStudents,
-    } = useStudents(targetSubBranchId);
+    } = useStudents({ subBranchId: targetSubBranchId });
 
     const {
         data: cls,
@@ -44,13 +44,13 @@ const AddStudentToClassView = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">
-            <div className="max-w-6xl mx-auto">
-                <h1 className="text-2xl font-bold mb-4">
+        <div className="bg-gray-50 md:p-8 px-4 py-8 min-h-screen">
+            <div className="mx-auto max-w-6xl">
+                <h1 className="mb-4 font-bold text-2xl">
                     Pendaftaran Ulang Peserta Didik
                 </h1>
                 {!isLoading && cls && (
-                    <h3 className="text-base font-normal mb-4">
+                    <h3 className="mb-4 font-normal text-base">
                         {cls.name}
                     </h3>
                 )}
@@ -60,14 +60,14 @@ const AddStudentToClassView = () => {
                 )}
 
                 {(!students || isLoading) && (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mt-16">
+                    <div className="gap-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mt-16">
                         {[...Array(18)].map((_, idx) => (
                             <div
                                 key={idx}
-                                className="p-4 border rounded-lg bg-white border-gray-200"
+                                className="bg-white p-4 border border-gray-200 rounded-lg"
                             >
                                 <div className="flex justify-between items-center gap-2">
-                                    <div className="flex gap-4 items-center">
+                                    <div className="flex items-center gap-4">
                                         <SkeletonLoader
                                             variant="circular"
                                             width={40}
@@ -94,7 +94,7 @@ const AddStudentToClassView = () => {
                 {students && !isLoading && (
                     <>
                         {students.length === 0 && (
-                            <div className="bg-white rounded-md shadow-md p-6 border border-gray-200">
+                            <div className="bg-white shadow-md p-6 border border-gray-200 rounded-md">
                                 <p className="text-gray-700 text-center">
                                     Belum ada daftar siswa. Buat Pendaftaran
                                     siswa baru terlebih dahulu!
@@ -102,7 +102,7 @@ const AddStudentToClassView = () => {
                             </div>
                         )}
                         {students.length > 0 && (
-                            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div className="gap-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                                 {students.map((student) => {
                                     const isStudentRegistered = () => {
                                         if (

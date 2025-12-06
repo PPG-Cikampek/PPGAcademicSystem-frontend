@@ -1,31 +1,94 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import api from "./api";
 
-// Fetch students list scoped by the current role and IDs
-export const useStudents = (
-    { role, branchId, subBranchId } = {},
-    options = {}
-) => {
+// Fetch students list (supports legacy list mode and server-side pagination mode)
+export const useStudents = (params = {}, options = {}) => {
+    const isLegacyParam = typeof params === "string";
+    const normalizedParams = isLegacyParam ? { subBranchId: params } : params;
+
+    const {
+        role,
+        branchId,
+        subBranchId,
+        page,
+        limit,
+        search,
+        filters = {},
+        sort = {},
+    } = normalizedParams || {};
+
+    const isPaginatedMode =
+        page !== undefined ||
+        limit !== undefined ||
+        search !== undefined ||
+        (filters && Object.keys(filters).length > 0) ||
+        sort?.key !== undefined ||
+        sort?.direction !== undefined;
+
+    const queryKey = isPaginatedMode
+        ? [
+              "students",
+              {
+                  role,
+                  branchId,
+                  subBranchId,
+                  page,
+                  limit,
+                  search,
+                  filters,
+                  sort,
+              },
+          ]
+        : ["students", role, branchId, subBranchId || params];
+
     return useQuery({
-        queryKey: ["students", role, branchId, subBranchId],
+        queryKey,
         queryFn: async () => {
+            if (isPaginatedMode) {
+                const response = await api.get(`/students`, {
+                    params: {
+                        role,
+                        branchId,
+                        subBranchId,
+                        page,
+                        limit,
+                        search,
+                        sortBy: sort?.key,
+                        sortDir: sort?.direction,
+                        isActive: filters?.isActive,
+                        isProfileComplete: filters?.isProfileComplete,
+                        isInternal: filters?.isInternal,
+                        group: filters?.group,
+                        branch: filters?.branch,
+                    },
+                });
+                return response.data;
+            }
+
+            // Legacy list mode (no pagination)
             let url;
             if (role === "admin") {
                 url = `/students`;
             } else if (role === "branchAdmin") {
                 url = `/students/branch/${branchId}`;
-            } else {
+            } else if (subBranchId) {
                 url = `/students/sub-branch/${subBranchId}`;
+            } else {
+                url = `/students`;
             }
+
             const response = await api.get(url);
             return response.data.students;
         },
         enabled:
-            role === "admin"
+            isPaginatedMode
+                ? true
+                : role === "admin"
                 ? true
                 : role === "branchAdmin"
                 ? Boolean(branchId)
-                : Boolean(subBranchId),
+                : Boolean(subBranchId) || Boolean(params),
+        keepPreviousData: isPaginatedMode,
         ...options,
     });
 };

@@ -153,7 +153,7 @@ const DataTable = ({
         <tr className="animate-pulse">
             {columns.map((_, index) => (
                 <td key={index} className="p-2 md:p-4">
-                    <div className="h-4 bg-gray-200 rounded-sm"></div>
+                    <div className="bg-gray-200 rounded-sm h-4"></div>
                 </td>
             ))}
         </tr>
@@ -162,8 +162,8 @@ const DataTable = ({
     const SkeletonHeader = () => (
         <tr>
             {columns.map((_, index) => (
-                <th key={index} className="min-w-14 p-2 md:p-4">
-                    <div className="h-4 bg-gray-200 rounded-sm animate-pulse w-20"></div>
+                <th key={index} className="p-2 md:p-4 min-w-14">
+                    <div className="bg-gray-200 rounded-sm w-20 h-4 animate-pulse"></div>
                 </th>
             ))}
         </tr>
@@ -182,7 +182,7 @@ const DataTable = ({
                 showFilters ? "max-h-96" : "max-h-0"
             }`}
         >
-            <div className="card-basic flex-col rounded-md m-0 border p-4">
+            <div className="flex-col m-0 p-4 border rounded-md card-basic">
                 <div className="flex items-center gap-2 mb-4">
                     <h3 className="font-normal text-base">Filter Data</h3>
                     <button
@@ -192,14 +192,14 @@ const DataTable = ({
                         Reset
                     </button>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div className="gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
                     {filterOptions.map(({ key, label, options }) => (
                         <div key={key}>
-                            <label className="text-sm font-medium text-gray-700 mb-1">
+                            <label className="mb-1 font-medium text-gray-700 text-sm">
                                 {label}
                             </label>
                             <select
-                                className="w-full border rounded-full px-2 py-2 text-sm focus:ring-1 focus:ring-primary focus:outline-hidden"
+                                className="px-2 py-2 border rounded-full focus:outline-hidden focus:ring-1 focus:ring-primary w-full text-sm"
                                 value={filters[key] || ""}
                                 onChange={(e) =>
                                     setFilters((prev) => ({
@@ -243,10 +243,10 @@ const DataTable = ({
                 {isLoading ? (
                     <>
                         <div className="flex items-center gap-2">
-                            <div className="h-8 w-32 bg-gray-200 rounded-sm animate-pulse"></div>
+                            <div className="bg-gray-200 rounded-sm w-32 h-8 animate-pulse"></div>
                         </div>
                         <div className="flex items-center gap-2">
-                            <div className="h-8 w-48 bg-gray-200 rounded-sm animate-pulse"></div>
+                            <div className="bg-gray-200 rounded-sm w-48 h-8 animate-pulse"></div>
                         </div>
                     </>
                 ) : (
@@ -255,7 +255,7 @@ const DataTable = ({
                             <div className="flex items-center gap-2">
                                 <span>Tampilkan</span>
                                 <select
-                                    className="border rounded-sm px-2 py-1"
+                                    className="px-2 py-1 border rounded-sm"
                                     value={entriesPerPage}
                                     onChange={(e) =>
                                         setEntriesPerPage(
@@ -272,13 +272,13 @@ const DataTable = ({
                                 <span>item</span>
                             </div>
                         )}
-                        <div className="flex flex-col md:flex-row w-full md:w-auto items-start md:items-center gap-2">
+                        <div className="flex md:flex-row flex-col items-start md:items-center gap-2 w-full md:w-auto">
                             {config.showSearch && (
                                 <div className="flex items-center gap-2">
                                     <span>Pencarian:</span>
                                     <input
                                         type="text"
-                                        className="bg-white px-2 py-1 border rounded-[4px] shadow-xs hover:ring-1 hover:ring-primary focus:outline-hidden focus:ring-2 focus:ring-primary transition-all duration-300"
+                                        className="bg-white shadow-xs px-2 py-1 border rounded-sm focus:outline-hidden hover:ring-1 hover:ring-primary focus:ring-2 focus:ring-primary transition-all duration-300"
                                         value={searchTerm}
                                         onChange={(e) =>
                                             setSearchTerm(e.target.value)
@@ -289,7 +289,7 @@ const DataTable = ({
                             {config.showFilter && filterOptions.length > 0 && (
                                 <button
                                     onClick={() => setShowFilters(!showFilters)}
-                                    className="btn-mobile-primary m-0 flex items-center gap-1"
+                                    className="flex items-center gap-1 m-0 btn-mobile-primary"
                                 >
                                     <Filter size={16} />
                                     Filter
@@ -305,7 +305,7 @@ const DataTable = ({
                     config.showBottomEntries ? "mb-4" : ""
                 }  `}
             >
-                <table className="w-full rounded-md">
+                <table className="rounded-md w-full">
                     <thead className="border-b">
                         {isLoading ? (
                             <SkeletonHeader />
@@ -413,7 +413,7 @@ const DataTable = ({
                                     <tr>
                                         <td
                                             colSpan={columns.length}
-                                            className="p-4 text-center italic text-gray-500"
+                                            className="p-4 text-gray-500 text-center italic"
                                         >
                                             Tidak ada data
                                         </td>
@@ -427,10 +427,10 @@ const DataTable = ({
             <div className="flex justify-between items-center">
                 {isLoading ? (
                     <>
-                        <div className="h-4 w-48 bg-gray-200 rounded-sm animate-pulse"></div>
+                        <div className="bg-gray-200 rounded-sm w-48 h-4 animate-pulse"></div>
                         <div className="flex gap-2">
-                            <div className="h-8 w-24 bg-gray-200 rounded-sm animate-pulse"></div>
-                            <div className="h-8 w-24 bg-gray-200 rounded-sm animate-pulse"></div>
+                            <div className="bg-gray-200 rounded-sm w-24 h-8 animate-pulse"></div>
+                            <div className="bg-gray-200 rounded-sm w-24 h-8 animate-pulse"></div>
                         </div>
                     </>
                 ) : (
