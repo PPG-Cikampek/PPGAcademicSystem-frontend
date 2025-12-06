@@ -64,7 +64,7 @@ const BranchAdminMunaqasyahDetailView = () => {
         },
         // {
         //     key: "munaqisyCount",
-        //     label: "Jumlah Munaqis",
+        //     label: "Jumlah Guru & Munaqis",
         //     sortable: true,
         //     headerAlign: "center",
         //     cellAlign: "center",
@@ -89,14 +89,15 @@ const BranchAdminMunaqasyahDetailView = () => {
         },
         {
             key: "progress",
-            label: "Persentase Selesai",
+            label: "Penyelesaian",
             sortable: true,
             headerAlign: "center",
             cellAlign: "center",
-            render: (item) =>
-                item?.progress || item?.progress === 0
-                    ? `${Number(item.progress).toFixed(1)}%`
-                    : "0%",
+            render: (item) => {
+                const completed = item?.completedCount ?? 0;
+                const total = item?.studentCount ?? 0;
+                return `${completed}/${total} siswa`;
+            },
         },
         {
             key: "munaqasyahStatus",
