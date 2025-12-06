@@ -9,11 +9,7 @@ import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 const MunaqasyahCard = ({ year, onClick, isClickAble = true, fetchData }) => {
     const { sendRequest, isLoading, error, setError } = useHttp();
 
-    const {
-        modalState,
-        openModal,
-        closeModal,
-    } = useModal();
+    const { modalState, openModal, closeModal } = useModal();
 
     const branchMunaqasyahStatusHandler = (actionName, name, branchYearId) => {
         const confirmAction = async (action) => {
@@ -28,24 +24,15 @@ const MunaqasyahCard = ({ year, onClick, isClickAble = true, fetchData }) => {
                 const responseData = await sendRequest(url, "PATCH", body, {
                     "Content-Type": "application/json",
                 });
-                openModal(
-                    responseData.message,
-                    "success",
-                    null,
-                    "Berhasil!"
-                );
+                openModal(responseData.message, "success", null, "Berhasil!");
                 if (typeof fetchData === "function") {
                     await fetchData(); // Refresh parent data to update year.munaqasyahStatus
                 }
             } catch (err) {
                 setError(err.message);
-                openModal(
-                    err.message,
-                    "error",
-                    null,
-                    "Gagal!"
-                );
+                openModal(err.message, "error", null, "Gagal!");
             }
+            return false;
         };
 
         if (actionName === "start") {
@@ -63,12 +50,13 @@ const MunaqasyahCard = ({ year, onClick, isClickAble = true, fetchData }) => {
                 `Selesaikan Munaosah Desa untuk Tahun Ajaran ${academicYearFormatter(
                     name
                 )}?`,
-                "confirmation", 
+                "confirmation",
                 () => confirmAction("completed"),
                 "Konfirmasi",
                 true
             );
         }
+        return false;
     };
 
     return (
@@ -77,8 +65,23 @@ const MunaqasyahCard = ({ year, onClick, isClickAble = true, fetchData }) => {
                 <ErrorCard error={error} onClose={() => setError(null)} />
             )}
             <div
-                className="card-basic rounded-md flex-col m-0 p-0"
-                onClick={typeof onClick === "function" ? onClick : undefined}
+                className="flex-col m-0 p-0 rounded-md card-basic"
+                onClick={(e) => {
+                    // If card is not clickable or the parent didn't provide an onClick,
+                    // do nothing.
+                    if (!isClickAble || typeof onClick !== "function") return;
+
+                    // If the user clicked on an interactive child element, cancel
+                    // the card navigation. We consider native interactive elements
+                    // and any element marked explicitly with data-no-nav.
+                    const interactiveSelector =
+                        '[data-no-nav], button, a, input, textarea, select, [role="button"]';
+                    if (e.target.closest && e.target.closest(interactiveSelector)) {
+                        return;
+                    }
+
+                    onClick(e);
+                }}
             >
                 <NewModal
                     modalState={modalState}
@@ -90,10 +93,10 @@ const MunaqasyahCard = ({ year, onClick, isClickAble = true, fetchData }) => {
                         isClickAble ? "cursor-pointer hover:bg-gray-50" : ""
                     } transition-colors duration-200`}
                 >
-                    <div className="flex md:justify-between items-start md:flex-row flex-col md:items-center w-full">
+                    <div className="flex md:flex-row flex-col md:justify-between items-start md:items-center w-full">
                         <div className="flex flex-col">
-                            <div className="flex gap-2 flex-row flex-wrap">
-                                <h2 className="text-xl font-medium text-gray-800">
+                            <div className="flex flex-row flex-wrap gap-2">
+                                <h2 className="font-medium text-gray-800 text-xl">
                                     {academicYearFormatter(
                                         year.academicYearId.name
                                     )}
@@ -157,9 +160,11 @@ const MunaqasyahCard = ({ year, onClick, isClickAble = true, fetchData }) => {
                                             "completed") && (
                                         <div className="mt-4">
                                             <button
+                                                data-no-nav
                                                 className="btn-primary-outline"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
+                                                    e.preventDefault();
                                                     branchMunaqasyahStatusHandler(
                                                         "start",
                                                         year.name,
@@ -177,9 +182,11 @@ const MunaqasyahCard = ({ year, onClick, isClickAble = true, fetchData }) => {
                                     {year.munaqasyahStatus === "inProgress" && (
                                         <div className="mt-4">
                                             <button
+                                                data-no-nav
                                                 className="btn-primary-outline"
                                                 onClick={(e) => {
                                                     e.stopPropagation();
+                                                    e.preventDefault();
                                                     branchMunaqasyahStatusHandler(
                                                         "complete",
                                                         year.name,
