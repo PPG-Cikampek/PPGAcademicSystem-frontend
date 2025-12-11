@@ -473,13 +473,10 @@ const StudentsView = () => {
                                 closeModal();
                                 setTimeout(() => startBulkDownload(true), 100);
                             }}
-                            className="hover:bg-blue-50 px-4 py-3 rounded-md btn-primary-outline w-full transition-colors"
+                            className="px-4 py-3 rounded-md button-primary-subtle-outline w-full transition-colors"
                         >
                             <div className="flex flex-col items-start">
-                                <span className="font-semibold text-base">Kualitas Tinggi (High Quality)</span>
-                                <span className="text-gray-600 text-sm">
-                                    Menggunakan gambar asli. Ukuran file lebih besar, proses lebih lama.
-                                </span>
+                                <span className="font-semibold text-base">Kualitas Tinggi</span>
                             </div>
                         </button>
                         <button
@@ -487,13 +484,9 @@ const StudentsView = () => {
                                 closeModal();
                                 setTimeout(() => startBulkDownload(false), 100);
                             }}
-                            className="hover:bg-blue-50 px-4 py-3 rounded-md btn-primary-outline w-full transition-colors"
-                        >
+                            className="px-4 py-3 rounded-md button-primary-subtle-outline w-full transition-colors">
                             <div className="flex flex-col items-start">
-                                <span className="font-semibold text-base">Kualitas Rendah (Low Quality)</span>
-                                <span className="text-gray-600 text-sm">
-                                    Menggunakan thumbnail. Ukuran file lebih kecil, proses lebih cepat.
-                                </span>
+                                <span className="font-semibold text-base">Kualitas Rendah</span>
                             </div>
                         </button>
                     </div>
