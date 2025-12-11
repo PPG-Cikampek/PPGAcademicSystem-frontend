@@ -55,7 +55,7 @@ const QuestionPackageView = () => {
                             },
                         })
                     }
-                    className="button-primary w-24"
+                    className="w-24 button-primary"
                 >
                     Unduh
                 </button>
@@ -97,7 +97,7 @@ const QuestionPackageView = () => {
                             },
                         })
                     }
-                    className="button-primary w-24"
+                    className="w-24 button-primary"
                 >
                     Unduh
                 </button>
@@ -118,7 +118,7 @@ const QuestionPackageView = () => {
                             },
                         })
                     }
-                    className="button-primary w-24"
+                    className="w-24 button-primary"
                 >
                     Unduh
                 </button>
@@ -139,7 +139,7 @@ const QuestionPackageView = () => {
                             },
                         })
                     }
-                    className="button-primary w-24"
+                    className="w-24 button-primary"
                 >
                     Unduh
                 </button>
@@ -160,7 +160,7 @@ const QuestionPackageView = () => {
                             },
                         })
                     }
-                    className="button-primary w-24"
+                    className="w-24 button-primary"
                 >
                     Unduh
                 </button>
@@ -181,7 +181,7 @@ const QuestionPackageView = () => {
                             },
                         })
                     }
-                    className="button-primary w-24"
+                    className="w-24 button-primary"
                 >
                     Unduh
                 </button>
@@ -202,7 +202,7 @@ const QuestionPackageView = () => {
                             },
                         })
                     }
-                    className="button-primary w-24"
+                    className="w-24 button-primary"
                 >
                     Unduh
                 </button>
@@ -223,7 +223,7 @@ const QuestionPackageView = () => {
                             },
                         })
                     }
-                    className="button-primary w-24"
+                    className="w-24 button-primary"
                 >
                     Unduh
                 </button>
@@ -244,7 +244,7 @@ const QuestionPackageView = () => {
                             },
                         })
                     }
-                    className="button-primary w-24"
+                    className="w-24 button-primary"
                 >
                     Unduh
                 </button>
@@ -265,14 +265,14 @@ const QuestionPackageView = () => {
                             },
                         })
                     }
-                    className="button-primary w-24"
+                    className="w-24 button-primary"
                 >
                     Unduh
                 </button>
             ),
         },
         {
-            key: "independance",
+            key: "independence",
             label: "Kemandirian",
             sortable: true,
             render: (pkg) => (
@@ -281,12 +281,12 @@ const QuestionPackageView = () => {
                         navigate("/munaqasyah/question-package/class", {
                             state: {
                                 semester: pkg.name,
-                                category: "independance",
-                                seed: pkg.independance,
+                                category: "independence",
+                                seed: pkg.independence,
                             },
                         })
                     }
-                    className="button-primary w-24"
+                    className="w-24 button-primary"
                 >
                     Unduh
                 </button>
@@ -302,7 +302,7 @@ const QuestionPackageView = () => {
                             e.stopPropagation();
                             // navigate(`/munaqasyah/question-bank/${classGrade}/${question._id}/update`);
                         }}
-                        className="p-2 hover:bg-gray-100 rounded-full"
+                        className="hover:bg-gray-100 p-2 rounded-full"
                     >
                         <Download className="w-4 h-4" />
                     </button>
@@ -311,7 +311,7 @@ const QuestionPackageView = () => {
                             e.stopPropagation();
                             // navigate(`/munaqasyah/question-bank/${classGrade}/${question._id}/update`);
                         }}
-                        className="p-2 hover:bg-gray-100 rounded-full"
+                        className="hover:bg-gray-100 p-2 rounded-full"
                     >
                         <RefreshCw className="w-4 h-4" />
                     </button>
@@ -320,7 +320,7 @@ const QuestionPackageView = () => {
                             e.stopPropagation();
                             // handleDeleteQuestion(question._id);
                         }}
-                        className="p-2 hover:bg-gray-100 rounded-full text-red-500"
+                        className="hover:bg-gray-100 p-2 rounded-full text-red-500"
                     >
                         <Trash className="w-4 h-4" />
                     </button>
@@ -330,11 +330,11 @@ const QuestionPackageView = () => {
     ];
 
     return (
-        <div className="min-h-screen px-4 py-8 md:p-8">
-            <div className="max-w-6xl mx-auto">
+        <div className="md:p-8 px-4 py-8 min-h-screen">
+            <div className="mx-auto max-w-6xl">
                 <div className="flex flex-col justify-between items-stretch gap-2 mb-4">
-                    <div className="flex items-center mb-6 gap-4">
-                        <h1 className="text-2xl font-semibold text-gray-900">
+                    <div className="flex items-center gap-4 mb-6">
+                        <h1 className="font-semibold text-gray-900 text-2xl">
                             {"Paket Soal Daerah (under construction)"}
                         </h1>
                     </div>
