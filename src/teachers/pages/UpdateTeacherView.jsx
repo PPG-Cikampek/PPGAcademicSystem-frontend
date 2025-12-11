@@ -186,7 +186,7 @@ const UpdateTeacherView = () => {
                 }
 
                 // Use XHR for progress tracking
-                const url = `${import.meta.env.VITE_BACKEND_URL}/teachers/${id}`;
+                const url = `${import.meta.env.VITE_BACKEND_URL}/teachers`;
                 
                 const sendWithProgress = () =>
                     new Promise((resolve, reject) => {
