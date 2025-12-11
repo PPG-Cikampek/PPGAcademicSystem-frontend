@@ -25,8 +25,9 @@ const StudentsView = () => {
     });
     const [sort, setSort] = useState({ key: "name", direction: "asc" });
 
-    // Selection state for bulk operations
+    // Selection state for bulk operations - store both IDs (for UI) and full data (for download)
     const [selectedStudentIds, setSelectedStudentIds] = useState([]);
+    const selectedStudentsDataRef = useRef(new Map()); // Map of studentId -> studentData
 
     // Modal state for progress feedback
     const { modalState, openModal, closeModal } = useNewModal();
@@ -64,26 +65,39 @@ const StudentsView = () => {
     const total = studentsData?.total ?? students.length;
     const filterMeta = studentsData?.filterMeta || {};
 
-    // Handle bulk ID card download
-    const handleBulkDownload = useCallback(async () => {
-        if (selectedStudentIds.length === 0) {
-            openModal(
-                "Silakan pilih peserta didik terlebih dahulu dengan mencentang checkbox pada tabel.",
-                "warning",
-                null,
-                "Tidak ada yang dipilih"
-            );
-            return;
+    // Handle selection change - store student data for cross-page access
+    const handleSelectionChange = useCallback((newSelectedIds) => {
+        // Find newly selected students from current page and add to map
+        const currentStudentsMap = new Map(students.map(s => [s._id, s]));
+        
+        // Add newly selected students to the ref
+        newSelectedIds.forEach(id => {
+            if (currentStudentsMap.has(id) && !selectedStudentsDataRef.current.has(id)) {
+                selectedStudentsDataRef.current.set(id, currentStudentsMap.get(id));
+            }
+        });
+        
+        // Remove deselected students from the ref
+        const newSelectedSet = new Set(newSelectedIds);
+        for (const id of selectedStudentsDataRef.current.keys()) {
+            if (!newSelectedSet.has(id)) {
+                selectedStudentsDataRef.current.delete(id);
+            }
         }
+        
+        setSelectedStudentIds(newSelectedIds);
+    }, [students]);
 
-        // Get the selected students data
-        const selectedStudents = students.filter((s) =>
-            selectedStudentIds.includes(s._id)
-        );
+    // Handle quality selection and start download
+    const startBulkDownload = useCallback(async (useHighQuality) => {
+        // Get the selected students data from our stored map (supports cross-page selection)
+        const selectedStudents = selectedStudentIds
+            .map(id => selectedStudentsDataRef.current.get(id))
+            .filter(Boolean);
 
         if (selectedStudents.length === 0) {
             openModal(
-                "Peserta didik yang dipilih tidak ditemukan di halaman ini. Silakan pilih kembali.",
+                "Data peserta didik tidak ditemukan. Silakan pilih kembali.",
                 "warning",
                 null,
                 "Data tidak ditemukan"
@@ -92,8 +106,9 @@ const StudentsView = () => {
         }
 
         // Open progress modal
+        const qualityText = useHighQuality ? "Kualitas Tinggi" : "Kualitas Rendah";
         openModal(
-            `Memproses ${selectedStudents.length} ID Card...`,
+            `Memproses ${selectedStudents.length} ID Card (${qualityText})...`,
             "info",
             null,
             "Mengunduh ID Card"
@@ -108,7 +123,8 @@ const StudentsView = () => {
             const result = await bulkGenerateIdCards(
                 selectedStudents,
                 (progressValue) => setProgress(progressValue),
-                abortControllerRef.current.signal
+                abortControllerRef.current.signal,
+                useHighQuality
             );
 
             if (result.success && result.zipBlob) {
@@ -131,6 +147,7 @@ const StudentsView = () => {
                     );
                     // Clear selection after successful download
                     setSelectedStudentIds([]);
+                    selectedStudentsDataRef.current.clear();
                 }, 100);
             } else {
                 closeModal();
@@ -159,7 +176,30 @@ const StudentsView = () => {
             setProgress(0);
             abortControllerRef.current = null;
         }
-    }, [selectedStudentIds, students, openModal, closeModal]);
+    }, [selectedStudentIds, openModal, closeModal]);
+
+    // Handle bulk download button click - show quality selection modal
+    const handleBulkDownload = useCallback(() => {
+        if (selectedStudentIds.length === 0) {
+            openModal(
+                "Silakan pilih peserta didik terlebih dahulu dengan mencentang checkbox pada tabel.",
+                "warning",
+                null,
+                "Tidak ada yang dipilih"
+            );
+            return;
+        }
+
+        // Show quality selection modal with custom content
+        openModal(
+            `Pilih kualitas gambar untuk ${selectedStudentIds.length} ID Card yang akan diunduh:`,
+            "confirmation",
+            null,
+            "Pilih Kualitas ID Card",
+            false,
+            "md"
+        );
+    }, [selectedStudentIds, openModal]);
 
     // Handle modal close with cancellation
     const handleModalClose = useCallback(() => {
@@ -385,7 +425,7 @@ const StudentsView = () => {
                         tableId="students-table"
                         selectable={canBulkDownload}
                         selectedRows={selectedStudentIds}
-                        onSelectionChange={setSelectedStudentIds}
+                        onSelectionChange={handleSelectionChange}
                         topRightSlot={
                             canBulkDownload && (
                                 <button
@@ -425,7 +465,40 @@ const StudentsView = () => {
                 isLoading={isGenerating}
                 loadingVariant="bar"
                 progress={progress}
-            />
+            >
+                {modalState.type === "confirmation" && modalState.title === "Pilih Kualitas ID Card" && (
+                    <div className="flex flex-col gap-3 mt-4">
+                        <button
+                            onClick={() => {
+                                closeModal();
+                                setTimeout(() => startBulkDownload(true), 100);
+                            }}
+                            className="hover:bg-blue-50 px-4 py-3 rounded-md btn-primary-outline w-full transition-colors"
+                        >
+                            <div className="flex flex-col items-start">
+                                <span className="font-semibold text-base">Kualitas Tinggi (High Quality)</span>
+                                <span className="text-gray-600 text-sm">
+                                    Menggunakan gambar asli. Ukuran file lebih besar, proses lebih lama.
+                                </span>
+                            </div>
+                        </button>
+                        <button
+                            onClick={() => {
+                                closeModal();
+                                setTimeout(() => startBulkDownload(false), 100);
+                            }}
+                            className="hover:bg-blue-50 px-4 py-3 rounded-md btn-primary-outline w-full transition-colors"
+                        >
+                            <div className="flex flex-col items-start">
+                                <span className="font-semibold text-base">Kualitas Rendah (Low Quality)</span>
+                                <span className="text-gray-600 text-sm">
+                                    Menggunakan thumbnail. Ukuran file lebih kecil, proses lebih cepat.
+                                </span>
+                            </div>
+                        </button>
+                    </div>
+                )}
+            </NewModal>
         </div>
     );
 };

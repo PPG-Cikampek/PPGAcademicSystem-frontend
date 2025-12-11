@@ -1,4 +1,4 @@
-import { Filter, SquareCheck } from "lucide-react";
+import { Filter, Check } from "lucide-react";
 import { useMemo, useState, useCallback } from "react";
 
 const ServerDataTable = ({
@@ -235,7 +235,7 @@ const ServerDataTable = ({
                                 {selectable && (
                                     <th className="p-2 md:p-4 w-10 text-center">
                                         <div className="flex justify-center items-center">
-                                            <label className="relative cursor-pointer">
+                                            <label className="relative flex items-center cursor-pointer">
                                                 <input
                                                     type="checkbox"
                                                     checked={allSelected}
@@ -245,8 +245,8 @@ const ServerDataTable = ({
                                                     onChange={handleSelectAll}
                                                     className="peer checked:bg-primary shadow-sm hover:shadow-md border border-slate-300 checked:border-primary rounded-sm w-4 h-4 transition-all appearance-none cursor-pointer"
                                                 />
-                                                <span className="top-1/2 left-1/2 absolute opacity-0 peer-checked:opacity-100 text-white -translate-x-1/2 -translate-y-1/2 pointer-events-none transform">
-                                                    <SquareCheck size={16} />
+                                                <span className="top-1/2 left-1/2 absolute opacity-0 peer-checked:opacity-100 text-white -translate-x-1/2 -translate-y-1/2 transform">
+                                                    <Check size={12} />
                                                 </span>
                                             </label>
                                         </div>
@@ -304,18 +304,20 @@ const ServerDataTable = ({
                                     } transition-all duration-300 ease-in-out`}
                                 >
                                     {selectable && (
-                                        <td className="p-2 md:p-4 w-10 text-center">
+                                        <td 
+                                            className="p-2 md:p-4 w-10 text-center"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
                                             <div className="flex justify-center items-center">
-                                                <label className="relative cursor-pointer">
+                                                <label className="relative flex items-center cursor-pointer">
                                                     <input
                                                         type="checkbox"
                                                         checked={selectedRows.includes(getRowId(item))}
                                                         onChange={(e) => handleRowSelect(item, e)}
-                                                        onClick={(e) => e.stopPropagation()}
                                                         className="peer checked:bg-primary shadow-sm hover:shadow-md border border-slate-300 checked:border-primary rounded-sm w-4 h-4 transition-all appearance-none cursor-pointer"
                                                     />
-                                                    <span className="top-1/2 left-1/2 absolute opacity-0 peer-checked:opacity-100 text-white -translate-x-1/2 -translate-y-1/2 pointer-events-none transform">
-                                                        <SquareCheck size={16} />
+                                                    <span className="top-1/2 left-1/2 absolute opacity-0 peer-checked:opacity-100 text-white -translate-x-1/2 -translate-y-1/2 transform">
+                                                        <Check size={12} />
                                                     </span>
                                                 </label>
                                             </div>

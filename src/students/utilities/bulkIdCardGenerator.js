@@ -46,15 +46,23 @@ const generateQRCode = async (value) => {
 /**
  * Prepare student data for PDF generation
  * @param {Object} student - The raw student data
+ * @param {boolean} useHighQuality - Whether to use high quality (actual image) or low quality (thumbnail)
  * @returns {Promise<Object>} - Prepared student data for PDF
  */
-const prepareStudentForPdf = async (student) => {
-    // Get student image
+const prepareStudentForPdf = async (student, useHighQuality = true) => {
+    // Get student image based on quality preference
     let imageDataUrl = null;
-    if (student.image || student.thumbnail) {
-        const imageUrl = student.thumbnail
-            ? student.thumbnail
-            : `${import.meta.env.VITE_BACKEND_URL}/${student.image}`;
+    if (useHighQuality && student.image) {
+        // High quality: use actual image
+        const imageUrl = `${import.meta.env.VITE_BACKEND_URL}/${student.image}`;
+        imageDataUrl = await imageToBase64(imageUrl);
+    } else if (!useHighQuality && student.thumbnail) {
+        // Low quality: use thumbnail
+        const thumbnailUrl = student.thumbnail;
+        imageDataUrl = await imageToBase64(thumbnailUrl);
+    } else if (student.image) {
+        // Fallback: if thumbnail doesn't exist but image does, use image
+        const imageUrl = `${import.meta.env.VITE_BACKEND_URL}/${student.image}`;
         imageDataUrl = await imageToBase64(imageUrl);
     }
     
@@ -79,10 +87,11 @@ const prepareStudentForPdf = async (student) => {
 /**
  * Generate a single ID card PDF blob
  * @param {Object} student - The student data
+ * @param {boolean} useHighQuality - Whether to use high quality images
  * @returns {Promise<Blob>} - PDF blob
  */
-const generateSingleIdCard = async (student) => {
-    const preparedStudent = await prepareStudentForPdf(student);
+const generateSingleIdCard = async (student, useHighQuality = true) => {
+    const preparedStudent = await prepareStudentForPdf(student, useHighQuality);
     const doc = createElement(IDCardDocument, { student: preparedStudent });
     const pdfInstance = pdf([]);
     pdfInstance.updateContainer(doc);
@@ -112,9 +121,10 @@ const createZipFromBlobs = async (pdfFiles) => {
  * @param {Array<Object>} students - Array of student data
  * @param {Function} onProgress - Callback for progress updates (0-100)
  * @param {AbortSignal} signal - Optional abort signal for cancellation
+ * @param {boolean} useHighQuality - Whether to use high quality images (default: true)
  * @returns {Promise<{success: boolean, zipBlob?: Blob, error?: string, completed: number, failed: number}>}
  */
-export const bulkGenerateIdCards = async (students, onProgress, signal) => {
+export const bulkGenerateIdCards = async (students, onProgress, signal, useHighQuality = true) => {
     if (!students || students.length === 0) {
         return { success: false, error: "No students selected", completed: 0, failed: 0 };
     }
@@ -141,7 +151,7 @@ export const bulkGenerateIdCards = async (students, onProgress, signal) => {
         const student = students[i];
 
         try {
-            const blob = await generateSingleIdCard(student);
+            const blob = await generateSingleIdCard(student, useHighQuality);
             const fileName = `IDCard_${student.name?.replace(/\s+/g, "_") || "Unknown"}_${student.nis || i + 1}.pdf`;
             pdfFiles.push({ blob, fileName });
             completed++;
