@@ -1,10 +1,14 @@
-import { useContext, useMemo, useState } from "react";
+import { useContext, useMemo, useState, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useStudents } from "../../shared/queries";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
 import StudentInitial from "../../shared/Components/UIElements/StudentInitial";
 import WarningCard from "../../shared/Components/UIElements/WarningCard";
 import ServerDataTable from "../../shared/Components/UIElements/ServerDataTable";
+import NewModal from "../../shared/Components/Modal/NewModal";
+import useNewModal from "../../shared/hooks/useNewModal";
+import { bulkGenerateIdCards, downloadBlob } from "../utilities/bulkIdCardGenerator";
+import { IdCard } from "lucide-react";
 
 const StudentsView = () => {
     const navigate = useNavigate();
@@ -20,6 +24,18 @@ const StudentsView = () => {
         group: "",
     });
     const [sort, setSort] = useState({ key: "name", direction: "asc" });
+
+    // Selection state for bulk operations
+    const [selectedStudentIds, setSelectedStudentIds] = useState([]);
+
+    // Modal state for progress feedback
+    const { modalState, openModal, closeModal } = useNewModal();
+    const [isGenerating, setIsGenerating] = useState(false);
+    const [progress, setProgress] = useState(0);
+    const abortControllerRef = useRef(null);
+
+    // Check if user can bulk download (admin or subBranchAdmin only)
+    const canBulkDownload = auth.userRole === "admin" || auth.userRole === "subBranchAdmin";
 
     const { data: studentsData, isLoading, isFetching } = useStudents(
         {
@@ -47,6 +63,111 @@ const StudentsView = () => {
     const students = studentsData?.students || [];
     const total = studentsData?.total ?? students.length;
     const filterMeta = studentsData?.filterMeta || {};
+
+    // Handle bulk ID card download
+    const handleBulkDownload = useCallback(async () => {
+        if (selectedStudentIds.length === 0) {
+            openModal(
+                "Silakan pilih peserta didik terlebih dahulu dengan mencentang checkbox pada tabel.",
+                "warning",
+                null,
+                "Tidak ada yang dipilih"
+            );
+            return;
+        }
+
+        // Get the selected students data
+        const selectedStudents = students.filter((s) =>
+            selectedStudentIds.includes(s._id)
+        );
+
+        if (selectedStudents.length === 0) {
+            openModal(
+                "Peserta didik yang dipilih tidak ditemukan di halaman ini. Silakan pilih kembali.",
+                "warning",
+                null,
+                "Data tidak ditemukan"
+            );
+            return;
+        }
+
+        // Open progress modal
+        openModal(
+            `Memproses ${selectedStudents.length} ID Card...`,
+            "info",
+            null,
+            "Mengunduh ID Card"
+        );
+        setIsGenerating(true);
+        setProgress(0);
+
+        // Create abort controller for cancellation
+        abortControllerRef.current = new AbortController();
+
+        try {
+            const result = await bulkGenerateIdCards(
+                selectedStudents,
+                (progressValue) => setProgress(progressValue),
+                abortControllerRef.current.signal
+            );
+
+            if (result.success && result.zipBlob) {
+                // Download the zip file
+                const date = new Date().toLocaleDateString("id-ID").replace(/\//g, "-");
+                downloadBlob(result.zipBlob, `IDCards_${date}.zip`);
+
+                // Show success message
+                closeModal();
+                setTimeout(() => {
+                    openModal(
+                        `Berhasil mengunduh ${result.completed} ID Card${
+                            result.failed > 0
+                                ? `\n${result.failed} ID Card gagal diproses.`
+                                : ""
+                        }`,
+                        "success",
+                        null,
+                        "Berhasil!"
+                    );
+                    // Clear selection after successful download
+                    setSelectedStudentIds([]);
+                }, 100);
+            } else {
+                closeModal();
+                setTimeout(() => {
+                    openModal(
+                        result.error || "Terjadi kesalahan saat memproses ID Card.",
+                        "error",
+                        null,
+                        "Gagal"
+                    );
+                }, 100);
+            }
+        } catch (error) {
+            console.error("Bulk download error:", error);
+            closeModal();
+            setTimeout(() => {
+                openModal(
+                    "Terjadi kesalahan saat mengunduh ID Card.",
+                    "error",
+                    null,
+                    "Gagal"
+                );
+            }, 100);
+        } finally {
+            setIsGenerating(false);
+            setProgress(0);
+            abortControllerRef.current = null;
+        }
+    }, [selectedStudentIds, students, openModal, closeModal]);
+
+    // Handle modal close with cancellation
+    const handleModalClose = useCallback(() => {
+        if (isGenerating && abortControllerRef.current) {
+            abortControllerRef.current.abort();
+        }
+        closeModal();
+    }, [isGenerating, closeModal]);
 
     const columns = [
         {
@@ -262,9 +383,49 @@ const StudentsView = () => {
                             navigate(`/dashboard/students/${student._id}`)
                         }
                         tableId="students-table"
+                        selectable={canBulkDownload}
+                        selectedRows={selectedStudentIds}
+                        onSelectionChange={setSelectedStudentIds}
+                        topRightSlot={
+                            canBulkDownload && (
+                                <button
+                                    onClick={handleBulkDownload}
+                                    disabled={selectedStudentIds.length === 0 || isGenerating}
+                                    className={`flex items-center gap-2 m-0 btn-mobile-primary ${
+                                        selectedStudentIds.length === 0 || isGenerating
+                                            ? "opacity-50 cursor-not-allowed"
+                                            : ""
+                                    }`}
+                                    title={
+                                        selectedStudentIds.length === 0
+                                            ? "Pilih peserta didik terlebih dahulu"
+                                            : `Download ${selectedStudentIds.length} ID Card`
+                                    }
+                                >
+                                    <IdCard size={16} />
+                                    <span className="hidden md:inline">
+                                        Download ID Card
+                                        {selectedStudentIds.length > 0 &&
+                                            ` (${selectedStudentIds.length})`}
+                                    </span>
+                                    <span className="md:hidden">
+                                        {selectedStudentIds.length > 0
+                                            ? selectedStudentIds.length
+                                            : "ID"}
+                                    </span>
+                                </button>
+                            )
+                        }
                     />
                 )}
             </div>
+            <NewModal
+                modalState={modalState}
+                onClose={handleModalClose}
+                isLoading={isGenerating}
+                loadingVariant="bar"
+                progress={progress}
+            />
         </div>
     );
 };

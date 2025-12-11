@@ -1,5 +1,5 @@
-import { Filter } from "lucide-react";
-import { useMemo, useState } from "react";
+import { Filter, SquareCheck } from "lucide-react";
+import { useMemo, useState, useCallback } from "react";
 
 const ServerDataTable = ({
     data = [],
@@ -27,8 +27,56 @@ const ServerDataTable = ({
     emptyMessage = "Tidak ada data",
     loadingRows = 5,
     topRightSlot = null,
+    // New props for checkbox selection
+    selectable = false,
+    selectedRows = [],
+    onSelectionChange,
+    rowIdKey = "_id",
 }) => {
     const [showFilters, setShowFilters] = useState(false);
+
+    // Get unique row identifier
+    const getRowId = useCallback((item) => item[rowIdKey] || item.id, [rowIdKey]);
+
+    // Check if all visible rows are selected
+    const allSelected = useMemo(() => {
+        if (!selectable || data.length === 0) return false;
+        return data.every((item) => selectedRows.includes(getRowId(item)));
+    }, [selectable, data, selectedRows, getRowId]);
+
+    // Check if some but not all rows are selected (indeterminate state)
+    const someSelected = useMemo(() => {
+        if (!selectable || data.length === 0) return false;
+        const selectedCount = data.filter((item) => selectedRows.includes(getRowId(item))).length;
+        return selectedCount > 0 && selectedCount < data.length;
+    }, [selectable, data, selectedRows, getRowId]);
+
+    // Handle select all toggle
+    const handleSelectAll = useCallback(() => {
+        if (!onSelectionChange) return;
+        if (allSelected) {
+            // Deselect all visible rows
+            const visibleIds = data.map(getRowId);
+            onSelectionChange(selectedRows.filter((id) => !visibleIds.includes(id)));
+        } else {
+            // Select all visible rows
+            const visibleIds = data.map(getRowId);
+            const newSelection = [...new Set([...selectedRows, ...visibleIds])];
+            onSelectionChange(newSelection);
+        }
+    }, [allSelected, data, selectedRows, onSelectionChange, getRowId]);
+
+    // Handle individual row selection
+    const handleRowSelect = useCallback((item, e) => {
+        e.stopPropagation();
+        if (!onSelectionChange) return;
+        const id = getRowId(item);
+        if (selectedRows.includes(id)) {
+            onSelectionChange(selectedRows.filter((rowId) => rowId !== id));
+        } else {
+            onSelectionChange([...selectedRows, id]);
+        }
+    }, [selectedRows, onSelectionChange, getRowId]);
 
     const totalPages = useMemo(() => {
         if (!pagination) return 1;
@@ -45,6 +93,11 @@ const ServerDataTable = ({
 
     const SkeletonRow = () => (
         <tr className="animate-pulse">
+            {selectable && (
+                <td className="p-2 md:p-4 w-10">
+                    <div className="bg-gray-200 rounded-sm w-4 h-4"></div>
+                </td>
+            )}
             {columns.map((_, idx) => (
                 <td key={idx} className="p-2 md:p-4">
                     <div className="bg-gray-200 rounded-sm h-4"></div>
@@ -166,6 +219,11 @@ const ServerDataTable = ({
                     <thead className="border-b">
                         {isLoading ? (
                             <tr>
+                                {selectable && (
+                                    <th className="p-2 md:p-4 w-10">
+                                        <div className="bg-gray-200 rounded-sm w-4 h-4 animate-pulse"></div>
+                                    </th>
+                                )}
                                 {columns.map((_, index) => (
                                     <th key={index} className="p-2 md:p-4 min-w-14">
                                         <div className="bg-gray-200 rounded-sm w-20 h-4 animate-pulse"></div>
@@ -174,6 +232,26 @@ const ServerDataTable = ({
                             </tr>
                         ) : (
                             <tr>
+                                {selectable && (
+                                    <th className="p-2 md:p-4 w-10 text-center">
+                                        <div className="flex justify-center items-center">
+                                            <label className="relative cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={allSelected}
+                                                    ref={(el) => {
+                                                        if (el) el.indeterminate = someSelected;
+                                                    }}
+                                                    onChange={handleSelectAll}
+                                                    className="peer checked:bg-primary shadow-sm hover:shadow-md border border-slate-300 checked:border-primary rounded-sm w-4 h-4 transition-all appearance-none cursor-pointer"
+                                                />
+                                                <span className="top-1/2 left-1/2 absolute opacity-0 peer-checked:opacity-100 text-white -translate-x-1/2 -translate-y-1/2 pointer-events-none transform">
+                                                    <SquareCheck size={16} />
+                                                </span>
+                                            </label>
+                                        </div>
+                                    </th>
+                                )}
                                 {columns.map(({ key, label, sortable, headerAlign }) => (
                                     <th
                                         key={key}
@@ -204,7 +282,7 @@ const ServerDataTable = ({
                         ) : data.length === 0 ? (
                             <tr>
                                 <td
-                                    colSpan={columns.length}
+                                    colSpan={selectable ? columns.length + 1 : columns.length}
                                     className="p-4 text-gray-500 text-center italic"
                                 >
                                     {emptyMessage}
@@ -219,8 +297,30 @@ const ServerDataTable = ({
                                         clickableRows
                                             ? "hover:bg-gray-50 hover:cursor-pointer"
                                             : ""
+                                    } ${
+                                        selectable && selectedRows.includes(getRowId(item))
+                                            ? "bg-blue-50"
+                                            : ""
                                     } transition-all duration-300 ease-in-out`}
                                 >
+                                    {selectable && (
+                                        <td className="p-2 md:p-4 w-10 text-center">
+                                            <div className="flex justify-center items-center">
+                                                <label className="relative cursor-pointer">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={selectedRows.includes(getRowId(item))}
+                                                        onChange={(e) => handleRowSelect(item, e)}
+                                                        onClick={(e) => e.stopPropagation()}
+                                                        className="peer checked:bg-primary shadow-sm hover:shadow-md border border-slate-300 checked:border-primary rounded-sm w-4 h-4 transition-all appearance-none cursor-pointer"
+                                                    />
+                                                    <span className="top-1/2 left-1/2 absolute opacity-0 peer-checked:opacity-100 text-white -translate-x-1/2 -translate-y-1/2 pointer-events-none transform">
+                                                        <SquareCheck size={16} />
+                                                    </span>
+                                                </label>
+                                            </div>
+                                        </td>
+                                    )}
                                     {columns.map(({ key, render, cellStyle, cellAlign }) => (
                                         <td
                                             key={key}
