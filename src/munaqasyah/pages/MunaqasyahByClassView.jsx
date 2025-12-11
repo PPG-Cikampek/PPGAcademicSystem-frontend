@@ -107,6 +107,20 @@ const MunaqasyahByClassView = () => {
                     ].includes(cat.key)
             );
         }
+
+        if (
+            rawScores.length > 0 &&
+            rawScores[0].classId &&
+            /(7|8|9)/.test(rawScores[0].classId.name)
+        ) {
+            return DEFAULT_SCORE_CATEGORIES.filter(
+                (cat) => 
+                    !["memorizingBeautifulName",
+                        "writing"
+                    ].includes(cat.key)
+            );
+        }
+
         return DEFAULT_SCORE_CATEGORIES;
     }, [rawScores]);
 

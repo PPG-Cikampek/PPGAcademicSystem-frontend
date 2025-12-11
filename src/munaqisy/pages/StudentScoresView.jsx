@@ -110,6 +110,20 @@ const StudentScoresView = () => {
                 ].includes(cat.key)
         );
     }
+    
+     if (
+            rawScores.length > 0 &&
+            rawScores[0].classId &&
+            /(7|8|9)/.test(rawScores[0].classId.name)
+        ) {
+            filteredScoreCategories = scoreCategories.filter(
+                (cat) =>
+                    ![
+                        "memorizingBeautifulName",
+                        "writing",
+                    ].includes(cat.key)
+            );
+        }
 
     const handleCategoryClick = (category) => {
         const data = {
