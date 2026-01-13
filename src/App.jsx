@@ -1,3 +1,5 @@
+import * as Sentry from "@sentry/react";
+
 import {
     useState,
     useCallback,
@@ -12,6 +14,9 @@ import {
     Route,
     Navigate,
     useLocation,
+    useNavigationType,
+    createRoutesFromChildren,
+    matchRoutes,
 } from "react-router-dom";
 
 import { useAuth } from "./shared/hooks/auth-hook";
@@ -26,6 +31,36 @@ import {
     getFallbackRoute,
     shouldPreservePath,
 } from "./shared/Utilities/routeUtils";
+
+Sentry.init({
+    dsn: "https://82fb633a151819a31e5b646e11cc6a84@o4510683943469056.ingest.us.sentry.io/4510683944452096",
+    integrations: [
+        Sentry.reactRouterV7BrowserTracingIntegration({
+            useEffect: useEffect,
+            useLocation,
+            useNavigationType,
+            createRoutesFromChildren,
+            matchRoutes,
+        }),
+        Sentry.replayIntegration({
+            // NOTE: This will disable built-in masking. Only use this if your site has no sensitive data.
+            maskAllText: false,
+            blockAllMedia: false,
+            maskAllInputs: false,
+        }),
+        Sentry.browserTracingIntegration(),
+        Sentry.feedbackIntegration({
+            // Additional SDK configuration goes in here, for example:
+            colorScheme: "system",
+        }),
+    ],
+    tracesSampleRate: 1.0,
+    // Session Replay
+    replaysSessionSampleRate: 0.1, // 10% of sessions
+    replaysOnErrorSampleRate: 1.0, // 100% of sessions with errors
+});
+
+const SentryRoutes = Sentry.withSentryReactRouterV7Routing(Routes);
 
 // Smart Route Handler Component
 const SmartRouteHandler = ({ children }) => {
@@ -125,21 +160,6 @@ function App() {
 
     const { routes, Wrapper } = getRouteConfig(userRole);
 
-    const routeElement = (
-        <Wrapper>
-            <SmartRouteHandler>
-                <Routes>
-                    {routes.map(({ path, element }) => (
-                        <Route key={path} path={path} element={element} />
-                    ))}
-
-                    {/* Catch-all route - SmartRouteHandler will handle the logic */}
-                    <Route path="*" element={<div>Route not found</div>} />
-                </Routes>
-            </SmartRouteHandler>
-        </Wrapper>
-    );
-
     return (
         <RouteErrorBoundary>
             <GeneralContext.Provider
@@ -164,17 +184,41 @@ function App() {
                         }}
                     >
                         <Router>
-                            <main className="h-auto">
-                                <Suspense
-                                    fallback={
-                                        <div className="flex justify-center mt-16">
-                                            <LoadingCircle size={32} />
-                                        </div>
-                                    }
-                                >
-                                    {routeElement}
-                                </Suspense>
-                            </main>
+                            <Wrapper>
+                                <SmartRouteHandler>
+                                    <main className="h-auto">
+                                        <Suspense
+                                            fallback={
+                                                <div className="flex justify-center mt-16">
+                                                    <LoadingCircle size={32} />
+                                                </div>
+                                            }
+                                        >
+                                            <SentryRoutes>
+                                                {routes.map(
+                                                    ({ path, element }) => (
+                                                        <Route
+                                                            key={path}
+                                                            path={path}
+                                                            element={element}
+                                                        />
+                                                    )
+                                                )}
+
+                                                {/* Catch-all route - SmartRouteHandler will handle the logic */}
+                                                <Route
+                                                    path="*"
+                                                    element={
+                                                        <div>
+                                                            Route not found
+                                                        </div>
+                                                    }
+                                                />
+                                            </SentryRoutes>
+                                        </Suspense>
+                                    </main>
+                                </SmartRouteHandler>
+                            </Wrapper>
                         </Router>
                     </AuthContext.Provider>
                 </SidebarContext.Provider>

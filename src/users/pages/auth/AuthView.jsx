@@ -129,7 +129,7 @@ const AuthView = () => {
     };
 
     return (
-        <div className="m-auto max-w-md mt-16 md:mt-24">
+        <div className="m-auto mt-16 md:mt-24 max-w-md">
             <div
                 className={`pb-24 transition-opacity duration-300 ${
                     isTransitioning ? "opacity-0" : "opacity-100"
@@ -191,9 +191,9 @@ const AuthView = () => {
                                 onClick={() =>
                                     navigate(`/reset-password/reset`)
                                 }
-                                className="text-center mt-2"
+                                className="mt-2 text-center"
                             >
-                                <p className="underline text-xs text-gray-600 active:text-primary hover:text-primary hover:cursor-pointer">
+                                <p className="text-gray-600 hover:text-primary active:text-primary text-xs underline hover:cursor-pointer">
                                     Reset Password
                                 </p>
                             </div>

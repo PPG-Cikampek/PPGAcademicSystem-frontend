@@ -1,3 +1,6 @@
+import "../sentry.js";
+import * as Sentry from "@sentry/react";
+
 import { StrictMode, useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -56,10 +59,16 @@ const queryClient = new QueryClient({
 
 const AppWrapper = () => {
     const { modalState, closeModal } = useVersionCheck();
-    const { maintenance: isMaintenance, targetDate, loading } = useMaintenanceFlag({
+    const {
+        maintenance: isMaintenance,
+        targetDate,
+        loading,
+    } = useMaintenanceFlag({
         defaultValue: false,
     });
-    const { testing = false, loading: loadingTesting } = useTestingFlag({ defaultValue: false });
+    const { testing = false, loading: loadingTesting } = useTestingFlag({
+        defaultValue: false,
+    });
 
     console.log("Maintenance mode:", isMaintenance, "targetDate:", targetDate);
 
@@ -78,11 +87,13 @@ const AppWrapper = () => {
         <StrictMode>
             <QueryClientProvider client={queryClient}>
                 {/* Show testing banner when testing flag is true */}
-                {testing && (
-                    <></>
-                )}
+                {testing && <></>}
 
-                {isMaintenance ? <MaintenanceView targetDate={targetDate} /> : <App />}
+                {isMaintenance ? (
+                    <MaintenanceView targetDate={targetDate} />
+                ) : (
+                    <App />
+                )}
                 {/* <App /> */}
                 <ReactQueryDevtools initialIsOpen={false} />
                 <PWAInstallPrompt />
@@ -96,4 +107,13 @@ const AppWrapper = () => {
     );
 };
 
-createRoot(document.getElementById("root")).render(<AppWrapper />);
+createRoot(document.getElementById("root"), {
+    // Callback called when an error is thrown and not caught by an ErrorBoundary.
+    onUncaughtError: Sentry.reactErrorHandler((error, errorInfo) => {
+        console.warn("Uncaught error", error, errorInfo.componentStack);
+    }),
+    // Callback called when React catches an error in an ErrorBoundary.
+    onCaughtError: Sentry.reactErrorHandler(),
+    // Callback called when React automatically recovers from errors.
+    onRecoverableError: Sentry.reactErrorHandler(),
+}).render(<AppWrapper />);

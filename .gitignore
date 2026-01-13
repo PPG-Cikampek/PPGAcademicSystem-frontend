@@ -142,3 +142,6 @@ deploy.sh
 *.csv
 *.sh
 stats.html
+
+# Sentry Config File
+.env.sentry-build-plugin
