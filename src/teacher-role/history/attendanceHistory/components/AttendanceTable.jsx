@@ -11,6 +11,8 @@ const AttendanceTable = ({
 }) => {
     const navigate = useNavigate();
 
+    console.log(attendances)
+
     if (!isExpanded) return null;
 
     const columns = [
@@ -91,7 +93,7 @@ const AttendanceTable = ({
                     duration: 0.3,
                     ease: "easeInOut",
                 }}
-                className="overflow-hidden bg-white"
+                className="bg-white overflow-hidden"
             >
                 <DataTable
                     data={attendances}

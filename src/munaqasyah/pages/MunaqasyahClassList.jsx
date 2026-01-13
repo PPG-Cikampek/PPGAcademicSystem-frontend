@@ -76,7 +76,7 @@ const MunaqasyahClassList = () => {
                                         ? paramBranchId
                                             ? `/munaqasyah/monitor/${branchYearId}/branch/${paramBranchId}/sub-branch/${subBranchId}/class/${cls.classId._id}`
                                             : `/munaqasyah/${branchYearId}/sub-branch/${subBranchId}/class/${cls.classId._id}`
-                                        : `/munaqasyah/class/${cls.classId._id}`
+                                        : `/munaqasyah/class/${cls.classId._id || cls.classId.id}`
                                 }
                                 state={{
                                     branchYearId,

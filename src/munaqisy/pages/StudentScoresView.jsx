@@ -112,9 +112,9 @@ const StudentScoresView = () => {
     }
     
      if (
-            rawScores.length > 0 &&
-            rawScores[0].classId &&
-            /(7|8|9)/.test(rawScores[0].classId.name)
+        state.studentData &&
+        state.studentData.className &&
+            /(7|8|9)/.test(state.studentData.className)
         ) {
             filteredScoreCategories = scoreCategories.filter(
                 (cat) =>
