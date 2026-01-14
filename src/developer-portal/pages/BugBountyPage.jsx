@@ -237,7 +237,7 @@ const BugBountyPage = () => {
         <div className="bg-gray-50 md:p-8 px-4 py-8 min-h-screen">
             <div className="mx-auto max-w-6xl">
                 <PortalHeader
-                    title="Bug Bounty Program"
+                    title="Laporan Temuan Bug"
                     description="Laporkan bug yang Anda temukan dan dapatkan poin kontribusi. Poin akan diberikan ketika bug berhasil diperbaiki."
                 />
 
