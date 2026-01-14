@@ -1,3 +1,5 @@
+import { useContext } from "react";
+import { AuthContext } from "../../shared/Components/Context/auth-context";
 import StatusBadge from "./StatusBadge";
 
 /**
@@ -5,7 +7,10 @@ import StatusBadge from "./StatusBadge";
  * Display card for bug report in lists
  * Similar to FeatureCard.jsx pattern
  */
-const BugReportCard = ({ report, onClick, isAdmin = false }) => {
+const BugReportCard = ({ report, onClick, isAdmin = false })  => {
+
+    const auth = useContext(AuthContext);
+
     const formatDate = (dateString) => {
         if (!dateString) return "-";
         return new Date(dateString).toLocaleDateString("id-ID", {
@@ -48,7 +53,7 @@ const BugReportCard = ({ report, onClick, isAdmin = false }) => {
                 </span>
                 
                 {/* Show reporter info for admin view */}
-                {isAdmin && report.reporterName && (
+                {isAdmin || report.reporterName !== auth.userName && (
                     <span className="bg-indigo-50 px-2 py-1 rounded text-indigo-700">
                         {report.reporterName}
                     </span>

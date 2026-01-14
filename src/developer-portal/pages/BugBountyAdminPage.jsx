@@ -3,7 +3,6 @@ import { useSearchParams } from "react-router-dom";
 import { PortalHeader, EmptyState } from "../components";
 import BugReportCard from "../components/BugReportCard";
 import BugReportDetail from "../components/BugReportDetail";
-import StatusBadge from "../components/StatusBadge";
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 import {

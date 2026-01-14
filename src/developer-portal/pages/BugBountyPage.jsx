@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { PortalHeader, EmptyState } from "../components";
 import BugReportForm from "../components/BugReportForm";
@@ -21,8 +21,9 @@ import {
  */
 const BugBountyPage = () => {
     const [searchParams, setSearchParams] = useSearchParams();
-    const activeTab = searchParams.get("tab") || "submissions";
+    const activeTab = searchParams.get("tab") || "leaderboard";
     const selectedReportId = searchParams.get("reportId");
+    const isPublicTab = activeTab === "all";
 
     // Get current user ID from localStorage
     const userData = JSON.parse(localStorage.getItem("userData") || "{}");
@@ -32,17 +33,28 @@ const BugBountyPage = () => {
     const [showForm, setShowForm] = useState(false);
 
     // Queries
+    const reportQueryFilters = useMemo(() => {
+        if (isPublicTab) {
+            return { page: 1, limit: 50, scope: "public" };
+        }
+        return { page: 1, limit: 50 };
+    }, [isPublicTab]);
+
+    const reportDetailFilters = useMemo(() => {
+        return isPublicTab ? { scope: "public" } : {};
+    }, [isPublicTab]);
+
     const {
         data: reportsData,
         isLoading,
         error,
         refetch
-    } = useBugReports({ page: 1, limit: 50 });
+    } = useBugReports(reportQueryFilters);
 
     const {
         data: selectedReportData,
         isLoading: isLoadingReport
-    } = useBugReport(selectedReportId);
+    } = useBugReport(selectedReportId, reportDetailFilters);
 
     // Mutations
     const createMutation = useCreateBugReport();
@@ -51,11 +63,16 @@ const BugBountyPage = () => {
 
     const reports = reportsData?.bugReports || [];
     const selectedReport = selectedReportData?.bugReport;
+    const listTabActive = activeTab === "submissions" || isPublicTab;
+    const emptyStateMessage = isPublicTab
+        ? "Belum ada bounty yang dipublikasikan. Coba lagi nanti!"
+        : "Anda belum memiliki laporan bug. Mulai laporkan bug untuk berkontribusi!";
 
     const tabs = [
+        { id: "leaderboard", label: "Leaderboard" },
+        { id: "all", label: "Semua Laporan" },
         { id: "submissions", label: "Laporan Saya" },
-        { id: "submit", label: "Kirim Laporan" },
-        { id: "leaderboard", label: "Leaderboard" }
+        { id: "submit", label: "Kirim Laporan" }
     ];
 
     const handleTabChange = (tabId) => {
@@ -136,8 +153,8 @@ const BugBountyPage = () => {
 
                 {/* Tab Content */}
                 <div className="bg-white shadow-sm p-6 rounded-lg">
-                    {/* Submissions Tab */}
-                    {activeTab === "submissions" && (
+                    {/* Public/Public submissions List */}
+                    {listTabActive && (
                         <>
                             {isLoading && (
                                 <div className="flex justify-center py-12">
@@ -154,7 +171,7 @@ const BugBountyPage = () => {
 
                             {!isLoading && !error && reports.length === 0 && (
                                 <EmptyState
-                                    message="Anda belum memiliki laporan bug. Mulai laporkan bug untuk berkontribusi!"
+                                    message={emptyStateMessage}
                                 />
                             )}
 

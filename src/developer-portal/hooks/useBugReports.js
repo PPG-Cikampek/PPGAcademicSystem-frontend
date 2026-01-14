@@ -33,11 +33,22 @@ export const useBugReports = (filters = {}) => {
  * Fetch single bug report by reportId
  * @param {string} reportId - The report ID (e.g., 'BUG-000001')
  */
-export const useBugReport = (reportId) => {
+export const useBugReport = (reportId, filters = {}) => {
+    const queryParams = new URLSearchParams();
+
+    Object.entries(filters).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== "") {
+            queryParams.append(key, value);
+        }
+    });
+
+    const queryString = queryParams.toString();
+
     return useQuery({
-        queryKey: [...BUG_REPORTS_QUERY_KEY, reportId],
+        queryKey: [...BUG_REPORTS_QUERY_KEY, reportId, filters],
         queryFn: async () => {
-            const response = await api.get(`/bugReports/${reportId}`);
+            const url = `/bugReports/${reportId}${queryString ? `?${queryString}` : ""}`;
+            const response = await api.get(url);
             return response.data;
         },
         enabled: !!reportId,
