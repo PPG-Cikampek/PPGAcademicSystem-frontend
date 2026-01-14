@@ -72,7 +72,7 @@ const BugBountyPage = () => {
         { id: "leaderboard", label: "Leaderboard" },
         { id: "all", label: "Semua Laporan" },
         { id: "submissions", label: "Laporan Saya" },
-        { id: "submit", label: "Kirim Laporan" }
+        { id: "submit", label: "Buat Laporan Baru" }
     ];
 
     const handleTabChange = (tabId) => {
