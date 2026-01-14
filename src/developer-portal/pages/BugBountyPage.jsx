@@ -189,6 +189,12 @@ const BugBountyPage = () => {
             ),
         },
         {
+            key: "reporterName",
+            label: "Nama Pelapor",
+            sortable: true,
+            render: (report) => report.reporterName || "Anonim",
+        },
+        {
             key: "severity",
             label: "Keparahan",
             sortable: true,
