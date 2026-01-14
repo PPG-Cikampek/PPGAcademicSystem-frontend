@@ -10,6 +10,9 @@ const ReleaseManagementPage = lazy(() =>
 const AnnouncementManagementPage = lazy(() =>
     import("./pages/AnnouncementManagementPage")
 );
+const BugBountyAdminPage = lazy(() =>
+    import("./pages/BugBountyAdminPage")
+);
 
 export const adminPortalRoutes = [
     { path: "/admin/portal", element: <AdminPortalPage /> },
@@ -37,4 +40,7 @@ export const adminPortalRoutes = [
         path: "/admin/portal/announcements/:announcementId/edit",
         element: <AnnouncementManagementPage />,
     },
+    // Bug Bounty admin routes
+    { path: "/admin/portal/bug-bounty", element: <BugBountyAdminPage /> },
+    { path: "/admin/portal/bug-bounty/:reportId", element: <BugBountyAdminPage /> },
 ];

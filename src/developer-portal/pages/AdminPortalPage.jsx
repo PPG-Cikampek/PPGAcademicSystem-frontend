@@ -7,6 +7,7 @@ import {
     useCurrentFeatures,
     useReleaseNotes,
 } from "../hooks/usePortalData";
+import { useBugReportMetrics } from "../hooks/useBugReports";
 import { useAdminCheck } from "../hooks/useAdminCheck";
 import "../styles/admin-portal.css";
 
@@ -25,6 +26,11 @@ const summaryCards = [
         title: "Kelola Pengumuman",
         description: "Komunikasikan informasi penting ke seluruh pengguna.",
         link: "/admin/portal/announcements",
+    },
+    {
+        title: "Bug Bounty",
+        description: "Kelola laporan bug dan berikan poin kontribusi.",
+        link: "/admin/portal/bug-bounty",
     },
 ];
 
@@ -48,6 +54,7 @@ const AdminPortalPage = () => {
     const featuresQuery = useCurrentFeatures();
     const releasesQuery = useReleaseNotes();
     const announcementsQuery = useAnnouncements();
+    const bugReportsMetricsQuery = useBugReportMetrics();
 
     if (userRole && !isAdmin) {
         return <Navigate to="/info-portal" replace />;
@@ -56,7 +63,8 @@ const AdminPortalPage = () => {
     const isLoading =
         featuresQuery.isLoading ||
         releasesQuery.isLoading ||
-        announcementsQuery.isLoading;
+        announcementsQuery.isLoading ||
+        bugReportsMetricsQuery.isLoading;
 
     const hasError =
         featuresQuery.error || releasesQuery.error || announcementsQuery.error;
@@ -100,7 +108,7 @@ const AdminPortalPage = () => {
 
                 {!isLoading && !hasError && (
                     <>
-                        <section className="gap-4 grid md:grid-cols-3">
+                        <section className="gap-4 grid md:grid-cols-4">
                             <StatsCard
                                 label="Total Fitur"
                                 value={featuresQuery.data?.length || 0}
@@ -115,6 +123,11 @@ const AdminPortalPage = () => {
                                 label="Pengumuman Aktif"
                                 value={announcementsQuery.data?.length || 0}
                                 link="/admin/portal/announcements"
+                            />
+                            <StatsCard
+                                label="Bug Reports"
+                                value={bugReportsMetricsQuery.data?.metrics?.pending || 0}
+                                link="/admin/portal/bug-bounty"
                             />
                         </section>
                     </>

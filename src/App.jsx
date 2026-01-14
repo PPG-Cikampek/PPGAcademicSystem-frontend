@@ -49,10 +49,10 @@ Sentry.init({
             maskAllInputs: false,
         }),
         Sentry.browserTracingIntegration(),
-        Sentry.feedbackIntegration({
-            // Additional SDK configuration goes in here, for example:
-            colorScheme: "system",
-        }),
+        // Sentry.feedbackIntegration({
+        //     // Additional SDK configuration goes in here, for example:
+        //     colorScheme: "system",
+        // }),
     ],
     tracesSampleRate: 1.0,
     // Session Replay

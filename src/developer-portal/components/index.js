@@ -10,3 +10,10 @@ export { default as FeatureManagementTable } from './FeatureManagementTable';
 export { default as ReleaseManagementTable } from './ReleaseManagementTable';
 export { default as AnnouncementManagementTable } from './AnnouncementManagementTable';
 export { default as DeleteConfirmationDialog } from './DeleteConfirmationDialog';
+
+// Bug Bounty components
+export { default as BugReportForm } from './BugReportForm';
+export { default as BugReportCard } from './BugReportCard';
+export { default as BugReportDetail } from './BugReportDetail';
+export { default as LeaderboardTable } from './LeaderboardTable';
+export { default as StatusBadge } from './StatusBadge';
