@@ -269,7 +269,7 @@ const BugBountyAdminPage = () => {
                         </div>
                         <div className="bg-white shadow-sm p-4 rounded-lg">
                             <p className="text-gray-500 text-sm">Poin Diberikan</p>
-                            <p className="font-bold text-indigo-600 text-2xl">
+                            <p className="font-bold text-primary text-2xl">
                                 {metricsData?.metrics?.totalPointsIssued || 0}
                             </p>
                         </div>

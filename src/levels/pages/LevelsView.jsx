@@ -68,15 +68,15 @@ const LevelsView = () => {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50 px-4 py-8 md:p-8">
-            <div className="max-w-6xl mx-auto">
-                <div className="flex items-center justify-between mb-8">
-                    <h1 className="text-2xl font-bold text-gray-900">
+        <div className="bg-gray-50 md:p-8 px-4 py-8 min-h-screen">
+            <div className="mx-auto max-w-6xl">
+                <div className="flex justify-between items-center mb-8">
+                    <h1 className="font-bold text-gray-900 text-2xl">
                         Manajemen Desa dan Kelompok
                     </h1>
                     <Link to={`/settings/levels/new`}>
-                        <button className="button-primary pl-[10px]">
-                            <PlusIcon className="w-4 h-4 mr-2" />
+                        <button className="pl-[10px] button-primary">
+                            <PlusIcon className="mr-2 w-4 h-4" />
                             Tambah
                         </button>
                     </Link>
@@ -104,31 +104,31 @@ const LevelsView = () => {
                 )}
 
                 {data && !isLoading && (
-                    <div className="bg-white rounded-lg shadow-sm divide-y">
+                    <div className="bg-white shadow-sm rounded-lg divide-y">
                         {data.branches.map((branch) => (
                             <div
                                 key={branch._id}
-                                className="p-4 hover:bg-gray-100 hover:cursor-pointer transition-all duration-200"
+                                className="hover:bg-gray-100 p-4 transition-all duration-200 hover:cursor-pointer"
                             >
                                 <div
                                     onClick={() => toggleBranch(branch._id)}
-                                    className="flex items-center space-x-4 "
+                                    className="flex items-center space-x-4"
                                 >
-                                    {/* <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
-                                        <Building className="w-4 h-4 text-indigo-600" />
+                                    {/* <div className="flex justify-center items-center bg-indigo-100 rounded-full w-8 h-8">
+                                        <Building className="w-4 h-4 text-primary" />
                                     </div> */}
                                     <div className="flex-1 h-fit">
                                         <div className="flex items-center gap-2">
-                                            <h4 className="text-sm font-semibold text-gray-900">
+                                            <h4 className="font-semibold text-gray-900 text-sm">
                                                 Desa {branch.name}
                                             </h4>
-                                            <div className="text-xs text-gray-500 border border-gray-500 rounded-sm p-1">
+                                            <div className="p-1 border border-gray-500 rounded-sm text-gray-500 text-xs">
                                                 {branch.subBranches.length}{" "}
                                                 Kelompok
                                             </div>
                                         </div>
-                                        <div className="flex items-center text-xs text-gray-500 mt-1">
-                                            {/* <MapPin className="w-4 h-4 mr-1" /> */}
+                                        <div className="flex items-center mt-1 text-gray-500 text-xs">
+                                            {/* <MapPin className="mr-1 w-4 h-4" /> */}
                                             {branch.address}
                                         </div>
                                     </div>
@@ -158,18 +158,18 @@ const LevelsView = () => {
                                 </div>
 
                                 {expandedBranches[branch._id] && (
-                                    <div className="mt-3 ml-12 space-y-2">
+                                    <div className="space-y-2 mt-3 ml-12">
                                         {branch.subBranches.map((sub) => (
                                             <div
                                                 key={sub._id}
-                                                className="flex items-center justify-between py-2 px-3 bg-gray-50 rounded-sm text-sm"
+                                                className="flex justify-between items-center bg-gray-50 px-3 py-2 rounded-sm text-sm"
                                             >
                                                 <div>
                                                     <div className="font-medium text-gray-900">
                                                         Kelompok {sub.name}
                                                     </div>
-                                                    <div className="flex items-center text-xs text-gray-500 mt-1">
-                                                        {/* <MapPin className="w-4 h-4 mr-1" /> */}
+                                                    <div className="flex items-center mt-1 text-gray-500 text-xs">
+                                                        {/* <MapPin className="mr-1 w-4 h-4" /> */}
                                                         {sub.address}
                                                     </div>
                                                 </div>
@@ -180,7 +180,7 @@ const LevelsView = () => {
                                                                 `/settings/levels/teaching-group/${sub._id}`
                                                             )
                                                         }
-                                                        className="px-2 italic text-gray-500 hover:underline hover:text-blue-500 hover:cursor-pointer"
+                                                        className="px-2 text-gray-500 hover:text-blue-500 hover:underline italic hover:cursor-pointer"
                                                     >
                                                         Edit
                                                     </button>
@@ -192,7 +192,7 @@ const LevelsView = () => {
                                                                 sub._id
                                                             )
                                                         }
-                                                        className="px-2 italic text-gray-500 hover:underline hover:text-red-500 hover:cursor-pointer"
+                                                        className="px-2 text-gray-500 hover:text-red-500 hover:underline italic hover:cursor-pointer"
                                                     >
                                                         Hapus
                                                     </button>

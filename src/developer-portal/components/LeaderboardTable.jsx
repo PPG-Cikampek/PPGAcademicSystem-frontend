@@ -27,7 +27,7 @@ const LeaderboardTable = ({ currentUserId }) => {
     if (isLoading) {
         return (
             <div className="flex justify-center items-center py-12">
-                <div className="border-indigo-600 border-b-2 rounded-full w-8 h-8 animate-spin"></div>
+                <div className="border-primary border-b-2 rounded-full w-8 h-8 animate-spin"></div>
             </div>
         );
     }
@@ -38,7 +38,7 @@ const LeaderboardTable = ({ currentUserId }) => {
                 <p className="mb-4 text-red-500">Gagal memuat leaderboard</p>
                 <button
                     onClick={() => refetch()}
-                    className="font-medium text-indigo-600 hover:text-indigo-800"
+                    className="font-medium text-primary hover:text-indigo-800"
                 >
                     Coba Lagi
                 </button>
@@ -60,7 +60,7 @@ const LeaderboardTable = ({ currentUserId }) => {
                             onClick={() => setPeriod(option.value)}
                             className={`px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${
                                 period === option.value
-                                    ? "bg-indigo-600 text-white"
+                                    ? "bg-primary text-white"
                                     : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                             }`}
                         >
@@ -153,7 +153,7 @@ const LeaderboardTable = ({ currentUserId }) => {
                                                     />
                                                 ) : (
                                                     <div className="flex justify-center items-center bg-indigo-100 mr-3 rounded-full w-8 h-8">
-                                                        <span className="font-medium text-indigo-600 text-sm">
+                                                        <span className="font-medium text-primary text-sm">
                                                             {entry.userName?.charAt(0)?.toUpperCase()}
                                                         </span>
                                                     </div>
@@ -162,7 +162,7 @@ const LeaderboardTable = ({ currentUserId }) => {
                                                     <div className="font-medium text-gray-900 text-sm">
                                                         {entry.userName}
                                                         {isCurrentUser && (
-                                                            <span className="ml-2 text-indigo-600 text-xs">
+                                                            <span className="ml-2 text-primary text-xs">
                                                                 (Anda)
                                                             </span>
                                                         )}

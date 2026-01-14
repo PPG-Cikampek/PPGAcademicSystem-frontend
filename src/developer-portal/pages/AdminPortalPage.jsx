@@ -43,7 +43,7 @@ const StatsCard = ({ label, value, link }) => (
             <p className="text-gray-500 text-sm">{label}</p>
             <p className="font-semibold text-gray-900 text-3xl">{value}</p>
         </div>
-        <span className="font-medium text-indigo-600 hover:text-indigo-500 text-sm">
+        <span className="font-medium text-primary hover:text-primary text-sm">
             Lihat detail →
         </span>
     </NavLink>

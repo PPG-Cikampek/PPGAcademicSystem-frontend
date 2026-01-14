@@ -8,7 +8,7 @@ import {
 } from "../utilities/bugReportValidation";
 
 const inputClass =
-    "w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200";
+    "w-full rounded-md border border-gray-200 bg-white px-3 py-2 text-sm shadow-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-indigo-200";
 
 /**
  * BugReportDetail Component
@@ -225,7 +225,7 @@ const BugReportDetail = ({
                         <div className="space-y-4 pl-4 border-indigo-200 border-l-2">
                             {report.updates.map((update, index) => (
                                 <div key={update._id || index} className="relative">
-                                    <div className="-left-[21px] absolute bg-indigo-500 rounded-full w-3 h-3"></div>
+                                    <div className="-left-[21px] absolute bg-primary rounded-full w-3 h-3"></div>
                                     <span className="block text-gray-500 text-xs">
                                         {formatDate(update.createdAt)}
                                     </span>
@@ -242,7 +242,7 @@ const BugReportDetail = ({
                     <div className="pt-6 border-gray-200 border-t">
                         <button
                             onClick={() => setShowAdminPanel(!showAdminPanel)}
-                            className="font-medium text-indigo-600 hover:text-indigo-800 text-sm"
+                            className="font-medium text-primary hover:text-indigo-800 text-sm"
                         >
                             {showAdminPanel ? "Tutup Panel Admin" : "Buka Panel Admin"}
                         </button>
@@ -258,7 +258,7 @@ const BugReportDetail = ({
                                             onClick={() => setStatusAction(action.value)}
                                             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                                                 statusAction === action.value
-                                                    ? "bg-indigo-600 text-white"
+                                                    ? "bg-primary text-white"
                                                     : "bg-white text-gray-700 border border-gray-300 hover:bg-gray-50"
                                             }`}
                                         >
@@ -324,7 +324,7 @@ const BugReportDetail = ({
                                     <button
                                         onClick={handleStatusSubmit}
                                         disabled={isUpdating}
-                                        className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 px-4 py-2 rounded-md text-white transition-colors"
+                                        className="bg-primary hover:bg-indigo-700 disabled:opacity-50 px-4 py-2 rounded-md text-white transition-colors"
                                     >
                                         {isUpdating ? "Memproses..." : "Simpan Perubahan"}
                                     </button>
