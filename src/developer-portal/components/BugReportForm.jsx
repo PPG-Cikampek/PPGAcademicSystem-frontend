@@ -282,14 +282,14 @@ const BugReportForm = ({ onSubmit, onCancel, isSubmitting = false }) => {
                         type="button"
                         onClick={onCancel}
                         disabled={isSubmitting}
-                        className="bg-white hover:bg-gray-50 disabled:opacity-50 px-6 py-2 border border-gray-300 rounded-md w-full sm:w-auto text-gray-700 transition-colors"
+                        className="button-primary-subtle-outline"
                     >
                         Batal
                     </button>
                     <button
                         type="submit"
                         disabled={isSubmitting}
-                        className="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 px-6 py-2 rounded-md w-full sm:w-auto text-white transition-colors"
+                        className="button-primary"
                     >
                         {isSubmitting ? "Mengirim..." : "Kirim Laporan"}
                     </button>

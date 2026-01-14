@@ -52,7 +52,7 @@ const LeaderboardTable = ({ currentUserId }) => {
         <div className="space-y-4">
             {/* Period Filter */}
             <div className="flex justify-between items-center">
-                <h3 className="font-semibold text-gray-900">Peringkat Kontributor</h3>
+                <h3 className="font-semibold text-gray-900">Peringkat</h3>
                 <div className="flex gap-2">
                     {periodOptions.map((option) => (
                         <button
@@ -102,13 +102,13 @@ const LeaderboardTable = ({ currentUserId }) => {
                                     Pengguna
                                 </th>
                                 <th className="px-4 py-3 font-medium text-gray-500 text-xs text-center uppercase tracking-wider">
-                                    Poin
+                                    Total Poin
                                 </th>
                                 <th className="px-4 py-3 font-medium text-gray-500 text-xs text-center uppercase tracking-wider">
-                                    Laporan
+                                    Total Laporan
                                 </th>
                                 <th className="px-4 py-3 font-medium text-gray-500 text-xs text-center uppercase tracking-wider">
-                                    Diterima
+                                    Total Laporan Diterima
                                 </th>
                                 <th className="hidden md:table-cell px-4 py-3 font-medium text-gray-500 text-xs text-left uppercase tracking-wider">
                                     Kontribusi Terakhir

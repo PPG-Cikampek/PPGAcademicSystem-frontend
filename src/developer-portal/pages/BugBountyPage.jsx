@@ -311,7 +311,7 @@ const BugBountyPage = () => {
                 {selectedReportId && (
                     <div className="z-50 fixed inset-0 overflow-hidden">
                         <div
-                            className="absolute inset-0 bg-black bg-opacity-50"
+                            className="absolute inset-0 bg-black/20"
                             onClick={handleCloseDetail}
                         />
                         <div className="right-0 absolute inset-y-0 bg-white shadow-xl w-full max-w-2xl">
