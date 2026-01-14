@@ -1,83 +1,117 @@
-import { useState, useEffect, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { PortalHeader, EmptyState } from "../components";
+import { PortalHeader } from "../components";
 import BugReportForm from "../components/BugReportForm";
-import BugReportCard from "../components/BugReportCard";
 import BugReportDetail from "../components/BugReportDetail";
 import LeaderboardTable from "../components/LeaderboardTable";
+import StatusBadge from "../components/StatusBadge";
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
+import ServerDataTable from "../../shared/Components/UIElements/ServerDataTable";
 import {
     useBugReports,
     useBugReport,
     useCreateBugReport,
     useUpdateBugReportStatus,
-    useAddBugReportUpdate
+    useAddBugReportUpdate,
 } from "../hooks/useBugReports";
+import { STATUS_LABELS, SEVERITY_LABELS } from "../utilities/bugReportValidation";
 
-/**
- * BugBountyPage Component
- * Main user-facing page with tabs for Bug Bounty feature
- */
+const statusOptions = Object.entries(STATUS_LABELS).map(([value, label]) => ({
+    value,
+    label,
+}));
+
+const severityOptions = Object.entries(SEVERITY_LABELS).map(([value, label]) => ({
+    value,
+    label,
+}));
+
+const FILTER_OPTIONS = [
+    { key: "status", label: "Status", options: statusOptions },
+    { key: "severity", label: "Keparahan", options: severityOptions },
+];
+
+const DEFAULT_SORT = { key: "createdAt", direction: "desc" };
+
+const formatDate = (dateString) => {
+    if (!dateString) return "-";
+    return new Date(dateString).toLocaleDateString("id-ID", {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+    });
+};
+
 const BugBountyPage = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const activeTab = searchParams.get("tab") || "leaderboard";
     const selectedReportId = searchParams.get("reportId");
     const isPublicTab = activeTab === "all";
 
-    // Get current user ID from localStorage
     const userData = JSON.parse(localStorage.getItem("userData") || "{}");
     const currentUserId = userData.userId;
 
-    // State
-    const [showForm, setShowForm] = useState(false);
+    const [filters, setFilters] = useState({ status: "", severity: "" });
+    const [page, setPage] = useState(1);
+    const [pageSize, setPageSize] = useState(10);
+    const [search, setSearch] = useState("");
+    const [sort, setSort] = useState(DEFAULT_SORT);
 
-    // Queries
     const reportQueryFilters = useMemo(() => {
-        if (isPublicTab) {
-            return { page: 1, limit: 50, scope: "public" };
-        }
-        return { page: 1, limit: 50 };
-    }, [isPublicTab]);
-
-    const reportDetailFilters = useMemo(() => {
-        return isPublicTab ? { scope: "public" } : {};
-    }, [isPublicTab]);
+        return {
+            page,
+            limit: pageSize,
+            sortBy: sort.key,
+            sortDir: sort.direction,
+            ...(isPublicTab ? { scope: "public" } : {}),
+            ...(filters.status ? { status: filters.status } : {}),
+            ...(filters.severity ? { severity: filters.severity } : {}),
+            ...(search ? { search } : {}),
+        };
+    }, [
+        isPublicTab,
+        page,
+        pageSize,
+        sort.key,
+        sort.direction,
+        filters.status,
+        filters.severity,
+        search,
+    ]);
 
     const {
         data: reportsData,
         isLoading,
+        isFetching,
         error,
-        refetch
+        refetch,
     } = useBugReports(reportQueryFilters);
 
-    const {
-        data: selectedReportData,
-        isLoading: isLoadingReport
-    } = useBugReport(selectedReportId, reportDetailFilters);
+    const { data: selectedReportData, isLoading: isLoadingReport } = useBugReport(
+        selectedReportId,
+        {
+            scope: isPublicTab ? "public" : undefined,
+        }
+    );
 
-    // Mutations
     const createMutation = useCreateBugReport();
     const statusMutation = useUpdateBugReportStatus();
     const updateMutation = useAddBugReportUpdate();
 
     const reports = reportsData?.bugReports || [];
+    const totalReports = reportsData?.total || reports.length || 0;
+    const tableIsLoading = isLoading || isFetching;
+
     const selectedReport = selectedReportData?.bugReport;
     const listTabActive = activeTab === "submissions" || isPublicTab;
-    const emptyStateMessage = isPublicTab
-        ? "Belum ada bounty yang dipublikasikan. Coba lagi nanti!"
-        : "Anda belum memiliki laporan bug. Mulai laporkan bug untuk berkontribusi!";
-
-    const tabs = [
-        { id: "leaderboard", label: "Leaderboard" },
-        { id: "all", label: "Semua Laporan" },
-        { id: "submissions", label: "Laporan Saya" },
-        { id: "submit", label: "Buat Laporan Baru" }
-    ];
+    const emptyListMessage =
+        search || filters.status || filters.severity
+            ? "Tidak ditemukan hasil untuk pencarian atau filter yang dipilih."
+            : "Belum ada laporan bug.";
 
     const handleTabChange = (tabId) => {
         setSearchParams({ tab: tabId });
-        setShowForm(tabId === "submit");
     };
 
     const handleReportClick = (report) => {
@@ -88,10 +122,28 @@ const BugBountyPage = () => {
         setSearchParams({ tab: activeTab });
     };
 
+    const handleFiltersChange = (nextFilters = {}) => {
+        if (Object.keys(nextFilters).length === 0) {
+            setFilters({ status: "", severity: "" });
+            setPage(1);
+            return;
+        }
+
+        setFilters({
+            status: nextFilters.status ?? "",
+            severity: nextFilters.severity ?? "",
+        });
+        setPage(1);
+    };
+
+    const handleSortChange = (nextSort) => {
+        setSort(nextSort);
+        setPage(1);
+    };
+
     const handleSubmit = async (formData) => {
         try {
             await createMutation.mutateAsync(formData);
-            setShowForm(false);
             setSearchParams({ tab: "submissions" });
             refetch();
         } catch (err) {
@@ -119,23 +171,84 @@ const BugBountyPage = () => {
         }
     };
 
-    // Show form when tab is "submit"
-    useEffect(() => {
-        setShowForm(activeTab === "submit");
-    }, [activeTab]);
+    const columns = [
+        {
+            key: "reportId",
+            label: "ID Laporan",
+            sortable: true,
+            render: (report) => (
+                <span className="font-mono text-gray-500 text-xs">{report.reportId}</span>
+            ),
+        },
+        {
+            key: "title",
+            label: "Judul",
+            sortable: true,
+            render: (report) => (
+                <span className="font-medium text-gray-900 line-clamp-1">{report.title}</span>
+            ),
+        },
+        {
+            key: "severity",
+            label: "Keparahan",
+            sortable: true,
+            cellAlign: "center",
+            render: (report) => <StatusBadge type="severity" value={report.severity} />,
+        },
+        {
+            key: "status",
+            label: "Status",
+            sortable: true,
+            cellAlign: "center",
+            render: (report) => <StatusBadge type="status" value={report.status} />,
+        },
+        {
+            key: "createdAt",
+            label: "Dilaporkan",
+            sortable: true,
+            render: (report) => formatDate(report.createdAt),
+        },
+        {
+            key: "pointsAwarded",
+            label: "Poin",
+            cellAlign: "center",
+            render: (report) => (report.pointsAwarded > 0 ? `+${report.pointsAwarded}` : "-"),
+        },
+        {
+            key: "actions",
+            label: "Aksi",
+            headerAlign: "center",
+            cellAlign: "center",
+            render: (report) => (
+                <button
+                    onClick={(event) => {
+                        event.stopPropagation();
+                        handleReportClick(report);
+                    }}
+                    className="btn-primary-outline text-xs btn-mobile-primary"
+                >
+                    Detail
+                </button>
+            ),
+        },
+    ];
 
     return (
         <div className="bg-gray-50 md:p-8 px-4 py-8 min-h-screen">
-            <div className="mx-auto max-w-5xl">
+            <div className="mx-auto max-w-6xl">
                 <PortalHeader
                     title="Bug Bounty Program"
                     description="Laporkan bug yang Anda temukan dan dapatkan poin kontribusi. Poin akan diberikan ketika bug berhasil diperbaiki."
                 />
 
-                {/* Tabs */}
                 <div className="mb-6 border-gray-200 border-b">
                     <nav className="flex space-x-8 -mb-px">
-                        {tabs.map((tab) => (
+                        {[
+                            { id: "leaderboard", label: "Leaderboard" },
+                            { id: "all", label: "Semua Laporan" },
+                            { id: "submissions", label: "Laporan Saya" },
+                            { id: "submit", label: "Buat Laporan Baru" },
+                        ].map((tab) => (
                             <button
                                 key={tab.id}
                                 onClick={() => handleTabChange(tab.id)}
@@ -151,60 +264,50 @@ const BugBountyPage = () => {
                     </nav>
                 </div>
 
-                {/* Tab Content */}
-                <div className="bg-white shadow-sm p-6 rounded-lg">
-                    {/* Public/Public submissions List */}
-                    {listTabActive && (
-                        <>
-                            {isLoading && (
-                                <div className="flex justify-center py-12">
-                                    <LoadingCircle size={32} />
-                                </div>
-                            )}
-
-                            {error && (
-                                <ErrorCard
-                                    error={error}
-                                    onClear={refetch}
-                                />
-                            )}
-
-                            {!isLoading && !error && reports.length === 0 && (
-                                <EmptyState
-                                    message={emptyStateMessage}
-                                />
-                            )}
-
-                            {!isLoading && !error && reports.length > 0 && (
-                                <div className="space-y-2">
-                                    {reports.map((report) => (
-                                        <BugReportCard
-                                            key={report.reportId}
-                                            report={report}
-                                            onClick={handleReportClick}
-                                        />
-                                    ))}
-                                </div>
-                            )}
-                        </>
-                    )}
-
-                    {/* Submit Tab */}
-                    {activeTab === "submit" && (
-                        <BugReportForm
-                            onSubmit={handleSubmit}
-                            onCancel={() => handleTabChange("submissions")}
-                            isSubmitting={createMutation.isPending}
+                {listTabActive && (
+                    <>
+                        {error && <ErrorCard error={error} onClear={refetch} />}
+                        <ServerDataTable
+                            data={reports}
+                            columns={columns}
+                            total={totalReports}
+                            page={page}
+                            pageSize={pageSize}
+                            onPageChange={(nextPage) => setPage(nextPage)}
+                            onPageSizeChange={(size) => {
+                                setPageSize(size);
+                                setPage(1);
+                            }}
+                            search={search}
+                            onSearchChange={(value) => {
+                                setSearch(value);
+                                setPage(1);
+                            }}
+                            filters={filters}
+                            onFiltersChange={handleFiltersChange}
+                            filterOptions={FILTER_OPTIONS}
+                            sort={sort}
+                            onSortChange={handleSortChange}
+                            isLoading={tableIsLoading}
+                            emptyMessage={emptyListMessage}
+                            onRowClick={(item) => handleReportClick(item)}
+                            tableId="bugReports-table"
                         />
-                    )}
+                    </>
+                )}
 
-                    {/* Leaderboard Tab */}
-                    {activeTab === "leaderboard" && (
-                        <LeaderboardTable currentUserId={currentUserId} />
-                    )}
-                </div>
+                {activeTab === "submit" && (
+                    <BugReportForm
+                        onSubmit={handleSubmit}
+                        onCancel={() => handleTabChange("submissions")}
+                        isSubmitting={createMutation.isPending}
+                    />
+                )}
 
-                {/* Report Detail Drawer/Modal */}
+                {activeTab === "leaderboard" && (
+                    <LeaderboardTable currentUserId={currentUserId} />
+                )}
+
                 {selectedReportId && (
                     <div className="z-50 fixed inset-0 overflow-hidden">
                         <div
