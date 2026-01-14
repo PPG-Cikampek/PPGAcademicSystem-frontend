@@ -16,7 +16,7 @@ const STATUS_LABELS = {
     reviewing: 'Sedang Ditinjau',
     accepted: 'Diterima',
     rejected: 'Ditolak',
-    fixed: 'Diperbaiki'
+    fixed: 'Selesai'
 };
 
 const SEVERITY_COLORS = {
