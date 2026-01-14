@@ -244,7 +244,7 @@ const BugBountyPage = () => {
                 <div className="mb-6 border-gray-200 border-b">
                     <nav className="flex space-x-8 -mb-px">
                         {[
-                            { id: "leaderboard", label: "Leaderboard" },
+                            { id: "leaderboard", label: "Peringkat" },
                             { id: "all", label: "Semua Laporan" },
                             { id: "submissions", label: "Laporan Saya" },
                             { id: "submit", label: "Buat Laporan Baru" },

@@ -6,12 +6,14 @@ import { AuthContext } from "../../Context/auth-context";
 import getUserRoleTitle from "../../../Utilities/getUserRoleTitle";
 import FloatingMenu from "../../UIElements/FloatingMenu";
 import BackButton from "../../UIElements/BackButton";
+import useUserProfile from "../../../queries/useUserProfile";
 import {
     User,
     Settings,
     ChevronLeft,
     ChevronRight,
     LogOut,
+    Award
 } from "lucide-react";
 
 // Throttle utility function
@@ -161,16 +163,40 @@ const Navbar = () => {
             .slice(0, 2)
             .join(" ");
 
+        // Use React Query to fetch up-to-date user profile (contributionPoints)
+        const { data: userProfile } = useUserProfile(auth.userId, {
+            enabled: !!auth.userId,
+        });
+
+        const points = userProfile?.contributionPoints ?? 0;
+        const formattedPoints = Intl.NumberFormat().format(points);
+
         return (
             <FloatingMenu
-                boxWidth="w-36"
-                label="Profile"
+                boxWidth="w-48"
+                label={
+                    <span className="flex items-center gap-2">
+                        <span className="truncate">{displayName}</span>
+                        <span
+                            className="ml-2 px-2 py-0.5 border border-secondary rounded-md font-medium text-primary text-xs"
+                            title={`Contribution points: ${points}`}
+                            aria-label={`Contribution points ${points}`}
+                        >
+                            {formattedPoints}
+                        </span>
+                    </span>
+                }
                 style={`btn-secondary-outline-sharp py-3 max-md:text-right`}
                 buttons={[
                     {
                         icon: User,
-                        label: displayName,
+                        label: "Lihat Profile",
                         onClick: () => navigate(`/profile/${auth.userId}`),
+                    },
+                    {
+                        icon: Award,
+                        label: `${points} Poin Kontribusi`,
+                        onClick: () => navigate(`/info-portal/bug-bounty?tab=leaderboard`),
                     },
                     {
                         icon: LogOut,
