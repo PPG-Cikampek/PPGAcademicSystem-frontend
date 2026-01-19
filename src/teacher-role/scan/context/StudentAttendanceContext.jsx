@@ -1,7 +1,10 @@
 // StudentAttendanceContext.jsx
 // Performance Optimization: Uses Map for O(1) student lookups instead of O(n) array operations
 // This significantly improves performance for QR code scanning and student state updates
-import { createContext, useReducer, useEffect, useMemo, useRef, useCallback } from "react";
+// 
+// REFACTORED: Now mounted at route level per scan route, not globally.
+// This prevents stale state issues and ensures clean context per navigation.
+import { createContext, useReducer, useEffect, useMemo, useRef, useCallback, startTransition } from "react";
 import { useAttendanceData, useClassData } from "../../../shared/queries";
 
 const StudentAttendanceContext = createContext();
@@ -243,8 +246,19 @@ const reducer = (state, action) => {
 
 const StudentAttendanceProvider = ({ children }) => {
     const [state, dispatch] = useReducer(reducer, initialState);
+    
+    // Track mounted state to prevent updates after unmount
+    const isMountedRef = useRef(true);
+    
+    useEffect(() => {
+        isMountedRef.current = true;
+        return () => {
+            isMountedRef.current = false;
+        };
+    }, []);
 
     // Use React Query hooks for data fetching
+    // These are now safe because the provider is mounted per-route
     const {
         data: attendanceData,
         isLoading: attendanceLoading,
@@ -259,37 +273,49 @@ const StudentAttendanceProvider = ({ children }) => {
     } = useClassData(state.classId);
 
     // Update state when attendance data is loaded
+    // Use startTransition to mark as non-urgent and allow batching
     useEffect(() => {
-        if (attendanceData) {
-            dispatch({ type: "SET_STUDENT_LIST", payload: attendanceData });
+        if (attendanceData && isMountedRef.current) {
+            startTransition(() => {
+                dispatch({ type: "SET_STUDENT_LIST", payload: attendanceData });
+            });
         }
     }, [attendanceData]);
 
     // Update state when class data is loaded
     useEffect(() => {
-        if (classData) {
-            dispatch({
-                type: "SET_CLASS_START_TIME",
-                payload: classData.class.startTime,
-            });
-            dispatch({
-                type: "SET_IS_ACTIVE_YEAR_ACTIVATED",
-                payload: classData.class.teachingGroupId.branchYearId.isActive,
+        if (classData && isMountedRef.current) {
+            startTransition(() => {
+                dispatch({
+                    type: "SET_CLASS_START_TIME",
+                    payload: classData.class.startTime,
+                });
+                dispatch({
+                    type: "SET_IS_ACTIVE_YEAR_ACTIVATED",
+                    payload: classData.class.teachingGroupId.branchYearId.isActive,
+                });
             });
         }
     }, [classData]);
 
     // Update loading and error states
+    // Use startTransition for batching multiple rapid state changes
     useEffect(() => {
-        dispatch({
-            type: "SET_LOADING",
-            payload: attendanceLoading || classLoading,
+        if (!isMountedRef.current) return;
+        startTransition(() => {
+            dispatch({
+                type: "SET_LOADING",
+                payload: attendanceLoading || classLoading,
+            });
         });
     }, [attendanceLoading, classLoading]);
 
     useEffect(() => {
+        if (!isMountedRef.current) return;
         const error = attendanceError || classError;
-        dispatch({ type: "SET_ERROR", payload: error ? error.message : null });
+        startTransition(() => {
+            dispatch({ type: "SET_ERROR", payload: error ? error.message : null });
+        });
     }, [attendanceError, classError]);
 
     // Helper function to get student list as array for components that need it

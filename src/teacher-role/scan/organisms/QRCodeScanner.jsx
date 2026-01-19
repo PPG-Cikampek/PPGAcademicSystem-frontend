@@ -1,18 +1,79 @@
-import { useState, useContext, memo, useCallback } from "react";
+// QRCodeScanner.jsx
+// Refactored to use overlay pattern - scanner stays mounted to prevent
+// DOM reconciliation issues and camera re-initialization
+import { useState, useContext, memo, useCallback, useRef, useEffect } from "react";
 import { StudentAttendanceLookupContext } from "../context/StudentAttendanceContext";
 import { QRScanner } from "../../../shared/Components/Scanner";
-import SequentialAnimation from "../../shared/Components/Animation/SequentialAnimation";
+
+// Scan result overlay component - displays over the scanner without unmounting it
+const ScanResultOverlay = memo(({ scannedData, isError }) => {
+    return (
+        <div
+            className="z-10 absolute inset-0 flex justify-center items-center bg-black animate-fade-in"
+            style={{ backdropFilter: "blur(2px)" }}
+        >
+            <div
+                className={`text-center p-4 rounded-lg ${
+                    isError ? "animate-shake" : "animate-scale-in"
+                }`}
+            >
+                {isError ? (
+                    <p className="drop-shadow-lg font-semibold text-red-400 text-base">
+                        {scannedData}
+                    </p>
+                ) : (
+                    <div className="flex flex-col items-center gap-1">
+                        <p className="drop-shadow-lg font-medium text-white text-lg">
+                            {scannedData.name}
+                        </p>
+                        <p className="drop-shadow-lg text-gray-200 text-sm">
+                            {scannedData.nis}
+                        </p>
+                        <p
+                            className={`font-bold text-2xl drop-shadow-lg ${
+                                scannedData.status === "Hadir"
+                                    ? "text-green-400"
+                                    : "text-yellow-400"
+                            }`}
+                        >
+                            {scannedData.status}
+                        </p>
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+});
+
+ScanResultOverlay.displayName = "ScanResultOverlay";
 
 const QRCodeScanner = memo(() => {
     const [scannedData, setScannedData] = useState(null);
-    const [scanSuccess, setScanSuccess] = useState(false);
+    const [showOverlay, setShowOverlay] = useState(false);
+
+    // Use ref to track timeout for cleanup
+    const overlayTimeoutRef = useRef(null);
+
+    // Track mounted state
+    const isMountedRef = useRef(true);
 
     // Slim lookup + status marking context (stable identity unless classStartTime changes)
     const { classStartTime, getStudent, hasStudent, markStatus } = useContext(
-        StudentAttendanceLookupContext
+        StudentAttendanceLookupContext,
     );
 
-    const getPresenceStatus = (timeString) => {
+    // Cleanup on unmount
+    useEffect(() => {
+        isMountedRef.current = true;
+        return () => {
+            isMountedRef.current = false;
+            if (overlayTimeoutRef.current) {
+                clearTimeout(overlayTimeoutRef.current);
+            }
+        };
+    }, []);
+
+    const getPresenceStatus = useCallback((timeString) => {
         // Guard against null/undefined timeString
         if (!timeString || typeof timeString !== "string") {
             return "Hadir"; // Default to present if no time configured
@@ -43,21 +104,15 @@ const QRCodeScanner = memo(() => {
         ) {
             return "Terlambat"; // Current time is later
         }
-        if (
-            currentHours < inputHours ||
-            (currentHours === inputHours && currentMinutes < inputMinutes)
-        ) {
-            return "Hadir"; // Current time is earlier
-        }
-        return "Hadir"; // Times are equal
-    };
+        return "Hadir"; // Current time is earlier or equal
+    }, []);
 
     const dataHandler = useCallback(
         (data) => {
             // Delegate to stable markStatus (keeps scanner independent of full context churn)
             markStatus(data.id, data.newStatus);
         },
-        [markStatus]
+        [markStatus],
     );
 
     const handleScan = useCallback(
@@ -67,7 +122,10 @@ const QRCodeScanner = memo(() => {
                 return;
             }
 
-            setScanSuccess(true);
+            // Clear any pending timeout
+            if (overlayTimeoutRef.current) {
+                clearTimeout(overlayTimeoutRef.current);
+            }
 
             const isFound = hasStudent(data);
             if (!isFound) {
@@ -87,15 +145,21 @@ const QRCodeScanner = memo(() => {
                     timestamp: Date.now(),
                 };
                 dataHandler(attendanceData);
-                console.log(attendanceData);
+                console.log("Attendance recorded:", attendanceData);
             }
 
-            // Delay to show result then allow new scan
-            setTimeout(() => {
-                setScanSuccess(false);
-            }, 1000);
+            // Show overlay
+            setShowOverlay(true);
+
+            // Hide overlay after delay - scanner stays active underneath
+            overlayTimeoutRef.current = setTimeout(() => {
+                if (isMountedRef.current) {
+                    setShowOverlay(false);
+                    setScannedData(null);
+                }
+            }, 1200);
         },
-        [classStartTime, hasStudent, getStudent, getPresenceStatus, dataHandler]
+        [classStartTime, hasStudent, getStudent, getPresenceStatus, dataHandler],
     );
 
     const handleError = useCallback((error, instruction) => {
@@ -103,54 +167,35 @@ const QRCodeScanner = memo(() => {
         // Handle errors if needed
     }, []);
 
+    const isError = typeof scannedData === "string";
+
     return (
-        <div className="flex flex-col items-center justify-center h-full w-full p-4">
-            {scanSuccess ? (
-                <div className="relative w-72 h-72 border-2 border-gray-700 shadow-md rounded-md overflow-hidden">
-                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                        <SequentialAnimation
-                            variant={typeof scannedData === "string" ? 6 : 2}
-                        >
-                            {scannedData && (
-                                <div className="flex-col text-center">
-                                    {typeof scannedData === "string" ? (
-                                        <p className="text-red-500 font-semibold text-base">
-                                            {scannedData}
-                                        </p>
-                                    ) : (
-                                        <>
-                                            <p className="text-gray-700 text-lg">
-                                                {scannedData.name}
-                                            </p>
-                                            <p className="text-gray-700 text-lg">
-                                                {scannedData.nis}
-                                            </p>
-                                            <p className="text-green-500 font-bold text-2xl">
-                                                {scannedData.status}
-                                            </p>
-                                        </>
-                                    )}
-                                </div>
-                            )}
-                        </SequentialAnimation>
-                    </div>
-                </div>
-            ) : (
+        <div className="flex flex-col justify-center items-center px-4 w-full h-full">
+            {/* Container for scanner with overlay */}
+            <div className="relative rounded-md w-72 h-72 overflow-hidden">
+                {/* QRScanner always mounted - prevents camera re-initialization issues */}
                 <QRScanner
                     onScan={handleScan}
                     onError={handleError}
                     scannerOptions={{
                         returnDetailedScanResult: true,
                     }}
-                    cooldownDuration={1000}
+                    cooldownDuration={1200}
                     enableBeep={true}
                 />
-            )}
+
+                {/* Overlay displayed on top of scanner when scan occurs */}
+                {showOverlay && scannedData && (
+                    <div className="mt-72">
+                        <ScanResultOverlay scannedData={scannedData} isError={isError} />
+                    </div>
+                )}
+            </div>
         </div>
     );
 });
 
 // Add display name for debugging
-QRCodeScanner.displayName = "QRCodeScanner - for debugging";
+QRCodeScanner.displayName = "QRCodeScanner";
 
 export default QRCodeScanner;

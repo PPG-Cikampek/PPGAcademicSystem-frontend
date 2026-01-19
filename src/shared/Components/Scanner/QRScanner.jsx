@@ -238,7 +238,7 @@ const QRScanner = ({
 
     return (
         <div
-            className={`flex flex-col items-center justify-center h-full w-full p-4 ${className}`}
+            className={`flex flex-col items-center justify-center h-full w-full ${className}`}
             style={style}
         >
             <div className={defaultContainerStyles}>
@@ -255,8 +255,8 @@ const QRScanner = ({
                 />
 
                 {(cooldown || !scanning || error) && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                        <p className="text-white text-center px-4 whitespace-pre-line">
+                    <div className="absolute inset-0 flex justify-center items-center bg-black bg-opacity-50">
+                        <p className="px-4 text-white text-center whitespace-pre-line">
                             {status}
                         </p>
                     </div>
@@ -283,7 +283,7 @@ const QRScanner = ({
             </div>
 
             {instruction && (
-                <div className="mt-6 px-4 italic text-gray-600 whitespace-pre-line">
+                <div className="mt-6 px-4 text-gray-600 italic whitespace-pre-line">
                     {instruction}
                 </div>
             )}

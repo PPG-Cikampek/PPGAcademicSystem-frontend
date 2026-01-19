@@ -5,6 +5,20 @@ import { MunaqasyahScoreProvider } from "../munaqisy/context/MunaqasyahScoreCont
 import StudentReportView from "../students/pages/StudentReportView";
 import { infoPortalRoutes } from "./infoPortalRoutes";
 
+// Create QueryClient singleton outside component to prevent recreation on each render
+const queryClient = new QueryClient({
+    defaultOptions: {
+        queries: {
+            staleTime: 5 * 60 * 1000, // 5 minutes
+            retry: 2,
+            refetchOnWindowFocus: false,
+        },
+        mutations: {
+            retry: 1,
+        },
+    },
+});
+
 const MunaqasyahScannerView = lazy(() =>
     import("../munaqisy/pages/MunaqasyahScannerView")
 );
@@ -83,7 +97,14 @@ const HelpCenterView = lazy(() => import("../help-center/pages/HelpCenterView"))
 
 export const teacherRoutes = [
     { path: "/dashboard", element: <HomeScreenView /> },
-    { path: "/scan", element: <ScannerView /> },
+    {
+        path: "/scan",
+        element: (
+            <StudentAttendanceProvider>
+                <ScannerView />
+            </StudentAttendanceProvider>
+        ),
+    },
     {
         path: "/help-center",
         element: (
@@ -113,7 +134,9 @@ export const teacherRoutes = [
         path: "/scan/class/:classId",
         element: (
             <PageHeader>
-                <ScannerView />
+                <StudentAttendanceProvider>
+                    <ScannerView />
+                </StudentAttendanceProvider>
             </PageHeader>
         ),
     },
@@ -290,11 +313,9 @@ export const teacherRoutes = [
 ];
 
 export const TeacherRouteWrapper = ({ children }) => (
-    <QueryClientProvider client={new QueryClient()}>
-        <StudentAttendanceProvider>
-            <MunaqasyahScoreProvider>
-                <HomeNavigation>{children}</HomeNavigation>
-            </MunaqasyahScoreProvider>
-        </StudentAttendanceProvider>
+    <QueryClientProvider client={queryClient}>
+        <MunaqasyahScoreProvider>
+            <HomeNavigation>{children}</HomeNavigation>
+        </MunaqasyahScoreProvider>
     </QueryClientProvider>
 );

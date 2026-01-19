@@ -1,5 +1,7 @@
 // ScannerView.jsx
-import { useContext, useEffect, useState, useRef, useCallback } from "react";
+// Refactored to use explicit view state machine to prevent DOM reconciliation issues
+// with AnimatePresence during async state transitions
+import { useContext, useEffect, useReducer, useRef, useCallback, startTransition } from "react";
 
 import { useCreateAttendanceMutation } from "../../../shared/queries";
 
@@ -9,9 +11,8 @@ import { AuthContext } from "../../../shared/Components/Context/auth-context";
 import QRCodeScanner from "../organisms/QRCodeScanner";
 import StatusBar from "../molecules/StatusBar";
 import AttendedStudents from "../organisms/AttendedStudents";
-import SequentialAnimation from "../../shared/Components/Animation/SequentialAnimation";
 
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 import ErrorDisplay from "../molecules/ErrorDisplay";
 import CreateAttendanceCard from "../molecules/CreateAttendanceCard";
@@ -19,21 +20,57 @@ import InactiveYearInfo from "../molecules/InactiveYearInfo";
 import SkeletonLoader from "../../../shared/Components/UIElements/SkeletonLoader";
 import LoadingCircle from "../../../shared/Components/UIElements/LoadingCircle";
 
+// View state machine to manage transitions atomically
+// This prevents multiple derived boolean states from causing race conditions
+const VIEW_STATES = {
+    INITIALIZING: 'initializing',
+    LOADING: 'loading',
+    CREATE_ATTENDANCE: 'create_attendance',
+    CREATING: 'creating',
+    SCANNING: 'scanning',
+    ERROR: 'error',
+};
+
+const viewStateReducer = (state, action) => {
+    switch (action.type) {
+        case 'INITIALIZE':
+            return { ...state, viewState: VIEW_STATES.INITIALIZING };
+        case 'SET_LOADING':
+            return { ...state, viewState: VIEW_STATES.LOADING };
+        case 'SHOW_CREATE_CARD':
+            return { ...state, viewState: VIEW_STATES.CREATE_ATTENDANCE, error: null };
+        case 'START_CREATING':
+            return { ...state, viewState: VIEW_STATES.CREATING, error: null };
+        case 'SHOW_SCANNER':
+            return { ...state, viewState: VIEW_STATES.SCANNING, error: null };
+        case 'SET_ERROR':
+            return { ...state, viewState: VIEW_STATES.ERROR, error: action.payload };
+        case 'CLEAR_ERROR':
+            return { ...state, error: null };
+        default:
+            return state;
+    }
+};
+
+const initialViewState = {
+    viewState: VIEW_STATES.INITIALIZING,
+    error: null,
+};
+
 const ScannerView = () => {
     const createAttendanceMutation = useCreateAttendanceMutation();
 
-    const { state, dispatch, refetchAttendance } = useContext(
+    const { state: attendanceState, dispatch: attendanceDispatch, refetchAttendance } = useContext(
         StudentAttendanceContext
     );
 
-    const [isRefetching, setIsRefetching] = useState(false);
+    const [localState, localDispatch] = useReducer(viewStateReducer, initialViewState);
     
     // Track mounted state to prevent state updates after unmount
     const isMountedRef = useRef(true);
 
-    const navigate = useNavigate();
     const auth = useContext(AuthContext);
-    const classId = useParams().classId;
+    const { classId } = useParams();
 
     // Cleanup on unmount
     useEffect(() => {
@@ -43,17 +80,56 @@ const ScannerView = () => {
         };
     }, []);
 
+    // Initialize class context when classId is available
     useEffect(() => {
         if (classId) {
             const attendanceDate = new Date().toLocaleDateString("en-CA");
-            dispatch({ type: "SET_CLASSID", payload: classId });
-            dispatch({ type: "SET_ATTENDANCE_DATE", payload: attendanceDate });
+            attendanceDispatch({ type: "SET_CLASSID", payload: classId });
+            attendanceDispatch({ type: "SET_ATTENDANCE_DATE", payload: attendanceDate });
         }
-    }, [classId, dispatch]);
+    }, [classId, attendanceDispatch]);
+
+    // Sync view state with attendance context state
+    // This effect determines the correct view state based on context
+    useEffect(() => {
+        if (!isMountedRef.current) return;
+
+        // Handle error state from context
+        if (attendanceState.error) {
+            localDispatch({ type: 'SET_ERROR', payload: attendanceState.error });
+            return;
+        }
+
+        // Handle loading state
+        if (attendanceState.isLoading) {
+            localDispatch({ type: 'SET_LOADING' });
+            return;
+        }
+
+        // Determine view based on student list
+        if (attendanceState.studentList.length === 0) {
+            // Only show create card if not currently creating
+            if (localState.viewState !== VIEW_STATES.CREATING) {
+                localDispatch({ type: 'SHOW_CREATE_CARD' });
+            }
+        } else {
+            localDispatch({ type: 'SHOW_SCANNER' });
+        }
+    }, [
+        attendanceState.error,
+        attendanceState.isLoading,
+        attendanceState.studentList.length,
+        localState.viewState,
+    ]);
 
     const createAttendanceHandler = useCallback(async () => {
-        if (createAttendanceMutation.isPending || state.studentList.length > 0)
-            return; // Prevent double execution
+        // Prevent double execution
+        if (createAttendanceMutation.isPending || attendanceState.studentList.length > 0) {
+            return;
+        }
+
+        // Transition to creating state atomically
+        localDispatch({ type: 'START_CREATING' });
 
         try {
             await createAttendanceMutation.mutateAsync({
@@ -63,92 +139,125 @@ const ScannerView = () => {
                 branchYearId: auth.currentBranchYearId,
             });
             
-            // Check if still mounted before updating state
+            // Check if still mounted before continuing
             if (!isMountedRef.current) return;
-            setIsRefetching(true);
 
+            // Refetch will trigger the useEffect above to update view state
             await refetchAttendance();
 
-            // Check again before final state update
-            if (!isMountedRef.current) return;
-            setIsRefetching(false);
         } catch (err) {
             console.error(err);
             if (!isMountedRef.current) return;
-            dispatch({
-                type: "SET_ERROR",
-                payload: err?.message || "Failed to create attendance",
+            
+            // Use startTransition to batch these updates
+            startTransition(() => {
+                localDispatch({
+                    type: 'SET_ERROR',
+                    payload: err?.message || "Failed to create attendance",
+                });
+                attendanceDispatch({
+                    type: "SET_ERROR",
+                    payload: err?.message || "Failed to create attendance",
+                });
             });
-            setIsRefetching(false);
         }
-    }, [createAttendanceMutation, state.studentList.length, classId, auth.userSubBranchId, auth.userBranchId, auth.currentBranchYearId, refetchAttendance, dispatch]);
+    }, [
+        createAttendanceMutation,
+        attendanceState.studentList.length,
+        classId,
+        auth.userSubBranchId,
+        auth.userBranchId,
+        auth.currentBranchYearId,
+        refetchAttendance,
+        attendanceDispatch,
+    ]);
 
     const handleRetry = useCallback(async () => {
-        dispatch({ type: "SET_ERROR", payload: null });
         if (!isMountedRef.current) return;
-        setIsRefetching(true);
+        
+        // Clear error and set loading atomically
+        localDispatch({ type: 'SET_LOADING' });
+        attendanceDispatch({ type: "SET_ERROR", payload: null });
 
         try {
             await refetchAttendance();
         } catch (err) {
-            // Handle error if needed
-        } finally {
             if (isMountedRef.current) {
-                setIsRefetching(false);
+                localDispatch({ 
+                    type: 'SET_ERROR', 
+                    payload: err?.message || "Failed to retry" 
+                });
             }
         }
-    }, [dispatch, refetchAttendance]);
+    }, [attendanceDispatch, refetchAttendance]);
 
-    // Derive visibility states to prevent flicker during transitions
-    const showCreateCard = state.studentList.length === 0 && !state.isLoading && !isRefetching;
-    const showScanner = state.studentList.length !== 0 && !state.isLoading;
+    // Determine what to render based on view state
+    const { viewState, error } = localState;
+    const isCreatingOrLoading = viewState === VIEW_STATES.CREATING || viewState === VIEW_STATES.LOADING;
+    const showCreateCard = viewState === VIEW_STATES.CREATE_ATTENDANCE;
+    const showScanner = viewState === VIEW_STATES.SCANNING;
+    const showError = viewState === VIEW_STATES.ERROR && error;
+    const showLoading = viewState === VIEW_STATES.LOADING || viewState === VIEW_STATES.INITIALIZING;
 
     return (
         <div className="flex flex-col pb-40">
-            <SequentialAnimation variant={2}>
+            {/* StatusBar - always visible, no animation wrapper */}
+            <div className="animate-fade-in">
                 <StatusBar />
-            </SequentialAnimation>
+            </div>
 
-            {state.isLoading && <LoadingCircle />}
-
-            {state.error && (
-                <ErrorDisplay error={state.error} onRetry={handleRetry} />
+            {/* Loading state */}
+            {showLoading && (
+                <div className="flex justify-center mt-8">
+                    <LoadingCircle />
+                </div>
             )}
 
-            {!state.isLoading && !state.error && (
-                <SequentialAnimation variant={2} mode="wait">
-                    {showCreateCard && (
-                        <CreateAttendanceCard
-                            onCreate={createAttendanceHandler}
-                            isLoading={
-                                createAttendanceMutation.isPending ||
-                                isRefetching
-                            }
-                            isBranchYearActivated={state.isBranchYearActivated}
-                        />
-                    )}
-                    {showScanner && (
-                        <>
-                            {state.isBranchYearActivated === true && (
-                                <div className="m-4 card-basic">
-                                    <QRCodeScanner />
-                                </div>
-                            )}
-                            {state.isBranchYearActivated === false && (
-                                <InactiveYearInfo />
-                            )}
-                        </>
-                    )}
-                    <AttendedStudents />
-                </SequentialAnimation>
+            {/* Error state */}
+            {showError && (
+                <ErrorDisplay error={error} onRetry={handleRetry} />
             )}
-            {isRefetching && (
+
+            {/* Create Attendance Card - rendered when no attendance exists */}
+            {showCreateCard && (
+                <div className="animate-fade-in">
+                    <CreateAttendanceCard
+                        onCreate={createAttendanceHandler}
+                        isLoading={createAttendanceMutation.isPending}
+                        isBranchYearActivated={attendanceState.isBranchYearActivated}
+                    />
+                </div>
+            )}
+
+            {/* Creating state - show skeleton while creating */}
+            {viewState === VIEW_STATES.CREATING && (
                 <SkeletonLoader
                     count={2}
                     variant="rectangular"
                     height="150px"
                     className="mx-4 mb-6"
                 />
+            )}
+
+            {/* Scanner view - shown when attendance exists */}
+            {showScanner && (
+                <div className="animate-fade-in">
+                    {attendanceState.isBranchYearActivated === true && (
+                        <div className="m-4 card-basic">
+                            <QRCodeScanner />
+                        </div>
+                    )}
+                    {attendanceState.isBranchYearActivated === false && (
+                        <InactiveYearInfo />
+                    )}
+                </div>
+            )}
+
+            {/* AttendedStudents - always rendered but handles empty state internally */}
+            {!showLoading && !showError && (
+                <div className="animate-fade-in">
+                    <AttendedStudents />
+                </div>
             )}
         </div>
     );

@@ -53,6 +53,51 @@
             transform: translateY(-5px);
         }
     }
+
+    /* Animations for ScannerView and QRCodeScanner components */
+    /* These CSS animations replace framer-motion AnimatePresence to prevent DOM reconciliation issues */
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes scaleIn {
+        from {
+            opacity: 0;
+            transform: scale(0.9);
+        }
+        to {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+
+    @keyframes shake {
+        0%,
+        100% {
+            transform: translateX(0);
+        }
+        10%,
+        30%,
+        50%,
+        70%,
+        90% {
+            transform: translateX(-5px);
+        }
+        20%,
+        40%,
+        60%,
+        80% {
+            transform: translateX(5px);
+        }
+    }
 }
 
 @font-face {
@@ -94,7 +139,7 @@ html {
 
 /* 
 div * {
-    @apply border-solid border border-red-600 box-border;
+    @apply box-border border border-red-600 border-solid;
 } */
 
 #frame {
@@ -107,19 +152,19 @@ table {
 }
 
 body {
-    @apply bg-gray-50 text-sm font-normal h-full;
+    @apply bg-gray-50 h-full font-normal text-sm;
 }
 
 h2 {
-    @apply text-2xl font-semibold;
+    @apply font-semibold text-2xl;
 }
 
 h3 {
-    @apply text-xl font-semibold;
+    @apply font-semibold text-xl;
 }
 
 h4 {
-    @apply text-lg font-semibold;
+    @apply font-semibold text-lg;
 }
 
 @utility font-lpmq {
@@ -131,127 +176,127 @@ h4 {
 }
 
 @utility card-interactive {
-    @apply p-4 rounded-3xl bg-white shadow-xs ring-1 ring-gray-200 transition ease-out hover:-translate-y-1 hover:scale-[1.025] hover:cursor-pointer hover:shadow-lg duration-200;
+    @apply bg-white shadow-xs hover:shadow-lg p-4 rounded-3xl ring-1 ring-gray-200 hover:scale-[1.025] transition hover:-translate-y-1 duration-200 ease-out hover:cursor-pointer;
 }
 
 @utility icon-button-primary {
-    @apply p-3 rounded-full max-md:border max-md:border-blue-500 hover:cursor-pointer hover:bg-gray-200 hover:text-blue-700 text-blue-500 active:cursor-pointer active:bg-blue-500 active:text-white transition;
+    @apply hover:bg-gray-200 active:bg-blue-500 p-3 max-md:border max-md:border-blue-500 rounded-full text-blue-500 hover:text-blue-700 active:text-white transition hover:cursor-pointer active:cursor-pointer;
 }
 
 @utility icon-button-danger {
-    @apply p-3 rounded-full max-md:border max-md:border-red-500 hover:cursor-pointer hover:bg-gray-200 hover:text-red-700 text-red-500 active:cursor-pointer active:bg-red-500 active:text-white transition;
+    @apply hover:bg-gray-200 active:bg-red-500 p-3 max-md:border max-md:border-red-500 rounded-full text-red-500 hover:text-red-700 active:text-white transition hover:cursor-pointer active:cursor-pointer;
 }
 
 @utility card-basic {
-    @apply my-4 p-5 flex justify-center rounded-3xl bg-white shadow-xs ring-1 ring-gray-200;
+    @apply flex justify-center bg-white shadow-xs my-4 p-5 rounded-3xl ring-1 ring-gray-200;
 }
 
 @utility button-primary {
-    @apply mt-3 p-2 px-4 flex justify-center rounded-md border-2 border-primary shadow-xs transition ease-out hover:scale-[1.025] bg-primary text-white hover:cursor-pointer hover:shadow-lg active:bg-primary-darker focus:outline-hidden focus:ring-2 focus:ring-primary-subtle duration-150;
+    @apply flex justify-center bg-primary active:bg-primary-darker shadow-xs hover:shadow-lg mt-3 p-2 px-4 border-2 border-primary rounded-md focus:outline-hidden focus:ring-2 focus:ring-primary-subtle text-white hover:scale-[1.025] transition duration-150 ease-out hover:cursor-pointer;
 }
 
 @utility button-primary-subtle-outline {
-    @apply mt-3 p-2 px-4 flex justify-center rounded-md border-2 border-primary-subtle shadow-xs transition ease-out text-black hover:bg-gray-100 hover:cursor-pointer active:bg-primary active:text-white focus:outline-hidden focus:ring-2 focus:ring-primary-subtle duration-150;
+    @apply flex justify-center hover:bg-gray-100 active:bg-primary shadow-xs mt-3 p-2 px-4 border-2 border-primary-subtle rounded-md focus:outline-hidden focus:ring-2 focus:ring-primary-subtle text-black active:text-white transition duration-150 ease-out hover:cursor-pointer;
 }
 
 @utility button-secondary {
-    @apply mt-3 p-2 px-4 flex justify-center rounded-md border border-secondary bg-white shadow-xs transition ease-out hover:scale-105 hover:bg-secondary hover:text-white hover:cursor-pointer hover:shadow-lg focus:outline-hidden focus:ring-2 focus:ring-secondary-subtle duration-150;
+    @apply flex justify-center bg-white hover:bg-secondary shadow-xs hover:shadow-lg mt-3 p-2 px-4 border border-secondary rounded-md focus:outline-hidden focus:ring-2 focus:ring-secondary-subtle hover:text-white hover:scale-105 transition duration-150 ease-out hover:cursor-pointer;
 }
 
 @utility button-danger {
-    @apply mt-3 p-2 px-4 flex justify-center rounded-md border-2 border-danger text-black bg-white shadow-xs transition ease-out hover:scale-[1.025] hover:bg-danger hover:text-white hover:cursor-pointer hover:shadow-lg focus:outline-hidden focus:ring-2 focus:ring-danger-subtle disabled:opacity-60 duration-150;
+    @apply flex justify-center bg-white hover:bg-danger disabled:opacity-60 shadow-xs hover:shadow-lg mt-3 p-2 px-4 border-2 border-danger rounded-md focus:outline-hidden focus:ring-2 focus:ring-danger-subtle text-black hover:text-white hover:scale-[1.025] transition duration-150 ease-out hover:cursor-pointer;
 }
 
 @utility btn-danger-outline {
-    @apply p-2 px-4 ring-2 ring-danger-subtle hover:bg-danger hover:ring-danger hover:text-white hover:cursor-pointer rounded-[5px] disabled:opacity-60 disabled:hover:cursor-not-allowed transition-all duration-150;
+    @apply hover:bg-danger disabled:opacity-60 p-2 px-4 rounded-[5px] ring-2 ring-danger-subtle hover:ring-danger hover:text-white transition-all duration-150 hover:cursor-pointer disabled:hover:cursor-not-allowed;
 }
 
 @utility btn-primary-outline {
-    @apply p-2 px-4 ring-2 ring-primary-subtle hover:bg-primary hover:ring-primary hover:text-white hover:cursor-pointer rounded-[5px] disabled:opacity-60 disabled:hover:cursor-not-allowed transition-all duration-150;
+    @apply hover:bg-primary disabled:opacity-60 p-2 px-4 rounded-[5px] ring-2 ring-primary-subtle hover:ring-primary hover:text-white transition-all duration-150 hover:cursor-pointer disabled:hover:cursor-not-allowed;
 }
 
 @utility btn-neutral-outline {
-    @apply p-2 px-4 ring-2 ring-primary-subtle hover:bg-gray-500 hover:ring-gray-500 hover:text-white hover:cursor-pointer rounded-[5px] disabled:opacity-60 disabled:hover:cursor-not-allowed transition-all duration-150;
+    @apply hover:bg-gray-500 disabled:opacity-60 p-2 px-4 rounded-[5px] ring-2 ring-primary-subtle hover:ring-gray-500 hover:text-white transition-all duration-150 hover:cursor-pointer disabled:hover:cursor-not-allowed;
 }
 
 @utility btn-secondary-outline-sharp {
-    @apply p-2 px-4 hover:ring-1 hover:ring-primary-subtle hover:cursor-pointer focus:bg-primary-subtle focus:ring-primary-subtle rounded-[2px] transition-all duration-150;
+    @apply focus:bg-primary-subtle p-2 px-4 rounded-[2px] hover:ring-1 hover:ring-primary-subtle focus:ring-primary-subtle transition-all duration-150 hover:cursor-pointer;
 }
 
 @utility badge-primary {
-    @apply p-1 rounded-full bg-blue-100 text-primary font-normal;
+    @apply bg-blue-100 p-1 rounded-full font-normal text-primary;
 }
 
 @utility badge-green {
-    @apply p-1 rounded-full bg-green-100 text-green-700 font-normal;
+    @apply bg-green-100 p-1 rounded-full font-normal text-green-700;
 }
 
 @utility badge-yellow {
-    @apply p-1 rounded-full bg-yellow-100 text-yellow-700 font-normal;
+    @apply bg-yellow-100 p-1 rounded-full font-normal text-yellow-700;
 }
 
 @utility badge-orange {
-    @apply p-1 rounded-full bg-orange-100 text-orange-700 font-normal;
+    @apply bg-orange-100 p-1 rounded-full font-normal text-orange-700;
 }
 
 @utility badge-red {
-    @apply p-1 rounded-full bg-red-100 text-red-700 font-normal;
+    @apply bg-red-100 p-1 rounded-full font-normal text-red-700;
 }
 
 @utility badge-violet {
-    @apply p-1 rounded-full bg-violet-100 text-violet-700 font-normal;
+    @apply bg-violet-100 p-1 rounded-full font-normal text-violet-700;
 }
 
 @utility badge-primary-outline {
-    @apply p-2 rounded-md border border-primary-subtle;
+    @apply p-2 border border-primary-subtle rounded-md;
 }
 
 @utility btn-mobile-secondary-outline {
-    @apply p-2 px-4 rounded-md border border-secondary hover:cursor-pointer active:text-white active:bg-secondary disabled:border-primary-subtle disabled:opacity-60 transition-all duration-200;
+    @apply active:bg-secondary disabled:opacity-60 p-2 px-4 border border-secondary disabled:border-primary-subtle rounded-md active:text-white transition-all duration-200 hover:cursor-pointer;
 }
 
 @utility btn-mobile-danger-outline {
-    @apply p-2 px-4 rounded-md border border-danger hover:cursor-pointer active:text-white active:bg-danger disabled:border-primary-subtle disabled:opacity-60 transition-all duration-200;
+    @apply active:bg-danger disabled:opacity-60 p-2 px-4 border border-danger disabled:border-primary-subtle rounded-md active:text-white transition-all duration-200 hover:cursor-pointer;
 }
 
 @utility btn-mobile-primary {
-    @apply p-2 px-4 rounded-md border border-primary bg-primary hover:cursor-pointer scale-100 active:scale-[1.01] active:ring-2 focus:ring-2 text-white disabled:opacity-55 ease-out transition-all duration-200;
+    @apply bg-primary disabled:opacity-55 p-2 px-4 border border-primary rounded-md focus:ring-2 active:ring-2 text-white scale-100 active:scale-[1.01] transition-all duration-200 ease-out hover:cursor-pointer;
 }
 
 @utility btn-round-primary {
-    @apply p-2 px-4 rounded-full border border-primary bg-primary active:bg-primary-darker hover:bg-primary-darker hover:cursor-pointer focus:ring-2 text-white disabled:opacity-60 ease-out transition-all duration-200;
+    @apply bg-primary hover:bg-primary-darker active:bg-primary-darker disabled:opacity-60 p-2 px-4 border border-primary rounded-full focus:ring-2 text-white transition-all duration-200 ease-out hover:cursor-pointer;
 }
 
 @utility btn-round-gray {
-    @apply flex items-center gap-2 px-4 py-2 border border-gray-300 hover:bg-gray-200 active:bg-gray-200 disabled:text-gray-500 disabled:hover:bg-white disabled:cursor-not-allowed  hover:cursor-pointer rounded-full text-sm font-medium transition-colors;
+    @apply flex items-center gap-2 hover:bg-gray-200 active:bg-gray-200 disabled:hover:bg-white px-4 py-2 border border-gray-300 rounded-full font-medium disabled:text-gray-500 text-sm transition-colors hover:cursor-pointer disabled:cursor-not-allowed;
 }
 
 @utility btn-round-danger {
-    @apply flex items-center gap-2 px-4 py-2 border border-danger-darker hover:bg-danger active:bg-danger disabled:text-gray-500 disabled:hover:bg-white disabled:cursor-not-allowed  hover:cursor-pointer rounded-full text-sm font-medium transition-colors;
+    @apply flex items-center gap-2 hover:bg-danger active:bg-danger disabled:hover:bg-white px-4 py-2 border border-danger-darker rounded-full font-medium disabled:text-gray-500 text-sm transition-colors hover:cursor-pointer disabled:cursor-not-allowed;
 }
 
 @utility btn-round-white {
-    @apply flex text-gray-700 items-center gap-2 px-4 py-2 border border-white bg-white hover:bg-gray-200 active:bg-gray-200 disabled:text-gray-500 disabled:hover:bg-gray-400 disabled:cursor-not-allowed  hover:cursor-pointer rounded-full text-sm font-medium transition-colors;
+    @apply flex items-center gap-2 bg-white hover:bg-gray-200 active:bg-gray-200 disabled:hover:bg-gray-400 px-4 py-2 border border-white rounded-full font-medium text-gray-700 disabled:text-gray-500 text-sm transition-colors hover:cursor-pointer disabled:cursor-not-allowed;
 }
 
 @utility btn-icon-white {
-    @apply p-3 rounded-full hover:bg-gray-200 text-white hover:text-gray-700 transition disabled:hover:bg-white hover:cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed;
+    @apply hover:bg-gray-200 disabled:hover:bg-white disabled:opacity-30 p-3 rounded-full text-white hover:text-gray-700 transition hover:cursor-pointer disabled:cursor-not-allowed;
 }
 
 @utility btn-icon-primary {
-    @apply p-3 rounded-full hover:bg-gray-200 text-primary hover:text-primary-darker transition disabled:hover:bg-white hover:cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed;
+    @apply hover:bg-gray-200 disabled:hover:bg-white disabled:opacity-30 p-3 rounded-full text-primary hover:text-primary-darker transition hover:cursor-pointer disabled:cursor-not-allowed;
 }
 
 @utility btn-icon-secondary {
-    @apply p-3 rounded-full hover:bg-gray-200 text-secondary hover:text-secondary-darker transition disabled:hover:bg-white hover:cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed;
+    @apply hover:bg-gray-200 disabled:hover:bg-white disabled:opacity-30 p-3 rounded-full text-secondary hover:text-secondary-darker transition hover:cursor-pointer disabled:cursor-not-allowed;
 }
 
 @utility btn-icon-danger {
-    @apply p-3 rounded-full hover:bg-gray-200 text-danger hover:text-danger-darker transition disabled:hover:bg-white hover:cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed;
+    @apply hover:bg-gray-200 disabled:hover:bg-white disabled:opacity-30 p-3 rounded-full text-danger hover:text-danger-darker transition hover:cursor-pointer disabled:cursor-not-allowed;
 }
 
 @utility stat-card {
-    @apply bg-white rounded-lg shadow-xs p-6 mb-4 transition-all hover:shadow-md;
+    @apply bg-white shadow-xs hover:shadow-md mb-4 p-6 rounded-lg transition-all;
 }
 
 @utility modal-enter {
@@ -260,4 +305,16 @@ h4 {
 
 @utility modal-exit {
     animation: modalZoomOut 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@utility animate-fade-in {
+    animation: fadeIn 0.01s ease-out forwards;
+}
+
+@utility animate-scale-in {
+    animation: scaleIn 0.05s ease-out forwards;
+}
+
+@utility animate-shake {
+    animation: shake 0.5s ease-in-out;
 }
