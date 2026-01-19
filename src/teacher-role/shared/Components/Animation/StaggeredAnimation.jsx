@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -18,6 +18,7 @@ const itemVariants = {
 
 const StaggeredAnimation = ({ children }) => {
   return (
+    <AnimatePresence>
     <motion.div
       className="container"
       variants={containerVariants}
@@ -35,6 +36,7 @@ const StaggeredAnimation = ({ children }) => {
         </motion.div>
       ))}
     </motion.div>
+    </AnimatePresence>
   );
 };
 

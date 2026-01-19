@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion, useAnimation } from 'framer-motion';
+import { motion, useAnimation, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 
 const AnimatedComponent = ({ children }) => {
@@ -13,6 +13,7 @@ const AnimatedComponent = ({ children }) => {
     }, [controls, inView]);
 
     return (
+        <AnimatePresence>
         <motion.div
             ref={ref}
             initial={{ opacity: 0, x: 50 }
@@ -22,6 +23,7 @@ const AnimatedComponent = ({ children }) => {
         >
             {children}
         </motion.div>
+        </AnimatePresence>
     );
 };
 

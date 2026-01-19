@@ -1,7 +1,7 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
-const SequentialAnimation = ({ variant = 1, children }) => {
+const SequentialAnimation = ({ variant = 1, children, mode = 'sync' }) => {
     // Define animation variants for staggered entrance effect
     const containerVariants = {
         hidden: { opacity: 0 },
@@ -64,16 +64,24 @@ const SequentialAnimation = ({ variant = 1, children }) => {
     }
 
     return (
-        <motion.div
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className="sequential-animation-container"
-        >
-            {React.Children.map(children, (child) => (
-                <motion.div variants={childVariants}>{child}</motion.div>
-            ))}
-        </motion.div>
+        <AnimatePresence mode={mode}>
+            <motion.div
+                key="sequential-container"
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+                exit="hidden"
+                className="sequential-animation-container"
+            >
+                {React.Children.map(children, (child, index) => (
+                    child ? (
+                        <motion.div key={index} variants={childVariants}>
+                            {child}
+                        </motion.div>
+                    ) : null
+                ))}
+            </motion.div>
+        </AnimatePresence>
     );
 };
 

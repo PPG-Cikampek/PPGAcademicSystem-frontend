@@ -1,14 +1,15 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import AttendanceTable from "./AttendanceTable";
 
 const DateGroup = ({ date, attendances, isExpanded, onToggle, classId, onEditAttendance }) => {
     return (
+        <AnimatePresence>
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className="border shadow-xs rounded-full"
+            className="shadow-xs border rounded-full"
         >
             <motion.button
                 onClick={() => onToggle(date)}
@@ -33,6 +34,7 @@ const DateGroup = ({ date, attendances, isExpanded, onToggle, classId, onEditAtt
                 isExpanded={isExpanded}
             />
         </motion.div>
+        </AnimatePresence>
     );
 };
 

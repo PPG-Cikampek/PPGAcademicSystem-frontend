@@ -1,5 +1,5 @@
 // ScannerView.jsx
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef, useCallback } from "react";
 
 import { useCreateAttendanceMutation } from "../../../shared/queries";
 
@@ -27,10 +27,21 @@ const ScannerView = () => {
     );
 
     const [isRefetching, setIsRefetching] = useState(false);
+    
+    // Track mounted state to prevent state updates after unmount
+    const isMountedRef = useRef(true);
 
     const navigate = useNavigate();
     const auth = useContext(AuthContext);
     const classId = useParams().classId;
+
+    // Cleanup on unmount
+    useEffect(() => {
+        isMountedRef.current = true;
+        return () => {
+            isMountedRef.current = false;
+        };
+    }, []);
 
     useEffect(() => {
         if (classId) {
@@ -40,7 +51,7 @@ const ScannerView = () => {
         }
     }, [classId, dispatch]);
 
-    const createAttendanceHandler = async () => {
+    const createAttendanceHandler = useCallback(async () => {
         if (createAttendanceMutation.isPending || state.studentList.length > 0)
             return; // Prevent double execution
 
@@ -51,23 +62,30 @@ const ScannerView = () => {
                 branchId: auth.userBranchId,
                 branchYearId: auth.currentBranchYearId,
             });
+            
+            // Check if still mounted before updating state
+            if (!isMountedRef.current) return;
             setIsRefetching(true);
 
             await refetchAttendance();
 
+            // Check again before final state update
+            if (!isMountedRef.current) return;
             setIsRefetching(false);
         } catch (err) {
             console.error(err);
+            if (!isMountedRef.current) return;
             dispatch({
                 type: "SET_ERROR",
                 payload: err?.message || "Failed to create attendance",
             });
             setIsRefetching(false);
         }
-    };
+    }, [createAttendanceMutation, state.studentList.length, classId, auth.userSubBranchId, auth.userBranchId, auth.currentBranchYearId, refetchAttendance, dispatch]);
 
-    const handleRetry = async () => {
+    const handleRetry = useCallback(async () => {
         dispatch({ type: "SET_ERROR", payload: null });
+        if (!isMountedRef.current) return;
         setIsRefetching(true);
 
         try {
@@ -75,9 +93,15 @@ const ScannerView = () => {
         } catch (err) {
             // Handle error if needed
         } finally {
-            setIsRefetching(false);
+            if (isMountedRef.current) {
+                setIsRefetching(false);
+            }
         }
-    };
+    }, [dispatch, refetchAttendance]);
+
+    // Derive visibility states to prevent flicker during transitions
+    const showCreateCard = state.studentList.length === 0 && !state.isLoading && !isRefetching;
+    const showScanner = state.studentList.length !== 0 && !state.isLoading;
 
     return (
         <div className="flex flex-col pb-40">
@@ -92,8 +116,8 @@ const ScannerView = () => {
             )}
 
             {!state.isLoading && !state.error && (
-                <SequentialAnimation variant={2}>
-                    {state.studentList.length === 0 && !state.isLoading && (
+                <SequentialAnimation variant={2} mode="wait">
+                    {showCreateCard && (
                         <CreateAttendanceCard
                             onCreate={createAttendanceHandler}
                             isLoading={
@@ -103,10 +127,10 @@ const ScannerView = () => {
                             isBranchYearActivated={state.isBranchYearActivated}
                         />
                     )}
-                    {state.studentList.length !== 0 && !state.isLoading && (
+                    {showScanner && (
                         <>
                             {state.isBranchYearActivated === true && (
-                                <div className="card-basic m-4">
+                                <div className="m-4 card-basic">
                                     <QRCodeScanner />
                                 </div>
                             )}
