@@ -81,8 +81,6 @@ const QRCodeScanner = memo(() => {
 
         // Get the current time
         const now = new Date();
-        const currentHours = now.getHours();
-        const currentMinutes = now.getMinutes();
 
         // Parse the input time string safely
         const timeParts = timeString.split(":");
@@ -97,14 +95,17 @@ const QRCodeScanner = memo(() => {
             return "Hadir"; // Default if parsing failed
         }
 
-        // Compare the times
-        if (
-            currentHours > inputHours ||
-            (currentHours === inputHours && currentMinutes > inputMinutes)
-        ) {
-            return "Terlambat"; // Current time is later
+        // Allow a 15-minute grace period after the scheduled time.
+        // Calculate the difference in minutes between now and the scheduled time.
+        const scheduled = new Date();
+        scheduled.setHours(inputHours, inputMinutes, 0, 0);
+        const diffMinutes = Math.floor((now - scheduled) / (60 * 1000));
+
+        // If more than 15 minutes late, mark as late; otherwise still "Hadir".
+        if (diffMinutes > 15) {
+            return "Terlambat"; // More than 15 minutes late
         }
-        return "Hadir"; // Current time is earlier or equal
+        return "Hadir"; // Within 15 minutes or earlier
     }, []);
 
     const dataHandler = useCallback(
