@@ -8,6 +8,13 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 app.use(compression());
+
+// Indicate the default content language to clients and proxies
+app.use((req, res, next) => {
+    res.setHeader("Content-Language", "id");
+    next();
+});
+
 app.use(express.static(path.join(__dirname, "dist")));
 
 app.get("*", (req, res) => {

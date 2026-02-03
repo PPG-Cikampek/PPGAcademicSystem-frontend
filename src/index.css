@@ -318,3 +318,9 @@ h4 {
 @utility animate-shake {
     animation: shake 0.5s ease-in-out;
 }
+
+/* Google Translate / browser translation helper styles */
+.goog-te-banner-frame { display: none !important; }
+.goog-te-spinner { display: none !important; }
+.goog-te-banner-frame.skiptranslate { display: none !important; }
+html[translate="no"], body[translate="no"], .notranslate { unicode-bidi: isolate !important; }

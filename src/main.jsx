@@ -15,6 +15,20 @@ import PWAInstallPrompt from "./shared/Components/PWA/PWAInstallPrompt.jsx";
 import { useMaintenanceFlag } from "./shared/hooks/useMaintenanceFlag.js";
 import { useTestingFlag } from "./shared/hooks/useTestingFlag.js";
 
+// Prevent automatic browser translation (Google Translate / Chrome)
+if (typeof document !== "undefined") {
+    document.documentElement.setAttribute("translate", "no");
+    // Ensure the document language is set to Bahasa Indonesia
+    document.documentElement.setAttribute("lang", "id");
+    if (document.body) {
+        document.body.classList.add("notranslate");
+    } else {
+        document.addEventListener("DOMContentLoaded", () => {
+            document.body && document.body.classList.add("notranslate");
+        });
+    }
+}
+
 // PWA Install Detection
 let deferredPrompt;
 window.addEventListener("beforeinstallprompt", (e) => {
