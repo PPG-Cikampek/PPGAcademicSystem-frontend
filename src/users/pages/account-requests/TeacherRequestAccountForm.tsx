@@ -12,6 +12,7 @@ import useModal from "../../../shared/hooks/useNewModal";
 import { teacherFields, TeacherAccount, AccountField } from "../../config";
 import FileUpload from "../../../shared/Components/FormElements/FileUpload";
 import { Icon } from "@iconify-icon/react";
+import { getApiToken } from "../../../shared/queries/api";
 
 interface ResponseData {
     message: string;
@@ -110,7 +111,7 @@ const TeacherRequestAccountForm: React.FC = () => {
                     xhr.open("POST", url);
                     xhr.setRequestHeader(
                         "Authorization",
-                        "Bearer " + auth.token
+                        "Bearer " + getApiToken()
                     );
 
                     xhr.upload.onprogress = (event) => {

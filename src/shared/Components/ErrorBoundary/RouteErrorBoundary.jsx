@@ -1,5 +1,4 @@
 import React from "react";
-import clearSiteData from "../../Utilities/clearSiteData";
 
 class RouteErrorBoundary extends React.Component {
     constructor(props) {
@@ -21,20 +20,25 @@ class RouteErrorBoundary extends React.Component {
 
     handleRetry = () => {
         this.setState({ hasError: false, error: null });
-        // Refresh the page to reset the app state
         window.location.reload();
+    };
+
+    handleClearAndLogout = () => {
+        sessionStorage.clear();
+        localStorage.clear();
+        window.location.href = "/";
     };
 
     render() {
         if (this.state.hasError) {
             return (
-                <div className="flex flex-col items-center justify-center h-screen bg-gray-50">
-                    <div className="text-center p-8 bg-white rounded-lg shadow-md max-w-md">
-                        <div className="text-red-500 text-6xl mb-4">⚠️</div>
-                        <h2 className="text-2xl font-bold text-red-500 mb-4">
+                <div className="flex flex-col justify-center items-center bg-gray-50 h-screen">
+                    <div className="bg-white shadow-md p-8 rounded-lg max-w-md text-center">
+                        <div className="mb-4 text-red-500 text-6xl">⚠️</div>
+                        <h2 className="mb-4 font-bold text-red-500 text-2xl">
                             Terjadi Kesalahan
                         </h2>
-                        <p className="text-gray-600 mb-6">
+                        <p className="mb-6 text-gray-600">
                             Sistem mengalami kesalahan yang tidak terduga. Mohon
                             coba lagi atau hubungi tim ICT jika masalah
                             berlanjut. Sertakan screenshot dan kronologis
@@ -43,30 +47,25 @@ class RouteErrorBoundary extends React.Component {
                         <div className="space-y-3">
                             <button
                                 onClick={this.handleRetry}
-                                className="button-primary w-full"
+                                className="w-full button-primary"
                             >
                                 Refresh Halaman
                             </button>
                             <button
-                                onClick={() => {
-                                    clearSiteData();
-                                    window.location.href = "/";
-                                }}
+                                onClick={this.handleClearAndLogout}
                                 className="btn-neutral-outline w-full"
                             >
                                 Bersihkan cache & Login Kembali
                             </button>
                         </div>
-                        {/* {process.env.NODE_ENV === "development" && ( */}
                         <details className="mt-4 text-left">
-                            <summary className="cursor-pointer text-sm text-gray-500">
+                            <summary className="text-gray-500 text-sm cursor-pointer">
                                 Error Details
                             </summary>
-                            <pre className="mt-2 text-xs text-red-600 bg-red-50 p-2 rounded overflow-auto">
+                            <pre className="bg-red-50 mt-2 p-2 rounded overflow-auto text-red-600 text-xs">
                                 {this.state.error?.stack.toString()}
                             </pre>
                         </details>
-                        {/* )} */}
                     </div>
                 </div>
             );

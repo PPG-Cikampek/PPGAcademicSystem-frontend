@@ -187,7 +187,6 @@ const AdminMunaqasyahDetailView = () => {
             try {
                 const responseData = await sendRequest(url, "PATCH", body, {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${auth.token}`,
                 });
                 openModal(responseData.message, "success", null, "Berhasil!");
                 refetch();

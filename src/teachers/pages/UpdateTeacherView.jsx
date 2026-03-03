@@ -20,6 +20,7 @@ import useModal from "../../shared/hooks/useNewModal";
 import FileUpload from "../../shared/Components/FormElements/FileUpload";
 
 import { Icon } from "@iconify-icon/react";
+import { getApiToken } from "../../shared/queries/api";
 
 const CANCEL_UPLOAD_MESSAGE = "Permintaan dibatalkan oleh pengguna.";
 // Threshold for large file warning (in bytes) - adjust as needed
@@ -193,7 +194,7 @@ const UpdateTeacherView = () => {
                         const xhr = new XMLHttpRequest();
                         activeRequestRef.current = xhr;
                         xhr.open("PATCH", url);
-                        xhr.setRequestHeader("Authorization", "Bearer " + auth.token);
+                        xhr.setRequestHeader("Authorization", "Bearer " + getApiToken());
 
                         xhr.upload.onprogress = (event) => {
                             if (event.lengthComputable && event.total > 0) {

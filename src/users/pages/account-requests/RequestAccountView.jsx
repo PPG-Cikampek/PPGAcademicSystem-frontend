@@ -65,7 +65,6 @@ const RequestAccountView = () => {
             try {
                 const responseData = await sendRequest(url, "PATCH", body, {
                     "Content-Type": "application/json",
-                    Authorization: "Bearer " + auth.token,
                 });
 
                 // Use toast instead of modal for success
@@ -131,7 +130,7 @@ const RequestAccountView = () => {
             render: (item) => (
                 <div className="text-sm">
                     <div>{formatDate(item.createdTime)}</div>
-                    <div className="text-xs text-gray-500">
+                    <div className="text-gray-500 text-xs">
                         {new Date(item.createdTime).toLocaleTimeString(
                             "id-ID",
                             {
@@ -181,18 +180,18 @@ const RequestAccountView = () => {
                             e.stopPropagation();
                             handleCancelTicket(item.ticketId, "cancelled");
                         }}
-                        className="btn-danger-outline m-0 text-xs px-3 py-1"
+                        className="m-0 px-3 py-1 btn-danger-outline text-xs"
                         title="Batalkan Pendaftaran"
                     >
                         Batalkan
                     </button>
                 ) : item.status === "cancelled" ||
                   item.status === "rejected" ? (
-                    <span className="text-xs text-gray-500 italic">
+                    <span className="text-gray-500 text-xs italic">
                         Selesai
                     </span>
                 ) : (
-                    <span className="text-xs text-green-600 font-medium">
+                    <span className="font-medium text-green-600 text-xs">
                         Selesai
                     </span>
                 ),
@@ -200,7 +199,7 @@ const RequestAccountView = () => {
     ];
 
     return (
-        <div className="min-h-screen px-4 py-8 md:p-8">
+        <div className="md:p-8 px-4 py-8 min-h-screen">
             <ToastContainer toasts={toasts} onRemoveToast={removeToast} />
 
             <NewModal
@@ -209,13 +208,13 @@ const RequestAccountView = () => {
                 isLoading={isLoading}
             />
 
-            <div className="max-w-6xl mx-auto">
-                <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6">
+            <div className="mx-auto max-w-6xl">
+                <h2 className="mb-4 md:mb-6 font-bold text-xl md:text-2xl">
                     Riwayat Pendaftaran
                 </h2>
                 {isLoading && !tickets ? (
-                    <div className="bg-white rounded-lg shadow-sm border p-8">
-                        <div className="flex items-center justify-center">
+                    <div className="bg-white shadow-sm p-8 border rounded-lg">
+                        <div className="flex justify-center items-center">
                             <LoadingCircle size={32} />
                             <span className="ml-3 text-gray-600">
                                 Memuat daftar Pendaftaran...
@@ -274,19 +273,19 @@ const RequestAccountView = () => {
                     </div>
                 ) : tickets &&
                   (!tickets.tickets || tickets.tickets.length === 0) ? (
-                    <div className="bg-white rounded-lg border-2 border-dashed border-gray-300 p-12 text-center">
-                        <div className="mx-auto flex flex-col items-center">
-                            <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
-                                <Users className="h-10 w-10 text-gray-400" />
+                    <div className="bg-white p-12 border-2 border-gray-300 border-dashed rounded-lg text-center">
+                        <div className="flex flex-col items-center mx-auto">
+                            <div className="flex justify-center items-center bg-gray-100 mx-auto rounded-full w-20 h-20">
+                                <Users className="w-10 h-10 text-gray-400" />
                             </div>
-                            <h3 className="mt-4 text-lg font-semibold text-gray-900">
+                            <h3 className="mt-4 font-semibold text-gray-900 text-lg">
                                 Belum Ada Pendaftaran Baru
                             </h3>
-                            <p className="mt-2 text-sm text-gray-500 max-w-sm">
+                            <p className="mt-2 max-w-sm text-gray-500 text-sm">
                                 Anda belum memiliki Pendaftaran apapun. Mulai
                                 dengan membuat Pendaftaran baru di bawah ini.
                             </p>
-                            <div className="mt-6 flex gap-3">
+                            <div className="flex gap-3 mt-6">
                                 <Link
                                     to="/settings/requestAccount/teacher"
                                     className="btn-primary-outline"
@@ -303,26 +302,26 @@ const RequestAccountView = () => {
                         </div>
                     </div>
                 ) : null}
-                <h2 className="text-xl md:text-2xl font-bold my-8 md:my-12 mb-4 md:mb-6">
+                <h2 className="my-8 md:my-12 mb-4 md:mb-6 font-bold text-xl md:text-2xl">
                     Buat Pendaftaran Baru
                 </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 max-w-4xl mx-auto">
+                <div className="gap-4 md:gap-6 grid grid-cols-1 md:grid-cols-2 mx-auto max-w-4xl">
                     <Link
                         to="/settings/requestAccount/teacher"
-                        className="group card-interactive min-h-32 md:min-h-48 rounded-lg items-center p-6 md:p-8 transition-all duration-200 hover:shadow-lg"
+                        className="group items-center hover:shadow-lg p-6 md:p-8 rounded-lg min-h-32 md:min-h-48 transition-all duration-200 card-interactive"
                     >
                         <div className="flex flex-col items-center gap-3 md:gap-4 text-center">
-                            <div className="p-3 md:p-4 bg-blue-50 rounded-full group-hover:bg-blue-100 transition-colors">
+                            <div className="bg-blue-50 group-hover:bg-blue-100 p-3 md:p-4 rounded-full transition-colors">
                                 <GraduationCap
                                     size={32}
                                     className="md:w-12 md:h-12 text-blue-600"
                                 />
                             </div>
                             <div>
-                                <div className="font-semibold text-lg md:text-xl mb-1">
+                                <div className="mb-1 font-semibold text-lg md:text-xl">
                                     Pendaftaran Guru Baru
                                 </div>
-                                <div className="text-sm text-gray-600">
+                                <div className="text-gray-600 text-sm">
                                     Buat Pendaftaran tenaga pendidik baru
                                 </div>
                             </div>
@@ -330,20 +329,20 @@ const RequestAccountView = () => {
                     </Link>
                     <Link
                         to="/settings/requestAccount/student"
-                        className="group card-interactive min-h-32 md:min-h-48 rounded-lg items-center p-6 md:p-8 transition-all duration-200 hover:shadow-lg"
+                        className="group items-center hover:shadow-lg p-6 md:p-8 rounded-lg min-h-32 md:min-h-48 transition-all duration-200 card-interactive"
                     >
                         <div className="flex flex-col items-center gap-3 md:gap-4 text-center">
-                            <div className="p-3 md:p-4 bg-green-50 rounded-full group-hover:bg-green-100 transition-colors">
+                            <div className="bg-green-50 group-hover:bg-green-100 p-3 md:p-4 rounded-full transition-colors">
                                 <Users
                                     size={32}
                                     className="md:w-12 md:h-12 text-green-600"
                                 />
                             </div>
                             <div>
-                                <div className="font-semibold text-lg md:text-xl mb-1">
+                                <div className="mb-1 font-semibold text-lg md:text-xl">
                                     Pendaftaran Siswa Baru
                                 </div>
-                                <div className="text-sm text-gray-600">
+                                <div className="text-gray-600 text-sm">
                                     Buat Pendaftaran peserta didik baru
                                 </div>
                             </div>

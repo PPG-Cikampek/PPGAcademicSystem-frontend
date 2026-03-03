@@ -30,7 +30,6 @@ const MunaqasyahClassList = () => {
                     "GET",
                     null,
                     {
-                        Authorization: `Bearer ${auth.token}`,
                         "Content-Type": "application/json",
                     }
                 );
@@ -42,7 +41,7 @@ const MunaqasyahClassList = () => {
             }
         };
         fetchClasses();
-    }, [sendRequest, branchYearId, subBranchId, auth.token]);
+    }, [sendRequest, branchYearId, subBranchId]);
 
     return (
         <div className="bg-gray-50 md:p-8 px-4 py-8 min-h-screen">

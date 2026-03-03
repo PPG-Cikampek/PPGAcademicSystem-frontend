@@ -1,11 +1,14 @@
-import { useState, useCallback, useEffect } from "react";
-import useClearSiteData from "./useClearSiteData";
+import { useState, useCallback, useEffect, useRef } from "react";
+import { setApiToken, setOnUnauthorized } from "../queries/api";
+import iamApi from "../queries/iam-api";
 
-let logoutTimer;
+const IAM_URL = import.meta.env.VITE_IAM_URL || "http://localhost:3001";
+const CALLBACK_PATH = "/auth/callback";
+
+// Silent-refresh timer
+let refreshTimer = null;
 
 export const useAuth = () => {
-    const [token, setToken] = useState();
-    const [tokenExpirationDate, setTokenExpirationDate] = useState();
     const [userId, setUserId] = useState(null);
     const [userRole, setUserRole] = useState(null);
     const [userName, setUserName] = useState(null);
@@ -15,57 +18,11 @@ export const useAuth = () => {
     const [currentBranchYearId, setCurrentBranchYearId] = useState(null);
     const [userClassIds, setUserClassIds] = useState([]);
     const [isInitialized, setIsInitialized] = useState(false);
+    const isRefreshing = useRef(false);
 
-    const clearSiteData = useClearSiteData();
+    // ─── helpers ─────────────────────────
 
-    const login = useCallback(
-        (
-            uId,
-            role,
-            name,
-            branchId,
-            subBranchId,
-            currentBranchYear,
-            currentBranchYearId,
-            userClassIds,
-            token,
-            expirationDate
-        ) => {
-            setUserRole(role);
-            setToken(token);
-            setUserId(uId);
-            setUserName(name);
-            setUserBranchId(branchId);
-            setUserSubBranchId(subBranchId);
-            setCurrentBranchYear(currentBranchYear);
-            setCurrentBranchYearId(currentBranchYearId);
-            setUserClassIds(userClassIds);
-
-            const tokenExpirationDate =
-                expirationDate ||
-                new Date(new Date().getTime() + 1000 * 60 * 60 * 2);
-            setTokenExpirationDate(tokenExpirationDate);
-            localStorage.setItem(
-                "userData",
-                JSON.stringify({
-                    userId: uId,
-                    name: name,
-                    role: role,
-                    branchId: branchId,
-                    subBranchId: subBranchId,
-                    currentBranchYear: currentBranchYear,
-                    currentBranchYearId: currentBranchYearId,
-                    userClassIds: userClassIds,
-                    token: token,
-                    expiration: tokenExpirationDate.toISOString(),
-                })
-            );
-        },
-        []
-    );
-
-    const logout = useCallback(() => {
-        setToken(null);
+    const clearState = useCallback(() => {
         setUserId(null);
         setUserRole(null);
         setUserName(null);
@@ -73,111 +30,217 @@ export const useAuth = () => {
         setUserSubBranchId(null);
         setCurrentBranchYear(null);
         setCurrentBranchYearId(null);
-        setUserClassIds(null);
-
-        setTokenExpirationDate(null);
-        clearSiteData();
+        setUserClassIds([]);
+        setApiToken(null);
+        sessionStorage.removeItem("iam_access_token");
+        localStorage.removeItem("userData");
+        clearInterval(refreshTimer);
     }, []);
 
-    useEffect(() => {
-        if (token && tokenExpirationDate) {
-            const remainingTime =
-                tokenExpirationDate.getTime() - new Date().getTime();
-            logoutTimer = setTimeout(logout, remainingTime);
-        } else {
-            clearTimeout(logoutTimer);
+    const persistState = useCallback(
+        (profile) => {
+            localStorage.setItem(
+                "userData",
+                JSON.stringify({
+                    userId: profile.userId,
+                    role: profile.role,
+                    name: profile.name,
+                    branchId: profile.branchId,
+                    subBranchId: profile.subBranchId,
+                    currentBranchYear: profile.currentBranchYear,
+                    currentBranchYearId: profile.currentBranchYearId,
+                    userClassIds: profile.userClassIds,
+                })
+            );
+        },
+        []
+    );
+
+    const applyProfile = useCallback(
+        (profile, token) => {
+            setApiToken(token);
+            sessionStorage.setItem("iam_access_token", token);
+            setUserId(profile.userId);
+            setUserRole(profile.role);
+            setUserName(profile.name);
+            setUserBranchId(profile.branchId || null);
+            setUserSubBranchId(profile.subBranchId || null);
+            setCurrentBranchYear(profile.currentBranchYear || null);
+            setCurrentBranchYearId(profile.currentBranchYearId || null);
+            setUserClassIds(profile.userClassIds || []);
+            persistState(profile);
+        },
+        [persistState]
+    );
+
+    // ─── silent refresh ─────────────────
+    const silentRefresh = useCallback(async () => {
+        if (isRefreshing.current) return;
+        isRefreshing.current = true;
+        try {
+            const res = await iamApi.post("/api/auth/refresh");
+            if (res.data?.accessToken) {
+                setApiToken(res.data.accessToken);
+                sessionStorage.setItem("iam_access_token", res.data.accessToken);
+            }
+        } catch {
+            // refresh failed — session expired
+            clearState();
+        } finally {
+            isRefreshing.current = false;
         }
-    }, [token, logout, tokenExpirationDate]);
+    }, [clearState]);
 
-    useEffect(() => {
-        let isMounted = true;
+    const startRefreshCycle = useCallback(() => {
+        clearInterval(refreshTimer);
+        // refresh every 13 min (access token lives 15 min)
+        refreshTimer = setInterval(silentRefresh, 13 * 60 * 1000);
+    }, [silentRefresh]);
 
-        const initializeAuth = () => {
+    // ─── public API ─────────────────────
+
+    const redirectToLogin = useCallback(() => {
+        const callbackUrl = `${window.location.origin}${CALLBACK_PATH}`;
+        window.location.href = `${IAM_URL}/login?redirect_uri=${encodeURIComponent(callbackUrl)}`;
+    }, []);
+
+    const handleCallback = useCallback(
+        async (accessToken) => {
+            setApiToken(accessToken);
+            sessionStorage.setItem("iam_access_token", accessToken);
+
+            // Fetch user profile from IAM
+            let userProfile;
             try {
-                const storedData = localStorage.getItem("userData");
+                const meRes = await iamApi.get("/api/auth/me");
+                if (!meRes.data?.authenticated) throw new Error("Not authenticated");
+                userProfile = meRes.data.user;
+            } catch {
+                clearState();
+                throw new Error("Failed to fetch user profile from IAM");
+            }
 
-                if (!storedData) {
-                    // No stored data, user is not logged in
-                    if (isMounted) {
-                        setIsInitialized(true);
-                    }
-                    return;
+            const profile = {
+                userId: userProfile.userId || userProfile._id,
+                role: userProfile.role,
+                name: userProfile.name,
+                email: userProfile.email,
+                branchId: userProfile.branchId || null,
+                subBranchId: userProfile.subBranchId || null,
+                currentBranchYear: null,
+                currentBranchYearId: null,
+                userClassIds: [],
+            };
+
+            applyProfile(profile, accessToken);
+            startRefreshCycle();
+
+            return profile;
+        },
+        [applyProfile, startRefreshCycle, clearState]
+    );
+
+    const login = useCallback(
+        (profile, token) => {
+            applyProfile(profile, token);
+            startRefreshCycle();
+        },
+        [applyProfile, startRefreshCycle]
+    );
+
+    const logout = useCallback(async () => {
+        try {
+            await iamApi.post("/api/auth/logout");
+        } catch {
+            // ignore — best-effort
+        }
+        clearState();
+        window.location.href = "/";
+    }, [clearState]);
+
+    // ─── 401 interceptor ────────────────
+    useEffect(() => {
+        setOnUnauthorized(async (error) => {
+            try {
+                await silentRefresh();
+                // Retry original request with new token
+                const config = error.config;
+                const token = sessionStorage.getItem("iam_access_token");
+                if (token) {
+                    config.headers.Authorization = `Bearer ${token}`;
+                    const axios = (await import("axios")).default;
+                    return axios(config);
                 }
+            } catch {
+                clearState();
+                redirectToLogin();
+            }
+            return null;
+        });
 
-                const parsedData = JSON.parse(storedData);
+        return () => setOnUnauthorized(null);
+    }, [silentRefresh, clearState, redirectToLogin]);
 
-                // Validate stored data structure
-                if (
-                    !parsedData ||
-                    !parsedData.token ||
-                    !parsedData.expiration ||
-                    !parsedData.role
-                ) {
-                    // Invalid stored data, clear it
-                    localStorage.removeItem("userData");
-                    if (isMounted) {
-                        setIsInitialized(true);
-                    }
-                    return;
-                }
+    // ─── restore on mount ───────────────
+    useEffect(() => {
+        const restore = async () => {
+            const savedToken = sessionStorage.getItem("iam_access_token");
+            const savedData = localStorage.getItem("userData");
 
-                // Check if token is expired
-                const expirationDate = new Date(parsedData.expiration);
-                if (expirationDate <= new Date()) {
-                    // Token expired, clear stored data
-                    localStorage.removeItem("userData");
-                    if (isMounted) {
-                        setIsInitialized(true);
-                    }
-                    return;
-                }
-
-                // Valid stored data, restore auth state
-                if (isMounted) {
-                    login(
-                        parsedData.userId,
-                        parsedData.role,
-                        parsedData.name,
-                        parsedData.branchId,
-                        parsedData.subBranchId,
-                        parsedData.currentBranchYear,
-                        parsedData.currentBranchYearId,
-                        parsedData.userClassIds,
-                        parsedData.token,
-                        expirationDate
-                    );
-                    setIsInitialized(true);
-                }
-            } catch (error) {
-                console.error(
-                    "Error initializing auth from localStorage:",
-                    error
-                );
-                // Clear potentially corrupted data
-                localStorage.removeItem("userData");
-                if (isMounted) {
-                    setIsInitialized(true);
+            if (savedToken && savedData) {
+                try {
+                    const parsed = JSON.parse(savedData);
+                    setApiToken(savedToken);
+                    setUserId(parsed.userId);
+                    setUserRole(parsed.role);
+                    setUserName(parsed.name);
+                    setUserBranchId(parsed.branchId || null);
+                    setUserSubBranchId(parsed.subBranchId || null);
+                    setCurrentBranchYear(parsed.currentBranchYear || null);
+                    setCurrentBranchYearId(parsed.currentBranchYearId || null);
+                    setUserClassIds(parsed.userClassIds || []);
+                    startRefreshCycle();
+                } catch {
+                    clearState();
                 }
             }
+            setIsInitialized(true);
         };
 
-        initializeAuth();
+        restore();
+        return () => clearInterval(refreshTimer);
+    }, [clearState, startRefreshCycle]);
 
-        return () => {
-            isMounted = false;
-        };
-    }, [login]);
+    const setAttributes = useCallback(
+        (branchId, subBranchId, classIds, branchYear, branchYearId) => {
+            setUserBranchId(branchId);
+            setUserSubBranchId(subBranchId);
+            setUserClassIds(classIds);
+            setCurrentBranchYear(branchYear || null);
+            setCurrentBranchYearId(branchYearId || null);
 
-    const setAttributes = useCallback((branchId, subBranchId, userClassIds) => {
-        setUserBranchId(branchId);
-        setUserSubBranchId(subBranchId);
-        setUserClassIds(userClassIds);
-    }, []);
+            // Also update persisted data
+            try {
+                const saved = JSON.parse(localStorage.getItem("userData") || "{}");
+                saved.branchId = branchId;
+                saved.subBranchId = subBranchId;
+                saved.userClassIds = classIds;
+                saved.currentBranchYear = branchYear || null;
+                saved.currentBranchYearId = branchYearId || null;
+                localStorage.setItem("userData", JSON.stringify(saved));
+            } catch {
+                // ignore
+            }
+        },
+        []
+    );
 
     return {
-        token,
+        isLoggedIn: !!userId,
         login,
         logout,
+        redirectToLogin,
+        handleCallback,
         userId,
         userRole,
         userName,

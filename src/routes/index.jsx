@@ -16,6 +16,7 @@ import { munaqisyRoutes, MunaqisyRouteWrapper } from "./munaqisyRoutes.jsx";
 import { studentRoutes, StudentRouteWrapper } from "./studentRoutes.jsx";
 
 import AuthView from "../users/pages/auth/AuthView.jsx";
+import AuthCallbackView from "../users/pages/auth/AuthCallbackView.jsx";
 import PasswordResetView from "../users/pages/auth/PasswordResetView.jsx";
 import EmailVerifyView from "../users/pages/auth/EmailVerifyView.jsx";
 import StudentIDCard from "../students/id-card/StudentIDCard.jsx";
@@ -61,6 +62,10 @@ const getRouteConfig = (userRole) => {
             return {
                 routes: [
                     { path: "/", element: <AuthView /> },
+                    {
+                        path: "/auth/callback",
+                        element: <AuthCallbackView />,
+                    },
                     {
                         path: "/reset-password/:token",
                         element: <PasswordResetView />,

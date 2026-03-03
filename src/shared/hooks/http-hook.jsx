@@ -1,12 +1,10 @@
-// hooks/useHttp.js
-import { useState, useCallback, useRef, useEffect, useContext } from 'react';
-import { AuthContext } from '../Components/Context/auth-context';
+import { useState, useCallback, useRef, useEffect } from 'react';
+import { getApiToken } from '../queries/api';
 
 const useHttp = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState(null);
     const activeHttpRequests = useRef([]);
-    const auth = useContext(AuthContext);
 
     const sendRequest = useCallback(async (url, method = 'GET', body = null, headers = {}) => {
         setIsLoading(true);
@@ -15,10 +13,11 @@ const useHttp = () => {
         const httpAbortCtrl = new AbortController();
         activeHttpRequests.current.push(httpAbortCtrl);
 
-        // Automatically add Authorization header if token exists and not already present
+        // Automatically add Authorization header from shared api token
         const mergedHeaders = { ...headers };
-        if (auth.token && !mergedHeaders.Authorization && !mergedHeaders.authorization) {
-            mergedHeaders.Authorization = `Bearer ${auth.token}`;
+        const token = getApiToken();
+        if (token && !mergedHeaders.Authorization && !mergedHeaders.authorization) {
+            mergedHeaders.Authorization = `Bearer ${token}`;
         }
 
         try {
@@ -26,7 +25,7 @@ const useHttp = () => {
                 method,
                 body,
                 headers: mergedHeaders,
-                signal: httpAbortCtrl.signal // Attach the abort signal to the request
+                signal: httpAbortCtrl.signal
             });
 
             const responseData = await response.json();
@@ -43,18 +42,16 @@ const useHttp = () => {
             return responseData;
         } catch (err) {
             if (err.name === 'AbortError') {
-                // Request was aborted; no need to update state
                 return;
             }
             setIsLoading(false);
             setError(err.message || 'Gagal menghubungi server!');
             throw err;
         }
-    }, [auth.token]);
+    }, []);
 
     useEffect(() => {
         return () => {
-            // Cleanup: abort any ongoing requests when the component using the hook unmounts
             activeHttpRequests.current.forEach((abortCtrl) => abortCtrl.abort());
         };
     }, []);

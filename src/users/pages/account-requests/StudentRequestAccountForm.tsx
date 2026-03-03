@@ -17,6 +17,7 @@ const CANCEL_UPLOAD_MESSAGE = "Permintaan dibatalkan oleh pengguna.";
 // Threshold for large file warning (in bytes) - adjust as needed
 const LARGE_FILE_SIZE_THRESHOLD = 5 * 1024 * 1024; // 5 MB
 import { Icon } from "@iconify-icon/react";
+import { getApiToken } from "../../../shared/queries/api";
 
 interface ResponseData {
     message: string;
@@ -109,7 +110,7 @@ const StudentRequestAccountForm: React.FC = () => {
                     xhr.open("POST", url);
                     xhr.setRequestHeader(
                         "Authorization",
-                        "Bearer " + auth.token
+                        "Bearer " + getApiToken()
                     );
 
                     xhr.upload.onprogress = (event) => {

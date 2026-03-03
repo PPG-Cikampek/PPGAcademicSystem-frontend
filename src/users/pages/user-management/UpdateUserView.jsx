@@ -101,7 +101,6 @@ const UpdateUserView = () => {
 
             await sendRequest(url, "PATCH", body, {
                 "Content-Type": "application/json",
-                Authorization: "Bearer " + auth.token,
             });
         } catch {
             // Error is already handled by useHttp
@@ -112,8 +111,8 @@ const UpdateUserView = () => {
 
     if (!loadedUser && !isLoading) {
         return (
-            <div className="m-4 flex justify-center">
-                <div className="card-basic flex flex-col items-center">
+            <div className="flex justify-center m-4">
+                <div className="flex flex-col items-center card-basic">
                     <h2 className="font-semibold">404 place not found!</h2>
                 </div>
             </div>
@@ -121,7 +120,7 @@ const UpdateUserView = () => {
     }
 
     return (
-        <div className="m-auto max-w-md mt-14 md:mt-8">
+        <div className="m-auto mt-14 md:mt-8 max-w-md">
             {!loadedUser && isLoading && (
                 <div className="flex justify-center mt-16">
                     <LoadingCircle size={32} />

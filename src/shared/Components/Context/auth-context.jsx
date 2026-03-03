@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext } from "react";
 
 export const AuthContext = createContext({
     isLoggedIn: false,
@@ -10,8 +10,10 @@ export const AuthContext = createContext({
     currentBranchYear: null,
     currentBranchYearId: null,
     userClassIds: [],
-    token: null,
+    isInitialized: false,
     login: () => {},
     logout: () => {},
+    redirectToLogin: () => {},
+    handleCallback: () => {},
     setAttributes: () => {},
 });

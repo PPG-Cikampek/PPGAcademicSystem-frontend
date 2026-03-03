@@ -35,7 +35,7 @@ const EmailVerifyView = () => {
     }, [sendRequest, token]);
 
     return (
-        <div className="card-basic mx-auto mt-36 w-96 h-64 flex flex-col gap-4 justify-center items-center">
+        <div className="flex flex-col justify-center items-center gap-4 mx-auto mt-36 w-96 h-64 card-basic">
             {isLoading && (
                 <div className="flex justify-center mt-16">
                     <LoadingCircle size={32} />
@@ -46,7 +46,7 @@ const EmailVerifyView = () => {
                     <img
                         src={logo}
                         alt="logo"
-                        className="size-24 self-center mb-4"
+                        className="self-center mb-4 size-24"
                     />
                     <h1
                         className={`text-2xl font-bold self-center ${
@@ -57,9 +57,9 @@ const EmailVerifyView = () => {
                     </h1>
                     <p
                         onClick={() => navigate("/")}
-                        className="text-gray-600 hover:text-blue-500 hover:cursor-pointer hover:underline"
+                        className="text-gray-600 hover:text-blue-500 hover:underline hover:cursor-pointer"
                     >
-                        Kembali ke {auth.token ? "Dashboard" : "Login"}
+                        Kembali ke {auth.isLoggedIn ? "Dashboard" : "Login"}
                     </p>
                 </>
             )}

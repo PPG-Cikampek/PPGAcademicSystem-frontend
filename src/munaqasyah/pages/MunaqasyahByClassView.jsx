@@ -9,6 +9,7 @@ import { ChevronDown } from "lucide-react";
 import { generatePDFContent } from "../components/StudentReportPDF";
 import { useQuery } from "@tanstack/react-query";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
+import { getApiToken } from "../../shared/queries/api";
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
 import WarningCard from "../../shared/Components/UIElements/WarningCard";
 
@@ -28,14 +29,14 @@ const DEFAULT_SCORE_CATEGORIES = [
 ];
 
 const fetchScores = async ({ queryKey }) => {
-    const [_key, { branchYearId, classId, subBranchId, token }] = queryKey;
+    const [_key, { branchYearId, classId, subBranchId }] = queryKey;
     const res = await fetch(
         `${
             import.meta.env.VITE_BACKEND_URL
         }/scores/branch-year/${branchYearId}?classId=${classId}&subBranchId=${subBranchId}`,
         {
             headers: {
-                Authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${getApiToken()}`,
                 "Content-Type": "application/json",
             },
         }
@@ -67,7 +68,7 @@ const MunaqasyahByClassView = () => {
     } = useQuery({
         queryKey: [
             "scores",
-            { branchYearId, classId, subBranchId, token: auth.token },
+            { branchYearId, classId, subBranchId },
         ],
         queryFn: fetchScores,
         refetchInterval: 3000,

@@ -91,7 +91,6 @@ const BulkNewUsersAndStudentsView = () => {
         try {
             response = await sendRequest(url, "POST", body, {
                 "Content-Type": "application/json",
-                Authorization: "Bearer " + auth.token,
             });
             openModal(
                 response.message,
@@ -109,7 +108,7 @@ const BulkNewUsersAndStudentsView = () => {
     };
 
     return (
-        <div className="m-auto max-w-md mt-14 md:mt-8">
+        <div className="m-auto mt-14 md:mt-8 max-w-md">
             <NewModal modalState={modalState} onClose={closeModal} />
 
             <div className="px-2">

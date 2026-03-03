@@ -92,7 +92,6 @@ const ProfileView = () => {
                     JSON.stringify({ name: newName }),
                     {
                         "Content-Type": "application/json",
-                        Authorization: "Bearer " + auth.token,
                     }
                 );
                 setUserData((prev) => ({ ...prev, name: newName }));
@@ -109,7 +108,7 @@ const ProfileView = () => {
             }
             return false;
         },
-        [auth.userId, auth.token, sendRequest]
+        [auth.userId, sendRequest]
     );
 
     const handleEmailVerification = useCallback(() => {
@@ -139,7 +138,6 @@ const ProfileView = () => {
                     }),
                     {
                         "Content-Type": "application/json",
-                        Authorization: "Bearer " + auth.token,
                     }
                 );
                 openModal(
@@ -162,7 +160,7 @@ const ProfileView = () => {
             "Verifikasi Email?",
             true
         );
-    }, [auth.token, sendRequest, userData]);
+    }, [sendRequest, userData]);
 
     const handleEmailUpdate = useCallback(
         async (newEmail) => {
@@ -191,7 +189,6 @@ const ProfileView = () => {
                         }),
                         {
                             "Content-Type": "application/json",
-                            Authorization: "Bearer " + auth.token,
                         }
                     );
                     openModal(
@@ -217,7 +214,7 @@ const ProfileView = () => {
             );
             return true;
         },
-        [auth.token, sendRequest, userData]
+        [sendRequest, userData]
     );
 
     const handlePasswordUpdate = useCallback(
@@ -248,7 +245,6 @@ const ProfileView = () => {
                         }),
                         {
                             "Content-Type": "application/json",
-                            Authorization: "Bearer " + auth.token,
                         }
                     );
                     openModal(
@@ -272,12 +268,12 @@ const ProfileView = () => {
             setModalIsOpen(true);
             return true;
         },
-        [auth.token, sendRequest, userData]
+        [sendRequest, userData]
     );
 
     return (
-        <div className="container mx-auto p-6 max-w-4xl">
-            <div className="card-basic rounded-md flex flex-col items-stretch mb-12">
+        <div className="mx-auto p-6 max-w-4xl container">
+            <div className="flex flex-col items-stretch mb-12 rounded-md card-basic">
                 <NewModal
                     modalState={modalState}
                     onClose={closeModal}
@@ -289,7 +285,7 @@ const ProfileView = () => {
                     userData.isEmailVerified !== true && (
                         <WarningCard
                             onClick={handleEmailVerification}
-                            className="items-center justify-start hover:cursor-pointer hover:underline"
+                            className="justify-start items-center hover:underline hover:cursor-pointer"
                             warning="Verifikasi email Anda agar dapat mengubah password!"
                             onClear={() => setError(null)}
                         />
@@ -300,11 +296,11 @@ const ProfileView = () => {
                 )}
 
                 <div className="flex flex-col items-stretch">
-                    <h1 className="text-2xl font-bold self-center mt-4">
+                    <h1 className="self-center mt-4 font-bold text-2xl">
                         Profile
                     </h1>
 
-                    <div className="flex flex-col md:flex-row gap-4 justify-around py-2">
+                    <div className="flex md:flex-row flex-col justify-around gap-4 py-2">
                         <ProfileImageUpload
                             userData={userData}
                             isLoading={isLoading}

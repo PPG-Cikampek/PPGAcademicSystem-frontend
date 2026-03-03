@@ -65,14 +65,14 @@ const SentryRoutes = Sentry.withSentryReactRouterV7Routing(Routes);
 // Smart Route Handler Component
 const SmartRouteHandler = ({ children }) => {
     const location = useLocation();
-    const { isLoggedIn, userRole, token } = useContext(AuthContext);
+    const { isLoggedIn, userRole } = useContext(AuthContext);
     const { routes } = getRouteConfig(userRole);
 
     const currentPath = location.pathname;
 
     // For logged-out users, only allow auth-related routes
     if (!isLoggedIn) {
-        const guestRoutes = ["/", "/reset-password", "/verify-email", "/demo"];
+        const guestRoutes = ["/", "/auth/callback", "/reset-password", "/verify-email", "/demo"];
         const isGuestRoute = guestRoutes.some(
             (route) =>
                 currentPath === route || currentPath.startsWith(route + "/")
@@ -107,9 +107,11 @@ function App() {
     const [navigateBlockMessage, setNavigateBlockMessage] = useState(true);
 
     const {
-        token,
+        isLoggedIn,
         login,
         logout,
+        redirectToLogin,
+        handleCallback,
         userId,
         userRole,
         userName,
@@ -168,7 +170,7 @@ function App() {
                 <SidebarContext.Provider value={{ isSidebarOpen, toggle }}>
                     <AuthContext.Provider
                         value={{
-                            isLoggedIn: !!token,
+                            isLoggedIn,
                             userRole,
                             userId,
                             userName,
@@ -177,10 +179,11 @@ function App() {
                             currentBranchYear,
                             currentBranchYearId,
                             userClassIds,
-                            token,
                             login,
                             setAttributes,
                             logout,
+                            redirectToLogin,
+                            handleCallback,
                         }}
                     >
                         <Router>
