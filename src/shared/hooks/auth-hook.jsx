@@ -3,10 +3,34 @@ import { setApiToken, setOnUnauthorized } from "../queries/api";
 import iamApi from "../queries/iam-api";
 
 const IAM_URL = import.meta.env.VITE_IAM_URL || "http://localhost:3001";
+const IAM_CLIENT_ID = import.meta.env.VITE_IAM_CLIENT_ID || "academic-system";
 const CALLBACK_PATH = "/auth/callback";
+const OAUTH_STATE_KEY = "academic_oauth_state";
+const PKCE_VERIFIER_KEY = "academic_pkce_verifier";
+const TOKENS_STORAGE_KEY = "oauthTokens";
 
 // Silent-refresh timer
 let refreshTimer = null;
+
+const toBase64Url = (uint8Array) => {
+    let binary = "";
+    uint8Array.forEach((byte) => {
+        binary += String.fromCharCode(byte);
+    });
+    return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+};
+
+const randomString = (length = 64) => {
+    const bytes = new Uint8Array(length);
+    crypto.getRandomValues(bytes);
+    return toBase64Url(bytes).slice(0, length);
+};
+
+const createCodeChallenge = async (codeVerifier) => {
+    const data = new TextEncoder().encode(codeVerifier);
+    const digest = await crypto.subtle.digest("SHA-256", data);
+    return toBase64Url(new Uint8Array(digest));
+};
 
 export const useAuth = () => {
     const [userId, setUserId] = useState(null);
@@ -19,6 +43,7 @@ export const useAuth = () => {
     const [userClassIds, setUserClassIds] = useState([]);
     const [isInitialized, setIsInitialized] = useState(false);
     const isRefreshing = useRef(false);
+    const isHydrating = useRef(false);
 
     // ─── helpers ─────────────────────────
 
@@ -33,6 +58,9 @@ export const useAuth = () => {
         setUserClassIds([]);
         setApiToken(null);
         sessionStorage.removeItem("iam_access_token");
+        localStorage.removeItem(TOKENS_STORAGE_KEY);
+        sessionStorage.removeItem(OAUTH_STATE_KEY);
+        sessionStorage.removeItem(PKCE_VERIFIER_KEY);
         localStorage.removeItem("userData");
         clearInterval(refreshTimer);
     }, []);
@@ -78,10 +106,44 @@ export const useAuth = () => {
         if (isRefreshing.current) return;
         isRefreshing.current = true;
         try {
-            const res = await iamApi.post("/api/auth/refresh");
-            if (res.data?.accessToken) {
-                setApiToken(res.data.accessToken);
-                sessionStorage.setItem("iam_access_token", res.data.accessToken);
+            const tokenRaw = localStorage.getItem(TOKENS_STORAGE_KEY);
+            let refreshToken = null;
+
+            if (tokenRaw) {
+                try {
+                    refreshToken = JSON.parse(tokenRaw).refreshToken;
+                } catch {
+                    refreshToken = null;
+                }
+            }
+
+            if (!refreshToken) {
+                throw new Error("No refresh token");
+            }
+
+            const params = new URLSearchParams({
+                grant_type: "refresh_token",
+                client_id: IAM_CLIENT_ID,
+                refresh_token: refreshToken,
+            });
+
+            const res = await iamApi.post("/oauth/token", params.toString(), {
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+            });
+
+            if (res.data?.access_token) {
+                setApiToken(res.data.access_token);
+                sessionStorage.setItem("iam_access_token", res.data.access_token);
+                localStorage.setItem(
+                    TOKENS_STORAGE_KEY,
+                    JSON.stringify({
+                        accessToken: res.data.access_token,
+                        refreshToken: res.data.refresh_token,
+                        idToken: res.data.id_token,
+                    })
+                );
             }
         } catch {
             // refresh failed — session expired
@@ -100,33 +162,110 @@ export const useAuth = () => {
     // ─── public API ─────────────────────
 
     const redirectToLogin = useCallback(() => {
-        const callbackUrl = `${window.location.origin}${CALLBACK_PATH}`;
-        window.location.href = `${IAM_URL}/login?redirect_uri=${encodeURIComponent(callbackUrl)}`;
-    }, []);
+        const startAuthorize = async () => {
+            const callbackUrl = `${window.location.origin}${CALLBACK_PATH}`;
+            const state = randomString(32);
+            const codeVerifier = randomString(64);
+            const codeChallenge = await createCodeChallenge(codeVerifier);
+
+            sessionStorage.setItem(OAUTH_STATE_KEY, state);
+            sessionStorage.setItem(PKCE_VERIFIER_KEY, codeVerifier);
+
+            const params = new URLSearchParams({
+                response_type: "code",
+                client_id: IAM_CLIENT_ID,
+                redirect_uri: callbackUrl,
+                scope: "openid profile email",
+                state,
+                code_challenge: codeChallenge,
+                code_challenge_method: "S256",
+            });
+
+            window.location.href = `${IAM_URL}/oauth/authorize?${params.toString()}`;
+        };
+
+        startAuthorize().catch(() => {
+            clearState();
+        });
+    }, [clearState]);
 
     const handleCallback = useCallback(
-        async (accessToken) => {
+        async ({ code, state }) => {
+            const expectedState = sessionStorage.getItem(OAUTH_STATE_KEY);
+            const codeVerifier = sessionStorage.getItem(PKCE_VERIFIER_KEY);
+
+            if (!expectedState || expectedState !== state) {
+                throw new Error("OAuth state mismatch");
+            }
+
+            if (!codeVerifier) {
+                throw new Error("PKCE verifier is missing");
+            }
+
+            const callbackUrl = `${window.location.origin}${CALLBACK_PATH}`;
+            const params = new URLSearchParams({
+                grant_type: "authorization_code",
+                code,
+                redirect_uri: callbackUrl,
+                client_id: IAM_CLIENT_ID,
+                code_verifier: codeVerifier,
+            });
+
+            const tokenRes = await iamApi.post("/oauth/token", params.toString(), {
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+            });
+
+            const accessToken = tokenRes.data?.access_token;
+            if (!accessToken) {
+                throw new Error("Token exchange failed");
+            }
+
             setApiToken(accessToken);
             sessionStorage.setItem("iam_access_token", accessToken);
+            localStorage.setItem(
+                TOKENS_STORAGE_KEY,
+                JSON.stringify({
+                    accessToken,
+                    refreshToken: tokenRes.data?.refresh_token,
+                    idToken: tokenRes.data?.id_token,
+                })
+            );
+
+            sessionStorage.removeItem(OAUTH_STATE_KEY);
+            sessionStorage.removeItem(PKCE_VERIFIER_KEY);
 
             // Fetch user profile from IAM
             let userProfile;
             try {
-                const meRes = await iamApi.get("/api/auth/me");
-                if (!meRes.data?.authenticated) throw new Error("Not authenticated");
-                userProfile = meRes.data.user;
+                const userInfoRes = await iamApi.get("/oauth/userinfo", {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                    },
+                });
+                userProfile = userInfoRes.data;
+                if (!userProfile?.sub || !userProfile?.role) {
+                    throw new Error("Incomplete userinfo response");
+                }
             } catch {
-                clearState();
-                throw new Error("Failed to fetch user profile from IAM");
+                try {
+                    const meRes = await iamApi.get("/api/auth/me");
+                    if (!meRes.data?.authenticated) throw new Error("Not authenticated");
+                    userProfile = meRes.data.user;
+                } catch {
+                    clearState();
+                    throw new Error("Failed to fetch user profile from IAM");
+                }
             }
 
             const profile = {
-                userId: userProfile.userId || userProfile._id,
+                userId: userProfile.userId || userProfile._id || userProfile.sub,
                 role: userProfile.role,
-                name: userProfile.name,
-                email: userProfile.email,
-                branchId: userProfile.branchId || null,
-                subBranchId: userProfile.subBranchId || null,
+                name: userProfile.name || "",
+                email: userProfile.email || "",
+                branchId: userProfile.branchId || userProfile.branch_id || null,
+                subBranchId: userProfile.subBranchId || userProfile.sub_branch_id || null,
                 currentBranchYear: null,
                 currentBranchYearId: null,
                 userClassIds: [],
@@ -150,12 +289,12 @@ export const useAuth = () => {
 
     const logout = useCallback(async () => {
         try {
-            await iamApi.post("/api/auth/logout");
+            const postLogoutRedirectUri = encodeURIComponent(window.location.origin);
+            window.location.href = `${IAM_URL}/oauth/logout?post_logout_redirect_uri=${postLogoutRedirectUri}`;
         } catch {
             // ignore — best-effort
         }
         clearState();
-        window.location.href = "/";
     }, [clearState]);
 
     // ─── 401 interceptor ────────────────
@@ -184,8 +323,12 @@ export const useAuth = () => {
     // ─── restore on mount ───────────────
     useEffect(() => {
         const restore = async () => {
+            if (isHydrating.current) return;
+            isHydrating.current = true;
+
             const savedToken = sessionStorage.getItem("iam_access_token");
             const savedData = localStorage.getItem("userData");
+            const savedOauthTokens = localStorage.getItem(TOKENS_STORAGE_KEY);
 
             if (savedToken && savedData) {
                 try {
@@ -203,13 +346,46 @@ export const useAuth = () => {
                 } catch {
                     clearState();
                 }
+            } else if (savedOauthTokens) {
+                try {
+                    await silentRefresh();
+                    const meRes = await iamApi.get("/api/auth/me");
+                    if (meRes.data?.authenticated) {
+                        const userProfile = meRes.data.user;
+                        const hydratedToken = sessionStorage.getItem("iam_access_token");
+
+                        if (!hydratedToken) {
+                            throw new Error("Missing hydrated token");
+                        }
+
+                        const profile = {
+                            userId: userProfile.userId || userProfile._id,
+                            role: userProfile.role,
+                            name: userProfile.name,
+                            email: userProfile.email,
+                            branchId: userProfile.branchId || null,
+                            subBranchId: userProfile.subBranchId || null,
+                            currentBranchYear: null,
+                            currentBranchYearId: null,
+                            userClassIds: [],
+                        };
+
+                        applyProfile(profile, hydratedToken);
+                        startRefreshCycle();
+                    } else {
+                        clearState();
+                    }
+                } catch {
+                    clearState();
+                }
             }
             setIsInitialized(true);
+            isHydrating.current = false;
         };
 
         restore();
         return () => clearInterval(refreshTimer);
-    }, [clearState, startRefreshCycle]);
+    }, [applyProfile, clearState, silentRefresh, startRefreshCycle]);
 
     const setAttributes = useCallback(
         (branchId, subBranchId, classIds, branchYear, branchYearId) => {

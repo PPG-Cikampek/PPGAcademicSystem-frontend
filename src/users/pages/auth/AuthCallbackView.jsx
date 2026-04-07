@@ -13,9 +13,17 @@ const AuthCallbackView = () => {
     const runSetup = usePostLoginSetup();
 
     useEffect(() => {
-        const token = searchParams.get("token");
-        if (!token) {
-            setError("Token tidak ditemukan di URL callback.");
+        const code = searchParams.get("code");
+        const state = searchParams.get("state");
+        const oauthError = searchParams.get("error");
+
+        if (oauthError) {
+            setError(`OAuth error: ${oauthError}`);
+            return;
+        }
+
+        if (!code || !state) {
+            setError("Code/state tidak ditemukan di URL callback.");
             return;
         }
 
@@ -23,7 +31,7 @@ const AuthCallbackView = () => {
 
         const process = async () => {
             try {
-                const profile = await auth.handleCallback(token);
+                const profile = await auth.handleCallback({ code, state });
                 await runSetup(profile);
                 if (!cancelled) {
                     navigate("/dashboard", { replace: true });
