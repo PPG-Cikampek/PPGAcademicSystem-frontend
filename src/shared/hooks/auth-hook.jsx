@@ -289,8 +289,23 @@ export const useAuth = () => {
 
     const logout = useCallback(async () => {
         try {
-            const postLogoutRedirectUri = encodeURIComponent(window.location.origin);
-            window.location.href = `${IAM_URL}/oauth/logout?post_logout_redirect_uri=${postLogoutRedirectUri}`;
+            const logoutUrl = new URL(`${IAM_URL}/oauth/logout`);
+            logoutUrl.searchParams.set("client_id", IAM_CLIENT_ID);
+            logoutUrl.searchParams.set("post_logout_redirect_uri", window.location.origin);
+
+            const tokenRaw = localStorage.getItem(TOKENS_STORAGE_KEY);
+            if (tokenRaw) {
+                try {
+                    const tokenState = JSON.parse(tokenRaw);
+                    if (tokenState?.idToken) {
+                        logoutUrl.searchParams.set("id_token_hint", tokenState.idToken);
+                    }
+                } catch {
+                    // ignore malformed token cache
+                }
+            }
+
+            window.location.href = logoutUrl.toString();
         } catch {
             // ignore — best-effort
         }
