@@ -202,10 +202,7 @@ const Navbar = () => {
                         icon: LogOut,
                         label: "Logout",
                         variant: "danger",
-                        onClick: () => {
-                            auth.logout();
-                            navigate("/");
-                        },
+                        onClick: auth.logout,
                     },
                 ]}
             />

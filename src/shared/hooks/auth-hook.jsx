@@ -12,6 +12,10 @@ const TOKENS_STORAGE_KEY = "oauthTokens";
 // Silent-refresh timer
 let refreshTimer = null;
 
+// Deduplicate callback processing by OAuth code+state so React StrictMode
+// extra effect cycles in development don't exchange the same code twice.
+const callbackInFlight = new Map();
+
 const toBase64Url = (uint8Array) => {
     let binary = "";
     uint8Array.forEach((byte) => {
@@ -44,10 +48,13 @@ export const useAuth = () => {
     const [isInitialized, setIsInitialized] = useState(false);
     const isRefreshing = useRef(false);
     const isHydrating = useRef(false);
+    const isLoggingOut = useRef(false);
+    const authVersion = useRef(0);
 
     // ─── helpers ─────────────────────────
 
     const clearState = useCallback(() => {
+        authVersion.current += 1;
         setUserId(null);
         setUserRole(null);
         setUserName(null);
@@ -63,6 +70,8 @@ export const useAuth = () => {
         sessionStorage.removeItem(PKCE_VERIFIER_KEY);
         localStorage.removeItem("userData");
         clearInterval(refreshTimer);
+        refreshTimer = null;
+        isRefreshing.current = false;
     }, []);
 
     const persistState = useCallback(
@@ -86,6 +95,7 @@ export const useAuth = () => {
 
     const applyProfile = useCallback(
         (profile, token) => {
+            if (isLoggingOut.current) return;
             setApiToken(token);
             sessionStorage.setItem("iam_access_token", token);
             setUserId(profile.userId);
@@ -103,7 +113,9 @@ export const useAuth = () => {
 
     // ─── silent refresh ─────────────────
     const silentRefresh = useCallback(async () => {
-        if (isRefreshing.current) return;
+        if (isRefreshing.current || isLoggingOut.current) return;
+
+        const refreshStartVersion = authVersion.current;
         isRefreshing.current = true;
         try {
             const tokenRaw = localStorage.getItem(TOKENS_STORAGE_KEY);
@@ -134,6 +146,13 @@ export const useAuth = () => {
             });
 
             if (res.data?.access_token) {
+                if (
+                    isLoggingOut.current ||
+                    refreshStartVersion !== authVersion.current
+                ) {
+                    return;
+                }
+
                 setApiToken(res.data.access_token);
                 sessionStorage.setItem("iam_access_token", res.data.access_token);
                 localStorage.setItem(
@@ -147,13 +166,16 @@ export const useAuth = () => {
             }
         } catch {
             // refresh failed — session expired
-            clearState();
+            if (!isLoggingOut.current) {
+                clearState();
+            }
         } finally {
             isRefreshing.current = false;
         }
     }, [clearState]);
 
     const startRefreshCycle = useCallback(() => {
+        if (isLoggingOut.current) return;
         clearInterval(refreshTimer);
         // refresh every 13 min (access token lives 15 min)
         refreshTimer = setInterval(silentRefresh, 13 * 60 * 1000);
@@ -162,6 +184,8 @@ export const useAuth = () => {
     // ─── public API ─────────────────────
 
     const redirectToLogin = useCallback(() => {
+        if (isLoggingOut.current) return;
+
         const startAuthorize = async () => {
             const callbackUrl = `${window.location.origin}${CALLBACK_PATH}`;
             const state = randomString(32);
@@ -185,96 +209,114 @@ export const useAuth = () => {
         };
 
         startAuthorize().catch(() => {
-            clearState();
+            if (!isLoggingOut.current) {
+                clearState();
+            }
         });
     }, [clearState]);
 
     const handleCallback = useCallback(
         async ({ code, state }) => {
-            const expectedState = sessionStorage.getItem(OAUTH_STATE_KEY);
-            const codeVerifier = sessionStorage.getItem(PKCE_VERIFIER_KEY);
-
-            if (!expectedState || expectedState !== state) {
-                throw new Error("OAuth state mismatch");
+            const callbackKey = `${code}:${state}`;
+            const inFlight = callbackInFlight.get(callbackKey);
+            if (inFlight) {
+                return inFlight;
             }
 
-            if (!codeVerifier) {
-                throw new Error("PKCE verifier is missing");
-            }
+            const callbackPromise = (async () => {
+                const expectedState = sessionStorage.getItem(OAUTH_STATE_KEY);
+                const codeVerifier = sessionStorage.getItem(PKCE_VERIFIER_KEY);
 
-            const callbackUrl = `${window.location.origin}${CALLBACK_PATH}`;
-            const params = new URLSearchParams({
-                grant_type: "authorization_code",
-                code,
-                redirect_uri: callbackUrl,
-                client_id: IAM_CLIENT_ID,
-                code_verifier: codeVerifier,
-            });
+                if (!expectedState || expectedState !== state) {
+                    throw new Error("OAuth state mismatch");
+                }
 
-            const tokenRes = await iamApi.post("/oauth/token", params.toString(), {
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded",
-                },
-            });
+                if (!codeVerifier) {
+                    throw new Error("PKCE verifier is missing");
+                }
 
-            const accessToken = tokenRes.data?.access_token;
-            if (!accessToken) {
-                throw new Error("Token exchange failed");
-            }
+                const callbackUrl = `${window.location.origin}${CALLBACK_PATH}`;
+                const params = new URLSearchParams({
+                    grant_type: "authorization_code",
+                    code,
+                    redirect_uri: callbackUrl,
+                    client_id: IAM_CLIENT_ID,
+                    code_verifier: codeVerifier,
+                });
 
-            setApiToken(accessToken);
-            sessionStorage.setItem("iam_access_token", accessToken);
-            localStorage.setItem(
-                TOKENS_STORAGE_KEY,
-                JSON.stringify({
-                    accessToken,
-                    refreshToken: tokenRes.data?.refresh_token,
-                    idToken: tokenRes.data?.id_token,
-                })
-            );
-
-            sessionStorage.removeItem(OAUTH_STATE_KEY);
-            sessionStorage.removeItem(PKCE_VERIFIER_KEY);
-
-            // Fetch user profile from IAM
-            let userProfile;
-            try {
-                const userInfoRes = await iamApi.get("/oauth/userinfo", {
+                const tokenRes = await iamApi.post("/oauth/token", params.toString(), {
                     headers: {
-                        Authorization: `Bearer ${accessToken}`,
+                        "Content-Type": "application/x-www-form-urlencoded",
                     },
                 });
-                userProfile = userInfoRes.data;
-                if (!userProfile?.sub || !userProfile?.role) {
-                    throw new Error("Incomplete userinfo response");
+
+                const accessToken = tokenRes.data?.access_token;
+                if (!accessToken) {
+                    throw new Error("Token exchange failed");
                 }
-            } catch {
+
+                setApiToken(accessToken);
+                sessionStorage.setItem("iam_access_token", accessToken);
+                localStorage.setItem(
+                    TOKENS_STORAGE_KEY,
+                    JSON.stringify({
+                        accessToken,
+                        refreshToken: tokenRes.data?.refresh_token,
+                        idToken: tokenRes.data?.id_token,
+                    })
+                );
+
+                sessionStorage.removeItem(OAUTH_STATE_KEY);
+                sessionStorage.removeItem(PKCE_VERIFIER_KEY);
+
+                // Fetch user profile from IAM
+                let userProfile;
                 try {
-                    const meRes = await iamApi.get("/api/auth/me");
-                    if (!meRes.data?.authenticated) throw new Error("Not authenticated");
-                    userProfile = meRes.data.user;
+                    const userInfoRes = await iamApi.get("/oauth/userinfo", {
+                        headers: {
+                            Authorization: `Bearer ${accessToken}`,
+                        },
+                    });
+                    userProfile = userInfoRes.data;
+                    if (!userProfile?.sub || !userProfile?.role) {
+                        throw new Error("Incomplete userinfo response");
+                    }
                 } catch {
-                    clearState();
-                    throw new Error("Failed to fetch user profile from IAM");
+                    try {
+                        const meRes = await iamApi.get("/api/auth/me");
+                        if (!meRes.data?.authenticated) throw new Error("Not authenticated");
+                        userProfile = meRes.data.user;
+                    } catch {
+                        clearState();
+                        throw new Error("Failed to fetch user profile from IAM");
+                    }
                 }
+
+                const profile = {
+                    userId: userProfile.userId || userProfile._id || userProfile.sub,
+                    role: userProfile.role,
+                    name: userProfile.name || "",
+                    email: userProfile.email || "",
+                    branchId: userProfile.branchId || userProfile.branch_id || null,
+                    subBranchId: userProfile.subBranchId || userProfile.sub_branch_id || null,
+                    currentBranchYear: null,
+                    currentBranchYearId: null,
+                    userClassIds: [],
+                };
+
+                applyProfile(profile, accessToken);
+                startRefreshCycle();
+
+                return profile;
+            })();
+
+            callbackInFlight.set(callbackKey, callbackPromise);
+
+            try {
+                return await callbackPromise;
+            } finally {
+                callbackInFlight.delete(callbackKey);
             }
-
-            const profile = {
-                userId: userProfile.userId || userProfile._id || userProfile.sub,
-                role: userProfile.role,
-                name: userProfile.name || "",
-                email: userProfile.email || "",
-                branchId: userProfile.branchId || userProfile.branch_id || null,
-                subBranchId: userProfile.subBranchId || userProfile.sub_branch_id || null,
-                currentBranchYear: null,
-                currentBranchYearId: null,
-                userClassIds: [],
-            };
-
-            applyProfile(profile, accessToken);
-            startRefreshCycle();
-
-            return profile;
         },
         [applyProfile, startRefreshCycle, clearState]
     );
@@ -287,7 +329,11 @@ export const useAuth = () => {
         [applyProfile, startRefreshCycle]
     );
 
-    const logout = useCallback(async () => {
+    const logout = useCallback(() => {
+        if (isLoggingOut.current) return;
+        isLoggingOut.current = true;
+        clearState();
+
         try {
             const logoutUrl = new URL(`${IAM_URL}/oauth/logout`);
             logoutUrl.searchParams.set("client_id", IAM_CLIENT_ID);
@@ -305,16 +351,21 @@ export const useAuth = () => {
                 }
             }
 
-            window.location.href = logoutUrl.toString();
+            window.location.replace(logoutUrl.toString());
         } catch {
-            // ignore — best-effort
+            // Fallback to local root if IAM logout URL construction/navigation fails.
+            isLoggingOut.current = false;
+            window.location.replace(window.location.origin);
         }
-        clearState();
     }, [clearState]);
 
     // ─── 401 interceptor ────────────────
     useEffect(() => {
         setOnUnauthorized(async (error) => {
+            if (isLoggingOut.current) {
+                return null;
+            }
+
             try {
                 await silentRefresh();
                 // Retry original request with new token
@@ -326,8 +377,10 @@ export const useAuth = () => {
                     return axios(config);
                 }
             } catch {
-                clearState();
-                redirectToLogin();
+                if (!isLoggingOut.current) {
+                    clearState();
+                    redirectToLogin();
+                }
             }
             return null;
         });
