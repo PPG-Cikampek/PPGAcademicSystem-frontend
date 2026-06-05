@@ -1,4 +1,4 @@
-import { useState, useMemo, useContext } from "react";
+import { useState, useMemo, useContext, useRef, useCallback } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import useModal from "../../shared/hooks/useNewModal";
 import NewModal from "../../shared/Components/Modal/NewModal";
@@ -7,6 +7,7 @@ import ErrorCard from "../../shared/Components/UIElements/ErrorCard";
 
 import { ChevronDown } from "lucide-react";
 import { generatePDFContent } from "../components/StudentReportPDF";
+import { bulkGenerateRaports, downloadBlob } from "../utilities/bulkRaportGenerator";
 import { useQuery } from "@tanstack/react-query";
 import { AuthContext } from "../../shared/Components/Context/auth-context";
 import LoadingCircle from "../../shared/Components/UIElements/LoadingCircle";
@@ -56,6 +57,9 @@ const MunaqasyahByClassView = () => {
     const branchYearId = paramBranchYearId || location.state?.branchYearId;
     const subBranchMunaqasyahStatus = location.state?.subBranchMunaqasyahStatus || null;
     const [loadingIdx, setLoadingIdx] = useState(null);
+    const [isBulkLoading, setIsBulkLoading] = useState(false);
+    const [bulkProgress, setBulkProgress] = useState(0);
+    const abortControllerRef = useRef(null);
 
     const auth = useContext(AuthContext);
     const subBranchId = paramSubBranchId || auth.userSubBranchId;
@@ -232,6 +236,92 @@ const MunaqasyahByClassView = () => {
         });
     };
 
+    const startBulkDownload = useCallback(
+        async (isPengurus) => {
+            const label = isPengurus ? "Pengurus" : "Orang Tua";
+            openModal(
+                `Memproses raport (${label})...`,
+                "info",
+                null,
+                "Mengunduh Seluruh Raport",
+            );
+            setIsBulkLoading(true);
+            setBulkProgress(0);
+            abortControllerRef.current = new AbortController();
+
+            const academicYearName = rawScores[0]?.branchYearId?.academicYearId?.name || "";
+            const className = rawScores[0]?.classId?.name || "";
+
+            const studentRaports = rawScores.map((score, idx) => ({
+                studentName: score.studentId.name,
+                studentScores: isPengurus ? rawScores[idx] : scores[idx],
+                scoreCategories,
+                studentNis: score.studentNis,
+                grade: score.classId.name,
+                academicYearName,
+                branchAvgScores,
+                isPengurus,
+            }));
+
+            const result = await bulkGenerateRaports(
+                studentRaports,
+                setBulkProgress,
+                abortControllerRef.current.signal,
+            );
+
+            setIsBulkLoading(false);
+            setBulkProgress(0);
+            abortControllerRef.current = null;
+
+            if (result.success && result.zipBlob) {
+                const safeYear = academicYearName.replace(/[/\\:*?"<>|]/g, "-");
+                const safeClass = className.replace(/\s+/g, "_");
+                downloadBlob(result.zipBlob, `Raport_${safeClass}_${safeYear}.zip`);
+
+                setTimeout(() => {
+                    openModal(
+                        `Berhasil mengunduh ${result.completed} raport${result.failed > 0 ? `\n${result.failed} gagal diproses.` : ""}`,
+                        "success",
+                        null,
+                        "Berhasil!",
+                    );
+                }, 100);
+            } else {
+                setTimeout(() => {
+                    openModal(
+                        result.error || "Terjadi kesalahan.",
+                        "error",
+                        null,
+                        "Gagal",
+                    );
+                }, 100);
+            }
+        },
+        [rawScores, scores, scoreCategories, branchAvgScores, openModal],
+    );
+
+    const handleBulkDownload = useCallback(() => {
+        if (rawScores.length === 0) {
+            openModal("Tidak ada data raport untuk diunduh.", "warning", null, "Data Kosong");
+            return;
+        }
+        openModal(
+            "Pilih jenis raport yang akan diunduh:",
+            "confirmation",
+            null,
+            "Unduh Seluruh Raport",
+            false,
+            "md",
+        );
+    }, [rawScores, openModal]);
+
+    const handleModalClose = useCallback(() => {
+        if (isBulkLoading && abortControllerRef.current) {
+            abortControllerRef.current.abort();
+        }
+        closeModal();
+    }, [isBulkLoading, closeModal]);
+
     if (isLoading)
         return (
             <div className="flex justify-center items-center bg-gray-50 min-h-screen">
@@ -291,19 +381,53 @@ const MunaqasyahByClassView = () => {
             <div className="mx-auto max-w-6xl">
                 <NewModal
                     modalState={modalState}
-                    onClose={closeModal}
-                    isLoading={loadingIdx !== null}
-                />
+                    onClose={handleModalClose}
+                    isLoading={loadingIdx !== null || isBulkLoading}
+                    loadingVariant="bar"
+                    progress={bulkProgress}
+                >
+                    {modalState.type === "confirmation" && modalState.title === "Unduh Seluruh Raport" && (
+                        <div className="flex flex-col gap-3 mt-4">
+                            <button
+                                onClick={() => {
+                                    closeModal();
+                                    setTimeout(() => startBulkDownload(false), 100);
+                                }}
+                                className="px-4 py-3 rounded-md button-primary w-full transition-colors"
+                            >
+                                <span className="font-semibold text-base">Orang Tua</span>
+                            </button>
+                            <button
+                                onClick={() => {
+                                    closeModal();
+                                    setTimeout(() => startBulkDownload(true), 100);
+                                }}
+                                className="px-4 py-3 rounded-md btn-primary-outline w-full transition-colors"
+                            >
+                                <span className="font-semibold text-base">Pengurus</span>
+                            </button>
+                        </div>
+                    )}
+                </NewModal>
                 <div className="flex justify-between items-center mb-6 h-9">
                     <h1 className="font-semibold text-gray-900 text-2xl">
                         {rawScores[0]?.classId.name}
                     </h1>
 
-                    {expandedCount >= 2 && (
-                        <button onClick={collapseAll} className="mt-0 btn-neutral-outline">
-                            Tutup Semua
+                    <div className="flex items-center gap-2">
+                        <button
+                            onClick={handleBulkDownload}
+                            disabled={isBulkLoading || rawScores.length === 0}
+                            className="m-0 btn-primary-outline text-sm"
+                        >
+                            Unduh Seluruh Raport
                         </button>
-                    )}
+                        {expandedCount >= 2 && (
+                            <button onClick={collapseAll} className="mt-0 btn-neutral-outline">
+                                Tutup Semua
+                            </button>
+                        )}
+                    </div>
                 </div>
                 <WarningCard
                     className="justify-start items-center"
