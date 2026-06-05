@@ -292,32 +292,40 @@ export function generatePDFContent(
           )
         : "-";
 
+    const studentRank = studentScores.studentRank;
+    const showRankRow =
+        typeof studentRank === "number" && studentRank >= 1 && studentRank < 3;
+
+    const summaryBody = [
+        [
+            {
+                content: "Jumlah ",
+                colSpan: 2,
+                styles: { halign: "right", valign: "middle" },
+            },
+            totalScore,
+            { content: IndonesianNumberConverter(totalScore), colSpan: 2 },
+        ],
+    ];
+    if (showRankRow) {
+        summaryBody.push([
+            {
+                content: "Peringkat ",
+                colSpan: 2,
+                styles: { halign: "right", valign: "middle" },
+            },
+            {
+                content: `   ${studentRank} dari ${studentScores.studentTotal} siswa ${grade} se-desa.`,
+                colSpan: 3,
+                styles: { halign: "left", valign: "middle" },
+            },
+        ]);
+    }
+
     doc.autoTable({
         theme: "grid",
         head: [], // No headers
-        body: [
-            [
-                {
-                    content: "Jumlah ",
-                    colSpan: 2,
-                    styles: { halign: "right", valign: "middle" },
-                },
-                totalScore,
-                { content: IndonesianNumberConverter(totalScore), colSpan: 2 },
-            ],
-            [
-                {
-                    content: "Peringkat ",
-                    colSpan: 2,
-                    styles: { halign: "right", valign: "middle" },
-                },
-                {
-                    content: `   ${studentScores.studentRank} dari ${studentScores.studentTotal} siswa ${grade} se-desa.`,
-                    colSpan: 3,
-                    styles: { halign: "left", valign: "middle" },
-                },
-            ],
-        ],
+        body: summaryBody,
         startY: currentY,
         margin: { left: marginLeft, right: marginRight },
         tableWidth: pageWidth - marginLeft - marginRight,
