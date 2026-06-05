@@ -10,8 +10,19 @@ import { Download, RefreshCw, Trash } from "lucide-react";
 
 import { academicYearFormatter } from "../../shared/Utilities/academicYearFormatter";
 
+import { generateCategoryPDF, generateEmptyCategoryPDF } from "../utilities/generateCategoryPDF";
+import JSZip from "jszip";
+import { saveAs } from "file-saver";
+
+const CATEGORIES = [
+    'reciting', 'writing', 'quranTafsir', 'hadithTafsir',
+    'practice', 'moralManner', 'memorizingSurah', 'memorizingHadith',
+    'memorizingDua', 'memorizingBeautifulName', 'knowledge', 'independence'
+];
+
 const QuestionPackageView = () => {
     const [packages, setPackages] = useState([]);
+    const [isDownloading, setIsDownloading] = useState(false);
     const auth = useContext(AuthContext);
     const navigate = useNavigate();
 
@@ -32,6 +43,43 @@ const QuestionPackageView = () => {
         };
         fetchPackages();
     }, [sendRequest]);
+
+    const handleDownloadAll = async (pkg) => {
+        setIsDownloading(true);
+        try {
+            const semester = pkg.name.slice(-1);
+            const zip = new JSZip();
+
+            const results = await Promise.all(
+                CATEGORIES.map(async (category) => {
+                    const baseUrl = `${import.meta.env.VITE_BACKEND_URL}/munaqasyahs/examination/questions/package?semester=${semester}&category=${category}`;
+                    try {
+                        const response = await fetch(baseUrl);
+                        if (!response.ok) return { category, data: null };
+                        const data = await response.json();
+                        return { category, data };
+                    } catch {
+                        return { category, data: null };
+                    }
+                })
+            );
+
+            for (const { category, data } of results) {
+                let doc;
+                if (data && data.classes && data.classes.length > 0) {
+                    doc = generateCategoryPDF(pkg.name, category, data);
+                } else {
+                    doc = generateEmptyCategoryPDF(category);
+                }
+                zip.file(`${category}.pdf`, doc.output('arraybuffer'));
+            }
+
+            const blob = await zip.generateAsync({ type: 'blob' });
+            saveAs(blob, `PaketSoal_${pkg.name}.zip`);
+        } finally {
+            setIsDownloading(false);
+        }
+    };
 
     const columns = [
         {
@@ -300,9 +348,11 @@ const QuestionPackageView = () => {
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
-                            // navigate(`/munaqasyah/question-bank/${classGrade}/${question._id}/update`);
+                            handleDownloadAll(pkg);
                         }}
-                        className="hover:bg-gray-100 p-2 rounded-full"
+                        disabled={isDownloading}
+                        className="hover:bg-gray-100 p-2 rounded-full disabled:opacity-50"
+                        title="Download semua kategori"
                     >
                         <Download className="w-4 h-4" />
                     </button>
@@ -335,8 +385,14 @@ const QuestionPackageView = () => {
                 <div className="flex flex-col justify-between items-stretch gap-2 mb-4">
                     <div className="flex items-center gap-4 mb-6">
                         <h1 className="font-semibold text-gray-900 text-2xl">
-                            {"Paket Soal Daerah (under construction)"}
+                            {"Paket Soal Daerah"}
                         </h1>
+                        {isDownloading && (
+                            <div className="flex items-center gap-2 text-gray-500 text-sm">
+                                <LoadingCircle size={16} />
+                                <span>Mengunduh paket soal...</span>
+                            </div>
+                        )}
                     </div>
                 </div>
                 {isLoading && (
