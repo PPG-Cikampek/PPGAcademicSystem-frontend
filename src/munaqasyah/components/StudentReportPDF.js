@@ -25,68 +25,76 @@ export function generatePDFContent(
     studentNis,
     grade,
     academicYearName,
-    branchAvgScores
+    branchAvgScores,
+    isPengurus = false,
 ) {
     const doc = new jsPDF({});
 
     console.log(branchAvgScores);
 
-    // Add semi-transparent large logo as background watermark
-    const pageWidth =
-        doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
-    const pageHeight =
-        doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
-    const watermarkWidth = pageWidth * 0.6; // 70% of page width
-    const watermarkHeight = watermarkWidth * 0.95; // keep aspect ratio, adjust as needed
-    const watermarkX = (pageWidth - watermarkWidth) / 2;
-    const watermarkY = (pageHeight - watermarkHeight) / 2;
-    if (logo) {
-        try {
-            if (doc.setGState) {
-                doc.setGState(new doc.GState({ opacity: 0.05 }));
-                doc.addImage(
-                    logoHD,
-                    "WEBP",
-                    watermarkX,
-                    watermarkY,
-                    watermarkWidth,
-                    watermarkHeight
-                );
-                doc.setGState(new doc.GState({ opacity: 1 }));
-            } else if (doc.setFillAlpha) {
-                doc.setFillAlpha(0.08);
-                doc.addImage(
-                    logoHD,
-                    "WEBP",
-                    watermarkX,
-                    watermarkY,
-                    watermarkWidth,
-                    watermarkHeight
-                );
-                doc.setFillAlpha(1);
-            } else if (doc.setAlpha) {
-                doc.setAlpha(0.08);
-                doc.addImage(
-                    logoHD,
-                    "WEBP",
-                    watermarkX,
-                    watermarkY,
-                    watermarkWidth,
-                    watermarkHeight
-                );
-                doc.setAlpha(1);
-            } else {
-                doc.addImage(
-                    logoHD,
-                    "WEBP",
-                    watermarkX,
-                    watermarkY,
-                    watermarkWidth,
-                    watermarkHeight
-                );
+    const pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
+
+    // Solid yellow background for Pengurus report
+    if (isPengurus) {
+        doc.setFillColor(255, 255, 200);
+        doc.rect(0, 0, pageWidth, pageHeight, "F");
+    }
+
+    // Add semi-transparent large logo as background watermark (skip for Pengurus)
+    if (!isPengurus) {
+        const watermarkWidth = pageWidth * 0.6; // 70% of page width
+        const watermarkHeight = watermarkWidth * 0.95; // keep aspect ratio, adjust as needed
+        const watermarkX = (pageWidth - watermarkWidth) / 2;
+        const watermarkY = (pageHeight - watermarkHeight) / 2;
+        if (logo) {
+            try {
+                if (doc.setGState) {
+                    doc.setGState(new doc.GState({ opacity: 0.05 }));
+                    doc.addImage(
+                        logoHD,
+                        "WEBP",
+                        watermarkX,
+                        watermarkY,
+                        watermarkWidth,
+                        watermarkHeight,
+                    );
+                    doc.setGState(new doc.GState({ opacity: 1 }));
+                } else if (doc.setFillAlpha) {
+                    doc.setFillAlpha(0.08);
+                    doc.addImage(
+                        logoHD,
+                        "WEBP",
+                        watermarkX,
+                        watermarkY,
+                        watermarkWidth,
+                        watermarkHeight,
+                    );
+                    doc.setFillAlpha(1);
+                } else if (doc.setAlpha) {
+                    doc.setAlpha(0.08);
+                    doc.addImage(
+                        logoHD,
+                        "WEBP",
+                        watermarkX,
+                        watermarkY,
+                        watermarkWidth,
+                        watermarkHeight,
+                    );
+                    doc.setAlpha(1);
+                } else {
+                    doc.addImage(
+                        logoHD,
+                        "WEBP",
+                        watermarkX,
+                        watermarkY,
+                        watermarkWidth,
+                        watermarkHeight,
+                    );
+                }
+            } catch (e) {
+                // Fallback: ignore if logo fails to load
             }
-        } catch (e) {
-            // Fallback: ignore if logo fails to load
         }
     }
 
@@ -142,11 +150,7 @@ export function generatePDFContent(
 
     currentY += lineSpacing;
     doc.text("Tahun Ajaran", rightColX + 5, currentY);
-    doc.text(
-        `: ${academicYearFormatter(academicYearName)}`,
-        rightColX + 30,
-        currentY
-    );
+    doc.text(`: ${academicYearFormatter(academicYearName)}`, rightColX + 30, currentY);
 
     // Table for scores
     currentY += lineSpacing;
@@ -284,7 +288,7 @@ export function generatePDFContent(
     const totalBranchAvg = branchAvgScores
         ? Object.values(branchAvgScores).reduce(
               (sum, val) => (typeof val === "number" ? sum + val : sum),
-              0
+              0,
           )
         : "-";
 

@@ -38,7 +38,7 @@ const fetchScores = async ({ queryKey }) => {
                 Authorization: `Bearer ${token}`,
                 "Content-Type": "application/json",
             },
-        }
+        },
     );
     if (!res.ok) throw new Error("Failed to fetch scores");
     return res.json();
@@ -48,11 +48,13 @@ const MunaqasyahByClassView = () => {
     const [expandedCards, setExpandedCards] = useState({});
     const location = useLocation();
     const navigate = useNavigate();
-    const { branchYearId: paramBranchYearId, subBranchId: paramSubBranchId, classId } =
-        useParams();
+    const {
+        branchYearId: paramBranchYearId,
+        subBranchId: paramSubBranchId,
+        classId,
+    } = useParams();
     const branchYearId = paramBranchYearId || location.state?.branchYearId;
-    const subBranchMunaqasyahStatus =
-        location.state?.subBranchMunaqasyahStatus || null;
+    const subBranchMunaqasyahStatus = location.state?.subBranchMunaqasyahStatus || null;
     const [loadingIdx, setLoadingIdx] = useState(null);
 
     const auth = useContext(AuthContext);
@@ -65,10 +67,7 @@ const MunaqasyahByClassView = () => {
         isLoading,
         error,
     } = useQuery({
-        queryKey: [
-            "scores",
-            { branchYearId, classId, subBranchId, token: auth.token },
-        ],
+        queryKey: ["scores", { branchYearId, classId, subBranchId, token: auth.token }],
         queryFn: fetchScores,
         refetchInterval: 3000,
         enabled: Boolean(branchYearId && classId && subBranchId),
@@ -76,18 +75,14 @@ const MunaqasyahByClassView = () => {
 
     const rawScores = useMemo(() => {
         if (!responseData) return [];
-        const matchedClass = responseData.classes.find(
-            (cls) => cls.classId._id === classId
-        );
+        const matchedClass = responseData.classes.find((cls) => cls.classId._id === classId);
         console.log(responseData);
         return matchedClass ? matchedClass.scores : [];
     }, [responseData, classId]);
 
     const branchAvgScores = useMemo(() => {
         if (!responseData) return [];
-        const matchedClass = responseData.classes.find(
-            (cls) => cls.classId._id === classId
-        );
+        const matchedClass = responseData.classes.find((cls) => cls.classId._id === classId);
         return matchedClass ? matchedClass.averageScores : [];
     }, [responseData, classId]);
 
@@ -104,7 +99,7 @@ const MunaqasyahByClassView = () => {
                         "quranTafsir",
                         "hadithTafsir",
                         "memorizingHadith",
-                    ].includes(cat.key)
+                    ].includes(cat.key),
             );
         }
 
@@ -114,10 +109,7 @@ const MunaqasyahByClassView = () => {
             /(7|8|9)/.test(rawScores[0].classId.name)
         ) {
             return DEFAULT_SCORE_CATEGORIES.filter(
-                (cat) => 
-                    !["memorizingBeautifulName",
-                        "writing"
-                    ].includes(cat.key)
+                (cat) => !["memorizingBeautifulName", "writing"].includes(cat.key),
             );
         }
 
@@ -157,22 +149,21 @@ const MunaqasyahByClassView = () => {
                     [category.key]: {
                         ...score[category.key],
                         score:
-                            score[category.key]?.score < 60 &&
-                            score[category.key]?.score > 0
+                            score[category.key]?.score < 60 && score[category.key]?.score > 0
                                 ? 60
                                 : score[category.key]?.score === 0
-                                ? null
-                                : score[category.key]?.score,
+                                  ? null
+                                  : score[category.key]?.score,
                     },
                 }),
-                {}
+                {},
             ),
         }));
     }, [rawScores, scoreCategories]);
 
     const expandedCount = useMemo(
         () => Object.values(expandedCards).filter(Boolean).length,
-        [expandedCards]
+        [expandedCards],
     );
 
     const toggleCard = (id) => {
@@ -187,9 +178,7 @@ const MunaqasyahByClassView = () => {
     };
 
     const calculateAverage = (score) => {
-        const values = scoreCategories.map(
-            (category) => score[category.key]?.score ?? 0
-        );
+        const values = scoreCategories.map((category) => score[category.key]?.score ?? 0);
         const sum = values.reduce((a, b) => a + b, 0);
         return (sum / values.length).toFixed(1);
     };
@@ -200,7 +189,8 @@ const MunaqasyahByClassView = () => {
         studentNis,
         grade,
         academicYearName,
-        branchAvgScores
+        branchAvgScores,
+        isPengurus = false,
     ) => {
         const doc = generatePDFContent(
             studentName,
@@ -209,7 +199,8 @@ const MunaqasyahByClassView = () => {
             studentNis,
             grade,
             academicYearName,
-            branchAvgScores
+            branchAvgScores,
+            isPengurus,
         );
         const safeYear = academicYearName.replace(/[/\\:*?"<>|]/g, "-");
         doc.save(`Raport_${studentName}_${safeYear}.pdf`);
@@ -221,7 +212,8 @@ const MunaqasyahByClassView = () => {
         studentNis,
         grade,
         academicYearName,
-        branchAvgScores
+        branchAvgScores,
+        isPengurus = false,
     ) => {
         const doc = generatePDFContent(
             studentName,
@@ -230,7 +222,8 @@ const MunaqasyahByClassView = () => {
             studentNis,
             grade,
             academicYearName,
-            branchAvgScores
+            branchAvgScores,
+            isPengurus,
         );
         const pdfBlob = doc.output("blob");
         const pdfUrl = URL.createObjectURL(pdfBlob);
@@ -275,10 +268,7 @@ const MunaqasyahByClassView = () => {
                                     </div>
                                 </div>
                                 <div className="mt-4">
-                                    <SkeletonLoader
-                                        width="100%"
-                                        height="10px"
-                                    />
+                                    <SkeletonLoader width="100%" height="10px" />
                                 </div>
                             </div>
                         ))}
@@ -310,10 +300,7 @@ const MunaqasyahByClassView = () => {
                     </h1>
 
                     {expandedCount >= 2 && (
-                        <button
-                            onClick={collapseAll}
-                            className="mt-0 btn-neutral-outline"
-                        >
+                        <button onClick={collapseAll} className="mt-0 btn-neutral-outline">
                             Tutup Semua
                         </button>
                     )}
@@ -330,12 +317,10 @@ const MunaqasyahByClassView = () => {
                             (cat) =>
                                 score[cat.key]?.score != null &&
                                 score[cat.key]?.score !== "" &&
-                                score[cat.key]?.score !== 0
+                                score[cat.key]?.score !== 0,
                         ).length;
                         const totalCount = scoreCategories.length;
-                        const progressPercent = Math.round(
-                            (filledCount / totalCount) * 100
-                        );
+                        const progressPercent = Math.round((filledCount / totalCount) * 100);
 
                         return (
                             <div
@@ -358,11 +343,9 @@ const MunaqasyahByClassView = () => {
                                             </div>
 
                                             <span className="text-gray-500 text-base">
-                                                Rata-rata:{" "}
-                                                {calculateAverage(score)}
+                                                Rata-rata: {calculateAverage(score)}
                                             </span>
-                                            {subBranchMunaqasyahStatus !==
-                                                "inProgress" && (
+                                            {subBranchMunaqasyahStatus !== "inProgress" && (
                                                 <div className="flex md:flex-row flex-col gap-2 my-2 md:my-0">
                                                     <button
                                                         onClick={(e) => {
@@ -371,54 +354,38 @@ const MunaqasyahByClassView = () => {
                                                                 "Unduh Raport untuk Orang Tua?",
                                                                 "confirmation",
                                                                 () => {
-                                                                    setLoadingIdx(
-                                                                        idx
-                                                                    );
-                                                                    setTimeout(
-                                                                        () => {
-                                                                            downloadReport(
-                                                                                score
-                                                                                    .studentId
-                                                                                    .name,
-                                                                                scores[
-                                                                                    idx
-                                                                                ],
-                                                                                score.studentNis,
-                                                                                score
-                                                                                    .classId
-                                                                                    .name,
-                                                                                score
-                                                                                    .branchYearId
-                                                                                    .academicYearId
-                                                                                    .name,
-                                                                                branchAvgScores
-                                                                            );
-                                                                            setLoadingIdx(
-                                                                                null
-                                                                            );
-                                                                            openModal(
-                                                                                "Berhasil! Periksa folder unduhan anda.",
-                                                                                "success",
-                                                                                null,
-                                                                                "Berhasil!"
-                                                                            );
-                                                                        },
-                                                                        1200
-                                                                    );
+                                                                    setLoadingIdx(idx);
+                                                                    setTimeout(() => {
+                                                                        downloadReport(
+                                                                            score.studentId
+                                                                                .name,
+                                                                            scores[idx],
+                                                                            score.studentNis,
+                                                                            score.classId.name,
+                                                                            score.branchYearId
+                                                                                .academicYearId
+                                                                                .name,
+                                                                            branchAvgScores,
+                                                                            false,
+                                                                        );
+                                                                        setLoadingIdx(null);
+                                                                        openModal(
+                                                                            "Berhasil! Periksa folder unduhan anda.",
+                                                                            "success",
+                                                                            null,
+                                                                            "Berhasil!",
+                                                                        );
+                                                                    }, 1200);
                                                                 },
                                                                 "Konfirmasi",
-                                                                true
+                                                                true,
                                                             );
                                                         }}
                                                         className="bg-green-500 mt-0 border-green-500 button-primary"
-                                                        disabled={
-                                                            loadingIdx === idx
-                                                        }
+                                                        disabled={loadingIdx === idx}
                                                     >
                                                         {loadingIdx === idx ? (
-                                                            <LoadingCircle
-                                                                size={18}
-                                                            />
+                                                            <LoadingCircle size={18} />
                                                         ) : null}
                                                         Unduh Raport Orang Tua
                                                     </button>
@@ -427,28 +394,21 @@ const MunaqasyahByClassView = () => {
                                                             e.stopPropagation();
                                                             // Use normalized score for PDF
                                                             previewReport(
-                                                                score.studentId
-                                                                    .name,
+                                                                score.studentId.name,
                                                                 scores[idx],
                                                                 score.studentNis,
-                                                                score.classId
-                                                                    .name,
-                                                                score
-                                                                    .branchYearId
-                                                                    .academicYearId
-                                                                    .name,
-                                                                branchAvgScores
+                                                                score.classId.name,
+                                                                score.branchYearId
+                                                                    .academicYearId.name,
+                                                                branchAvgScores,
+                                                                false,
                                                             );
                                                         }}
                                                         className="hidden md:block bg-green-500 mt-0 border-green-500 button-primary"
-                                                        disabled={
-                                                            loadingIdx === idx
-                                                        }
+                                                        disabled={loadingIdx === idx}
                                                     >
                                                         {loadingIdx === idx ? (
-                                                            <LoadingCircle
-                                                                size={18}
-                                                            />
+                                                            <LoadingCircle size={18} />
                                                         ) : null}
                                                         Lihat Raport Orang Tua
                                                     </button>
@@ -459,54 +419,38 @@ const MunaqasyahByClassView = () => {
                                                                 "Unduh Raport untuk Pengurus?",
                                                                 "confirmation",
                                                                 () => {
-                                                                    setLoadingIdx(
-                                                                        idx
-                                                                    );
-                                                                    setTimeout(
-                                                                        () => {
-                                                                            downloadReport(
-                                                                                score
-                                                                                    .studentId
-                                                                                    .name,
-                                                                                rawScores[
-                                                                                    idx
-                                                                                ],
-                                                                                score.studentNis,
-                                                                                score
-                                                                                    .classId
-                                                                                    .name,
-                                                                                score
-                                                                                    .branchYearId
-                                                                                    .academicYearId
-                                                                                    .name,
-                                                                                branchAvgScores
-                                                                            );
-                                                                            setLoadingIdx(
-                                                                                null
-                                                                            );
-                                                                            openModal(
-                                                                                "Berhasil! Periksa folder unduhan anda.",
-                                                                                "success",
-                                                                                null,
-                                                                                "Berhasil!"
-                                                                            );
-                                                                        },
-                                                                        1200
-                                                                    );
+                                                                    setLoadingIdx(idx);
+                                                                    setTimeout(() => {
+                                                                        downloadReport(
+                                                                            score.studentId
+                                                                                .name,
+                                                                            rawScores[idx],
+                                                                            score.studentNis,
+                                                                            score.classId.name,
+                                                                            score.branchYearId
+                                                                                .academicYearId
+                                                                                .name,
+                                                                            branchAvgScores,
+                                                                            true,
+                                                                        );
+                                                                        setLoadingIdx(null);
+                                                                        openModal(
+                                                                            "Berhasil! Periksa folder unduhan anda.",
+                                                                            "success",
+                                                                            null,
+                                                                            "Berhasil!",
+                                                                        );
+                                                                    }, 1200);
                                                                 },
                                                                 "Konfirmasi",
-                                                                true
+                                                                true,
                                                             );
                                                         }}
                                                         className="m-0 btn-primary-outline text-gray-700"
-                                                        disabled={
-                                                            loadingIdx === idx
-                                                        }
+                                                        disabled={loadingIdx === idx}
                                                     >
                                                         {loadingIdx === idx ? (
-                                                            <LoadingCircle
-                                                                size={18}
-                                                            />
+                                                            <LoadingCircle size={18} />
                                                         ) : null}
                                                         Unduh Raport Pengurus
                                                     </button>
@@ -515,28 +459,21 @@ const MunaqasyahByClassView = () => {
                                                             e.stopPropagation();
                                                             // Use raw score for PDF
                                                             previewReport(
-                                                                score.studentId
-                                                                    .name,
+                                                                score.studentId.name,
                                                                 rawScores[idx],
                                                                 score.studentNis,
-                                                                score.classId
-                                                                    .name,
-                                                                score
-                                                                    .branchYearId
-                                                                    .academicYearId
-                                                                    .name,
-                                                                branchAvgScores
+                                                                score.classId.name,
+                                                                score.branchYearId
+                                                                    .academicYearId.name,
+                                                                branchAvgScores,
+                                                                true,
                                                             );
                                                         }}
                                                         className="hidden md:block m-0 btn-primary-outline text-gray-700"
-                                                        disabled={
-                                                            loadingIdx === idx
-                                                        }
+                                                        disabled={loadingIdx === idx}
                                                     >
                                                         {loadingIdx === idx ? (
-                                                            <LoadingCircle
-                                                                size={18}
-                                                            />
+                                                            <LoadingCircle size={18} />
                                                         ) : null}
                                                         Lihat Raport Pengurus
                                                     </button>
@@ -565,9 +502,7 @@ const MunaqasyahByClassView = () => {
                                                 className="bg-blue-600 rounded-full h-2.5 transition-all animate-pulse duration-300"
                                                 style={{
                                                     width: `${progressPercent}%`,
-                                                    animationDelay: `${
-                                                        idx * 0.5
-                                                    }s`,
+                                                    animationDelay: `${idx * 0.5}s`,
                                                 }}
                                             ></div>
                                         </div>
@@ -576,11 +511,7 @@ const MunaqasyahByClassView = () => {
 
                                 <div
                                     className={`overflow-hidden transition-all duration-300 
-                                ${
-                                    expandedCards[score._id]
-                                        ? "max-h-[800px]"
-                                        : "max-h-0"
-                                }`}
+                                ${expandedCards[score._id] ? "max-h-[800px]" : "max-h-0"}`}
                                 >
                                     <div className="bg-gray-50 px-4 py-4 border-gray-200 border-t">
                                         <div className="gap-1 md:gap-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
@@ -593,11 +524,8 @@ const MunaqasyahByClassView = () => {
                                                         {category.label}
                                                     </span>
                                                     <span className="font-medium text-gray-800">
-                                                        {score[category.key]
-                                                            ?.score > 0
-                                                            ? score[
-                                                                  category.key
-                                                              ]?.score
+                                                        {score[category.key]?.score > 0
+                                                            ? score[category.key]?.score
                                                             : "-"}
                                                     </span>
                                                 </div>
