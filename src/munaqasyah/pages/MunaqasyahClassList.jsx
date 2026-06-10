@@ -153,7 +153,7 @@ const MunaqasyahClassList = () => {
             branchYearMunaqasyahStatus !== "completed" &&
             branchYearMunaqasyahStatus !== "deferredCompleted"
         ) {
-            openModal("Munaqasyah belum selesai", "warning", null, "Perhatian");
+            openModal("Munaqosah belum selesai", "warning", null, "Perhatian");
             return;
         }
         if (!classes || classes.length === 0) {
