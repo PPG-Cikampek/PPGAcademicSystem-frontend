@@ -56,6 +56,7 @@ const MunaqasyahByClassView = () => {
     } = useParams();
     const branchYearId = paramBranchYearId || location.state?.branchYearId;
     const subBranchMunaqasyahStatus = location.state?.subBranchMunaqasyahStatus || null;
+    const branchYearMunaqasyahStatus = location.state?.branchYearMunaqasyahStatus || null;
     const [loadingIdx, setLoadingIdx] = useState(null);
     const [isBulkLoading, setIsBulkLoading] = useState(false);
     const [bulkProgress, setBulkProgress] = useState(0);
@@ -65,6 +66,18 @@ const MunaqasyahByClassView = () => {
     const subBranchId = paramSubBranchId || auth.userSubBranchId;
 
     const { modalState, openModal, closeModal } = useModal();
+
+    const requireMunaqasyahCompleted = useCallback(() => {
+        if (
+            branchYearMunaqasyahStatus &&
+            branchYearMunaqasyahStatus !== "completed" &&
+            branchYearMunaqasyahStatus !== "deferredCompleted"
+        ) {
+            openModal("Munaqasyah belum selesai", "warning", null, "Perhatian");
+            return false;
+        }
+        return true;
+    }, [branchYearMunaqasyahStatus, openModal]);
 
     const {
         data: responseData,
@@ -301,6 +314,7 @@ const MunaqasyahByClassView = () => {
     );
 
     const handleBulkDownload = useCallback(() => {
+        if (!requireMunaqasyahCompleted()) return;
         if (rawScores.length === 0) {
             openModal("Tidak ada data raport untuk diunduh.", "warning", null, "Data Kosong");
             return;
@@ -313,7 +327,7 @@ const MunaqasyahByClassView = () => {
             false,
             "md",
         );
-    }, [rawScores, openModal]);
+    }, [rawScores, requireMunaqasyahCompleted, openModal]);
 
     const handleModalClose = useCallback(() => {
         if (isBulkLoading && abortControllerRef.current) {
@@ -469,11 +483,11 @@ const MunaqasyahByClassView = () => {
                                             <span className="text-gray-500 text-base">
                                                 Rata-rata: {calculateAverage(score)}
                                             </span>
-                                            {subBranchMunaqasyahStatus !== "inProgress" && (
                                                 <div className="flex md:flex-row flex-col gap-2 my-2 md:my-0">
                                                     <button
                                                         onClick={(e) => {
                                                             e.stopPropagation();
+                                                            if (!requireMunaqasyahCompleted()) return;
                                                             openModal(
                                                                 "Unduh Raport untuk Orang Tua?",
                                                                 "confirmation",
@@ -516,7 +530,7 @@ const MunaqasyahByClassView = () => {
                                                     <button
                                                         onClick={(e) => {
                                                             e.stopPropagation();
-                                                            // Use normalized score for PDF
+                                                            if (!requireMunaqasyahCompleted()) return;
                                                             previewReport(
                                                                 score.studentId.name,
                                                                 scores[idx],
@@ -539,6 +553,7 @@ const MunaqasyahByClassView = () => {
                                                     <button
                                                         onClick={(e) => {
                                                             e.stopPropagation();
+                                                            if (!requireMunaqasyahCompleted()) return;
                                                             openModal(
                                                                 "Unduh Raport untuk Pengurus?",
                                                                 "confirmation",
@@ -581,7 +596,7 @@ const MunaqasyahByClassView = () => {
                                                     <button
                                                         onClick={(e) => {
                                                             e.stopPropagation();
-                                                            // Use raw score for PDF
+                                                            if (!requireMunaqasyahCompleted()) return;
                                                             previewReport(
                                                                 score.studentId.name,
                                                                 rawScores[idx],
@@ -602,7 +617,6 @@ const MunaqasyahByClassView = () => {
                                                         Lihat Raport Pengurus
                                                     </button>
                                                 </div>
-                                            )}
                                         </div>
 
                                         <ChevronDown

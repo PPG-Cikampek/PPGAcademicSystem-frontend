@@ -270,6 +270,7 @@ const BranchAdminMunaqasyahDetailView = () => {
                 branchYearId,
                 subBranchId,
                 subBranchMunaqasyahStatus,
+                branchYearMunaqasyahStatus: state?.munaqasyahStatus,
             },
         });
     };

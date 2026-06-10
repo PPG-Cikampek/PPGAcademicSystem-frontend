@@ -297,28 +297,32 @@ const SubBranchMunaqasyahView = () => {
                                                         </button>
                                                         <button
                                                             onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                navigate(
-                                                                    `/munaqasyah/${year.branchYear._id}`,
-                                                                    {
-                                                                        state: {
-                                                                            subBranchMunaqasyahStatus:
-                                                                                year
-                                                                                    .subBranch
-                                                                                    ?.munaqasyahStatus,
-                                                                        },
-                                                                    }
-                                                                );
-                                                            }}
-                                                            className="mt-2 button-primary"
-                                                        >
-                                                            Lihat Detail
-                                                        </button>
-                                                    </div>
-                                                )}
+                                                                 e.stopPropagation();
+                                                                 navigate(
+                                                                     `/munaqasyah/${year.branchYear._id}`,
+                                                                     {
+                                                                         state: {
+                                                                             subBranchMunaqasyahStatus:
+                                                                                 year
+                                                                                     .subBranch
+                                                                                     ?.munaqasyahStatus,
+                                                                             branchYearMunaqasyahStatus:
+                                                                                 year
+                                                                                     .branchYear
+                                                                                     .munaqasyahStatus,
+                                                                         },
+                                                                     }
+                                                                 );
+                                                             }}
+                                                             className="mt-2 button-primary"
+                                                         >
+                                                             Lihat Detail
+                                                         </button>
+                                                     </div>
+                                                 )}
 
-                                            {year.branchYear
-                                                ?.munaqasyahStatus !==
+                                             {year.branchYear
+                                                 ?.munaqasyahStatus !==
                                                 "notStarted" &&
                                                 (year.subBranch
                                                     ?.munaqasyahStatus ===
@@ -337,6 +341,10 @@ const SubBranchMunaqasyahView = () => {
                                                                             year
                                                                                 .subBranch
                                                                                 ?.munaqasyahStatus,
+                                                                        branchYearMunaqasyahStatus:
+                                                                            year
+                                                                                .branchYear
+                                                                                .munaqasyahStatus,
                                                                     },
                                                                 }
                                                             );
@@ -355,24 +363,28 @@ const SubBranchMunaqasyahView = () => {
                                                     <button
                                                         onClick={(e) => {
                                                             e.stopPropagation();
-                                                            navigate(
-                                                                `/munaqasyah/${year.branchYear._id}`,
-                                                                {
-                                                                    state: {
-                                                                        subBranchMunaqasyahStatus:
-                                                                            year
-                                                                                .subBranch
-                                                                                ?.munaqasyahStatus,
-                                                                    },
-                                                                }
-                                                            );
-                                                        }}
-                                                        className="mt-2 button-primary"
-                                                    >
-                                                        Lihat Detail
-                                                    </button>
-                                                </div>
-                                            )}
+                                                    navigate(
+                                                            `/munaqasyah/${year.branchYear._id}`,
+                                                            {
+                                                                state: {
+                                                                    subBranchMunaqasyahStatus:
+                                                                        year
+                                                                            .subBranch
+                                                                            ?.munaqasyahStatus,
+                                                                    branchYearMunaqasyahStatus:
+                                                                        year
+                                                                            .branchYear
+                                                                            .munaqasyahStatus,
+                                                                },
+                                                            }
+                                                        );
+                                                    }}
+                                                    className="mt-2 button-primary"
+                                                >
+                                                    Lihat Detail
+                                                </button>
+                                            </div>
+                                        )}
                                         </div>
                                     </div>
                                 </div>
