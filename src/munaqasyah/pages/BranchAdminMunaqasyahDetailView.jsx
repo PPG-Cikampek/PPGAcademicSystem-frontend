@@ -104,16 +104,16 @@ const BranchAdminMunaqasyahDetailView = () => {
                 return `${completed}/${total} siswa`;
             },
         },
-        {
-            key: "munaqasyahStatus",
-            label: "Status",
-            sortable: true,
-            headerAlign: "center",
-            cellAlign: "center",
-            render: (item) => getMunaqasyahStatusName(item.munaqasyahStatus),
-            cellStyle: (item) =>
-                getMunaqasyahStatusStyle(item.munaqasyahStatus),
-        },
+        // {
+        //     key: "munaqasyahStatus",
+        //     label: "Status",
+        //     sortable: true,
+        //     headerAlign: "center",
+        //     cellAlign: "center",
+        //     render: (item) => getMunaqasyahStatusName(item.munaqasyahStatus),
+        //     cellStyle: (item) =>
+        //         getMunaqasyahStatusStyle(item.munaqasyahStatus),
+        // },
         {
             key: "action",
             label: "Aksi",
@@ -186,7 +186,7 @@ const BranchAdminMunaqasyahDetailView = () => {
                         >
                             Monitor
                         </button>
-                        <button
+                        {/* <button
                             className="disabled:opacity-50 mx-1 btn-primary-outline"
                             onClick={() =>
                                 subBranchMunaqasyahStatusHandler(
@@ -202,7 +202,7 @@ const BranchAdminMunaqasyahDetailView = () => {
                             }
                         >
                             Mulai Susulan
-                        </button>
+                        </button> */}
                     </>
                 );
             },
