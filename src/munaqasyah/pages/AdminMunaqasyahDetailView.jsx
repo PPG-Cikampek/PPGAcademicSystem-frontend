@@ -264,7 +264,7 @@ const AdminMunaqasyahDetailView = () => {
                     branchYearId,
                     subBranchId,
                     subBranchMunaqasyahStatus,
-                    branchYearMunaqasyahStatus: state?.year?.munaqasyahStatus,
+                    branchMunaqasyahStatus: state?.year?.munaqasyahStatus,
                 },
             }
         );

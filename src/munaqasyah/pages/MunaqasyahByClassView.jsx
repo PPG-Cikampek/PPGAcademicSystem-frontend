@@ -56,7 +56,7 @@ const MunaqasyahByClassView = () => {
     } = useParams();
     const branchYearId = paramBranchYearId || location.state?.branchYearId;
     const subBranchMunaqasyahStatus = location.state?.subBranchMunaqasyahStatus || null;
-    const branchYearMunaqasyahStatus = location.state?.branchYearMunaqasyahStatus || null;
+    const branchMunaqasyahStatus = location.state?.branchMunaqasyahStatus || null;
     const [loadingIdx, setLoadingIdx] = useState(null);
     const [isBulkLoading, setIsBulkLoading] = useState(false);
     const [bulkProgress, setBulkProgress] = useState(0);
@@ -69,15 +69,15 @@ const MunaqasyahByClassView = () => {
 
     const requireMunaqasyahCompleted = useCallback(() => {
         if (
-            branchYearMunaqasyahStatus &&
-            branchYearMunaqasyahStatus !== "completed" &&
-            branchYearMunaqasyahStatus !== "deferredCompleted"
+            branchMunaqasyahStatus &&
+            branchMunaqasyahStatus !== "completed" &&
+            branchMunaqasyahStatus !== "deferredCompleted"
         ) {
             openModal("Munaqosah belum selesai", "warning", null, "Perhatian");
             return false;
         }
         return true;
-    }, [branchYearMunaqasyahStatus, openModal]);
+    }, [branchMunaqasyahStatus, openModal]);
 
     const {
         data: responseData,

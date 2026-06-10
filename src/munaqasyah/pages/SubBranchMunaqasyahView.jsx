@@ -306,7 +306,7 @@ const SubBranchMunaqasyahView = () => {
                                                                                  year
                                                                                      .subBranch
                                                                                      ?.munaqasyahStatus,
-                                                                             branchYearMunaqasyahStatus:
+                                                                             branchMunaqasyahStatus:
                                                                                  year
                                                                                      .branchYear
                                                                                      .munaqasyahStatus,
@@ -341,7 +341,7 @@ const SubBranchMunaqasyahView = () => {
                                                                             year
                                                                                 .subBranch
                                                                                 ?.munaqasyahStatus,
-                                                                        branchYearMunaqasyahStatus:
+                                                                        branchMunaqasyahStatus:
                                                                             year
                                                                                 .branchYear
                                                                                 .munaqasyahStatus,
@@ -371,7 +371,7 @@ const SubBranchMunaqasyahView = () => {
                                                                         year
                                                                             .subBranch
                                                                             ?.munaqasyahStatus,
-                                                                    branchYearMunaqasyahStatus:
+                                                                    branchMunaqasyahStatus:
                                                                         year
                                                                             .branchYear
                                                                             .munaqasyahStatus,

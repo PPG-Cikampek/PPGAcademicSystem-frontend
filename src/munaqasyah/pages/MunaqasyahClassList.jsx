@@ -27,7 +27,7 @@ const MunaqasyahClassList = () => {
 
     const location = useLocation();
     const subBranchMunaqasyahStatus = location.state?.subBranchMunaqasyahStatus;
-    const branchYearMunaqasyahStatus = location.state?.branchYearMunaqasyahStatus;
+    const branchMunaqasyahStatus = location.state?.branchMunaqasyahStatus;
 
     useEffect(() => {
         const fetchClasses = async () => {
@@ -149,9 +149,9 @@ const MunaqasyahClassList = () => {
 
     const handleBulkDownload = useCallback(() => {
         if (
-            branchYearMunaqasyahStatus &&
-            branchYearMunaqasyahStatus !== "completed" &&
-            branchYearMunaqasyahStatus !== "deferredCompleted"
+            branchMunaqasyahStatus &&
+            branchMunaqasyahStatus !== "completed" &&
+            branchMunaqasyahStatus !== "deferredCompleted"
         ) {
             openModal("Munaqosah belum selesai", "warning", null, "Perhatian");
             return;
@@ -168,7 +168,7 @@ const MunaqasyahClassList = () => {
             false,
             "md",
         );
-    }, [classes, branchYearMunaqasyahStatus, openModal]);
+    }, [classes, branchMunaqasyahStatus, openModal]);
 
     const handleModalClose = useCallback(() => {
         if (isBulkLoading && abortControllerRef.current) {
@@ -253,7 +253,7 @@ const MunaqasyahClassList = () => {
                                     branchYearId,
                                     subBranchId,
                                     subBranchMunaqasyahStatus,
-                                    branchYearMunaqasyahStatus,
+                                    branchMunaqasyahStatus,
                                 }}
                             >
                                 <div
