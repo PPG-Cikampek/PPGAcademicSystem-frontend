@@ -80,13 +80,28 @@ const AcademicYearsView = () => {
         );
     };
 
+    const getActionForAcademicYearStatus = (currentStatus, actionType) => {
+        if (actionType === "start") {
+            if (currentStatus === "notStarted") return "inProgress";
+            return "deferredInProgress";
+        }
+        if (actionType === "complete") {
+            if (currentStatus === "inProgress") return "completed";
+            return "deferredCompleted";
+        }
+        return "inProgress";
+    };
+
     const munaqasyahStatusHandler = (
         actionType,
         academicYearName,
-        academicYearId
+        academicYearId,
+        currentStatus
     ) => {
-        const confirmAction = async (action) => {
-            const body = JSON.stringify({ munaqasyahStatus: action });
+        const action = getActionForAcademicYearStatus(currentStatus, actionType);
+
+        const confirmAction = async (act) => {
+            const body = JSON.stringify({ munaqasyahStatus: act });
             try {
                 const responseData = await sendRequest(
                     `${
@@ -122,27 +137,17 @@ const AcademicYearsView = () => {
             }
         };
 
-        if (actionType === "start") {
-            openModal(
-                `Mulai munaqosah untuk tahun ajaran ${academicYearFormatter(
-                    academicYearName
-                )}?`,
-                "confirmation",
-                () => confirmAction("inProgress"),
-                `Konfirmasi`,
-                true
-            );
-        } else if (actionType === "complete") {
-            openModal(
-                `Selesaikan munaqosah untuk tahun ajaran ${academicYearFormatter(
-                    academicYearName
-                )}?`,
-                "confirmation",
-                () => confirmAction("completed"),
-                `Konfirmasi`,
-                true
-            );
-        }
+        const isStarting =
+            action === "inProgress" || action === "deferredInProgress";
+        openModal(
+            `${isStarting ? "Mulai" : "Selesaikan"} munaqosah untuk tahun ajaran ${academicYearFormatter(
+                academicYearName
+            )}${isStarting && currentStatus !== "notStarted" ? " (Susulan)" : ""}?`,
+            "confirmation",
+            () => confirmAction(action),
+            `Konfirmasi`,
+            true
+        );
     };
 
     const deleteAcademicYearHandler = (academicYearName, academicYearId) => {

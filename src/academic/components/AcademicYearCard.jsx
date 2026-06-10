@@ -59,8 +59,12 @@ const AcademicYearCard = ({
                     return "py-1 px-2 rounded-md text-sm text-center w-min text-yellow-600 bg-yellow-100";
                 if (item.munaqasyahStatus === "inProgress")
                     return "py-1 px-2 rounded-md text-sm text-center w-min text-blue-600 bg-blue-100";
+                if (item.munaqasyahStatus === "deferredInProgress")
+                    return "py-1 px-2 rounded-md text-sm text-center w-min text-orange-600 bg-orange-100";
                 if (item.munaqasyahStatus === "completed")
                     return "py-1 px-2 rounded-md text-sm text-center w-min text-green-600 bg-green-100";
+                if (item.munaqasyahStatus === "deferredCompleted")
+                    return "py-1 px-2 rounded-md text-sm text-center w-min text-teal-600 bg-teal-100";
                 return "py-1 px-2 text-sm text-center w-min text-gray-500";
             },
         },
@@ -78,10 +82,20 @@ const AcademicYearCard = ({
                 label: "Munaqosah sedang berjalan",
                 className: "text-blue-600 bg-blue-100",
             };
+        if (status === "deferredInProgress")
+            return {
+                label: "Munaqosah susulan sedang berjalan",
+                className: "text-orange-600 bg-orange-100",
+            };
         if (status === "completed")
             return {
                 label: "Munaqosah selesai",
                 className: "text-green-600 bg-green-100",
+            };
+        if (status === "deferredCompleted")
+            return {
+                label: "Munaqosah susulan selesai",
+                className: "text-teal-600 bg-teal-100",
             };
         return {
             label: "Status tidak diketahui",
@@ -128,7 +142,9 @@ const AcademicYearCard = ({
                         >
                             {munaqasyahStatusObj.label}
                         </div>
-                        {year.munaqasyahStatus === "inProgress" && (
+                        {(year.munaqasyahStatus === "inProgress" ||
+                            year.munaqasyahStatus ===
+                                "deferredInProgress") && (
                             <button
                                 className="btn-primary-outline mt-2"
                                 onClick={(e) => {
@@ -136,14 +152,20 @@ const AcademicYearCard = ({
                                     onMunaqsyahStatusChange(
                                         "complete",
                                         year.name,
-                                        year._id
+                                        year._id,
+                                        year.munaqasyahStatus
                                     );
                                 }}
                             >
-                                Selesaikan Munaqosah
+                                {year.munaqasyahStatus === "inProgress"
+                                    ? "Selesaikan Munaqosah"
+                                    : "Selesaikan Munaqosah Susulan"}
                             </button>
                         )}
-                        {year.munaqasyahStatus !== "inProgress" && (
+                        {(year.munaqasyahStatus === "notStarted" ||
+                            year.munaqasyahStatus === "completed" ||
+                            year.munaqasyahStatus ===
+                                "deferredCompleted") && (
                             <button
                                 className="btn-primary-outline mt-2"
                                 onClick={(e) => {
@@ -151,7 +173,8 @@ const AcademicYearCard = ({
                                     onMunaqsyahStatusChange(
                                         "start",
                                         year.name,
-                                        year._id
+                                        year._id,
+                                        year.munaqasyahStatus
                                     );
                                 }}
                             >
