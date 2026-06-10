@@ -73,7 +73,7 @@ const MunaqasyahByClassView = () => {
             branchMunaqasyahStatus !== "completed" &&
             branchMunaqasyahStatus !== "deferredCompleted"
         ) {
-            openModal("Munaqosah belum selesai", "warning", null, "Perhatian");
+            openModal("Tidak dapat mengunduh raport jika munaqosah masih berjalan!", "warning", null, "Perhatian");
             return false;
         }
         return true;

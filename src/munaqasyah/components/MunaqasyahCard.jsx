@@ -166,8 +166,8 @@ const MunaqasyahCard = ({ year, onClick, isClickAble = true, fetchData }) => {
                             </div>
                         </div>
                         {year.academicYearId.isActive === true &&
-                            year.academicYearId.munaqasyahStatus !==
-                                "notStarted" && (
+                            year.academicYearId.munaqasyahStatus ===
+                                "inProgress" && (
                                 <>
                                     {(year.munaqasyahStatus === "notStarted" ||
                                         year.munaqasyahStatus ===

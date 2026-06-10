@@ -217,7 +217,7 @@ const SubBranchMunaqasyahView = () => {
                                         </div>
 
                                         <div>
-                                            {year.branchYear.isActive ===
+                                            {/* {year.branchYear.isActive ===
                                                 true &&
                                                 (year.branchYear
                                                     ?.munaqasyahStatus ===
@@ -254,7 +254,7 @@ const SubBranchMunaqasyahView = () => {
                                                             ? "Mulai Munaqosah"
                                                             : "Mulai Munaqosah Susulan"}
                                                     </button>
-                                                )}
+                                                )} */}
                                             {year.branchYear.isActive ===
                                                 true &&
                                                 (year.branchYear
@@ -273,7 +273,7 @@ const SubBranchMunaqasyahView = () => {
                                                         ?.munaqasyahStatus ===
                                                         "deferredInProgress") && (
                                                     <div className="flex flex-row gap-2">
-                                                        <button
+                                                        {/* <button
                                                             className="mt-2 btn-primary-outline"
                                                             onClick={(e) => {
                                                                 e.preventDefault();
@@ -294,7 +294,7 @@ const SubBranchMunaqasyahView = () => {
                                                             "inProgress"
                                                                 ? "Selesaikan Munaqosah"
                                                                 : "Selesaikan Munaqosah Susulan"}
-                                                        </button>
+                                                        </button> */}
                                                         <button
                                                             onClick={(e) => {
                                                                  e.stopPropagation();

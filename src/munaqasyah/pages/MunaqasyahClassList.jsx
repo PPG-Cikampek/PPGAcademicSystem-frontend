@@ -153,7 +153,7 @@ const MunaqasyahClassList = () => {
             branchMunaqasyahStatus !== "completed" &&
             branchMunaqasyahStatus !== "deferredCompleted"
         ) {
-            openModal("Munaqosah belum selesai", "warning", null, "Perhatian");
+            openModal("Tidak dapat mengunduh raport jika munaqosah masih berjalan!", "warning", null, "Perhatian");
             return;
         }
         if (!classes || classes.length === 0) {
