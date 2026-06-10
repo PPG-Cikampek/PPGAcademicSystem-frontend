@@ -36,6 +36,18 @@ const SubBranchMunaqasyahView = () => {
         SubBranchMunaqasyahView.fetchSubBranchYears = fetchSubBranchYears; // Expose for use elsewhere
     }, [sendRequest]);
 
+    const getActionForStatus = (currentStatus, actionType) => {
+        if (actionType === "start") {
+            if (currentStatus === "notStarted") return "inProgress";
+            return "deferredInProgress";
+        }
+        if (actionType === "finish") {
+            if (currentStatus === "inProgress") return "completed";
+            return "deferredCompleted";
+        }
+        return "inProgress";
+    };
+
     const munaqasyahStatusHandler = (
         actionType,
         subBranchYearName,
@@ -70,23 +82,20 @@ const SubBranchMunaqasyahView = () => {
             }
         };
 
-        if (actionType === "start") {
-            openModal(
-                `Mulai munaqosah untuk tahun ajaran ${subBranchYearName}?`,
-                "confirmation",
-                () => confirmStart("inProgress"),
-                `Konfirmasi`,
-                true
-            );
-        } else if (actionType === "finish") {
-            openModal(
-                `Mulai munaqosah untuk tahun ajaran ${subBranchYearName}?`,
-                "confirmation",
-                () => confirmStart("completed"),
-                `Konfirmasi`,
-                true
-            );
-        }
+        const currentStatus = subBranchYears?.find(
+            (y) => y.subBranch?._id === subBranchId
+        )?.subBranch?.munaqasyahStatus || "notStarted";
+        const action = getActionForStatus(currentStatus, actionType);
+
+        const isStarting =
+            action === "inProgress" || action === "deferredInProgress";
+        openModal(
+            `${isStarting ? "Mulai" : "Selesaikan"} munaqosah untuk tahun ajaran ${subBranchYearName}${isStarting && currentStatus !== "notStarted" ? " (Susulan)" : ""}?`,
+            "confirmation",
+            () => confirmStart(action),
+            `Konfirmasi`,
+            true
+        );
     };
 
     return (
@@ -143,9 +152,12 @@ const SubBranchMunaqasyahView = () => {
                                         <div className="text-gray-500">
                                             {year.branchYear.isActive ===
                                                 true &&
-                                                year.subBranch
+                                                (year.subBranch
                                                     ?.munaqasyahStatus ===
-                                                    "inProgress" && (
+                                                    "inProgress" ||
+                                                    year.subBranch
+                                                        ?.munaqasyahStatus ===
+                                                        "deferredInProgress") && (
                                                     <div className="text-green-500">
                                                         Munaqosah Kelompok
                                                         berjalan!
@@ -153,9 +165,14 @@ const SubBranchMunaqasyahView = () => {
                                                 )}
                                             {year.branchYear.isActive ===
                                                 true &&
-                                                year.branchYear.academicYearId
+                                                (year.branchYear
+                                                    .academicYearId
                                                     ?.munaqasyahStatus ===
-                                                    "inProgress" &&
+                                                    "inProgress" ||
+                                                    year.branchYear
+                                                        .academicYearId
+                                                        ?.munaqasyahStatus ===
+                                                        "deferredInProgress") &&
                                                 (year.branchYear
                                                     ?.munaqasyahStatus ===
                                                 "notStarted" ? (
@@ -166,7 +183,10 @@ const SubBranchMunaqasyahView = () => {
                                                     </div>
                                                 ) : year.branchYear
                                                       ?.munaqasyahStatus ===
-                                                  "inProgress" ? (
+                                                      "inProgress" ||
+                                                  year.branchYear
+                                                      ?.munaqasyahStatus ===
+                                                      "deferredInProgress" ? (
                                                     <div className="inline-flex items-center gap-1 text-blue-500">
                                                         <CircleAlert />
                                                         Desa sudah memulai
@@ -184,7 +204,10 @@ const SubBranchMunaqasyahView = () => {
                                                 true &&
                                                 year.branchYear.academicYearId
                                                     ?.munaqasyahStatus !==
-                                                    "inProgress" && (
+                                                    "inProgress" &&
+                                                year.branchYear.academicYearId
+                                                    ?.munaqasyahStatus !==
+                                                    "deferredInProgress" && (
                                                     <div className="inline-flex items-center gap-1 text-gray-600">
                                                         <CircleAlert />
                                                         Munaqosah Daerah belum
@@ -194,14 +217,23 @@ const SubBranchMunaqasyahView = () => {
                                         </div>
 
                                         <div>
-                                            {year.branchYear
-                                                ?.munaqasyahStatus ===
-                                                "inProgress" &&
-                                                year.branchYear.isActive ===
-                                                    true &&
+                                            {year.branchYear.isActive ===
+                                                true &&
+                                                (year.branchYear
+                                                    ?.munaqasyahStatus ===
+                                                    "inProgress" ||
+                                                    year.branchYear
+                                                        ?.munaqasyahStatus ===
+                                                        "deferredInProgress" ||
+                                                    year.branchYear
+                                                        ?.munaqasyahStatus ===
+                                                        "deferredCompleted") &&
                                                 year.subBranch
                                                     ?.munaqasyahStatus !==
-                                                    "inProgress" && (
+                                                    "inProgress" &&
+                                                year.subBranch
+                                                    ?.munaqasyahStatus !==
+                                                    "deferredInProgress" && (
                                                     <button
                                                         className="mt-2 btn-primary-outline"
                                                         onClick={(e) => {
@@ -223,14 +255,23 @@ const SubBranchMunaqasyahView = () => {
                                                             : "Mulai Munaqosah Susulan"}
                                                     </button>
                                                 )}
-                                            {year.branchYear
-                                                ?.munaqasyahStatus ===
-                                                "inProgress" &&
-                                                year.branchYear.isActive ===
-                                                    true &&
-                                                year.subBranch
+                                            {year.branchYear.isActive ===
+                                                true &&
+                                                (year.branchYear
                                                     ?.munaqasyahStatus ===
-                                                    "inProgress" && (
+                                                    "inProgress" ||
+                                                    year.branchYear
+                                                        ?.munaqasyahStatus ===
+                                                        "deferredInProgress" ||
+                                                    year.branchYear
+                                                        ?.munaqasyahStatus ===
+                                                        "deferredCompleted") &&
+                                                (year.subBranch
+                                                    ?.munaqasyahStatus ===
+                                                    "inProgress" ||
+                                                    year.subBranch
+                                                        ?.munaqasyahStatus ===
+                                                        "deferredInProgress") && (
                                                     <div className="flex flex-row gap-2">
                                                         <button
                                                             className="mt-2 btn-primary-outline"
@@ -248,7 +289,11 @@ const SubBranchMunaqasyahView = () => {
                                                                 );
                                                             }}
                                                         >
-                                                            Selesaikan Munaqosah
+                                                            {year.subBranch
+                                                                ?.munaqasyahStatus ===
+                                                            "inProgress"
+                                                                ? "Selesaikan Munaqosah"
+                                                                : "Selesaikan Munaqosah Susulan"}
                                                         </button>
                                                         <button
                                                             onClick={(e) => {
@@ -275,9 +320,12 @@ const SubBranchMunaqasyahView = () => {
                                             {year.branchYear
                                                 ?.munaqasyahStatus !==
                                                 "notStarted" &&
-                                                year.subBranch
+                                                (year.subBranch
                                                     ?.munaqasyahStatus ===
-                                                    "completed" && (
+                                                    "completed" ||
+                                                    year.subBranch
+                                                        ?.munaqasyahStatus ===
+                                                        "deferredCompleted") && (
                                                     <button
                                                         onClick={(e) => {
                                                             e.stopPropagation();

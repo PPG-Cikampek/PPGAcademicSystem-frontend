@@ -11,14 +11,24 @@ const MunaqasyahCard = ({ year, onClick, isClickAble = true, fetchData }) => {
 
     const { modalState, openModal, closeModal } = useModal();
 
-    const branchMunaqasyahStatusHandler = (actionName, name, branchYearId) => {
-        const confirmAction = async (action) => {
+    const getActionForStatus = (status) => {
+        if (status === "notStarted") return "inProgress";
+        if (status === "inProgress") return "completed";
+        if (status === "completed" || status === "deferredCompleted")
+            return "deferredInProgress";
+        if (status === "deferredInProgress") return "deferredCompleted";
+        return "inProgress";
+    };
+
+    const branchMunaqasyahStatusHandler = (currentStatus, name, branchYearId) => {
+        const action = getActionForStatus(currentStatus);
+        const confirmAction = async (act) => {
             const url = `${
                 import.meta.env.VITE_BACKEND_URL
             }/branchYears/munaqasyah/`;
             const body = JSON.stringify({
                 branchYearId,
-                action: action,
+                action: act,
             });
             try {
                 const responseData = await sendRequest(url, "PATCH", body, {
@@ -26,7 +36,7 @@ const MunaqasyahCard = ({ year, onClick, isClickAble = true, fetchData }) => {
                 });
                 openModal(responseData.message, "success", null, "Berhasil!");
                 if (typeof fetchData === "function") {
-                    await fetchData(); // Refresh parent data to update year.munaqasyahStatus
+                    await fetchData();
                 }
             } catch (err) {
                 setError(err.message);
@@ -35,27 +45,17 @@ const MunaqasyahCard = ({ year, onClick, isClickAble = true, fetchData }) => {
             return false;
         };
 
-        if (actionName === "start") {
-            openModal(
-                `Mulai Munaosah Desa untuk Tahun Ajaran ${academicYearFormatter(
-                    name
-                )}?`,
-                "confirmation",
-                () => confirmAction("inProgress"),
-                "Konfirmasi",
-                true
-            );
-        } else {
-            openModal(
-                `Selesaikan Munaosah Desa untuk Tahun Ajaran ${academicYearFormatter(
-                    name
-                )}?`,
-                "confirmation",
-                () => confirmAction("completed"),
-                "Konfirmasi",
-                true
-            );
-        }
+        const isStarting =
+            action === "inProgress" || action === "deferredInProgress";
+        openModal(
+            `${isStarting ? "Mulai" : "Selesaikan"} Munaosah Desa untuk Tahun Ajaran ${academicYearFormatter(
+                name
+            )}${isStarting && currentStatus !== "notStarted" ? " (Susulan)" : ""}?`,
+            "confirmation",
+            () => confirmAction(action),
+            "Konfirmasi",
+            true
+        );
         return false;
     };
 
@@ -119,8 +119,14 @@ const MunaqasyahCard = ({ year, onClick, isClickAble = true, fetchData }) => {
                                             "inProgress"
                                                 ? "text-yellow-600 bg-yellow-100"
                                                 : year.munaqasyahStatus ===
+                                                  "deferredInProgress"
+                                                ? "text-orange-600 bg-orange-100"
+                                                : year.munaqasyahStatus ===
                                                   "completed"
                                                 ? "text-green-600 bg-green-100"
+                                                : year.munaqasyahStatus ===
+                                                  "deferredCompleted"
+                                                ? "text-teal-600 bg-teal-100"
                                                 : "text-gray-600 bg-gray-100"
                                         } rounded-sm`}
                                     >
@@ -145,19 +151,29 @@ const MunaqasyahCard = ({ year, onClick, isClickAble = true, fetchData }) => {
                                 {year.academicYearId.munaqasyahStatus ===
                                 "inProgress"
                                     ? "Daerah sudah memulai munaqosah!"
-                                    : year.academicYearId.munaqasyahStatus ===
-                                      "completed"
+                                    : year.academicYearId
+                                          .munaqasyahStatus ===
+                                      "deferredInProgress"
+                                    ? "Daerah sedang munaqosah susulan."
+                                    : year.academicYearId
+                                          .munaqasyahStatus === "completed"
                                     ? "Munaqosah daerah sudah selesai."
+                                    : year.academicYearId
+                                          .munaqasyahStatus ===
+                                      "deferredCompleted"
+                                    ? "Munaqosah susulan daerah selesai."
                                     : "Daerah belum memulai"}
                             </div>
                         </div>
                         {year.academicYearId.isActive === true &&
-                            year.academicYearId.munaqasyahStatus ===
-                                "inProgress" && (
+                            year.academicYearId.munaqasyahStatus !==
+                                "notStarted" && (
                                 <>
                                     {(year.munaqasyahStatus === "notStarted" ||
                                         year.munaqasyahStatus ===
-                                            "completed") && (
+                                            "completed" ||
+                                        year.munaqasyahStatus ===
+                                            "deferredCompleted") && (
                                         <div className="mt-4">
                                             <button
                                                 data-no-nav
@@ -166,7 +182,7 @@ const MunaqasyahCard = ({ year, onClick, isClickAble = true, fetchData }) => {
                                                     e.stopPropagation();
                                                     e.preventDefault();
                                                     branchMunaqasyahStatusHandler(
-                                                        "start",
+                                                        year.munaqasyahStatus,
                                                         year.name,
                                                         year._id
                                                     );
@@ -179,7 +195,10 @@ const MunaqasyahCard = ({ year, onClick, isClickAble = true, fetchData }) => {
                                             </button>
                                         </div>
                                     )}
-                                    {year.munaqasyahStatus === "inProgress" && (
+                                    {(year.munaqasyahStatus ===
+                                        "inProgress" ||
+                                        year.munaqasyahStatus ===
+                                            "deferredInProgress") && (
                                         <div className="mt-4">
                                             <button
                                                 data-no-nav
@@ -188,13 +207,16 @@ const MunaqasyahCard = ({ year, onClick, isClickAble = true, fetchData }) => {
                                                     e.stopPropagation();
                                                     e.preventDefault();
                                                     branchMunaqasyahStatusHandler(
-                                                        "complete",
+                                                        year.munaqasyahStatus,
                                                         year.name,
                                                         year._id
                                                     );
                                                 }}
                                             >
-                                                Selesaikan Munaqosah
+                                                {year.munaqasyahStatus ===
+                                                "inProgress"
+                                                    ? "Selesaikan Munaqosah"
+                                                    : "Selesaikan Munaqosah Susulan"}
                                             </button>
                                         </div>
                                     )}

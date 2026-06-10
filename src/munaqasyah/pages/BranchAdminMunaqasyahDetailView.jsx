@@ -31,7 +31,10 @@ const BranchAdminMunaqasyahDetailView = () => {
         refetch,
     } = useBranchSubBranchSummary(auth.userBranchId, branchYearId, {
         refetchInterval:
-            state?.munaqasyahStatus === "inProgress" ? 3000 : false,
+            state?.munaqasyahStatus === "inProgress" ||
+            state?.munaqasyahStatus === "deferredInProgress"
+                ? 3000
+                : false,
         refetchOnWindowFocus: false,
     });
 
@@ -46,7 +49,9 @@ const BranchAdminMunaqasyahDetailView = () => {
         const statusClassMap = {
             notStarted: "bg-gray-100 text-gray-600 px-2 py-1 rounded-sm",
             inProgress: "bg-yellow-400 text-white px-2 py-1 rounded-sm",
+            deferredInProgress: "bg-orange-400 text-white px-2 py-1 rounded-sm",
             completed: "bg-green-500 text-white px-2 py-1 rounded-sm",
+            deferredCompleted: "bg-teal-500 text-white px-2 py-1 rounded-sm",
         };
         return (
             statusClassMap[status] ||
@@ -115,50 +120,68 @@ const BranchAdminMunaqasyahDetailView = () => {
             sortable: false,
             headerAlign: "center",
             cellAlign: "center",
-            render: (item) =>
-                item.munaqasyahStatus === "notStarted" ? (
-                    <button
-                        className="disabled:opacity-50 btn-primary-outline"
-                        // disabled={state.munaqasyahStatus !== "inProgress"}
-                        onClick={() =>
-                            subBranchMunaqasyahStatusHandler(
-                                "start",
-                                item.name,
-                                item._id
-                            )
-                        }
-                    >
-                        Mulai
-                    </button>
-                ) : item.munaqasyahStatus === "inProgress" ? (
-                    <div className="flex flex-row gap-2">
+            render: (item) => {
+                if (
+                    item.munaqasyahStatus === "notStarted"
+                ) {
+                    return (
                         <button
-                            className="mt-0 button-primary"
-                            onClick={() =>
-                                handleMonitor(item._id, item.munaqasyahStatus)
-                            }
-                        >
-                            Pantau
-                        </button>
-                        <button
-                            className="disabled:opacity-50 mx-1 btn-primary-outline"
+                            className="disabled:opacity-50 btn-primary-outline"
                             onClick={() =>
                                 subBranchMunaqasyahStatusHandler(
-                                    "complete",
+                                    "start",
                                     item.name,
                                     item._id
                                 )
                             }
                         >
-                            Selesaikan
+                            Mulai
                         </button>
-                    </div>
-                ) : (
+                    );
+                }
+                if (
+                    item.munaqasyahStatus === "inProgress" ||
+                    item.munaqasyahStatus === "deferredInProgress"
+                ) {
+                    return (
+                        <div className="flex flex-row gap-2">
+                            <button
+                                className="mt-0 button-primary"
+                                onClick={() =>
+                                    handleMonitor(
+                                        item._id,
+                                        item.munaqasyahStatus
+                                    )
+                                }
+                            >
+                                Pantau
+                            </button>
+                            <button
+                                className="disabled:opacity-50 mx-1 btn-primary-outline"
+                                onClick={() =>
+                                    subBranchMunaqasyahStatusHandler(
+                                        "complete",
+                                        item.name,
+                                        item._id
+                                    )
+                                }
+                            >
+                                {item.munaqasyahStatus === "inProgress"
+                                    ? "Selesaikan Munaqosah"
+                                    : "Selesaikan Munaqosah Susulan"}
+                            </button>
+                        </div>
+                    );
+                }
+                return (
                     <>
                         <button
                             className="disabled:opacity-50 mx-1 btn-primary-outline"
                             onClick={() =>
-                                handleMonitor(item._id, item.munaqasyahStatus)
+                                handleMonitor(
+                                    item._id,
+                                    item.munaqasyahStatus
+                                )
                             }
                         >
                             Monitor
@@ -172,27 +195,51 @@ const BranchAdminMunaqasyahDetailView = () => {
                                     item._id
                                 )
                             }
-                            disabled={state.munaqasyahStatus !== "inProgress"}
+                            disabled={
+                                state.munaqasyahStatus !== "inProgress" &&
+                                state.munaqasyahStatus !== "deferredInProgress" &&
+                                state.munaqasyahStatus !== "deferredCompleted"
+                            }
                         >
                             Mulai Susulan
                         </button>
                     </>
-                ),
+                );
+            },
         },
     ];
+
+    const getActionForStatus = (currentStatus, actionName) => {
+        if (actionName === "start") {
+            if (currentStatus === "notStarted") return "inProgress";
+            return "deferredInProgress";
+        }
+        if (actionName === "complete") {
+            if (currentStatus === "inProgress") return "completed";
+            return "deferredCompleted";
+        }
+        return "inProgress";
+    };
 
     const subBranchMunaqasyahStatusHandler = (
         actionName,
         subBranchName,
         subBranchId
     ) => {
-        const confirmAction = async (action) => {
+        // Find current sub-branch status from data
+        const currentItem = subBranchData.find(
+            (sb) => sb._id === subBranchId
+        );
+        const currentStatus = currentItem?.munaqasyahStatus || "notStarted";
+        const action = getActionForStatus(currentStatus, actionName);
+
+        const confirmAction = async (act) => {
             const url = `${
                 import.meta.env.VITE_BACKEND_URL
             }/branchYears/munaqasyah/${auth.currentBranchYearId}/sub-branch/`;
             const body = JSON.stringify({
                 subBranchId,
-                munaqasyahStatus: action,
+                munaqasyahStatus: act,
             });
             try {
                 const responseData = await sendRequest(url, "PATCH", body, {
@@ -206,23 +253,15 @@ const BranchAdminMunaqasyahDetailView = () => {
             }
         };
 
-        if (actionName === "start") {
-            openModal(
-                `Mulai Munaosah untuk Kelompok ${subBranchName}?`,
-                "confirmation",
-                () => confirmAction("inProgress"),
-                "Konfirmasi",
-                true
-            );
-        } else {
-            openModal(
-                `Selesaikan Munaosah untuk Kelompok ${subBranchName}?`,
-                "confirmation",
-                () => confirmAction("completed"),
-                "Konfirmasi",
-                true
-            );
-        }
+        const isStarting =
+            action === "inProgress" || action === "deferredInProgress";
+        openModal(
+            `${isStarting ? "Mulai" : "Selesaikan"} Munaosah untuk Kelompok ${subBranchName}${isStarting && currentStatus !== "notStarted" ? " (Susulan)" : ""}?`,
+            "confirmation",
+            () => confirmAction(action),
+            "Konfirmasi",
+            true
+        );
     };
 
     const handleMonitor = (subBranchId, subBranchMunaqasyahStatus) => {

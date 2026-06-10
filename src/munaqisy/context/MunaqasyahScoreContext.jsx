@@ -98,14 +98,18 @@ const fetchYearData = async (branchYearId, subBranchId, dispatch) => {
         console.log(data.branchYear);
 
         const isMunaqasyahInProgress = (data, subBranchId) =>
-            data.teachingGroups
-                ?.flatMap((g) => g.subBranches || [])
-                .find((sub) => sub._id === subBranchId)?.munaqasyahStatus ===
-            "inProgress";
+            ["inProgress", "deferredInProgress"].includes(
+                data.teachingGroups
+                    ?.flatMap((g) => g.subBranches || [])
+                    .find((sub) => sub._id === subBranchId)
+                    ?.munaqasyahStatus
+            );
 
         dispatch({
             type: "SET_IS_BRANCH_YEAR_MUNAQASYAH_STARTED",
-            payload: data.branchYear.munaqasyahStatus === "inProgress",
+            payload:
+                data.branchYear.munaqasyahStatus === "inProgress" ||
+                data.branchYear.munaqasyahStatus === "deferredInProgress",
         });
         dispatch({
             type: "SET_IS_SUB_BRANCH_MUNAQASYAH_STARTED",
