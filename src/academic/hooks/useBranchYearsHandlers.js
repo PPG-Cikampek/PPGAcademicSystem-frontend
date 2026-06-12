@@ -49,12 +49,26 @@ const useBranchYearsHandlers = (openModal, closeModal) => {
         );
     };
 
-    const deactivateYearHandler = (branchYearName, branchYearId) => (e) => {
+    const deactivateYearHandler = (year) => (e) => {
         e.stopPropagation();
+        const munaqasyahStatus = year?.munaqasyahStatus;
+        if (
+            munaqasyahStatus === "inProgress" ||
+            munaqasyahStatus === "deferredInProgress"
+        ) {
+            openModal(
+                "Tidak dapat menonaktifkan tahun ajaran saat munaqosah sedang berjalan. Nonaktifkan munaqosah terlebih dahulu, lalu coba lagi!",
+                "warning",
+                null,
+                "Gagal!",
+                false
+            );
+            return;
+        }
         const confirmDelete = async () => {
             try {
                 const res = await deactivateMutation.mutateAsync({
-                    branchYearId,
+                    branchYearId: year._id,
                     branchId: auth.userBranchId,
                 });
                 openModal(res.message, "success", null, "Berhasil!", false);
@@ -71,7 +85,7 @@ const useBranchYearsHandlers = (openModal, closeModal) => {
             return false;
         };
         openModal(
-            `Nonaktifkan tahun ajaran ${formatAcademicYear(branchYearName)}?`,
+            `Nonaktifkan tahun ajaran ${formatAcademicYear(year.academicYearId.name)}?`,
             "confirmation",
             confirmDelete,
             "Konfirmasi",

@@ -191,8 +191,7 @@ const BranchYearCard = ({
                                 onClick={(e) => {
                                     e.stopPropagation();
                                     deactivateYearHandler(
-                                        year.academicYearId.name,
-                                        year._id
+                                        year
                                     )(e);
                                 }}
                                 className="btn-danger-outline m-0 text-gray-700 mt-4 md:mt-0"
