@@ -1,15 +1,15 @@
-import { lazy } from "react";
+import { lazy, useEffect } from "react";
 import PreviewReport from "../munaqasyah/pages/PreviewReport";
 import SubBranchAdminClassesView from "../class/pages/SubBranchAdminClassesView";
-import BranchYearsView from "../academic/pages/BranchYearsView";
-import NewBranchYearsView from "../academic/pages/NewBranchYearView";
-import NewTeachingGroupView from "../teaching-group/page/NewTeachingGroupView";
+// import BranchYearsView from "../academic/pages/BranchYearsView";
+// import NewBranchYearsView from "../academic/pages/NewBranchYearView";
+// import NewTeachingGroupView from "../teaching-group/page/NewTeachingGroupView";
 import BranchAdminMunaqasyahView from "../munaqasyah/pages/BranchAdminMunaqasyahView";
 import TeachingGroupDetailView from "../teaching-group/page/TeachingGroupDetailView";
 import AddSubBranchToTeachingGroupView from "../teaching-group/page/AddSubBranchToTeachingGroupView";
 import BranchAdminMunaqasyahDetailView from "../munaqasyah/pages/BranchAdminMunaqasyahDetailView";
 import UpdateClassView from "../class/pages/UpdateClassView";
-import UpdateTeachingGroupView from "../teaching-group/page/UpdateTeachingGroupView";
+// import UpdateTeachingGroupView from "../teaching-group/page/UpdateTeachingGroupView";
 import MunaqasyahClassList from "../munaqasyah/pages/MunaqasyahClassList";
 import MunaqasyahByClassView from "../munaqasyah/pages/MunaqasyahByClassView";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -59,6 +59,13 @@ const RequestAccountTicketDetail = lazy(() =>
 );
 const HelpCenterView = lazy(() => import("../help-center/pages/HelpCenterView"));
 
+const AcademicRedirect = () => {
+  useEffect(() => {
+    window.location.href = import.meta.env.VITE_ACADEMIC_BASE_URL + "/dashboard/management/branch-academic-year";
+  }, []);
+  return null;
+};
+
 export const branchAdminRoutes = [
     { path: "/verify-email/:token", element: <EmailVerifyView /> },
     { path: "/profile/:userId", element: <ProfileView /> },
@@ -91,10 +98,11 @@ export const branchAdminRoutes = [
         element: <AddSubBranchToTeachingGroupView />,
     },
     { path: "/munaqasyah/student/score", element: <PreviewReport /> },
-    { path: "/academic", element: <BranchYearsView /> },
-    { path: "/academic/new", element: <NewBranchYearsView /> },
-    { path: "/academic/teachingGroups/new", element: <NewTeachingGroupView /> },
-    { path: "/academic/teachingGroups/edit", element: <UpdateTeachingGroupView /> },
+    // { path: "/academic", element: <BranchYearsView /> },
+    // { path: "/academic/new", element: <NewBranchYearsView /> },
+    // { path: "/academic/teachingGroups/new", element: <NewTeachingGroupView /> },
+    // { path: "/academic/teachingGroups/edit", element: <UpdateTeachingGroupView /> },
+    { path: "/academic/*", element: <AcademicRedirect /> },
     { path: "/performance", element: <BranchPerformanceView /> },
     { path: "/settings/requestAccount", element: <RequestAccountView /> },
     {

@@ -1,8 +1,8 @@
-import { lazy } from "react";
+import { lazy, useEffect } from "react";
 import PreviewReport from "../munaqasyah/pages/PreviewReport";
 import SubBranchAdminClassesView from "../class/pages/SubBranchAdminClassesView";
 import TeachingGroupDetailView from "../teaching-group/page/TeachingGroupDetailView";
-import BranchYearsView from "../academic/pages/BranchYearsView";
+// import BranchYearsView from "../academic/pages/BranchYearsView";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { infoPortalRoutes } from "./infoPortalRoutes";
 
@@ -62,6 +62,13 @@ const MunaqasyahByClassView = lazy(() =>
 );
 const HelpCenterView = lazy(() => import("../help-center/pages/HelpCenterView"));
 
+const AcademicRedirect = () => {
+  useEffect(() => {
+    window.location.href = import.meta.env.VITE_ACADEMIC_BASE_URL + "/dashboard/management/branch-academic-year";
+  }, []);
+  return null;
+};
+
 export const subBranchAdminRoutes = [
     { path: "/verify-email/:token", element: <EmailVerifyView /> },
     { path: "/profile/:userId", element: <ProfileView /> },
@@ -95,7 +102,8 @@ export const subBranchAdminRoutes = [
         path: "/settings/requestAccount/ticket/:ticketId",
         element: <RequestAccountTicketDetail />,
     },
-    { path: "/dashboard/teaching-groups", element: <BranchYearsView /> },
+    // { path: "/dashboard/teaching-groups", element: <BranchYearsView /> },
+    { path: "/dashboard/teaching-groups", element: <AcademicRedirect /> },
     {
         path: "/dashboard/teaching-groups/:teachingGroupId",
         element: <TeachingGroupDetailView />,
