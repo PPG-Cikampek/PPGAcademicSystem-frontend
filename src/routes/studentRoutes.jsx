@@ -1,4 +1,4 @@
-import { lazy } from "react";
+import { lazy, useEffect } from "react";
 import { infoPortalRoutes } from "./infoPortalRoutes";
 
 const PageHeader = lazy(() =>
@@ -19,6 +19,13 @@ const UpdateStudentView = lazy(() =>
 const ProfileView = lazy(() => import("../users/pages/profile/ProfileView"));
 const HelpCenterView = lazy(() => import("../help-center/pages/HelpCenterView"));
 
+const StudentsRedirect = () => {
+  useEffect(() => {
+    window.location.href = import.meta.env.VITE_ACADEMIC_BASE_URL + "/students";
+  }, []);
+  return null;
+};
+
 export const studentRoutes = [
     {
         path: "/",
@@ -36,22 +43,24 @@ export const studentRoutes = [
             </PageHeader>
         ),
     },
-    {
-        path: "/dashboard/students/:studentId",
-        element: (
-            <PageHeader>
-                <StudentDetailView />
-            </PageHeader>
-        ),
-    },
-    {
-        path: "/dashboard/students/:studentId/update",
-        element: (
-            <PageHeader>
-                <UpdateStudentView />
-            </PageHeader>
-        ),
-    },
+    // {
+    //     path: "/dashboard/students/:studentId",
+    //     element: (
+    //         <PageHeader>
+    //             <StudentDetailView />
+    //         </PageHeader>
+    //     ),
+    // },
+    // {
+    //     path: "/dashboard/students/:studentId/update",
+    //     element: (
+    //         <PageHeader>
+    //             <UpdateStudentView />
+    //         </PageHeader>
+    //     ),
+    // },
+    { path: "/dashboard/students/:studentId", element: <StudentsRedirect /> },
+    { path: "/dashboard/students/:studentId/update", element: <StudentsRedirect /> },
     {
         path: "/settings/profile/:userId",
         element: (

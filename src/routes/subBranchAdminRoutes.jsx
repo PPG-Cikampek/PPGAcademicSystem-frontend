@@ -69,6 +69,13 @@ const AcademicRedirect = () => {
   return null;
 };
 
+const StudentsRedirect = () => {
+  useEffect(() => {
+    window.location.href = import.meta.env.VITE_ACADEMIC_BASE_URL + "/students";
+  }, []);
+  return null;
+};
+
 export const subBranchAdminRoutes = [
     { path: "/verify-email/:token", element: <EmailVerifyView /> },
     { path: "/profile/:userId", element: <ProfileView /> },
@@ -76,12 +83,19 @@ export const subBranchAdminRoutes = [
     { path: "/help-center", element: <HelpCenterView /> },
     { path: "/dashboard/classes", element: <SubBranchAdminClassesView /> },
     { path: "/dashboard/classes/:classId", element: <ClassDetailView /> },
-    { path: "/dashboard/students", element: <StudentsView /> },
-    { path: "/dashboard/students/new", element: <NewStudentView /> },
-    { path: "/dashboard/students/:studentId", element: <StudentDetailView /> },
+    // { path: "/dashboard/students", element: <StudentsView /> },
+    // { path: "/dashboard/students/new", element: <NewStudentView /> },
+    // { path: "/dashboard/students/:studentId", element: <StudentDetailView /> },
+    // {
+    //     path: "/dashboard/students/:studentId/update",
+    //     element: <UpdateStudentView />,
+    // },
+    { path: "/dashboard/students", element: <StudentsRedirect /> },
+    { path: "/dashboard/students/new", element: <StudentsRedirect /> },
+    { path: "/dashboard/students/:studentId", element: <StudentsRedirect /> },
     {
         path: "/dashboard/students/:studentId/update",
-        element: <UpdateStudentView />,
+        element: <StudentsRedirect />,
     },
     { path: "/dashboard/teachers", element: <TeachersView /> },
     { path: "/dashboard/teachers/new", element: <NewTeacherView /> },

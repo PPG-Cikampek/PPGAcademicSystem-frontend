@@ -1,4 +1,4 @@
-import { lazy } from "react";
+import { lazy, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StudentAttendanceProvider } from "../teacher-role/scan/context/StudentAttendanceContext";
 import { MunaqasyahScoreProvider } from "../munaqisy/context/MunaqasyahScoreContext";
@@ -94,6 +94,13 @@ const NewMaterialProgresslView = lazy(() =>
     import("../teacher-role/materialProgress/pages/NewMaterialProgressView")
 );
 const HelpCenterView = lazy(() => import("../help-center/pages/HelpCenterView"));
+
+const StudentsRedirect = () => {
+  useEffect(() => {
+    window.location.href = import.meta.env.VITE_ACADEMIC_BASE_URL + "/students";
+  }, []);
+  return null;
+};
 
 export const teacherRoutes = [
     { path: "/dashboard", element: <HomeScreenView /> },
@@ -212,30 +219,33 @@ export const teacherRoutes = [
             </PageHeader>
         ),
     },
-    {
-        path: "/dashboard/students",
-        element: (
-            <PageHeader>
-                <StudentsView />
-            </PageHeader>
-        ),
-    },
-    {
-        path: "/dashboard/students/:studentId",
-        element: (
-            <PageHeader>
-                <StudentDetailView />
-            </PageHeader>
-        ),
-    },
-    {
-        path: "/dashboard/students/:studentId/update",
-        element: (
-            <PageHeader>
-                <UpdateStudentView />
-            </PageHeader>
-        ),
-    },
+    // {
+    //     path: "/dashboard/students",
+    //     element: (
+    //         <PageHeader>
+    //             <StudentsView />
+    //         </PageHeader>
+    //     ),
+    // },
+    // {
+    //     path: "/dashboard/students/:studentId",
+    //     element: (
+    //         <PageHeader>
+    //             <StudentDetailView />
+    //         </PageHeader>
+    //     ),
+    // },
+    // {
+    //     path: "/dashboard/students/:studentId/update",
+    //     element: (
+    //         <PageHeader>
+    //             <UpdateStudentView />
+    //         </PageHeader>
+    //     ),
+    // },
+    { path: "/dashboard/students", element: <StudentsRedirect /> },
+    { path: "/dashboard/students/:studentId", element: <StudentsRedirect /> },
+    { path: "/dashboard/students/:studentId/update", element: <StudentsRedirect /> },
     {
         path: "/dashboard/academic",
         element: (

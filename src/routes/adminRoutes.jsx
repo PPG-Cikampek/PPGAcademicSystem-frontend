@@ -1,4 +1,4 @@
-import { lazy } from 'react';
+import { lazy, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import PreviewReport from '../munaqasyah/pages/PreviewReport';
 import ClassesViewByAcademicYear from '../class/pages/ClassesViewByAcademicYear';
@@ -49,6 +49,13 @@ const CategoryPackageView = lazy(() => import('../munaqasyah/pages/CategoryPacka
 const HelpCenterView = lazy(() => import('../help-center/pages/HelpCenterView'));
 const HelpCenterManagementPage = lazy(() => import('../help-center/pages/HelpCenterManagementPage'));
 
+const StudentsRedirect = () => {
+  useEffect(() => {
+    window.location.href = import.meta.env.VITE_ACADEMIC_BASE_URL + "/students";
+  }, []);
+  return null;
+};
+
 export const adminRoutes = [
     { path: '/verify-email/:token', element: <EmailVerifyView /> },
     { path: '/profile/:userId', element: <ProfileView /> },
@@ -60,10 +67,14 @@ export const adminRoutes = [
     { path: '/dashboard/classes', element: <ClassesViewByAcademicYear/> },
     { path: '/dashboard/classes/academic-year', element: <ClassesView /> },
     { path: '/dashboard/classes/academic-year/:classId', element: <ClassDetailView /> },
-    { path: '/dashboard/students', element: <StudentsView /> },
-    { path: '/dashboard/students/new', element: <NewStudentView /> },
-    { path: '/dashboard/students/:studentId', element: <StudentDetailView /> },
-    { path: '/dashboard/students/:studentId/update', element: <UpdateStudentView /> },
+    // { path: '/dashboard/students', element: <StudentsView /> },
+    // { path: '/dashboard/students/new', element: <NewStudentView /> },
+    // { path: '/dashboard/students/:studentId', element: <StudentDetailView /> },
+    // { path: '/dashboard/students/:studentId/update', element: <UpdateStudentView /> },
+    { path: '/dashboard/students', element: <StudentsRedirect /> },
+    { path: '/dashboard/students/new', element: <StudentsRedirect /> },
+    { path: '/dashboard/students/:studentId', element: <StudentsRedirect /> },
+    { path: '/dashboard/students/:studentId/update', element: <StudentsRedirect /> },
     { path: '/dashboard/teachers', element: <TeachersView /> },
     { path: '/dashboard/teachers/new', element: <NewTeacherView /> },
     { path: '/dashboard/teachers/:teacherId', element: <TeacherDetailView /> },
