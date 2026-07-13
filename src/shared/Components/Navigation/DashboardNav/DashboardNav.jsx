@@ -139,7 +139,7 @@ const DashboardNav = ({ children }) => {
                 end: true,
                 subOptions: [
                     {
-                        link: import.meta.env.VITE_ACADEMIC_BASE_URL + "/dashboard/management/branch-academic-year",
+                        link: import.meta.env.VITE_ACADEMIC_BASE_URL + "/management/branch-academic-year",
                         label: "Tahun Ajaran Desa",
                         icon: <CalendarCog />,
                     },
@@ -186,7 +186,7 @@ const DashboardNav = ({ children }) => {
                 end: true,
                 subOptions: [
                     {
-                        link: import.meta.env.VITE_ACADEMIC_BASE_URL + "/dashboard/management/branch-academic-year",
+                        link: import.meta.env.VITE_ACADEMIC_BASE_URL + "/management/branch-academic-year",
                         label: "KBM",
                         icon: <CalendarCog />,
                     },

@@ -61,7 +61,7 @@ const HelpCenterView = lazy(() => import("../help-center/pages/HelpCenterView"))
 
 const AcademicRedirect = () => {
   useEffect(() => {
-    window.location.href = import.meta.env.VITE_ACADEMIC_BASE_URL + "/dashboard/management/branch-academic-year";
+    window.location.href = import.meta.env.VITE_ACADEMIC_BASE_URL + "/management/branch-academic-year";
   }, []);
   return null;
 };
