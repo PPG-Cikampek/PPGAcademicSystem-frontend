@@ -8,6 +8,10 @@
 export const isValidRouteForRole = (path, userRole, routes) => {
     if (!userRole || !routes) return false;
 
+    // Wildcard catch-all matches any path
+    const hasCatchAll = routes.some((route) => route.path === "*");
+    if (hasCatchAll) return true;
+
     // Check if the exact path exists
     const exactMatch = routes.find((route) => route.path === path);
     if (exactMatch) return true;
